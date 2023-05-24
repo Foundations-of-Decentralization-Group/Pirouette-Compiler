@@ -1,0 +1,17 @@
+(ocamllex lexer)
+
+(menhir
+ (modules parser))
+
+(library
+ (name expr)
+ (modules expr)
+ 
+ (preprocess
+  (pps ppx_deriving.show)))
+
+(executable
+ (name main)
+ (public_name main)
+ (modules main parser lexer)
+ (libraries expr))

@@ -1,0 +1,17 @@
+type token =
+    RParen
+  | Lambda
+  | LParen
+  | Identifier of string
+  | EOF
+  | END
+  | Dot
+val menhir_begin_marker : int
+val xv_variable : Expr.expr
+val xv_sub_expr : Expr.expr
+val xv_prog : Expr.expr option
+val xv_line_end : unit
+val xv_expr : Expr.expr
+val xv_application : Expr.expr
+val xv_abstraction : Expr.expr
+val menhir_end_marker : int
