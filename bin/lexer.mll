@@ -7,11 +7,12 @@
 
 let whitespace = [' ' '\t']+
 let newline = '\r' | '\n' | "\r\n" 
-let string = [^ '(' ')' '\\' '.' '#' ' ' '\t' '\n' '\t' '*' '-' '/' '+' '[' ']' ';']+
+let string = [^ 'L' 'R' '(' ')' '\\' '.' '#' ' ' '\t' '\n' '\t' '*' '-' '/' '+' '[' ']' ';']+
 let digit = ['0'-'9']
 let int = '-'? digit+
 let op = '+' | '-' | '*' | '/' 
 let conditional = '>' | '<'
+let sync_label = 'L' | 'R'
 
 rule read = 
     parse
@@ -20,6 +21,7 @@ rule read =
         | "]" {RSqParen}
         | conditional {Condition (lexeme lexbuf)}
         | op {Operator (lexeme lexbuf)}
+        | sync_label {SyncLbl (lexeme lexbuf)}
         | "=" {Equal}
         | "if" {If}
         | "then" {Then}

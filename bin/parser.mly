@@ -6,6 +6,7 @@
 %token <int> Val
 %token <string> Operator
 %token <string> Condition
+%token <string> SyncLbl
 %token LParen "("
 %token RParen ")"
 %token LSqParen "["
@@ -51,18 +52,29 @@ let ifbranch :=
         {Assoc {loc = i; arg = c}}
 
 let if_thn_else := 
-    | If; ift = ifbranch; Then; thn = sub_expr; Else; el = sub_expr; Terminate;
+    | If; ift = ifbranch; Then; thn = choreographies; Else; el = choreographies; Terminate;
         {Branch {ift; thn; el}}
+
+let sync := 
+    | sndr = Identifier; LSqParen; d = SyncLbl; RSqParen; Comm_S; rcvr = Identifier; Terminate;
+        {Sync {sndr; d; rcvr}}
 
 let sub_expr := 
     | eq
     | mappr
     | variable
-    | if_thn_else
     | v = Val; {Value v}
+
+let choreographies := 
+    | if_thn_else
+    | commS
+    | sync
+    | sub_expr
 
 let eq := 
     | LParen; lft = sub_expr; op = Operator; rght = sub_expr; RParen;
+        {Op {lft; op; rght}}
+    | lft = sub_expr; op = Operator; rght = sub_expr;
         {Op {lft; op; rght}}
 
 let commS :=
@@ -70,9 +82,10 @@ let commS :=
         {Comm_S {sndr = Assoc {loc = s; arg = msg}; rcvr = Assoc {loc = r; arg = b}}}
  
 let main := 
-    | commS
-    | if_thn_else
+    | choreographies
     | sr = commS; arg = expr;
+        {Seq {fst = sr; thn = arg}}
+    | sr = sync; arg = expr;
         {Seq {fst = sr; thn = arg}}
 
 // let sub_expr :=
