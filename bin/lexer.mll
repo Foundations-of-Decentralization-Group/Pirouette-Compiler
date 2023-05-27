@@ -6,18 +6,20 @@
 }
 
 let whitespace = [' ' '\t']+
-let newline = '\r' | '\n' | "\r\n" | ";"
-let string = [^ '(' ')' '\\' '.' '#' ' ' '\t' '\n' '\t' '*' '-' '/' '+' '[' ']']+
+let newline = '\r' | '\n' | "\r\n" 
+let string = [^ '(' ')' '\\' '.' '#' ' ' '\t' '\n' '\t' '*' '-' '/' '+' '[' ']' ';']+
 let digit = ['0'-'9']
 let int = '-'? digit+
+let op = '+' | '-' | '*' | '/' 
+let conditional = '>' | '<'
 
 rule read = 
     parse
         | whitespace {read lexbuf }
         | "[" {LSqParen}
         | "]" {RSqParen}
-        | "<" {LessThan}
-        | ">" {GreaterThan}
+        | conditional {Condition (lexeme lexbuf)}
+        | op {Operator (lexeme lexbuf)}
         | "=" {Equal}
         | "if" {If}
         | "then" {Then}
@@ -25,15 +27,12 @@ rule read =
         | "@>" {Comm_S}
         | "fun" {Function}
         | ":=" {Assignment}
-        | "/" {Divide}
-        | "*" {Multiply}
-        | "+" {Add}
-        | "-" {Subtract}
         | "let" {Let}
         | "in" {In}
         | "." {Dot}
         | "(" {LParen}
         | ")" {RParen}
+        | ";" {Terminate}
         | int { Val (int_of_string (lexeme lexbuf)) }
         | string {Identifier (lexeme lexbuf)}
         | newline {END}
