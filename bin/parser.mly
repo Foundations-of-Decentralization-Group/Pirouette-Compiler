@@ -45,14 +45,11 @@ let mappr :=
 let conditionals := 
     | lft = sub_expr; op = Condition; rght = sub_expr;
         {Condition {lft; op; rght}}
-
-let ifbranch := 
-    | conditionals
-    | i = Identifier; Dot; LParen; c = conditionals; RParen;
-        {Assoc {loc = i; arg = c}}
+    | LParen; c = conditionals; RParen;
+        {c}
 
 let if_thn_else := 
-    | If; ift = ifbranch; Then; thn = choreographies; Else; el = choreographies; Terminate;
+    | If; ift = choreographies; Then; thn = choreographies; Else; el = choreographies; Terminate;
         {Branch {ift; thn; el}}
 
 let sync := 
@@ -64,12 +61,26 @@ let sub_expr :=
     | mappr
     | variable
     | v = Val; {Value v}
+    | conditionals
+
+let le := 
+    | l = Identifier; Dot; e = sub_expr;
+        {Assoc {loc = l; arg = e}}
 
 let choreographies := 
     | if_thn_else
-    | commS
+    | let_in
+    | le
     | sync
-    | sub_expr
+    | variable
+
+let let_in := 
+    | c = choreographies; Comm_S; r = Identifier; Dot; vp = variable; Terminate;
+        {Let {fst = Assoc {loc = r; arg = vp}; snd = Snd {sndr = c; name = r}; thn = None}}  
+    | c = choreographies; Comm_S; r = Identifier; Dot; b = variable; Terminate; cp = choreographies;
+        {Let {fst = Assoc {loc = r; arg = b}; snd = Snd {sndr = c; name = r}; thn= cp}}
+    | Let; e = Identifier; Dot; v = variable; Assignment; c = choreographies; In; cp = choreographies;
+        {Let {fst = Assoc {loc = e; arg = v}; snd = Snd {sndr = c; name = e}; thn= cp}}      
 
 let eq := 
     | LParen; lft = sub_expr; op = Operator; rght = sub_expr; RParen;
@@ -78,13 +89,16 @@ let eq :=
         {Op {lft; op; rght}}
 
 let commS :=
+    | s = Identifier; Dot; msg = sub_expr; Comm_S; r = Identifier; Dot; b = variable;
+        {Comm_S {sndr = Assoc {loc = s; arg = msg}; rcvr = Assoc {loc = r; arg = b}}}
     | s = Identifier; Dot; msg = sub_expr; Comm_S; r = Identifier; Dot; b = variable; Terminate;
         {Comm_S {sndr = Assoc {loc = s; arg = msg}; rcvr = Assoc {loc = r; arg = b}}}
  
 let main := 
     | choreographies
-    | sr = commS; arg = expr;
-        {Seq {fst = sr; thn = arg}}
+    // move to commS implementation
+    // | sr = commS; arg = expr;
+    //     {Seq {fst = sr; thn = arg}}
     | sr = sync; arg = expr;
         {Seq {fst = sr; thn = arg}}
 
