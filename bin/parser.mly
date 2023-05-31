@@ -7,6 +7,7 @@
 %token <string> Operator
 %token <string> Condition
 %token <string> SyncLbl
+%token <string> ChoreoVars
 %token LParen "("
 %token RParen ")"
 %token LSqParen "["
@@ -16,7 +17,7 @@
 %token Else "else"
 %token Then "then"
 %token Comm_S "@>"
-%token Function "function"
+%token Fun "fun"
 %token Assignment ":="
 %token Let "let"
 %token In "in"
@@ -34,6 +35,9 @@ let line_end := END | EOF
 let prog :=
     | EOF; {None}
     | e = expr; line_end; {Some e}
+
+let choreo_vars := 
+    | i = ChoreoVars; {ChoreoVars i}
 
 let variable := 
     | i = Identifier; {Variable i}
@@ -63,6 +67,14 @@ let sub_expr :=
     | v = Val; {Value v}
     | conditionals
 
+let fun_expr := 
+    //ask about c = le or c = choreo
+    | Fun; name = Identifier; LParen; arg = le; RParen; Assignment; body = choreographies;
+        {Fun {name; arg; body}}
+    | Fun; name = ChoreoVars; LParen; arg = choreographies; RParen; Assignment; body = choreographies;
+        {Fun {name; arg; body}}
+
+
 let le := 
     | l = Identifier; Dot; e = sub_expr;
         {Assoc {loc = l; arg = e}}
@@ -72,7 +84,8 @@ let choreographies :=
     | let_in
     | le
     | sync
-    | variable
+    | choreo_vars
+    | fun_expr
 
 let let_in := 
     | c = choreographies; Comm_S; r = Identifier; Dot; vp = variable; Terminate;

@@ -9,6 +9,7 @@ let whitespace = [' ' '\t']+
 let newline = '\r' | '\n' | "\r\n" 
 let string = [^ 'L' 'R' '(' ')' '\\' '.' '#' ' ' '\t' '\n' '\t' '*' '-' '/' '+' '[' ']' ';']+
 let digit = ['0'-'9']
+let choreographic_vars = ['A'-'Z']
 let int = '-'? digit+
 let op = '+' | '-' | '*' | '/' 
 let conditional = '>' | '<'
@@ -22,12 +23,13 @@ rule read =
         | conditional {Condition (lexeme lexbuf)}
         | op {Operator (lexeme lexbuf)}
         | sync_label {SyncLbl (lexeme lexbuf)}
+        | choreographic_vars {ChoreoVars (lexeme lexbuf)}
         | "=" {Equal}
         | "if" {If}
         | "then" {Then}
         | "else" {Else}
         | "@>" {Comm_S}
-        | "fun" {Function}
+        | "fun" {Fun}
         | ":=" {Assignment}
         | "let" {Let}
         | "in" {In}
