@@ -39,7 +39,7 @@ rule read =
         | ";" {Terminate}
         | int { Val (int_of_string (lexeme lexbuf)) }
         | string {Identifier (lexeme lexbuf)}
-        | newline {END}
+        | newline { read lexbuf }
         | eof {EOF}
         | "#" {skip_line lexbuf}
         | _ {raise (SyntaxError ("Lexer - Illegal character: " ^ Lexing.lexeme lexbuf)) }
