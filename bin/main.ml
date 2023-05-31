@@ -1,13 +1,29 @@
 open Lexing
 open Expr
 
-let rec loop lexer =
+let loop lexer =
   flush stdout;
-  let _ = match Parser.prog Lexer.read lexer with
+  match Parser.prog Lexer.read lexer with
     | Some t ->
-        Printf.printf "%s\n\n" (show_expr t);
-    | None -> () in
-  loop lexer
+        Printf.printf "%s\n\n" (show_expr t)
+    | None -> Printf.printf "Couldnt resolve !\n\n"
+
+let read_file file_name =
+  let in_channel = open_in file_name in
+  let rec read_lines acc =
+    try
+      let line = input_line in_channel in
+      read_lines (line :: acc)
+    with End_of_file ->
+      close_in in_channel;
+      List.rev acc
+  in
+  read_lines []
 
 let () =
-  loop (from_channel stdin)
+  let file_name = "./input.txt" in
+  let lines = read_file file_name in
+  let content = String.concat "\n" lines in
+  let lexer = from_string content in
+  (* print_endline content; *)
+  loop lexer
