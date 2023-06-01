@@ -2,7 +2,6 @@ type expr =
   | Value of int
   | ChoreoVars of string
   | Variable of string
-  | Op of {lft: expr; op: string; rght: expr}
   | Condition of {lft: expr; op: string; rght: expr}
   | Branch of {ift: expr; thn : expr; el: expr}
   | Sync of {sndr: string; d: string; rcvr: string}
@@ -15,5 +14,9 @@ type expr =
   | Abstraction of { param : string; body : expr }
   | Application of { funct : expr; argument : expr }
   | Comm_S of {sndr: expr; rcvr : expr}
-  | None
+  | Plus of {lft: expr; rght: expr}
+  | Minus of {lft: expr; rght: expr}
+  | Product of {lft: expr; rght: expr}
+  | Division of {lft: expr; rght: expr}
+  | UMinus of {sub_expr : expr}
 [@@deriving show]
