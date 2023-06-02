@@ -18,7 +18,7 @@
 %token If "if"
 %token Else "else"
 %token Then "then"
-%token Comm_S "@>"
+%token Comm_S "~>"
 %token Fun "fun"
 %token Assignment ":="
 %token Let "let"

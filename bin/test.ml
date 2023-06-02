@@ -26,7 +26,7 @@ let test_parse_function_application_with_brackets_success _ =
     | None -> assert_failure "Failed to parse expression"
 
 let test_parse_function_application_with_choreo_body_success _ =
-  let input = "(fun funname (X) := Seller.b @> Buyer.l; X) s.g" in
+  let input = "(fun funname (X) := Seller.b ~> Buyer.l; X) s.g" in
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
@@ -50,7 +50,7 @@ let test_parse_choreo_var_success _ =
   | None -> assert_failure "Failed to parse expression"
 
 let test_parse_fun_expr_success _ =
-  let input = "fun funname (X) := Seller.b @> Buyer.l; Buyer[R] @> Seller; X" in
+  let input = "fun funname (X) := Seller.b ~> Buyer.l; Buyer[R] ~> Seller; X" in
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
@@ -62,7 +62,7 @@ let test_parse_fun_expr_success _ =
   | None -> assert_failure "Failed to parse expression"
 
 let test_parse_sync_success _ =
-  let input = "Buyer[R] @> Seller; X" in
+  let input = "Buyer[R] ~> Seller; X" in
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
@@ -71,7 +71,7 @@ let test_parse_sync_success _ =
   | None -> assert_failure "Failed to parse expression"
 
 let test_parse_if_thn_else_success _ =
-  let input = "if l.e then Buyer[L] @> Seller; X else Buyer[R] @> Seller; X" in
+  let input = "if l.e then Buyer[L] ~> Seller; X else Buyer[R] ~> Seller; X" in
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
@@ -82,7 +82,7 @@ let test_parse_if_thn_else_success _ =
   | None -> assert_failure "Failed to parse expression"  
 
 let test_parse_map_equation_success _ =
-  let input = "Buyer.s @> Seller.p; Seller.prices[b] @> Buyer.c; if Buyer.(c / 2 < price) then X else Y" in
+  let input = "Buyer.s ~> Seller.p; Seller.prices[b] ~> Buyer.c; if Buyer.(c / 2 < price) then X else Y" in
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
@@ -122,16 +122,16 @@ let test_parse_let_in2 _ =
   | None -> assert_failure "Failed to parse expression"  
 
 let test_parse_complex_success _ =
-  let input = "Person1.amt_due @> Person2.d; 
+  let input = "Person1.amt_due ~> Person2.d; 
   (fun initpay (X) :=
   if Person2.(x < 500)
-  then Person2[L] @> Person1; 
-  Person1.rem @> Person2.rcv; 
-  Person1.(amt_due - rem) @> Person2.y; 
+  then Person2[L] ~> Person1; 
+  Person1.rem ~> Person2.rcv; 
+  Person1.(amt_due - rem) ~> Person2.y; 
   Person2.d 
-  else Person2[R] @> Person1; 
-  Person1.500 @> Person2.rcv; 
-  Person1.0 @> Person2.y; 
+  else Person2[R] ~> Person1; 
+  Person1.500 ~> Person2.rcv; 
+  Person1.0 ~> Person2.y; 
   X) Person2.d" in
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with

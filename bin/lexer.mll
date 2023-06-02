@@ -30,7 +30,7 @@ rule read =
         | "if" {If}
         | "then" {Then}
         | "else" {Else}
-        | "@>" {Comm_S}
+        | "~>" {Comm_S}
         | "fun" {Fun}
         | ":=" {Assignment}
         | "let" {Let}
