@@ -74,8 +74,8 @@ let if_thn_else :=
         {Branch {ift; thn; el}}
 
 let sync := 
-    | sndr = Identifier; LSqParen; d = SyncLbl; RSqParen; Comm_S; rcvr = Identifier; Terminate;
-        {Sync {sndr; d; rcvr}}
+    | sndr = Identifier; LSqParen; d = SyncLbl; RSqParen; Comm_S; rcvr = Identifier; Terminate; thn = choreographies;
+        {Sync {sndr; d; rcvr; thn}}
 
 let value :=
     | v = Val; {Value v}

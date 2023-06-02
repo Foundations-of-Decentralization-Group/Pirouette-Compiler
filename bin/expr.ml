@@ -4,7 +4,7 @@ type expr =
   | Variable of string
   | Condition of {lft: expr; op: string; rght: expr}
   | Branch of {ift: expr; thn : expr; el: expr}
-  | Sync of {sndr: string; d: string; rcvr: string}
+  | Sync of {sndr: string; d: string; rcvr: string; thn: expr}
   | Fun of {name: string; arg: expr; body: expr}
   | Seq of {fst: expr; thn : expr}
   | Snd of {sndr: expr; name: string}
