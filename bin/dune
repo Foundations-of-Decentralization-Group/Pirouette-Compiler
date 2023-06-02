@@ -6,12 +6,16 @@
 (library
  (name expr)
  (modules expr)
- 
  (preprocess
   (pps ppx_deriving.show)))
 
-(executable
- (name main)
- (public_name main)
- (modules main parser lexer)
- (libraries expr))
+; (executable
+;  (name main)
+;  (public_name main)
+;  (modules main parser lexer)
+;  (libraries expr))
+
+(test
+ (name test)
+ (modules test parser lexer)
+ (libraries ounit2 expr))
