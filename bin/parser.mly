@@ -4,15 +4,17 @@
 
 %token <string> Identifier
 %token <int> Val
-%token <string> Operator
 %token <string> Condition
 %token <string> SyncLbl
 %token <string> ChoreoVars
+%token Plus "+"
+%token Minus "-"
+%token Product "*"
+%token Division "/"
 %token LParen "("
 %token RParen ")"
 %token LSqParen "["
 %token RSqParen "]"
-%token Equal "="
 %token If "if"
 %token Else "else"
 %token Then "then"
@@ -25,6 +27,21 @@
 %token Terminate ";"
 %token END
 %token EOF
+
+//Precedence Rules (Lower -> Higher)
+%nonassoc In
+%nonassoc Let
+%nonassoc Fun
+%nonassoc Then 
+%nonassoc Else
+%nonassoc Terminate
+%right Assignment
+%nonassoc Comm_S
+%nonassoc Dot
+%nonassoc Condition
+%left Plus Minus
+%left Product Division
+%nonassoc LParen RParen LSqParen RSqParen
 
 %start <Expr.expr option> prog
 
@@ -53,26 +70,32 @@ let conditionals :=
         {c}
 
 let if_thn_else := 
-    | If; ift = choreographies; Then; thn = choreographies; Else; el = choreographies; Terminate;
+    | If; ift = choreographies; Then; thn = choreographies; Else; el = choreographies;
         {Branch {ift; thn; el}}
 
 let sync := 
     | sndr = Identifier; LSqParen; d = SyncLbl; RSqParen; Comm_S; rcvr = Identifier; Terminate;
         {Sync {sndr; d; rcvr}}
 
+let value :=
+    | v = Val; {Value v}
+
 let sub_expr := 
+    | value
     | eq
     | mappr
     | variable
-    | v = Val; {Value v}
     | conditionals
 
 let fun_expr := 
-    //ask about c = le or c = choreo
-    | Fun; name = Identifier; LParen; arg = le; RParen; Assignment; body = choreographies;
+    | Fun; name = Identifier; LParen; arg = choreographies; RParen; Assignment; body = choreographies;
         {Fun {name; arg; body}}
-    | Fun; name = ChoreoVars; LParen; arg = choreographies; RParen; Assignment; body = choreographies;
-        {Fun {name; arg; body}}
+
+let application :=
+    | LParen; funct = choreographies; RParen; argument = choreographies;
+        {Application {funct; argument}} 
+    // | funct = choreographies; argument = choreographies;
+    //     {Application {funct; argument}}
 
 
 let le := 
@@ -86,26 +109,29 @@ let choreographies :=
     | sync
     | choreo_vars
     | fun_expr
+    | application
 
-let let_in := 
-    | c = choreographies; Comm_S; r = Identifier; Dot; vp = variable; Terminate;
-        {Let {fst = Assoc {loc = r; arg = vp}; snd = Snd {sndr = c; name = r}; thn = None}}  
+let let_in :=  
     | c = choreographies; Comm_S; r = Identifier; Dot; b = variable; Terminate; cp = choreographies;
         {Let {fst = Assoc {loc = r; arg = b}; snd = Snd {sndr = c; name = r}; thn= cp}}
     | Let; e = Identifier; Dot; v = variable; Assignment; c = choreographies; In; cp = choreographies;
         {Let {fst = Assoc {loc = e; arg = v}; snd = Snd {sndr = c; name = e}; thn= cp}}      
 
-let eq := 
-    | LParen; lft = sub_expr; op = Operator; rght = sub_expr; RParen;
-        {Op {lft; op; rght}}
-    | lft = sub_expr; op = Operator; rght = sub_expr;
-        {Op {lft; op; rght}}
+let operator :=
+    | lft = sub_expr; Plus; rght = sub_expr; 
+        {Plus {lft; rght}}
+    | lft = sub_expr; Minus; rght = sub_expr; 
+        {Minus {lft; rght}}
+    | lft = sub_expr; Product; rght = sub_expr; 
+        {Product {lft; rght}}
+    | lft = sub_expr; Division; rght = sub_expr; 
+        {Division {lft; rght}}
 
-let commS :=
-    | s = Identifier; Dot; msg = sub_expr; Comm_S; r = Identifier; Dot; b = variable;
-        {Comm_S {sndr = Assoc {loc = s; arg = msg}; rcvr = Assoc {loc = r; arg = b}}}
-    | s = Identifier; Dot; msg = sub_expr; Comm_S; r = Identifier; Dot; b = variable; Terminate;
-        {Comm_S {sndr = Assoc {loc = s; arg = msg}; rcvr = Assoc {loc = r; arg = b}}}
+let eq := 
+    | LParen; op = operator; RParen;
+        {op}
+    | op = operator; 
+        {op}
  
 let main := 
     | choreographies
