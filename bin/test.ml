@@ -137,61 +137,19 @@ let test_parse_complex_success _ =
   match Parser.prog Lexer.read lexer with
   | Some expr ->
       let expected = Expr.Let {fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")};
-      snd =
-      Expr.Snd {
-        sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "amt_due")};
-        name = "Person2"};
-      thn =
-      Expr.Application {
-        funct =
-        Expr.Fun {name = "initpay"; arg = (Expr.ChoreoVars "X");
-          body =
-          Expr.Branch {
-            ift =
-            Expr.Assoc {loc = "Person2";
-              arg =
-              Expr.Condition {lft = (Expr.Variable "x"); op = "<";
-                rght = (Expr.Value 500)}};
-            thn =
-            Expr.Sync {sndr = "Person2"; d = "L"; rcvr = "Person1";
-              thn =
-              Expr.Let {
-                fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "rcv")};
-                snd =
-                Expr.Snd {
-                  sndr =
-                  Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "rem")};
-                  name = "Person2"};
-                thn =
-                Expr.Let {
-                  fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "y")};
-                  snd =
-                  Expr.Snd {
-                    sndr =
-                    Expr.Assoc {loc = "Person1";
-                      arg =
-                      Expr.Minus {lft = (Expr.Variable "amt_due");
-                        rght = (Expr.Variable "rem")}};
-                    name = "Person2"};
-                  thn = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")}}}};
-            el =
-            Expr.Sync {sndr = "Person2"; d = "R"; rcvr = "Person1";
-              thn =
-              Expr.Let {
-                fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "rcv")};
-                snd =
-                Expr.Snd {
-                  sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Value 500)};
-                  name = "Person2"};
-                thn =
-                Expr.Let {
-                  fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "y")};
-                  snd =
-                  Expr.Snd {
-                    sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Value 0)};
-                    name = "Person2"};
-                  thn = (Expr.ChoreoVars "X")}}}}};
-        argument = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")}}}
+      snd = Expr.Snd {sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "amt_due")}; name = "Person2"};
+      thn = Expr.Application { funct = Expr.Fun {name = "initpay"; arg = (Expr.ChoreoVars "X");
+      body = Expr.Branch { ift = Expr.Assoc {loc = "Person2"; arg = Expr.Condition {lft = (Expr.Variable "x"); op = "<"; rght = (Expr.Value 500)}};
+      thn = Expr.Sync {sndr = "Person2"; d = "L"; rcvr = "Person1"; thn = Expr.Let { fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "rcv")};
+      snd = Expr.Snd { sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "rem")}; name = "Person2"};
+      thn = Expr.Let { fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "y")};
+      snd = Expr.Snd { sndr = Expr.Assoc {loc = "Person1"; arg = Expr.Minus {lft = (Expr.Variable "amt_due");  rght = (Expr.Variable "rem")}}; 
+      name = "Person2"}; thn = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")}}}};
+      el = Expr.Sync {sndr = "Person2"; d = "R"; rcvr = "Person1"; thn = Expr.Let {fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "rcv")};
+      snd = Expr.Snd { sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Value 500)}; name = "Person2"};
+      thn = Expr.Let {fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "y")}; 
+      snd = Expr.Snd {sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Value 0)}; name = "Person2"};thn = (Expr.ChoreoVars "X")}}}}};
+      argument = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")}}}
     in
       assert_equal expected expr
   | None -> assert_failure "Failed to parse expression"  
