@@ -1,6 +1,7 @@
 open Expr
 
-(* Custom parser function *)
+module SS = Set.Make(String);;
+
 let check_str s = 
   try int_of_string s |> ignore; true
   with Failure _ -> false
@@ -109,40 +110,6 @@ let rec parse_expr expr currentNode : string =
   | ChoreoVars x -> x 
   | Snd _ | Abstraction _ | Comm_S _ | UMinus _ -> "" 
 
-(* let parsed_expr : string =
-  parse_expr
-  (Expr.Let {fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")};
-  snd =
-  Expr.Snd {
-    sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "amt_due")};
-    name = "Person2"};
-  thn =
-  Expr.Application {
-    funct =
-    Expr.Fun {name = "initpay"; arg = (Expr.ChoreoVars "X");
-      body =
-      Expr.Branch {
-        ift =
-        Expr.Assoc {loc = "Person2";
-          arg =
-          Expr.Condition {lft = (Expr.Variable "d"); op = "<";
-            rght = (Expr.Value 500)}};
-        thn =
-        Expr.Sync {sndr = "Person2"; d = "L"; rcvr = "Person1";
-          thn = (Expr.ChoreoVars "X")};
-        el =
-        Expr.Sync {sndr = "Person2"; d = "R"; rcvr = "Person1";
-          thn = Expr.Assoc {loc = "Person1"; arg = (Expr.Value 0)}}}};
-    argument = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")}}})  "Person2" *)
-
-(* let () = print_endline parsed_expr *)
-
-
-module SS = Set.Make(String);;
-
-(* let print_set s =
-  SS.iter print_endline s;; *)
-
 let get_entitities expr : SS.t = 
   let set1 = SS.empty in
     let rec aux acc expr = match expr with
@@ -195,7 +162,3 @@ let () = SS.iter (fun entity ->
   print_endline str;
   print_endline res;
   ) entities
-
-(* 
-(Expr.Sync {sndr = "Buyer"; d = "L"; rcvr = "Seller"; 
-    thn = Expr.Assoc {loc = "Buyer"; arg = Expr.Plus {lft = Expr.Product {lft = Expr.Value 2; rght = Expr.Value 3}; rght = Expr.Value 5}}}) *)
