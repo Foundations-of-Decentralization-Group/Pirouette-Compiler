@@ -15,7 +15,13 @@
 ;  (modules main parser lexer)
 ;  (libraries expr))
 
-(test
- (name test)
- (modules test parser lexer)
- (libraries ounit2 expr))
+; (test
+;  (name test)
+;  (modules test parser lexer)
+;  (libraries ounit2 expr))
+
+(executable
+ (name ep)
+ (public_name ep)
+ (modules ep parser lexer)
+ (libraries expr))
