@@ -1,1 +1,5 @@
-(fun Fun (X) := X @> d.r;) seller.h
+Person1.amt_due ~> Person2.d;
+(fun initpay (X) :=
+if Person2.(d < 500)
+then Person2[L] ~> Person1; X
+else Person2[R] ~> Person1; Person1.0) Person2.d
