@@ -102,9 +102,9 @@ let test_parse_let_in1 _ =
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
-      let expected = Expr.Let {fst = Expr.Assoc {loc = "l"; arg = (Expr.Variable "x")}; 
-      snd = Expr.Snd { sndr = Expr.Assoc {loc = "l"; arg = (Expr.Value 5)}; name = "l"}; 
-      thn = Expr.Assoc {loc = "l"; arg = (Expr.Variable "x")};}
+      let expected = Expr.Let {fst = Expr.Assoc {loc = "l"; arg = (Expr.Variable "x")};
+      snd = Expr.Assoc {loc = "l"; arg = (Expr.Value 5)};
+      thn = Expr.Assoc {loc = "l"; arg = (Expr.Variable "x")}}
     in
       assert_equal expected expr
   | None -> assert_failure "Failed to parse expression"  
@@ -114,9 +114,9 @@ let test_parse_let_in2 _ =
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
-      let expected = Expr.Let {fst = Expr.Assoc {loc = "l"; arg = (Expr.Variable "x")}; 
-      snd = Expr.Snd { sndr = Expr.Assoc {loc = "l"; arg = (Expr.Value 5)}; name = "l"}; 
-      thn = Expr.Assoc {loc = "l"; arg = Expr.Plus {lft = (Expr.Variable "x"); rght = (Expr.Value 3)}};}
+      let expected = Expr.Let {fst = Expr.Assoc {loc = "l"; arg = (Expr.Variable "x")};
+      snd = Expr.Assoc {loc = "l"; arg = (Expr.Value 5)};
+      thn = Expr.Assoc {loc = "l"; arg = Expr.Plus {lft = (Expr.Variable "x"); rght = (Expr.Value 3)}}} 
     in
       assert_equal expected expr
   | None -> assert_failure "Failed to parse expression"  

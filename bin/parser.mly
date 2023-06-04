@@ -114,8 +114,10 @@ let choreographies :=
 let let_in :=  
     | c = choreographies; Comm_S; r = Identifier; Dot; b = variable; Terminate; cp = choreographies;
         {Let {fst = Assoc {loc = r; arg = b}; snd = Snd {sndr = c; name = r}; thn= cp}}
+    | Let; e = Identifier; Dot; v = variable; Assignment; r = Identifier; Dot; b = variable; Comm_S; Identifier; Terminate; In; cp = choreographies;
+        {Let {fst = Assoc {loc = e; arg = v}; snd = Snd {sndr = Assoc{loc = r; arg = b}; name = e}; thn= cp}}   
     | Let; e = Identifier; Dot; v = variable; Assignment; c = choreographies; In; cp = choreographies;
-        {Let {fst = Assoc {loc = e; arg = v}; snd = Snd {sndr = c; name = e}; thn= cp}}      
+        {Let {fst = Assoc {loc = e; arg = v}; snd = c; thn= cp}}  
 
 let operator :=
     | lft = sub_expr; Plus; rght = sub_expr; 
@@ -133,13 +135,13 @@ let eq :=
     | op = operator; 
         {op}
  
-let main := 
-    | choreographies
+// let main := 
+//     | choreographies
     // move to commS implementation
     // | sr = commS; arg = expr;
     //     {Seq {fst = sr; thn = arg}}
-    | sr = sync; arg = expr;
-        {Seq {fst = sr; thn = arg}}
+    // | sr = sync; arg = expr;
+    //     {Seq {fst = sr; thn = arg}}
 
 // let sub_expr :=
 //     | variable
@@ -155,4 +157,4 @@ let main :=
 //     {Application { funct = f; argument = a }}
 
 let expr := 
-    | main
+    | choreographies
