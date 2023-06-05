@@ -1,18 +1,20 @@
+open Ctrl
 open Expr
+
 
 module SS = Set.Make(String);;
 
-let check_str s = 
+(* let check_str s = 
   try int_of_string s |> ignore; true
-  with Failure _ -> false
+  with Failure _ -> false *)
 
-let parse_eq parsed_lft parsed_rght op : string = 
+(* let parse_eq parsed_lft parsed_rght op : string = 
   let isStrL = check_str parsed_lft in
   let isStrR = check_str parsed_rght in
   if isStrL = true &&  isStrR = true then
   "(" ^ parsed_lft ^ " " ^ op ^ " " ^ parsed_rght ^ ")"
-  else parsed_lft ^ " " ^ op ^ " " ^ parsed_rght
-
+  else parsed_lft ^ " " ^ op ^ " " ^ parsed_rght *)
+(* 
 let rec parse_expr expr currentNode : string =
   match expr with
   | Branch { ift = Assoc { loc; arg }; thn; el } ->
@@ -108,7 +110,7 @@ let rec parse_expr expr currentNode : string =
     let parsed_argument = parse_expr argument currentNode in
       parsed_funct ^ " " ^ parsed_argument
   | ChoreoVars x -> x 
-  | Snd _ | Abstraction _ | Comm_S _ | UMinus _ -> "" 
+  | Snd _ | Abstraction _ | Comm_S _ | UMinus _ -> ""  *)
 
 let get_entitities expr : SS.t = 
   let set1 = SS.empty in
@@ -145,20 +147,134 @@ let get_entitities expr : SS.t =
     in
       aux set1 expr
 
-let ast = (Expr.Application {
-  funct =
-  Expr.Fun {name = "funname"; arg = (Expr.ChoreoVars "X");
-    body = Expr.Let {fst = Expr.Assoc {loc = "Buyer"; arg = (Expr.Variable "l")}; 
-    snd = Expr.Snd {sndr = Expr.Assoc {loc = "Seller"; arg = (Expr.Variable "b")};
-    name = "Buyer"}; thn = (Expr.ChoreoVars "X")}};
-  argument = Expr.Assoc {loc = "s"; arg = (Expr.Variable "g")}})
+let ast = (Expr.Let {fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")};
+snd = Expr.Snd {sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "amt_due")}; name = "Person2"};
+thn = Expr.Application { funct = Expr.Fun {name = "initpay"; arg = (Expr.ChoreoVars "X");
+body = Expr.Branch { ift = Expr.Assoc {loc = "Person2"; arg = Expr.Condition {lft = (Expr.Variable "x"); op = "<"; rght = (Expr.Value 500)}};
+thn = Expr.Sync {sndr = "Person2"; d = "L"; rcvr = "Person1"; thn = Expr.Let { fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "rcv")};
+snd = Expr.Snd { sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "rem")}; name = "Person2"};
+thn = Expr.Let { fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "y")};
+snd = Expr.Snd { sndr = Expr.Assoc {loc = "Person1"; arg = Expr.Minus {lft = (Expr.Variable "amt_due");  rght = (Expr.Variable "rem")}}; 
+name = "Person2"}; thn = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")}}}};
+el = Expr.Sync {sndr = "Person2"; d = "R"; rcvr = "Person1"; thn = Expr.Let {fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "rcv")};
+snd = Expr.Snd { sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Value 500)}; name = "Person2"};
+thn = Expr.Let {fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "y")}; 
+snd = Expr.Snd {sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Value 0)}; name = "Person2"};thn = (Expr.ChoreoVars "X")}}}}};
+argument = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")}}})
 
 let entities : SS.t = 
   get_entitities ast
   
-let () = SS.iter (fun entity -> 
+(* let () = SS.iter (fun entity -> 
   let res = parse_expr ast entity in
   let str = "____________________________" ^ entity ^ "___________________________________" in 
   print_endline str;
   print_endline res;
+  ) entities *)
+
+
+
+
+  (* let rec parse_ast expr currentNode = *)
+let rec parse_ast expr_ast currentNode =
+  match expr_ast with
+  | Assoc { loc; arg } ->
+    let parsed_arg = parse_ast arg currentNode in
+    if currentNode = loc then
+      Ret parsed_arg
+    else 
+      Unit
+  | Branch { ift = Assoc { loc; arg }; thn; el } ->
+      let parsed_arg = parse_ast arg currentNode in
+      let parsed_thn = parse_ast thn currentNode in
+      let parsed_el = parse_ast el currentNode in
+      if currentNode = loc then 
+        Branch {ift = parsed_arg; thn = parsed_thn; el = parsed_el}
+    else
+      None
+  | Branch { ift = _; thn = _; el = _} -> None
+  | Sync { sndr; d; rcvr; thn} ->
+    if currentNode = sndr && currentNode = rcvr then
+      None
+    else if currentNode = sndr && currentNode != rcvr then
+      let parsed_el = parse_ast thn currentNode in
+        Choose {d; loc = rcvr; thn = parsed_el}
+    else if currentNode = rcvr && currentNode != sndr then
+      let parsed_el = parse_ast thn currentNode in
+        Allow {from= sndr; d; thn = parsed_el}
+    else
+      parse_ast thn currentNode
+  | Variable x -> Variable x
+  | Plus {lft; rght} -> 
+    let parsed_lft = parse_ast lft currentNode in
+    let parsed_rght = parse_ast rght currentNode in
+    Plus {lft =  parsed_lft; rght = parsed_rght}
+  | Minus {lft; rght} -> 
+    let parsed_lft = parse_ast lft currentNode in
+    let parsed_rght = parse_ast rght currentNode in
+    Minus {lft =  parsed_lft; rght = parsed_rght}
+  | Product {lft; rght} -> 
+    let parsed_lft = parse_ast lft currentNode in
+    let parsed_rght = parse_ast rght currentNode in
+    Product {lft =  parsed_lft; rght = parsed_rght}
+  | Division {lft; rght} -> 
+    let parsed_lft = parse_ast lft currentNode in
+    let parsed_rght = parse_ast rght currentNode in
+    Division {lft =  parsed_lft; rght = parsed_rght}
+  | Condition {lft; op; rght} -> 
+    let parsed_lft = parse_ast lft currentNode in
+    let parsed_rght = parse_ast rght currentNode in
+    Condition {lft = parsed_lft; op; rght = parsed_rght}
+  | Value x -> Value x
+  | Map {name; arg} -> 
+    let parsed_arg = parse_ast arg currentNode in
+    Map {name; arg = parsed_arg}
+  | Let {fst = Assoc{loc = _; arg = arg_fst}; snd = Snd {sndr = Assoc {loc; arg = arg_snd}; name}; thn} ->
+    let parsed_thn = parse_ast thn currentNode in
+    let parsed_arg_fst = parse_ast arg_fst currentNode in
+    let parsed_arg_snd = parse_ast arg_snd currentNode in
+    if name = currentNode && name = loc then None
+    else if name != currentNode && currentNode = loc then
+      Snd {arg = parsed_arg_snd; loc = name; thn = parsed_thn}
+    else if name = currentNode && currentNode != loc then
+      Rcv {arg = parsed_arg_fst; loc; thn = parsed_thn}
+    else
+      parsed_thn
+  | Let {fst = Assoc{loc; arg}; snd; thn} ->
+    let parsed_arg = parse_ast arg currentNode in
+    let parsed_snd = parse_ast snd currentNode in 
+    let parsed_thn = parse_ast thn currentNode in
+    if loc = currentNode then 
+      Let {binder = parsed_arg; arg = parsed_snd; thn = parsed_thn}
+    else 
+      Application {funct = Fun {name = "F"; arg = ChoreoVars "X"; body = parsed_thn}; argument = parsed_snd}
+  | Let {fst = _; snd = _; thn = _} -> None
+  | Fun {name; arg = Assoc {loc; arg = arg2}; body} -> 
+    let parsed_body = parse_ast body currentNode in
+    let parsed_arg = parse_ast arg2 currentNode in
+    if loc = currentNode then
+      Fun {name ; arg = parsed_arg; body = parsed_body}
+    else
+      Fun {name ; arg = ChoreoVars "X"; body = parsed_body}
+  | Fun {name; arg = ChoreoVars x; body} -> 
+    let parsed_body = parse_ast body currentNode in
+    Fun {name = name ; arg = ChoreoVars x; body = parsed_body}
+  | Fun {name = _; arg = _; body = _} -> None
+  | Application {funct; argument} -> 
+    let parsed_funct = parse_ast funct currentNode in
+    let parsed_argument = parse_ast argument currentNode in
+      Application {funct = parsed_funct; argument = parsed_argument}
+  | ChoreoVars x -> ChoreoVars x
+  | Snd _ | Abstraction _ | Comm_S _ | UMinus _ -> None 
+
+(* val parse_ast: expr -> string -> ctrl *)
+
+
+(* let () = Printf.printf "%s\n\n" (show_ctrl (parse_ast ast "Person2")) *)
+
+let () = SS.iter (fun entity -> 
+  let res = parse_ast ast entity in
+  let str = "____________________________" ^ entity ^ "___________________________________" in 
+  print_endline str;
+  Printf.printf "%s\n\n" ( show_ctrl res)
   ) entities
