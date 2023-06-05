@@ -147,7 +147,50 @@ let get_entitities expr : SS.t =
     in
       aux set1 expr
 
-let ast = (Expr.Let {fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")};
+let ast = Expr.Let {fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")};
+snd =
+Expr.Snd {
+  sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "amt_due")};
+  name = "Person2"};
+thn =
+Expr.Application {
+  funct =
+  Expr.Fun {name = "initpay"; arg = (Expr.ChoreoVars "X");
+    body =
+    Expr.Branch {
+      ift =
+      Expr.Assoc {loc = "Person2";
+        arg =
+        Expr.Condition {lft = (Expr.Variable "d"); op = "<";
+          rght = (Expr.Value 500)}};
+      thn =
+      Expr.Branch {
+        ift =
+        Expr.Assoc {loc = "Person2";
+          arg =
+          Expr.Condition {lft = (Expr.Variable "d"); op = "<";
+            rght = (Expr.Value 300)}};
+        thn =
+        Expr.Sync {sndr = "Person2"; d = "L"; rcvr = "Person1";
+          thn = (Expr.ChoreoVars "X")};
+        el =
+        Expr.Sync {sndr = "Person2"; d = "R"; rcvr = "Person1";
+          thn = Expr.Assoc {loc = "Person1"; arg = (Expr.Value 0)}}};
+      el =
+      Expr.Branch {
+        ift =
+        Expr.Assoc {loc = "Person2";
+          arg =
+          Expr.Condition {lft = (Expr.Variable "d"); op = "<";
+            rght = (Expr.Value 500)}};
+        thn =
+        Expr.Sync {sndr = "Person2"; d = "L"; rcvr = "Person1";
+          thn = (Expr.ChoreoVars "Y")};
+        el =
+        Expr.Sync {sndr = "Person2"; d = "R"; rcvr = "Person1";
+          thn = Expr.Assoc {loc = "Person1"; arg = (Expr.Value 1)}}}}};
+  argument = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "d")}}}
+(* let ast = (Expr.Let {fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")};
 snd = Expr.Snd {sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "amt_due")}; name = "Person2"};
 thn = Expr.Application { funct = Expr.Fun {name = "initpay"; arg = (Expr.ChoreoVars "X");
 body = Expr.Branch { ift = Expr.Assoc {loc = "Person2"; arg = Expr.Condition {lft = (Expr.Variable "x"); op = "<"; rght = (Expr.Value 500)}};
@@ -160,7 +203,7 @@ el = Expr.Sync {sndr = "Person2"; d = "R"; rcvr = "Person1"; thn = Expr.Let {fst
 snd = Expr.Snd { sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Value 500)}; name = "Person2"};
 thn = Expr.Let {fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "y")}; 
 snd = Expr.Snd {sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Value 0)}; name = "Person2"};thn = (Expr.ChoreoVars "X")}}}}};
-argument = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")}}})
+argument = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")}}}) *)
 
 let entities : SS.t = 
   get_entitities ast
@@ -173,7 +216,85 @@ let entities : SS.t =
   ) entities *)
 
 
-
+let rec merge_branch (lbranch:ctrl) (rbranch:ctrl) : ctrl= 
+  match lbranch, rbranch with
+    | ChoreoVars x, ChoreoVars y when x = y -> ChoreoVars x
+    | Unit, Unit -> Unit
+    | Ret x, Ret y when x = y -> Ret x
+    | Branch {ift; thn; el}, Branch {ift = ift2; thn = thn2; el = el2} 
+      when ift = ift2 ->
+        let merged_thn = merge_branch thn thn2 in
+        let merged_el = merge_branch el el2 in
+        Branch {ift; thn = merged_thn; el = merged_el}
+    | Snd {arg; loc; thn}, Snd {arg = arg2; loc = loc2; thn = thn2} 
+      when arg = arg2 && loc = loc2 ->
+        let merged_thn = merge_branch thn thn2 in
+        Snd {arg; loc; thn = merged_thn}
+    | Rcv {arg; loc; thn}, Rcv {arg = arg2; loc = loc2; thn = thn2} 
+      when arg = arg2 && loc = loc2 ->
+        let merged_thn = merge_branch thn thn2 in
+        Rcv {arg; loc; thn = merged_thn}
+    | Choose {d; loc; thn}, Choose {d = d2; loc = loc2; thn = thn2} 
+      when d = d2 && loc = loc2 ->
+        let merged_thn = merge_branch thn thn2 in
+        Choose {d; loc; thn = merged_thn}
+    (* LL *)
+    | Allow {from; l = SyncLabel{d; thn}; r = None}, Allow {from = from2; l = SyncLabel {d = d2; thn = thn2}; r = None} 
+      when d = d2 && from = from2 ->
+        let merged_thn = merge_branch thn thn2 in
+        Allow {from; l = SyncLabel{d; thn = merged_thn}; r = None}
+    (* LR *)
+    | Allow {from; l = SyncLabel{d; thn}; r = None}, Allow {from = from2; l = None; r = SyncLabel {d = d2; thn = thn2}} 
+      when from = from2 ->
+        Allow {from; l = SyncLabel{d; thn}; r = SyncLabel{d = d2; thn = thn2}}
+    (* LLR *)
+    | Allow {from; l = SyncLabel{d; thn}; r = None}, Allow {from = from2; l = SyncLabel {d = d2; thn = thn2}; r = SyncLabel {d = d3; thn = thn3}} 
+      when d = d2 && from = from2 && d2 != d3 ->
+        let merged_thn = merge_branch thn thn2 in
+        Allow {from; l = SyncLabel{d; thn = merged_thn}; r = SyncLabel{d = d3; thn = thn3}}
+    (* RL *)
+    | Allow {from; l = None; r = SyncLabel{d; thn}}, Allow {from = from2; l = SyncLabel {d = d2; thn = thn2}; r = None} 
+      when d != d2 && from = from2 ->
+        Allow {from; l = SyncLabel{d = d2; thn = thn2}; r = SyncLabel{d; thn}}
+    (* RR *)
+    | Allow {from; l = None; r = SyncLabel{d; thn}}, Allow {from = from2; l = None; r = SyncLabel {d = d2; thn = thn2}} 
+      when from = from2 && d = d2->
+        let merged_thn = merge_branch thn thn2 in
+        Allow {from; l = None; r = SyncLabel{d; thn = merged_thn}}
+    (* RLR *)
+    | Allow {from; l = None; r = SyncLabel{d; thn}}, Allow {from = from2; l = SyncLabel {d = d2; thn = thn2}; r = SyncLabel {d = d3; thn = thn3}} 
+      when d = d3 && from = from2 && d2 != d3 ->
+        let merged_thn = merge_branch thn thn3 in
+        Allow {from; l = SyncLabel{d = d2; thn = thn2}; r = SyncLabel{d; thn = merged_thn}}
+    (* LRL *)
+    | Allow {from; l = SyncLabel{d; thn}; r = SyncLabel{d = d2; thn = thn2}}, Allow {from = from2; l = SyncLabel {d = d3; thn = thn3}; r = None} 
+      when d = d3 && from = from2 && d2 != d3 ->
+        let merged_thn = merge_branch thn thn3 in
+        Allow {from; l = SyncLabel{d; thn = merged_thn}; r = SyncLabel{d; thn = thn2}}
+    (* LRR *)
+    | Allow {from; l = SyncLabel{d; thn}; r = SyncLabel{d = d2; thn = thn2}}, Allow {from = from2; l = None; r = SyncLabel {d = d3; thn = thn3}} 
+      when d2 = d3 && from = from2 && d != d3 ->
+        let merged_thn = merge_branch thn2 thn3 in
+        Allow {from; l = SyncLabel{d; thn}; r = SyncLabel{d = d2; thn = merged_thn}}
+    (* LRLR *)
+    | Allow {from; l = SyncLabel{d; thn}; r = SyncLabel{d = d2; thn = thn2}}, Allow {from = from2; l = SyncLabel {d = d3; thn = thn3}; r = SyncLabel {d = d4; thn = thn4}} 
+      when d = d3 && d2 = d4 && from = from2 ->
+        let merged_thn_l = merge_branch thn thn3 in
+        let merged_thn_r = merge_branch thn2 thn4 in
+        Allow {from; l = SyncLabel{d; thn = merged_thn_l}; r = SyncLabel{d = d2; thn = merged_thn_r}}
+    | Let {binder; arg; thn}, Let {binder = binder2; arg = arg2; thn = thn2}
+        when binder = binder2 -> 
+        let merged_arg = merge_branch arg arg2 in
+        let merged_thn = merge_branch thn thn2 in
+        Let {binder; arg = merged_arg; thn = merged_thn}
+    | Fun {name; arg; body}, Fun {name = name2; arg = arg2; body = body2} 
+        when name = name2 && arg = arg2 && body = body2 ->
+          Fun {name; arg; body}
+    | Application {funct; argument}, Application {funct = funct2; argument = argument2} ->
+      let merged_funct = merge_branch funct funct2 in
+      let merged_argument = merge_branch argument argument2 in
+          Application {funct = merged_funct; argument = merged_argument}
+    | _ -> None
 
   (* let rec parse_ast expr currentNode = *)
 let rec parse_ast expr_ast currentNode =
@@ -190,8 +311,8 @@ let rec parse_ast expr_ast currentNode =
       let parsed_el = parse_ast el currentNode in
       if currentNode = loc then 
         Branch {ift = parsed_arg; thn = parsed_thn; el = parsed_el}
-    else
-      None
+      else
+        merge_branch parsed_thn parsed_el
   | Branch { ift = _; thn = _; el = _} -> None
   | Sync { sndr; d; rcvr; thn} ->
     if currentNode = sndr && currentNode = rcvr then
@@ -201,7 +322,10 @@ let rec parse_ast expr_ast currentNode =
         Choose {d; loc = rcvr; thn = parsed_el}
     else if currentNode = rcvr && currentNode != sndr then
       let parsed_el = parse_ast thn currentNode in
-        Allow {from= sndr; d; thn = parsed_el}
+        if d = "L" then 
+          Allow {from= sndr; l = SyncLabel {d; thn = parsed_el}; r = None}
+        else
+          Allow {from= sndr; l = None; r = SyncLabel {d; thn = parsed_el}}
     else
       parse_ast thn currentNode
   | Variable x -> Variable x
