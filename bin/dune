@@ -9,6 +9,13 @@
  (preprocess
   (pps ppx_deriving.show)))
 
+
+(library
+ (name ctrl)
+ (modules ctrl)
+ (preprocess
+  (pps ppx_deriving.show)))
+
 ; (executable
 ;  (name main)
 ;  (public_name main)
@@ -24,4 +31,4 @@
  (name ep)
  (public_name ep)
  (modules ep parser lexer)
- (libraries expr))
+ (libraries expr ctrl))
