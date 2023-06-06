@@ -76,7 +76,7 @@ let rec parse_expr expr currentNode : string =
     else if name != currentNode && currentNode = loc then
       "send " ^ parsed_arg_snd ^ " to " ^ name ^ "; \n" ^ parsed_thn
     else if name = currentNode && currentNode != loc then
-      "receive " ^ parsed_arg_fst ^ " from " ^ loc ^ "; \n" ^ parsed_thn
+      "receive " ^ parsed_arg_fst ^ " loc " ^ loc ^ "; \n" ^ parsed_thn
     else
       parsed_thn
   | Let {fst = Assoc{loc; arg}; snd; thn} ->
@@ -239,49 +239,49 @@ let rec merge_branch (lbranch:ctrl) (rbranch:ctrl) : ctrl=
         let merged_thn = merge_branch thn thn2 in
         Choose {d; loc; thn = merged_thn}
     (* LL *)
-    | Allow {from; l = SyncLabel{d; thn}; r = None}, Allow {from = from2; l = SyncLabel {d = d2; thn = thn2}; r = None} 
-      when d = d2 && from = from2 ->
+    | AllowL {loc; thn}, AllowL {loc = loc2; thn = thn2} 
+      when loc = loc2 ->
         let merged_thn = merge_branch thn thn2 in
-        Allow {from; l = SyncLabel{d; thn = merged_thn}; r = None}
+        AllowL {loc; thn = merged_thn}
     (* LR *)
-    | Allow {from; l = SyncLabel{d; thn}; r = None}, Allow {from = from2; l = None; r = SyncLabel {d = d2; thn = thn2}} 
-      when from = from2 ->
-        Allow {from; l = SyncLabel{d; thn}; r = SyncLabel{d = d2; thn = thn2}}
+    | AllowL {loc; thn}, AllowR {loc = loc2; thn = thn2}
+      when loc = loc2 ->
+        AllowLR {loc; thnL = thn; thnR = thn2}
     (* LLR *)
-    | Allow {from; l = SyncLabel{d; thn}; r = None}, Allow {from = from2; l = SyncLabel {d = d2; thn = thn2}; r = SyncLabel {d = d3; thn = thn3}} 
-      when d = d2 && from = from2 && d2 != d3 ->
-        let merged_thn = merge_branch thn thn2 in
-        Allow {from; l = SyncLabel{d; thn = merged_thn}; r = SyncLabel{d = d3; thn = thn3}}
+    | AllowL {loc; thn}, AllowLR {loc = loc2; thnL; thnR} 
+      when loc = loc2->
+        let merged_thn = merge_branch thn thnL in
+        AllowLR {loc; thnL = merged_thn; thnR}
     (* RL *)
-    | Allow {from; l = None; r = SyncLabel{d; thn}}, Allow {from = from2; l = SyncLabel {d = d2; thn = thn2}; r = None} 
-      when d != d2 && from = from2 ->
-        Allow {from; l = SyncLabel{d = d2; thn = thn2}; r = SyncLabel{d; thn}}
+    | AllowR {loc; thn}, AllowL {loc = loc2; thn = thn2} 
+      when loc = loc2 ->
+        AllowLR {loc; thnL = thn2; thnR = thn}
     (* RR *)
-    | Allow {from; l = None; r = SyncLabel{d; thn}}, Allow {from = from2; l = None; r = SyncLabel {d = d2; thn = thn2}} 
-      when from = from2 && d = d2->
+    | AllowR {loc; thn}, AllowR {loc = loc2; thn = thn2} 
+      when loc = loc2->
         let merged_thn = merge_branch thn thn2 in
-        Allow {from; l = None; r = SyncLabel{d; thn = merged_thn}}
+        AllowR {loc; thn = merged_thn}
     (* RLR *)
-    | Allow {from; l = None; r = SyncLabel{d; thn}}, Allow {from = from2; l = SyncLabel {d = d2; thn = thn2}; r = SyncLabel {d = d3; thn = thn3}} 
-      when d = d3 && from = from2 && d2 != d3 ->
-        let merged_thn = merge_branch thn thn3 in
-        Allow {from; l = SyncLabel{d = d2; thn = thn2}; r = SyncLabel{d; thn = merged_thn}}
+    | AllowR {loc; thn}, AllowLR {loc = loc2; thnL; thnR} 
+      when loc = loc2 ->
+        let merged_thn = merge_branch thn thnR in
+        AllowLR {loc; thnL; thnR = merged_thn }
     (* LRL *)
-    | Allow {from; l = SyncLabel{d; thn}; r = SyncLabel{d = d2; thn = thn2}}, Allow {from = from2; l = SyncLabel {d = d3; thn = thn3}; r = None} 
-      when d = d3 && from = from2 && d2 != d3 ->
-        let merged_thn = merge_branch thn thn3 in
-        Allow {from; l = SyncLabel{d; thn = merged_thn}; r = SyncLabel{d; thn = thn2}}
+    | AllowLR {loc; thnL; thnR}, AllowL {loc = loc2; thn} 
+      when loc = loc2 ->
+        let merged_thn = merge_branch thnL thn in
+        AllowLR {loc; thnL = merged_thn; thnR}
     (* LRR *)
-    | Allow {from; l = SyncLabel{d; thn}; r = SyncLabel{d = d2; thn = thn2}}, Allow {from = from2; l = None; r = SyncLabel {d = d3; thn = thn3}} 
-      when d2 = d3 && from = from2 && d != d3 ->
-        let merged_thn = merge_branch thn2 thn3 in
-        Allow {from; l = SyncLabel{d; thn}; r = SyncLabel{d = d2; thn = merged_thn}}
+    | AllowLR {loc; thnL; thnR}, AllowR {loc = loc2; thn}
+      when loc = loc2 ->
+        let merged_thn = merge_branch thnR thn in
+        AllowLR {loc; thnL; thnR = merged_thn}
     (* LRLR *)
-    | Allow {from; l = SyncLabel{d; thn}; r = SyncLabel{d = d2; thn = thn2}}, Allow {from = from2; l = SyncLabel {d = d3; thn = thn3}; r = SyncLabel {d = d4; thn = thn4}} 
-      when d = d3 && d2 = d4 && from = from2 ->
-        let merged_thn_l = merge_branch thn thn3 in
-        let merged_thn_r = merge_branch thn2 thn4 in
-        Allow {from; l = SyncLabel{d; thn = merged_thn_l}; r = SyncLabel{d = d2; thn = merged_thn_r}}
+    | AllowLR {loc; thnL; thnR}, AllowLR {loc = loc2; thnL = thnL2; thnR = thnR2} 
+      when loc = loc2 ->
+        let merged_thn_l = merge_branch thnL thnL2 in
+        let merged_thn_r = merge_branch thnR thnR2 in
+        AllowLR {loc; thnL = merged_thn_l; thnR = merged_thn_r}
     | Let {binder; arg; thn}, Let {binder = binder2; arg = arg2; thn = thn2}
         when binder = binder2 -> 
         let merged_arg = merge_branch arg arg2 in
@@ -323,9 +323,9 @@ let rec parse_ast expr_ast currentNode =
     else if currentNode = rcvr && currentNode != sndr then
       let parsed_el = parse_ast thn currentNode in
         if d = "L" then 
-          Allow {from= sndr; l = SyncLabel {d; thn = parsed_el}; r = None}
+          AllowL {loc= sndr; thn = parsed_el}
         else
-          Allow {from= sndr; l = None; r = SyncLabel {d; thn = parsed_el}}
+          AllowR {loc= sndr; thn = parsed_el}
     else
       parse_ast thn currentNode
   | Variable x -> Variable x

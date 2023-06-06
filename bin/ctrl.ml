@@ -4,12 +4,14 @@ type ctrl =
   | Variable of string
   | Ret of ctrl
   | Unit
+  | None
   | Snd of {arg: ctrl; loc: string; thn: ctrl}
   | Rcv of {arg: ctrl; loc: string; thn: ctrl}
   | Branch of {ift: ctrl; thn : ctrl; el: ctrl}
   | Choose of {d: string; loc: string; thn: ctrl}
-  | SyncLabel of {d: string; thn: ctrl}
-  | Allow of {from: string; l: ctrl; r: ctrl}
+  | AllowL of {loc: string; thn: ctrl}
+  | AllowR of {loc: string; thn: ctrl}
+  | AllowLR of {loc: string; thnL: ctrl; thnR: ctrl}
   | Let of {binder: ctrl; arg: ctrl; thn: ctrl}
   | Fun of {name: string; arg: ctrl; body: ctrl}
   | Application of { funct : ctrl; argument : ctrl }
