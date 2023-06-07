@@ -1,6 +1,6 @@
 (lang dune 3.6)
 
-(name helloworld)
+(name Pirouette)
 
 (generate_opam_files true)
 
@@ -16,12 +16,10 @@
 (documentation https://url/to/documentation)
 
 (package
- (name helloworld)
- (synopsis "A short synopsis")
- (description "A longer description")
- (depends ocaml dune)
- (tags
-  (topics "to describe" your project)))
+ (name Pirouette)
+ (synopsis "A compiler for Pirouette code")
+ (description "A compiler for Pirouette code")
+ (depends ocaml dune menhir ocamllex ounit2 ppx_deriving))
 
 (using menhir 2.0)
 
