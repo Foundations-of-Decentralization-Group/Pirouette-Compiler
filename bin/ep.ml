@@ -235,72 +235,103 @@ let rec merge_branch (lbranch:ctrl) (rbranch:ctrl) : ctrl option=
           | Some merged_thn -> Some (Ctrl.Snd {arg; loc; thn = merged_thn})
           | _ -> None
         ) in res
-    (* | Rcv {arg; loc; thn}, Rcv {arg = arg2; loc = loc2; thn = thn2} 
+    | Rcv {arg; loc; thn}, Rcv {arg = arg2; loc = loc2; thn = thn2} 
       when arg = arg2 && loc = loc2 ->
         let merged_thn = merge_branch thn thn2 in
-        match merged_thn with
-          | Some merged_thn -> Some (Rcv {arg; loc; thn = merged_thn})
+        let res = (match merged_thn with
+          | Some merged_thn -> Some (Ctrl.Rcv {arg; loc; thn = merged_thn})
           | _ -> None
+        ) in res
     | Choose {d; loc; thn}, Choose {d = d2; loc = loc2; thn = thn2} 
       when d = d2 && loc = loc2 ->
         let merged_thn = merge_branch thn thn2 in
-        Choose {d; loc; thn = merged_thn}
+        let res = (match merged_thn with
+          | Some merged_thn -> Some (Ctrl.Choose {d; loc; thn = merged_thn})
+          | _ -> None
+        ) in res
     (* LL *)
     | AllowL {loc; thn}, AllowL {loc = loc2; thn = thn2} 
       when loc = loc2 ->
         let merged_thn = merge_branch thn thn2 in
-        AllowL {loc; thn = merged_thn}
+        let res = (match merged_thn with
+          | Some merged_thn -> Some (Ctrl.AllowL {loc; thn = merged_thn})
+          | _ -> None
+        ) in res
     (* LR *)
     | AllowL {loc; thn}, AllowR {loc = loc2; thn = thn2}
       when loc = loc2 ->
-        AllowLR {loc; thnL = thn; thnR = thn2}
+        Some (AllowLR {loc; thnL = thn; thnR = thn2})
     (* LLR *)
     | AllowL {loc; thn}, AllowLR {loc = loc2; thnL; thnR} 
       when loc = loc2->
         let merged_thn = merge_branch thn thnL in
-        AllowLR {loc; thnL = merged_thn; thnR}
+        let res = (match merged_thn with
+          | Some merged_thn -> Some (Ctrl.AllowLR {loc; thnL = merged_thn; thnR})
+          | _ -> None
+        ) in res
     (* RL *)
     | AllowR {loc; thn}, AllowL {loc = loc2; thn = thn2} 
       when loc = loc2 ->
-        AllowLR {loc; thnL = thn2; thnR = thn}
+        Some (AllowLR {loc; thnL = thn2; thnR = thn})
     (* RR *)
     | AllowR {loc; thn}, AllowR {loc = loc2; thn = thn2} 
       when loc = loc2->
         let merged_thn = merge_branch thn thn2 in
-        AllowR {loc; thn = merged_thn}
+        let res = (match merged_thn with
+          | Some merged_thn -> Some (Ctrl.AllowR {loc; thn = merged_thn})
+          | _ -> None
+        ) in res
     (* RLR *)
     | AllowR {loc; thn}, AllowLR {loc = loc2; thnL; thnR} 
       when loc = loc2 ->
         let merged_thn = merge_branch thn thnR in
-        AllowLR {loc; thnL; thnR = merged_thn }
+        let res = (match merged_thn with
+          | Some merged_thn -> Some (Ctrl.AllowLR {loc; thnL; thnR = merged_thn})
+          | _ -> None
+        ) in res
     (* LRL *)
     | AllowLR {loc; thnL; thnR}, AllowL {loc = loc2; thn} 
       when loc = loc2 ->
         let merged_thn = merge_branch thnL thn in
-        AllowLR {loc; thnL = merged_thn; thnR}
+        let res = (match merged_thn with
+          | Some merged_thn -> Some (Ctrl.AllowLR {loc; thnL = merged_thn; thnR})
+          | _ -> None
+        ) in res
     (* LRR *)
     | AllowLR {loc; thnL; thnR}, AllowR {loc = loc2; thn}
       when loc = loc2 ->
         let merged_thn = merge_branch thnR thn in
-        AllowLR {loc; thnL; thnR = merged_thn}
+        let res = (match merged_thn with
+          | Some merged_thn -> Some (Ctrl.AllowLR {loc; thnL; thnR = merged_thn})
+          | _ -> None
+        ) in res
     (* LRLR *)
     | AllowLR {loc; thnL; thnR}, AllowLR {loc = loc2; thnL = thnL2; thnR = thnR2} 
       when loc = loc2 ->
         let merged_thn_l = merge_branch thnL thnL2 in
         let merged_thn_r = merge_branch thnR thnR2 in
-        AllowLR {loc; thnL = merged_thn_l; thnR = merged_thn_r}
+        let res = (match merged_thn_l, merged_thn_r with
+          | Some merged_thn_l, Some merged_thn_r -> Some (Ctrl.AllowLR {loc; thnL = merged_thn_l; thnR = merged_thn_r})
+          | _ -> None
+        ) in res
     | Let {binder; arg; thn}, Let {binder = binder2; arg = arg2; thn = thn2}
         when binder = binder2 -> 
         let merged_arg = merge_branch arg arg2 in
         let merged_thn = merge_branch thn thn2 in
-        Let {binder; arg = merged_arg; thn = merged_thn}
+        let res = (match merged_arg, merged_thn with
+          | Some merged_arg, Some merged_thn -> Some (Ctrl.Let {binder; arg = merged_arg; thn = merged_thn})
+          | _ -> None
+        ) in res
     | Fun {name; arg; body}, Fun {name = name2; arg = arg2; body = body2} 
         when name = name2 && arg = arg2 && body = body2 ->
-          Fun {name; arg; body}
+          Some (Fun {name; arg; body})
     | Application {funct; argument}, Application {funct = funct2; argument = argument2} ->
       let merged_funct = merge_branch funct funct2 in
       let merged_argument = merge_branch argument argument2 in
-          Application {funct = merged_funct; argument = merged_argument} *)
+      let res = (match merged_funct, merged_argument with
+          | Some merged_funct, Some merged_argument -> Some (Ctrl.Application {funct = merged_funct; argument = merged_argument})
+          | _ -> None
+        ) in res
     | _ -> None
 
   (* let rec parse_ast expr currentNode = *)
