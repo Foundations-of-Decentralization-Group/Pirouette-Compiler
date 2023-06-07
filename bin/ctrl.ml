@@ -4,7 +4,6 @@ type ctrl =
   | Variable of string
   | Ret of ctrl
   | Unit
-  | None
   | Snd of {arg: ctrl; loc: string; thn: ctrl}
   | Rcv of {arg: ctrl; loc: string; thn: ctrl}
   | Branch of {ift: ctrl; thn : ctrl; el: ctrl}
