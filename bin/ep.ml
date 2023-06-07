@@ -216,24 +216,31 @@ let entities : SS.t =
   ) entities *)
 
 
-let rec merge_branch (lbranch:ctrl) (rbranch:ctrl) : ctrl= 
+let rec merge_branch (lbranch:ctrl) (rbranch:ctrl) : ctrl option= 
   match lbranch, rbranch with
-    | ChoreoVars x, ChoreoVars y when x = y -> ChoreoVars x
-    | Unit, Unit -> Unit
-    | Ret x, Ret y when x = y -> Ret x
-    | Branch {ift; thn; el}, Branch {ift = ift2; thn = thn2; el = el2} 
+    | ChoreoVars x, ChoreoVars y when x = y -> Some (ChoreoVars x)
+    | Unit, Unit -> Some Unit
+    | Ret x, Ret y when x = y -> Some (Ret x)
+    (* | Branch {ift; thn; el}, Branch {ift = ift2; thn = thn2; el = el2} 
       when ift = ift2 ->
         let merged_thn = merge_branch thn thn2 in
         let merged_el = merge_branch el el2 in
-        Branch {ift; thn = merged_thn; el = merged_el}
+        match merged_thn, merged_el with
+          | Some merged_thn, Some merged_el -> Some (Branch {ift; thn = merged_thn; el = merged_el})
+          | _ -> None *)
     | Snd {arg; loc; thn}, Snd {arg = arg2; loc = loc2; thn = thn2} 
       when arg = arg2 && loc = loc2 ->
         let merged_thn = merge_branch thn thn2 in
-        Snd {arg; loc; thn = merged_thn}
-    | Rcv {arg; loc; thn}, Rcv {arg = arg2; loc = loc2; thn = thn2} 
+        let res = (match merged_thn with
+          | Some merged_thn -> Some (Ctrl.Snd {arg; loc; thn = merged_thn})
+          | _ -> None
+        ) in res
+    (* | Rcv {arg; loc; thn}, Rcv {arg = arg2; loc = loc2; thn = thn2} 
       when arg = arg2 && loc = loc2 ->
         let merged_thn = merge_branch thn thn2 in
-        Rcv {arg; loc; thn = merged_thn}
+        match merged_thn with
+          | Some merged_thn -> Some (Rcv {arg; loc; thn = merged_thn})
+          | _ -> None
     | Choose {d; loc; thn}, Choose {d = d2; loc = loc2; thn = thn2} 
       when d = d2 && loc = loc2 ->
         let merged_thn = merge_branch thn thn2 in
@@ -293,7 +300,7 @@ let rec merge_branch (lbranch:ctrl) (rbranch:ctrl) : ctrl=
     | Application {funct; argument}, Application {funct = funct2; argument = argument2} ->
       let merged_funct = merge_branch funct funct2 in
       let merged_argument = merge_branch argument argument2 in
-          Application {funct = merged_funct; argument = merged_argument}
+          Application {funct = merged_funct; argument = merged_argument} *)
     | _ -> None
 
   (* let rec parse_ast expr currentNode = *)
@@ -312,8 +319,11 @@ let rec parse_ast expr_ast currentNode =
       if currentNode = loc then 
         Branch {ift = parsed_arg; thn = parsed_thn; el = parsed_el}
       else
-        merge_branch parsed_thn parsed_el
-  | Branch { ift = _; thn = _; el = _} -> None
+        let res = (match merge_branch parsed_thn parsed_el with
+          | None -> Unit
+          | Some x -> x) in res
+
+  | Branch { ift = _; thn = _; el = _} -> Unit
   | Sync { sndr; d; rcvr; thn} ->
     if currentNode = sndr && currentNode = rcvr then
       None
