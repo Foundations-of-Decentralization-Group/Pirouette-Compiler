@@ -25,20 +25,14 @@
  (preprocess
   (pps ppx_deriving.show)))
 
-; (executable
-;  (name main)
-;  (public_name main)
-;  (modules main parser lexer)
-;  (libraries expr))
-
-; (test
-;  (name test)
-;  (modules test parser lexer)
-;  (libraries ounit2 expr))
+(executable
+ (name main)
+ (public_name main)
+ (modules main)
+ (libraries expr parser lexer))
 
 (executable
  (name ep)
  (public_name ep)
  (modules ep)
- (modules ep)
- (libraries expr))
+ (libraries expr ctrl))
