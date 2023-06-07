@@ -3,6 +3,19 @@ open Expr
 
 module SS = Set.Make(String);;
 
+let get_fresh_fname =
+  let counter = ref 0 in
+  fun () ->
+    let name = "func_" ^ string_of_int !counter in
+    counter := !counter + 1;
+    name
+
+let get_fresh_cname =
+  let counter = ref 0 in
+  fun () ->
+    let name = "X_" ^ string_of_int !counter in
+    counter := !counter + 1;
+    name
 (* let check_str s = 
   try int_of_string s |> ignore; true
   with Failure _ -> false *)
@@ -404,7 +417,8 @@ let rec parse_ast (expr_ast: expr) (currentNode: string): ctrl option =
       | Some parsed_arg, Some parsed_snd, Some parsed_thn when loc = currentNode ->
         Some (Ctrl.Let {binder = parsed_arg; arg = parsed_snd; thn = parsed_thn})
       | Some _, Some parsed_snd, Some parsed_thn when loc != currentNode ->
-        Some (Ctrl.Application {funct = Fun {name = "F"; arg = ChoreoVars "X"; body = parsed_thn}; argument = parsed_snd})
+        Some (Ctrl.Application {funct = Fun {name = (get_fresh_fname()); 
+        arg = ChoreoVars (get_fresh_cname ()); body = parsed_thn}; argument = parsed_snd})
       | _ -> None)
   | Let {fst = _; snd = _; thn = _} -> None
   | Fun {name; arg = Assoc {loc; arg = arg2}; body} -> 
@@ -414,7 +428,7 @@ let rec parse_ast (expr_ast: expr) (currentNode: string): ctrl option =
       | Some parsed_body, Some parsed_arg when loc = currentNode ->
         Some (Ctrl.Fun {name ; arg = parsed_arg; body = parsed_body})
       | Some parsed_body, Some _ when loc != currentNode ->
-        Some (Ctrl.Fun {name ; arg = ChoreoVars "X"; body = parsed_body})
+        Some (Ctrl.Fun {name ; arg = ChoreoVars (get_fresh_cname()); body = parsed_body})
       | _ -> None)
   | Fun {name; arg = ChoreoVars x; body} -> 
     let parsed_body = parse_ast body currentNode in
