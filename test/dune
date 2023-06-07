@@ -1,2 +1,3 @@
 (test
- (name helloworld))
+ (name test)
+ (libraries lexer parser expr ounit2))

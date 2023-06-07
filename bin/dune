@@ -40,4 +40,5 @@
  (name ep)
  (public_name ep)
  (modules ep)
+ (modules ep)
  (libraries expr))
