@@ -20,6 +20,11 @@
   (modules parser))
 
 (library
+  (name utils)
+  (libraries unix)
+  (modules))
+
+(library
  (name ctrl)
  (modules ctrl)
  (preprocess

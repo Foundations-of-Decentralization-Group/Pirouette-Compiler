@@ -202,9 +202,10 @@ Expr.Application {
         Expr.Sync {sndr = "Person2"; d = "R"; rcvr = "Person1";
           thn = Expr.Assoc {loc = "Person1"; arg = (Expr.Value 0)}}}}};
   argument = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "d")}}} *)
-let ast = (Expr.Let {fst = Expr.Assoc {loc = "l"; arg = (Expr.Variable "x")};
-snd = Expr.Assoc {loc = "l3"; arg = (Expr.Value 5)};
-thn = Expr.Assoc {loc = "l2"; arg = Expr.Plus {lft = (Expr.Variable "x"); rght = (Expr.Value 3)}}})
+let ast = (Expr.Fun {name = "funname"; arg = (Expr.Assoc {loc = "Seller"; arg = (Expr.Variable "b")}); 
+body = Expr.Let {fst = Expr.Assoc {loc = "Buyer"; arg = (Expr.Variable "l")}; 
+snd = Expr.Snd {sndr = Expr.Assoc {loc = "Seller"; arg = (Expr.Variable "b")};
+name = "Buyer"}; thn = (Expr.Sync {sndr = "Buyer"; d = "R"; rcvr = "Seller"; thn = (Expr.ChoreoVars "X")})};})
 
 let entities : SS.t = 
   get_entitities ast
