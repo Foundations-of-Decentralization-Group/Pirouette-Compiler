@@ -30,6 +30,10 @@
  (preprocess
   (pps ppx_deriving.show)))
 
+(library
+ (name constants)
+ (modules constants))
+
 (executable
  (name main)
  (public_name main)
@@ -41,3 +45,9 @@
  (public_name ep)
  (modules ep)
  (libraries expr ctrl))
+
+(executable
+ (name codify)
+ (public_name codify)
+ (modules codify)
+ (libraries expr ctrl constants))

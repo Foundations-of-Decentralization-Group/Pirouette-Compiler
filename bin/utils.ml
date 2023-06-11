@@ -22,9 +22,9 @@ let listen_and_accept port =
   close server_sock
 
 
-let send_message message =
+let send_message message loc =
   let sock = socket PF_INET SOCK_STREAM 0 in
-  let server_addr = ADDR_INET (inet_addr_of_string "127.0.0.1", 8083) in
+  let server_addr = ADDR_INET (inet_addr_of_string "127.0.0.1", loc) in
   connect sock server_addr;
   let _ = send sock (Bytes.of_string message) 0 (String.length message) [] in ()
   (* close sock *)
