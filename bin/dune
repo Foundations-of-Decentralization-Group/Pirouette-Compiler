@@ -38,7 +38,7 @@
  (name main)
  (public_name main)
  (modules main)
- (libraries expr parser lexer))
+ (libraries expr parser unix lexer))
 
 (executable
  (name ep)
@@ -49,5 +49,5 @@
 (executable
  (name codify)
  (public_name codify)
- (modules codify)
- (libraries expr ctrl constants))
+ (modules codify utils)
+ (libraries expr ctrl constants unix ))

@@ -18,4 +18,8 @@ let _plus: string = "+"
 let _minus: string = "-"
 let _product: string = "*"
 let _division: string = "/"
+let _disreg: string = "___disreg"
+let _utilImport: string = "open Utils"
+let _boilerPlate: string = _utilImport ^ _endl ^ _endl ^ _endl ^ _let ^ _space ^ _unit ^ _space ^ _equals ^ _space
+let _serverBoilerPlate port: string = "let ___server_sock = open_port " ^ port ^ " in \n"
 (* Add more constants as needed *)
