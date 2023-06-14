@@ -3,7 +3,7 @@ open Expr
 
 module SS = Set.Make(String);;
 
-let get_fresh_fname =
+(* let get_fresh_fname =
   let counter = ref 0 in
   fun () ->
     let name = "func_" ^ string_of_int !counter in
@@ -15,7 +15,7 @@ let get_fresh_cname =
   fun () ->
     let name = "X_" ^ string_of_int !counter in
     counter := !counter + 1;
-    name
+    name *)
 (* let check_str s = 
   try int_of_string s |> ignore; true
   with Failure _ -> false *)
@@ -202,10 +202,16 @@ Expr.Application {
         Expr.Sync {sndr = "Person2"; d = "R"; rcvr = "Person1";
           thn = Expr.Assoc {loc = "Person1"; arg = (Expr.Value 0)}}}}};
   argument = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "d")}}} *)
-let ast = (Expr.Fun {name = "funname"; arg = (Expr.Assoc {loc = "Seller"; arg = (Expr.Variable "b")}); 
-body = Expr.Let {fst = Expr.Assoc {loc = "Buyer"; arg = (Expr.Variable "l")}; 
-snd = Expr.Snd {sndr = Expr.Assoc {loc = "Seller"; arg = (Expr.Variable "b")};
-name = "Buyer"}; thn = (Expr.Sync {sndr = "Buyer"; d = "R"; rcvr = "Seller"; thn = (Expr.ChoreoVars "X")})};})
+let ast = (Expr.Let {                          
+  fst = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "amt_due")};
+  snd = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "\"5\"")};
+  thn =
+  Expr.Let {fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")};
+    snd =
+    Expr.Snd {
+      sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "amt_due")};
+      name = "Person2"};
+    thn = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")}}})
 
 let entities : SS.t = 
   get_entitities ast
@@ -410,6 +416,8 @@ let rec parse_ast (expr_ast: expr) (currentNode: string): ctrl option =
       | _, _, _ when name = currentNode && name = loc -> None
       | Some parsed_thn, _, _ when name != currentNode && currentNode != loc -> Some parsed_thn
       | _ -> None)
+  (* remove the fresh thing -> intead of function put let () = E1 in E2 in ctrl
+      and let _ = E1 in E2 for ocaml  *)
   | Let {fst = Assoc{loc; arg}; snd; thn} ->
     let parsed_arg = parse_ast arg currentNode in
     let parsed_snd = parse_ast snd currentNode in 
@@ -418,11 +426,11 @@ let rec parse_ast (expr_ast: expr) (currentNode: string): ctrl option =
       | Some parsed_arg, Some parsed_snd, Some parsed_thn when loc = currentNode ->
         Some (Ctrl.Let {binder = parsed_arg; arg = parsed_snd; thn = parsed_thn})
       | Some _, Some parsed_snd, Some parsed_thn when loc != currentNode ->
-        Some (Ctrl.Application {funct = Fun {name = (get_fresh_fname()); 
-        arg = ChoreoVars (get_fresh_cname ()); body = parsed_thn}; argument = parsed_snd})
+        Some (Ctrl.Let {binder = Unit; arg = parsed_snd; thn = parsed_thn})
       | _ -> None)
   | Let {fst = _; snd = _; thn = _} -> None
-  | Fun {name; arg = Assoc {loc; arg = arg2}; body} -> 
+  (* remove the local function implementation*)
+  (* | Fun {name; arg = Assoc {loc; arg = arg2}; body} -> 
     let parsed_body = parse_ast body currentNode in
     let parsed_arg = parse_ast arg2 currentNode in
     (match parsed_body, parsed_arg with 
@@ -430,7 +438,7 @@ let rec parse_ast (expr_ast: expr) (currentNode: string): ctrl option =
         Some (Ctrl.Fun {name ; arg = parsed_arg; body = parsed_body})
       | Some parsed_body, Some _ when loc != currentNode ->
         Some (Ctrl.Fun {name ; arg = ChoreoVars (get_fresh_cname()); body = parsed_body})
-      | _ -> None)
+      | _ -> None) *)
   | Fun {name; arg = ChoreoVars x; body} -> 
     let parsed_body = parse_ast body currentNode in
     (match parsed_body with

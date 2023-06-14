@@ -3,6 +3,18 @@ open Constants
 open Hashtbl
 open Utils
 
+
+(*
+Data types - do we encode it in send rcv as well?
+typ option
+rcv location
+how to write good test code
+final exectution type? is it string? what are we trying to do with the output
+Send rcv how do sockets behave
+should library methods be included in the generated epp file
+Allow and choose implementation
+order of generated epp files to understand the working of send and rcv order
+*)
 let rec _codify (ast: ctrl) (confMap: (string, int) Hashtbl.t): string = 
   match ast with
   | Value x -> string_of_int x
@@ -31,12 +43,39 @@ let rec _codify (ast: ctrl) (confMap: (string, int) Hashtbl.t): string =
   | Choose {d; loc; thn} -> 
     let codified_thn = _codify thn confMap in
     _lParen ^ _sndmsg ^ _space ^ d ^ _space ^ loc ^ _rParen ^ _endl ^ codified_thn
-  | Let {binder; arg; thn} ->
-    let codified_binder = _codify binder confMap in 
+  | AllowL {loc; thn} ->
+    let codified_thn = _codify thn confMap in
+    _serverBoilerPlate (string_of_int (find confMap loc)) ^ 
+      _let ^ _space ^ "___synclbl" ^ _equals ^ _rcvmsg ^ _space ^ 
+      "___server_sock" ^ _space ^ _in ^ _space ^
+    _if ^ _space ^ _lParen ^ _endl ^ "___synclbl" ^ _rParen ^ _then ^ _space ^ 
+    _lParen ^ codified_thn ^ _rParen ^ _endl ^ _else ^ _space ^ _unit
+  | AllowR {loc; thn} ->
+    let codified_thn = _codify thn confMap in
+    _serverBoilerPlate (string_of_int (find confMap loc)) ^ 
+      _let ^ _space ^ "___synclbl" ^ _equals ^ _rcvmsg ^ _space ^ 
+      "___server_sock" ^ _space ^ _in ^ _space ^
+    _if ^ _space ^ _lParen ^ _endl ^ "___synclbl" ^ _rParen ^ _then ^ _space ^ 
+    _lParen ^ _unit ^ _rParen ^ _endl ^ _else ^ _space ^ codified_thn
+  | AllowLR {loc; thnL; thnR} ->
+    let codified_thnL = _codify thnL confMap in
+    let codified_thnR = _codify thnR confMap in
+    _serverBoilerPlate (string_of_int (find confMap loc)) ^ 
+      _let ^ _space ^ "___synclbl" ^ _equals ^ _rcvmsg ^ _space ^ 
+      "___server_sock" ^ _space ^ _in ^ _space ^
+    _if ^ _space ^ _lParen ^ _endl ^ "___synclbl" ^ _rParen ^ _then ^ _space ^ 
+    _lParen ^ codified_thnL ^ _rParen ^ _endl ^ _else ^ _space ^ codified_thnR
+  | Let {binder = Unit; arg; thn} -> 
     let codified_arg = _codify arg confMap in
     let codified_thn = _codify thn confMap in 
-      _let ^ _space ^ codified_binder ^ _equals ^ codified_arg ^ _space ^ _in ^ 
+      _let ^ _space ^ _underscore ^ _equals ^ codified_arg ^ _space ^ _in ^ 
       _lParen ^ _endl ^ _tab ^ codified_thn ^ _rParen
+  | Let {binder; arg; thn} ->
+  let codified_binder = _codify binder confMap in 
+  let codified_arg = _codify arg confMap in
+  let codified_thn = _codify thn confMap in 
+    _let ^ _space ^ codified_binder ^ _equals ^ codified_arg ^ _space ^ _in ^ 
+    _lParen ^ _endl ^ _tab ^ codified_thn ^ _rParen
   | Fun {name; arg; body} ->
     let codified_arg = _codify arg confMap in
     let codified_body = _codify body confMap in 
@@ -74,23 +113,10 @@ let rec _codify (ast: ctrl) (confMap: (string, int) Hashtbl.t): string =
   | _ -> ""
 
 
-let ast = (Ctrl.Let {binder = (Ctrl.Variable "amt_due");
-  arg = (Ctrl.Ret (Ctrl.Value 5));
-  thn =
-  Ctrl.Application {
-    funct =
-    Ctrl.Fun {name = "func_0"; arg = (Ctrl.ChoreoVars "X_0");
-      body =
-      Ctrl.Snd {arg = (Ctrl.Variable "amt_due"); loc = "Person2";
-        thn =
-        Ctrl.Application {
-          funct =
-          Ctrl.Fun {name = "initpay"; arg = (Ctrl.Variable "d");
-            body =
-            Ctrl.Rcv {arg = (Ctrl.Variable "amt_due"); loc = "Person2";
-              thn = (Ctrl.Ret (Ctrl.Variable "t"))}};
-          argument = (Ctrl.Ret (Ctrl.Variable "d"))}}};
-    argument = Ctrl.Unit}})
+let ast = (Ctrl.Let {binder = Ctrl.Unit; arg = (Ctrl.Ret (Ctrl.Variable "\"5\""));
+thn =
+Ctrl.Rcv {arg = (Ctrl.Variable "d"); loc = "Person1";
+  thn = (Ctrl.Ret (Ctrl.Variable "d"))}})
 
 (* let () = print_endline (_codify ast) *)
 
