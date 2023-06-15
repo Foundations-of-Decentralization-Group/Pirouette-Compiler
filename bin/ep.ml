@@ -204,15 +204,20 @@ Expr.Application {
   argument = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "d")}}} *)
 let ast = (Expr.Let {                          
   fst = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "amt_due")};
-  snd = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "\"5\"")};
+  snd = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "\"5\"")};
   thn =
   Expr.Let {fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")};
     snd =
     Expr.Snd {
       sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "amt_due")};
       name = "Person2"};
-    thn = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")}}})
-
+    thn =
+    Expr.Sync {sndr = "Person2"; d = "L"; rcvr = "Person1";
+      thn =
+      Expr.Assoc {loc = "Person1";
+        arg =
+        Expr.Plus {lft = (Expr.Variable "amt_due"); rght = (Expr.Value 3)}}}}})
+        
 let entities : SS.t = 
   get_entitities ast
 
@@ -220,7 +225,7 @@ let rec merge_branch (lbranch:ctrl) (rbranch:ctrl) : ctrl option=
   match lbranch, rbranch with
     | ChoreoVars x, ChoreoVars y when x = y -> Some (ChoreoVars x)
     | Unit, Unit -> Some Unit
-    | Ret x, Ret y when x = y -> Some (Ret x)
+    | Ret {arg = x}, Ret {arg = y} when x = y -> Some (Ret {arg = x})
     | Branch {ift; thn; el}, Branch {ift = ift2; thn = thn2; el = el2} 
       when ift = ift2 ->
         let merged_thn = merge_branch thn thn2 in
@@ -328,7 +333,7 @@ let rec parse_ast (expr_ast: expr) (currentNode: string): ctrl option =
   | Assoc { loc; arg } ->
     let parsed_arg = parse_ast arg currentNode in
     (match parsed_arg with
-        | Some parsed_arg when currentNode = loc -> Some (Ret parsed_arg)
+        | Some parsed_arg when currentNode = loc -> Some (Ret {arg = parsed_arg})
         | Some _ -> Some Unit
         | _ -> None)
   | Branch { ift = Assoc { loc; arg }; thn; el } ->

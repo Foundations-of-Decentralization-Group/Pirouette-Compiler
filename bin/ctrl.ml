@@ -2,7 +2,7 @@ type ctrl =
   | Value of int
   | ChoreoVars of string
   | Variable of string
-  | Ret of ctrl
+  | Ret of {arg: ctrl}
   | Unit
   | Snd of {arg: ctrl; loc: string; thn: ctrl}
   | Rcv of {arg: ctrl; loc: string; thn: ctrl}

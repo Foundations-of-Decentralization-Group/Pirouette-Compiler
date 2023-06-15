@@ -5,27 +5,26 @@ open Utils
 
 
 (*
-Data types - do we encode it in send rcv as well?
-typ option
-rcv location
-how to write good test code
-final exectution type? is it string? what are we trying to do with the output
-Send rcv how do sockets behave
-should library methods be included in the generated epp file
-Allow and choose implementation
-order of generated epp files to understand the working of send and rcv order
+AllowL and AllowR -> if we change it to if then else then, if true then something else (), 
+but then and else branch need to have same data type, what to do?
+As the final output, are we just returning a unit or printing something? The ocaml code wouldn't run 
+For example -> Peron1[L] ~> Person2; Person2.(d+3)
+What is the end statment, here we expect Person2 to execute d+3 in local scope, 
+But what do we need to do in ocaml code?
 *)
+
 let rec _codify (ast: ctrl) (confMap: (string, int) Hashtbl.t): string = 
   match ast with
   | Value x -> string_of_int x
   | Variable x -> x
   | ChoreoVars x -> x
-  | Ret x -> _codify x confMap
+  | Ret {arg} -> _codify arg confMap
   | Unit -> _unit
   | Snd {arg; loc; thn} -> 
     let codified_thn = _codify thn confMap in 
     let codified_arg = _codify arg confMap in
-    _let ^ _space ^ "_" ^ _equals ^ _lParen ^ _sndmsg ^ _space ^ codified_arg ^ _space ^ string_of_int (find confMap loc) ^ _rParen ^ _space ^ 
+    _let ^ _space ^ "_" ^ _equals ^ _lParen ^ _sndmsg ^ _space ^ 
+    codified_arg ^ _space ^ string_of_int (find confMap loc) ^ _rParen ^ _space ^ 
     _in ^ _endl ^ codified_thn
   | Rcv {arg; loc; thn} ->
     let codified_thn = _codify thn confMap in 
@@ -42,7 +41,10 @@ let rec _codify (ast: ctrl) (confMap: (string, int) Hashtbl.t): string =
     _space ^  _lParen ^ codified_el ^ _rParen
   | Choose {d; loc; thn} -> 
     let codified_thn = _codify thn confMap in
-    _lParen ^ _sndmsg ^ _space ^ d ^ _space ^ loc ^ _rParen ^ _endl ^ codified_thn
+    _let ^ _space ^ _underscore ^ _space ^ _equals ^ _space ^ _lParen ^ _sndmsg ^ _space ^ (if d = "L" then "\"true\"" else "\"false\"") ^ 
+    _space ^ string_of_int (find confMap loc) ^ _rParen ^ _space ^ _in ^ _endl ^ 
+    _let ^ _space ^ _underscore ^ _space ^ _equals ^ _space ^ codified_thn ^ 
+    _in ^ _space ^ _unit
   | AllowL {loc; thn} ->
     let codified_thn = _codify thn confMap in
     _serverBoilerPlate (string_of_int (find confMap loc)) ^ 
@@ -113,10 +115,16 @@ let rec _codify (ast: ctrl) (confMap: (string, int) Hashtbl.t): string =
   | _ -> ""
 
 
-let ast = (Ctrl.Let {binder = Ctrl.Unit; arg = (Ctrl.Ret (Ctrl.Variable "\"5\""));
+let ast = (Ctrl.Let {binder = (Ctrl.Variable "amt_due");
+arg = Ctrl.Ret {arg = (Ctrl.Variable "\"5\"")};
 thn =
-Ctrl.Rcv {arg = (Ctrl.Variable "d"); loc = "Person1";
-  thn = (Ctrl.Ret (Ctrl.Variable "d"))}})
+Ctrl.Snd {arg = (Ctrl.Variable "amt_due"); loc = "Person2";
+  thn =
+  Ctrl.AllowL {loc = "Person2";
+    thn =
+    Ctrl.Ret {
+      arg =
+      Ctrl.Plus {lft = (Ctrl.Variable "amt_due"); rght = (Ctrl.Value 3)}}}}})
 
 (* let () = print_endline (_codify ast) *)
 
