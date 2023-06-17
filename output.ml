@@ -1,16 +1,18 @@
-open Utils
+module Evt = Event
 
 let () =
-  let amt_due = 5 in
-  let func_0 X_0 =
-    let _ = send_message amt_due 8082 in
-    let initpay d =
-      let ___server_sock = open_port 8082 in
-      let amt_due = receive_message ___server_sock in
-      t
-    in
-    let ___disreg = initpay d in
+  let _channel_person1_person2 = Evt.new_channel () in
+  let _channel_person2_person1 = Evt.new_channel () in
+  let person1 () =
+    let _ = Evt.sync (Evt.send _channel_person1_person2 5) in
     ()
   in
-  let ___disreg = func_0 () in
-  ()
+
+  let person2 () =
+    let d = Evt.sync (Evt.receive _channel_person1_person2) in
+    d + 3
+  in
+  let person1 = Thread.create person1 () in
+  let person2 = Thread.create person2 () in
+  Thread.join person1;
+  Thread.join person2

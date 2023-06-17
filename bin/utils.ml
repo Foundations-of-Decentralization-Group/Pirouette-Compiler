@@ -72,7 +72,7 @@ let create_server_sockets input_hashmap =
   Hashtbl.iter process_entry input_hashmap;
   output_hashmap
 
-let read_config_file (filename : string) : (string, int) Hashtbl.t =
+(* let read_config_file (filename : string) : (string, int) Hashtbl.t =
   let config_table = Hashtbl.create 10 in
   let in_channel = open_in filename in
   try
@@ -92,4 +92,23 @@ let read_config_file (filename : string) : (string, int) Hashtbl.t =
       config_table
   | exn ->
       close_in_noerr in_channel;
+      raise exn *)
+
+let read_config_file (filename : string) : string list =
+  let config_list = ref [] in
+  let in_channel = open_in filename in
+  try
+    while true do
+      let line = input_line in_channel in
+      let key = String.trim line in
+      config_list := key :: !config_list
+    done;
+    !config_list
+  with
+  | End_of_file ->
+      close_in in_channel;
+      List.rev !config_list
+  | exn ->
+      close_in_noerr in_channel;
       raise exn
+      
