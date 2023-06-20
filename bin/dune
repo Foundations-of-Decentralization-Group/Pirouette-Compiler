@@ -51,3 +51,9 @@
  (public_name codify)
  (modules codify utils)
  (libraries expr ctrl constants unix ))
+
+(executable
+ (name output)
+ (public_name output)
+ (modules output)
+ (libraries threads.posix stdune))

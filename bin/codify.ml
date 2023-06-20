@@ -46,9 +46,9 @@ let rec _codify (ast: ctrl) (confMap: string list) (currentEntity: string): stri
     _let ^ _space ^ _underscore ^ _space ^ _equals ^ _space ^ _lParen ^ 
      _sync ^ _space ^  _lParen ^ _sndmsg ^ _space ^ 
     _space ^ "_channel_" ^ currentEntity ^ _underscore ^ loc ^ _space
-    ^ (if d = "L" then "\"true\"" else "\"false\"") ^ _rParen ^ _space ^ _in ^ _endl ^ 
+    ^ (if d = "L" then "true" else "false") ^ _rParen ^ _rParen ^ _space ^ _in ^ _endl ^ 
     _let ^ _space ^ _underscore ^ _space ^ _equals ^ _space ^ codified_thn ^ 
-    _in ^ _space ^ _unit
+    _in ^ _space ^ _unit 
   | AllowL {loc = _; thn = _} ->
     raise (InvalidProgramException "AllowL not permitted.")
   | AllowR {loc = _; thn = _} ->
@@ -136,14 +136,28 @@ let file_name = "config.conf"
 type astType = Ast of { code : ctrl; prop : string }
 
 let ast1 = Ast{
-  code = (Ctrl.Snd {arg = (Ctrl.Value 5); loc = "person2"; thn = Ctrl.Unit});
+  code = (Ctrl.Let {binder = (Ctrl.Variable "amt");
+  arg = Ctrl.Ret {arg = (Ctrl.Value 5)};
+  thn =
+  Ctrl.Snd {arg = (Ctrl.Variable "amt"); loc = "person2";
+    thn =
+    Ctrl.AllowLR {loc = "person2"; thnL = Ctrl.Ret {arg = (Ctrl.Value 1)};
+      thnR = Ctrl.Ret {arg = (Ctrl.Value 0)}}}});
   prop = "person1"
 }
 
 let ast2 = Ast{
   code = (
-    Ctrl.Rcv {arg = (Ctrl.Variable "d"); loc = "person1";
-    thn = Ctrl.Ret {arg = Ctrl.Plus {lft = (Ctrl.Variable "d"); rght = (Ctrl.Value 3)}}}
+    Ctrl.Let {binder = Ctrl.Unit; arg = Ctrl.Unit;
+  thn =
+  Ctrl.Rcv {arg = (Ctrl.Variable "d"); loc = "person1";
+    thn =
+    Ctrl.Branch {
+      ift =
+      Ctrl.Condition {lft = (Ctrl.Variable "d"); op = "<";
+        rght = (Ctrl.Value 10)};
+      thn = Ctrl.Choose {d = "L"; loc = "person1"; thn = Ctrl.Unit};
+      el = Ctrl.Choose {d = "R"; loc = "person1"; thn = Ctrl.Unit}}}}
   ); prop = "person2"}
 
 (* Function to output code for an entity *)
@@ -187,7 +201,7 @@ let codify asts file_name =
                 _let ^ _space ^ prop ^ "() = " ^ 
                 _lParen ^ _codify code confMap prop ^ _rParen ^ _space ^ _in ^ _space) asts 
                 |> String.concat "\n \n") ^ _getThreadBp confMap ^ _rParen in
-  let _output_file = "output.ml" in
+  let _output_file = "bin/output.ml" in
   (* print_endline code  *)
   _format_and_save_code code _output_file
 

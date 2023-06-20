@@ -202,22 +202,31 @@ Expr.Application {
         Expr.Sync {sndr = "Person2"; d = "R"; rcvr = "Person1";
           thn = Expr.Assoc {loc = "Person1"; arg = (Expr.Value 0)}}}}};
   argument = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "d")}}} *)
-let ast = (Expr.Let {                          
-  fst = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "amt_due")};
-  snd = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "\"5\"")};
+let ast = (
+Expr.Let {fst = Expr.Assoc {loc = "person1"; arg = (Expr.Variable "amt")};
+snd = Expr.Assoc {loc = "person1"; arg = (Expr.Value 5)};
+thn =
+Expr.Let {fst = Expr.Assoc {loc = "person2"; arg = (Expr.Variable "d")};
+  snd =
+  Expr.Snd {
+    sndr = Expr.Assoc {loc = "person1"; arg = (Expr.Variable "amt")};
+    name = "person2"};
   thn =
-  Expr.Let {fst = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")};
-    snd =
-    Expr.Snd {
-      sndr = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "amt_due")};
-      name = "Person2"};
+  Expr.Branch {
+    ift =
+    Expr.Assoc {loc = "person2";
+      arg =
+      Expr.Condition {lft = (Expr.Variable "d"); op = "<";
+        rght = (Expr.Value 10)}};
     thn =
-    Expr.Sync {sndr = "Person2"; d = "L"; rcvr = "Person1";
-      thn =
-      Expr.Assoc {loc = "Person1";
-        arg =
-        Expr.Plus {lft = (Expr.Variable "amt_due"); rght = (Expr.Value 3)}}}}})
-        
+    Expr.Sync {sndr = "person2"; d = "L"; rcvr = "person1";
+      thn = Expr.Assoc {loc = "person1"; arg = (Expr.Value 1)}};
+    el =
+    Expr.Sync {sndr = "person2"; d = "R"; rcvr = "person1";
+      thn = Expr.Assoc {loc = "person1"; arg = (Expr.Value 0)}}}}}
+
+)
+
 let entities : SS.t = 
   get_entitities ast
 

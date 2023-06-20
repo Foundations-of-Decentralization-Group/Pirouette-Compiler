@@ -1,2 +1,9 @@
-Person1.5 ~> Person2.d;
-Person2.(d+3)
+let person1.amt := person1.5 in 
+person1.amt ~> person2.d;
+if person2.(d<10)
+then
+person2[L] ~> person1;
+person1.1
+else 
+person2[R] ~> person1;
+person1.0
