@@ -1,14 +1,2 @@
-Person1.amt_due ~> Person2.d;
-(fun initpay (X) :=
-if Person2.(d < 500)
-then 
-
-if Person2.(d < 300)
-then Person2[L] ~> Person1; X
-else Person2[R] ~> Person1; Person1.0
-
-else 
-
-if Person2.(d < 300)
-then Person2[L] ~> Person1; Y
-else Person2[R] ~> Person1; Person1.1) Person1.d
+Person1.5 ~> Person2.d;
+Person2.(d+3)
