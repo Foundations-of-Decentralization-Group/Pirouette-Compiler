@@ -154,8 +154,11 @@ let get_entitities expr : SS.t =
         let acc_funct = aux acc funct in
         let acc = aux acc_funct argument in
           acc
+      | Calling {name = _; arg} ->
+        let acc_arg = aux acc arg in
+        acc_arg 
       | Variable _ | Value _ | ChoreoVars _ | Condition _ | Map _ | Abstraction _
-      | Comm_S _ | Plus _|Minus _|Product _|Division _| UMinus _-> acc
+      | Comm_S _ | Plus _|Minus _|Product _|Division _| UMinus _  -> acc
     in
       aux set1 expr
 
@@ -203,28 +206,11 @@ Expr.Application {
           thn = Expr.Assoc {loc = "Person1"; arg = (Expr.Value 0)}}}}};
   argument = Expr.Assoc {loc = "Person1"; arg = (Expr.Variable "d")}}} *)
 let ast = (
-Expr.Let {fst = Expr.Assoc {loc = "person1"; arg = (Expr.Variable "amt")};
-snd = Expr.Assoc {loc = "person1"; arg = (Expr.Value 5)};
-thn =
-Expr.Let {fst = Expr.Assoc {loc = "person2"; arg = (Expr.Variable "d")};
-  snd =
-  Expr.Snd {
-    sndr = Expr.Assoc {loc = "person1"; arg = (Expr.Variable "amt")};
-    name = "person2"};
-  thn =
-  Expr.Branch {
-    ift =
-    Expr.Assoc {loc = "person2";
-      arg =
-      Expr.Condition {lft = (Expr.Variable "d"); op = "<";
-        rght = (Expr.Value 10)}};
-    thn =
-    Expr.Sync {sndr = "person2"; d = "L"; rcvr = "person1";
-      thn = Expr.Assoc {loc = "person1"; arg = (Expr.Value 1)}};
-    el =
-    Expr.Sync {sndr = "person2"; d = "R"; rcvr = "person1";
-      thn = Expr.Assoc {loc = "person1"; arg = (Expr.Value 0)}}}}}
-
+  Expr.Application {
+  funct =
+  Expr.Fun {name = "loop"; arg = (Expr.ChoreoVars "X");
+    body = Expr.Calling {name = "loop"; arg = (Expr.ChoreoVars "X")}};
+  argument = Expr.Assoc {loc = "person1"; arg = (Expr.Value 0)}}
 )
 
 let entities : SS.t = 
@@ -459,6 +445,11 @@ let rec parse_ast (expr_ast: expr) (currentNode: string): ctrl option =
       | Some parsed_body -> Some (Ctrl.Fun {name = name ; arg = ChoreoVars x; body = parsed_body})
       | _ -> None)
   | Fun {name = _; arg = _; body = _} -> None
+  | Calling {name; arg} ->  
+    let parsed_arg = parse_ast arg currentNode in
+    (match parsed_arg with
+     | Some parsed_arg -> Some (Ctrl.Calling {name; arg = parsed_arg})
+     | _ -> None)
   | Application {funct; argument} -> 
     let parsed_funct = parse_ast funct currentNode in
     let parsed_argument = parse_ast argument currentNode in

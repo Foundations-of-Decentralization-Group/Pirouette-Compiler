@@ -13,6 +13,7 @@ type ctrl =
   | AllowLR of {loc: string; thnL: ctrl; thnR: ctrl}
   | Let of {binder: ctrl; arg: ctrl; thn: ctrl}
   | Fun of {name: string; arg: ctrl; body: ctrl}
+  | Calling of {name: string; arg: ctrl}
   | Application of { funct : ctrl; argument : ctrl }
   | Condition of {lft: ctrl; op: string; rght: ctrl}
   | Map of {name: string; arg: ctrl}

@@ -75,16 +75,17 @@ let rec _codify (ast: ctrl) (confMap: string list) (currentEntity: string): stri
   | Fun {name; arg; body} ->
     let codified_arg = _codify arg confMap currentEntity in
     let codified_body = _codify body confMap currentEntity in 
-      _let ^ _space ^ name ^ _space ^ codified_arg ^ _space ^ _equals ^ _space ^ 
+      _let ^ _space ^ _rec ^ _space ^ name ^ _space ^ codified_arg ^ _space ^ _equals ^ _space ^ 
       _lParen ^ codified_body ^ _rParen
-  | Application {funct = Fun {name; arg; body}; argument} ->
+  | Calling {name; arg} -> 
     let codified_arg = _codify arg confMap currentEntity in
-    let codified_body = _codify body confMap currentEntity in 
+      name ^ _space ^ codified_arg 
+  | Application {funct = Fun {name; arg; body}; argument} ->
+    let codify_funct = _codify (Fun {name; arg; body}) confMap currentEntity in
     let codified_argument = _codify argument confMap currentEntity in 
-    _let ^ _space ^ name ^ _space ^ codified_arg ^ _equals ^ _space ^
-    _lParen ^ codified_body ^ _rParen ^ _endl ^ _in ^ _space ^ 
-    _let ^ _space ^ _disreg ^ _equals ^ name ^ _space ^ codified_argument ^ _space ^ _in ^ _space
-    ^ _unit
+      codify_funct ^ _endl ^ _in ^ _space ^ 
+      _let ^ _space ^ _disreg ^ _equals ^ name ^ _space ^ codified_argument ^ _space ^ _in ^ _space
+      ^ _unit
   | Application {funct = _; argument = _} -> ""
   | Condition {lft; op; rght} ->
     let codified_lft = _codify lft confMap currentEntity in
@@ -136,17 +137,15 @@ let file_name = "config.conf"
 type astType = Ast of { code : ctrl; prop : string }
 
 let ast1 = Ast{
-  code = (Ctrl.Let {binder = (Ctrl.Variable "amt");
-  arg = Ctrl.Ret {arg = (Ctrl.Value 5)};
-  thn =
-  Ctrl.Snd {arg = (Ctrl.Variable "amt"); loc = "person2";
-    thn =
-    Ctrl.AllowLR {loc = "person2"; thnL = Ctrl.Ret {arg = (Ctrl.Value 1)};
-      thnR = Ctrl.Ret {arg = (Ctrl.Value 0)}}}});
+  code = (Ctrl.Application {
+    funct =
+    Ctrl.Fun {name = "loop"; arg = (Ctrl.ChoreoVars "X");
+      body = Ctrl.Calling {name = "loop"; arg = (Ctrl.ChoreoVars "X")}};
+    argument = Ctrl.Ret {arg = (Ctrl.Value 0)}});
   prop = "person1"
 }
 
-let ast2 = Ast{
+let _ast2 = Ast{
   code = (
     Ctrl.Let {binder = Ctrl.Unit; arg = Ctrl.Unit;
   thn =
@@ -162,14 +161,14 @@ let ast2 = Ast{
 
 (* Function to output code for an entity *)
 let output_code_for_entity (entity : string) =
-  let thread_code = "let " ^ entity ^ " = Thread.create " ^ entity ^ " () in " in
+  let thread_code = "let " ^ _underscore ^ entity ^ " = Thread.create " ^ entity ^ " () in " in
   thread_code
 
 (* Function to iterate over a list of entities *)
 let _getThreadBp (entities : string list) =
   let code_strings = List.map output_code_for_entity entities in
   let joined_code = String.concat "\n" code_strings in
-  let join_code = List.map (fun entity -> "Thread.join " ^ entity ^ ";") entities in
+  let join_code = List.map (fun entity -> "Thread.join " ^ _underscore ^ entity ^ ";") entities in
   let joined_join_code = String.concat "\n" join_code in
   joined_code ^ "\n" ^ joined_join_code
 
@@ -205,4 +204,4 @@ let codify asts file_name =
   (* print_endline code  *)
   _format_and_save_code code _output_file
 
-let () = codify [ast1; ast2] file_name 
+let () = codify [ast1] file_name 

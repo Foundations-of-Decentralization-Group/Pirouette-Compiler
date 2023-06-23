@@ -32,6 +32,7 @@
 %nonassoc In
 %nonassoc Let
 %nonassoc Fun
+%nonassoc Calling
 %nonassoc Then 
 %nonassoc Else
 %nonassoc Terminate
@@ -97,6 +98,10 @@ let application :=
     // | funct = choreographies; argument = choreographies;
     //     {Application {funct; argument}}
 
+let calling :=
+    | name = Identifier; arg = choreographies;
+        {Calling {name; arg}}
+
 
 let le := 
     | l = Identifier; Dot; e = sub_expr;
@@ -110,6 +115,7 @@ let choreographies :=
     | choreo_vars
     | fun_expr
     | application
+    | calling
 
 let let_in :=  
     | c = choreographies; Comm_S; r = Identifier; Dot; b = variable; Terminate; cp = choreographies;

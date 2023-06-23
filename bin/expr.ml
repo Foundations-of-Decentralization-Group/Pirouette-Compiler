@@ -6,6 +6,7 @@ type expr =
   | Branch of {ift: expr; thn : expr; el: expr}
   | Sync of {sndr: string; d: string; rcvr: string; thn: expr}
   | Fun of {name: string; arg: expr; body: expr}
+  | Calling of {name: string; arg: expr}
   | Snd of {sndr: expr; name: string}
   | Let of {fst: expr; snd: expr; thn: expr}
   | Map of {name: string; arg: expr}
