@@ -14,7 +14,7 @@ let int = '-'? digit+
 let conditional = '>' | '<' | '='
 let sync_label = 'L' | 'R'
 let bool = "true" | "false"
-let type = "bool" | "int"  | "string"
+let l_type = "bool" | "int"  | "string"
 
 rule read = 
     parse
@@ -42,9 +42,10 @@ rule read =
         | ")" {RParen}
         | ";" {Terminate}
         | ":" {Colon}
+        | "->" {Arrow}
         | ('"' (([^'>''"']|'>'[^'>''"'])* as st) '"') { STRING st }
         | bool {BOOL (lexeme lexbuf)}
-        | type {Type (lexeme lexbuf)}
+        | l_type {LType (lexeme lexbuf)}
         | string {Identifier (lexeme lexbuf)}
         | newline { read lexbuf }
         | eof {EOF}

@@ -6,7 +6,7 @@
 %token <string> Condition
 %token <string> SyncLbl
 %token <string> ChoreoVars
-%token <string> Type
+%token <string> LType
 %token <int> INT
 %token <string> STRING
 %token <string> BOOL
@@ -22,6 +22,7 @@
 %token Else "else"
 %token Then "then"
 %token Comm_S "~>"
+%token Arrow "->"
 %token Fun "fun"
 %token Colon ":"
 %token Assignment ":="
@@ -59,8 +60,9 @@ let prog :=
     | e = expr; line_end; {Some e}
 
 let choreo_vars := 
-    | i = ChoreoVars; {ChoreoVars i}
-
+    | name = ChoreoVars; Colon; loc=Identifier; Dot; typ=LType {ChoreoVars {name; typ = Some DotType{loc; typ}}}
+    | name = ChoreoVars; Colon; loc=Identifier; Dot; typ=LType {ChoreoVars {name; typ = Some DotType{loc; typ}}}
+    
 let variable := 
     | name = Identifier; Colon; typ = Type; {Variable {name; typ = Some typ}}
     | name = Identifier; {Variable {name; typ = None}}
