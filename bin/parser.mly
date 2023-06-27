@@ -3,10 +3,13 @@
 %}
 
 %token <string> Identifier
-%token <int> Val
 %token <string> Condition
 %token <string> SyncLbl
 %token <string> ChoreoVars
+%token <string> Type
+%token <int> INT
+%token <string> STRING
+%token <string> BOOL
 %token Plus "+"
 %token Minus "-"
 %token Product "*"
@@ -20,6 +23,7 @@
 %token Then "then"
 %token Comm_S "~>"
 %token Fun "fun"
+%token Colon ":"
 %token Assignment ":="
 %token Let "let"
 %token In "in"
@@ -32,13 +36,13 @@
 %nonassoc In
 %nonassoc Let
 %nonassoc Fun
-%nonassoc Calling
 %nonassoc Then 
 %nonassoc Else
 %nonassoc Terminate
 %right Assignment
 %nonassoc Comm_S
 %nonassoc Dot
+%nonassoc Colon
 %nonassoc Condition
 %left Plus Minus
 %left Product Division
@@ -58,54 +62,63 @@ let choreo_vars :=
     | i = ChoreoVars; {ChoreoVars i}
 
 let variable := 
-    | i = Identifier; {Variable i}
+    | name = Identifier; Colon; typ = Type; {Variable {name; typ = Some typ}}
+    | name = Identifier; {Variable {name; typ = None}}
 
+//to be removed upon confirmation
 let mappr :=
     | n = Identifier; LSqParen; a = sub_expr; RSqParen; 
-        {Map {name = n; arg = a}} 
+        {Map {name = n; arg = a; typ = None}} 
 
 let conditionals := 
     | lft = sub_expr; op = Condition; rght = sub_expr;
-        {Condition {lft; op; rght}}
+        {Condition {lft; op; rght; typ = Some "bool"}}
     | LParen; c = conditionals; RParen;
         {c}
 
 let if_thn_else := 
     | If; ift = choreographies; Then; thn = choreographies; Else; el = choreographies;
-        {Branch {ift; thn; el}}
+        {Branch {ift; thn; el; typ = None}}
 
 let sync := 
     | sndr = Identifier; LSqParen; d = SyncLbl; RSqParen; Comm_S; rcvr = Identifier; Terminate; thn = choreographies;
-        {Sync {sndr; d; rcvr; thn}}
+        {Sync {sndr; d; rcvr; thn; typ = None}}
 
-let value :=
-    | v = Val; {Value v}
+let integer :=
+    | v = INT; {INT v}
+
+let string :=
+    | v = STRING; {STRING v}
+
+let bool :=
+    | v = BOOL; {BOOL (bool_of_string v)}
 
 let sub_expr := 
-    | value
+    | integer
+    | string
+    | bool
     | eq
     | mappr
     | variable
     | conditionals
 
 let fun_expr := 
+    | Fun; name = Identifier; LParen; arg = choreographies; RParen; Colon; typ = Type; Assignment; body = choreographies;
+            {Fun {name; arg; body; typ = Some typ}}
     | Fun; name = Identifier; LParen; arg = choreographies; RParen; Assignment; body = choreographies;
-        {Fun {name; arg; body}}
+        {Fun {name; arg; body; typ = None}}
 
 let application :=
     | LParen; funct = choreographies; RParen; argument = choreographies;
-        {Application {funct; argument}} 
-    // | funct = choreographies; argument = choreographies;
-    //     {Application {funct; argument}}
+        {Application {funct; argument; typ = None}} 
 
 let calling :=
-    | name = Identifier; arg = choreographies;
-        {Calling {name; arg}}
-
+    | name = Identifier; arg = le;
+        {Calling {name; arg; typ = None}}
 
 let le := 
     | l = Identifier; Dot; e = sub_expr;
-        {Assoc {loc = l; arg = e}}
+        {Assoc {loc = l; arg = e; typ = None}}
 
 let choreographies := 
     | if_thn_else
@@ -118,49 +131,32 @@ let choreographies :=
     | calling
 
 let let_in :=  
+    // | e = le; Comm_S; r = Identifier; Dot; b = variable; Terminate; cp = choreographies;
+    //     {Let {fst = Assoc {loc = r; arg = b}; snd = Snd {sndr = e; name = r}; thn= cp}}
     | c = choreographies; Comm_S; r = Identifier; Dot; b = variable; Terminate; cp = choreographies;
-        {Let {fst = Assoc {loc = r; arg = b}; snd = Snd {sndr = c; name = r}; thn= cp}}
-    | Let; e = Identifier; Dot; v = variable; Assignment; r = Identifier; Dot; b = variable; Comm_S; Identifier; Terminate; In; cp = choreographies;
-        {Let {fst = Assoc {loc = e; arg = v}; snd = Snd {sndr = Assoc{loc = r; arg = b}; name = e}; thn= cp}}   
+        {Let {fst = Assoc {loc = r; arg = b; typ = None}; snd = Snd {sndr = c; name = r; typ = None}; thn= cp; typ = None}}
+    | Let; e = Identifier; Dot; v = variable; Assignment; r = Identifier; Dot; b = variable; Comm_S; 
+        Identifier; Terminate; In; cp = choreographies;
+        {Let {fst = Assoc {loc = e; arg = v; typ = None}; snd = Snd {sndr = Assoc{loc = r; arg = b; typ = None}; name = e; typ = None}; thn= cp; typ = None}}   
     | Let; e = Identifier; Dot; v = variable; Assignment; c = choreographies; In; cp = choreographies;
-        {Let {fst = Assoc {loc = e; arg = v}; snd = c; thn= cp}}  
+        {Let {fst = Assoc {loc = e; arg = v; typ = None}; snd = c; thn= cp; typ = None}}  
 
 let operator :=
     | lft = sub_expr; Plus; rght = sub_expr; 
-        {Plus {lft; rght}}
+        {Plus {lft; rght; typ = Some "int"}}
     | lft = sub_expr; Minus; rght = sub_expr; 
-        {Minus {lft; rght}}
+        {Minus {lft; rght; typ = Some "int"}}
     | lft = sub_expr; Product; rght = sub_expr; 
-        {Product {lft; rght}}
+        {Product {lft; rght; typ = Some "int"}}
     | lft = sub_expr; Division; rght = sub_expr; 
-        {Division {lft; rght}}
+        {Division {lft; rght; typ = Some "int"}}
 
 let eq := 
     | LParen; op = operator; RParen;
         {op}
     | op = operator; 
         {op}
- 
-// let main := 
-//     | choreographies
-    // move to commS implementation
-    // | sr = commS; arg = expr;
-    //     {Seq {fst = sr; thn = arg}}
-    // | sr = sync; arg = expr;
-    //     {Seq {fst = sr; thn = arg}}
-
-// let sub_expr :=
-//     | variable
-//     | LParen; e = expr; RParen; {e}
-
-// let abstraction ==
-//   | Lambda; p = Identifier; Dot; e = expr;
-//     { Abstraction { param = p; body = e } }
-
-// let application :=
-//   | sub_expr
-//   | f = application; a = sub_expr;
-//     {Application { funct = f; argument = a }}
 
 let expr := 
+    // | conditionals
     | choreographies

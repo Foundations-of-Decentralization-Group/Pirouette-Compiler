@@ -47,6 +47,12 @@
  (libraries expr ctrl))
 
 (executable
+ (name typechecker)
+ (public_name typechecker)
+ (modules typechecker)
+ (libraries expr))
+
+(executable
  (name codify)
  (public_name codify)
  (modules codify utils)

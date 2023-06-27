@@ -13,11 +13,13 @@ let choreographic_vars = ['A'-'Z']
 let int = '-'? digit+
 let conditional = '>' | '<' | '='
 let sync_label = 'L' | 'R'
+let bool = "true" | "false"
+let type = "bool" | "int"  | "string"
 
 rule read = 
     parse
         | whitespace {read lexbuf }
-        | int { Val (int_of_string (lexeme lexbuf)) }
+        | int { INT (int_of_string (lexeme lexbuf)) }
         | "[" {LSqParen}
         | "]" {RSqParen}
         | conditional {Condition (lexeme lexbuf)}
@@ -39,6 +41,10 @@ rule read =
         | "(" {LParen}
         | ")" {RParen}
         | ";" {Terminate}
+        | ":" {Colon}
+        | ('"' (([^'>''"']|'>'[^'>''"'])* as st) '"') { STRING st }
+        | bool {BOOL (lexeme lexbuf)}
+        | type {Type (lexeme lexbuf)}
         | string {Identifier (lexeme lexbuf)}
         | newline { read lexbuf }
         | eof {EOF}

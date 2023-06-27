@@ -122,7 +122,7 @@ let rec parse_expr expr currentNode : string =
     let parsed_argument = parse_expr argument currentNode in
       parsed_funct ^ " " ^ parsed_argument
   | ChoreoVars x -> x 
-  | Snd _ | Abstraction _ | Comm_S _ | UMinus _ -> ""  *)
+  | Snd _ | UMinus _ -> ""  *)
 
 let get_entitities expr : SS.t = 
   let set1 = SS.empty in
@@ -157,8 +157,8 @@ let get_entitities expr : SS.t =
       | Calling {name = _; arg} ->
         let acc_arg = aux acc arg in
         acc_arg 
-      | Variable _ | Value _ | ChoreoVars _ | Condition _ | Map _ | Abstraction _
-      | Comm_S _ | Plus _|Minus _|Product _|Division _| UMinus _  -> acc
+      | Variable _ | Value _ | ChoreoVars _ | Condition _ | Map _ 
+      | Plus _|Minus _|Product _|Division _| UMinus _  -> acc
     in
       aux set1 expr
 
@@ -458,7 +458,7 @@ let rec parse_ast (expr_ast: expr) (currentNode: string): ctrl option =
           Some (Ctrl.Application {funct = parsed_funct; argument = parsed_argument})
         | _ -> None)
   | ChoreoVars x -> Some (ChoreoVars x)
-  | Snd _ | Abstraction _ | Comm_S _ | UMinus _ -> None 
+  | Snd _ -> None 
 
 let () = SS.iter (fun entity -> 
   let res = parse_ast ast entity in
