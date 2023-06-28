@@ -11,10 +11,8 @@ let string = [^ 'L' 'R' '(' ')' '\\' '.' '#' ' ' '\t' '\n' '\t' '*' '-' '/' '+' 
 let digit = ['0'-'9']
 let choreographic_vars = ['A'-'Z']
 let int = '-'? digit+
-let conditional = '>' | '<' | '='
 let sync_label = 'L' | 'R'
 let bool = "true" | "false"
-let l_type = "bool" | "int"  | "string"
 
 rule read = 
     parse
@@ -22,17 +20,20 @@ rule read =
         | int { INT (int_of_string (lexeme lexbuf)) }
         | "[" {LSqParen}
         | "]" {RSqParen}
-        | conditional {Condition (lexeme lexbuf)}
         | "+" {Plus}
         | "-" {Minus}
         | "*" {Product}
         | "/" {Division}
+        | ">" {Gt}
+        | "<" {Lt}
+        | "=" {Eq}
         | sync_label {SyncLbl (lexeme lexbuf)}
         | choreographic_vars {ChoreoVars (lexeme lexbuf)}
         | "if" {If}
         | "then" {Then}
         | "else" {Else}
         | "~>" {Comm_S}
+        | "->" {Arrow}
         | "fun" {Fun}
         | ":=" {Assignment}
         | "let" {Let}
@@ -42,10 +43,11 @@ rule read =
         | ")" {RParen}
         | ";" {Terminate}
         | ":" {Colon}
-        | "->" {Arrow}
         | ('"' (([^'>''"']|'>'[^'>''"'])* as st) '"') { STRING st }
         | bool {BOOL (lexeme lexbuf)}
-        | l_type {LType (lexeme lexbuf)}
+        | "bool" {BoolType}
+        | "int" {IntType}
+        | "string" {StringType}
         | string {Identifier (lexeme lexbuf)}
         | newline { read lexbuf }
         | eof {EOF}
