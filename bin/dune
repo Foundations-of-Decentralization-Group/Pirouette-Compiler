@@ -50,7 +50,7 @@
  (name typechecker)
  (public_name typechecker)
  (modules typechecker)
- (libraries expr))
+ (libraries expr containers))
 
 (executable
  (name codify)
