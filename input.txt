@@ -1,2 +1,2 @@
-let person.name : int := person.5 in 
-person.name ~> person2.x ; person.name
+fun fname (X : person1.int)
+ := person1.(name : int)

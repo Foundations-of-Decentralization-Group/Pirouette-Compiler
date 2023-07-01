@@ -38,7 +38,7 @@
 %token EOF
 
 //Precedence Rules (Lower -> Higher)
-%nonassoc In
+%nonassoc In BoolType StringType IntType
 %nonassoc Let
 %nonassoc Fun
 %nonassoc Then 
@@ -76,20 +76,14 @@ let gtyp :=
     { ArrowType (ityp, otyp) }
 
 let variable := 
-    | LParen; name = Identifier; Colon; typ = ltyp; RParen; 
+    | LParen; name = Identifier; Colon; typ = z; RParen; 
         {Variable (Name name, Some typ)}
     | name = Identifier; 
         {Variable (Name name, None)}
 
 let choreo_vars := 
     | name = ChoreoVars; Colon; typ = gtyp; 
-        {ChoreoVars (Name name, Some typ) }
-    
-
-//to be removed upon confirmation
-let mappr :=
-    | name = Identifier; LSqParen; a = sub_expr; RSqParen; 
-        {Map (Name name, a, None)} 
+        {ChoreoVars (Name name, Some typ)}
 
 let binop :=
     | Gt; {Gt}
@@ -124,18 +118,32 @@ let sub_expr :=
     | string
     | bool
     | eq
-    | mappr
     | variable
     | if_condition
 
+// person.name ~> person2.x   let person2.x := person.name ~> person2 in ---
+
 // fun F (X) : (T1 -> T2) := C1 in C2
 //  fun F (X : T1 ) : T2 := C1 in C2 use this
-
+// name = ChoreoVars; Colon; ityp = gtyp; 
 let fun_expr :=    
-    | Fun; name = Identifier; LParen; arg = choreographies; RParen; Colon; typ = gtyp; Assignment; body = choreographies;
-            {Fun (Name name, arg, body, Some typ)}
-    | Fun; name = Identifier; LParen; arg = choreographies; RParen; Assignment; body = choreographies;
-        {Fun (Name name, arg, body, None)}
+    //arg = choreovars
+    | Fun; name = Identifier; LParen; arg_name = ChoreoVars; Colon; ityp = gtyp; RParen; Colon; otyp = gtyp; Assignment; body = choreographies;
+            {FunG (Name name, ChoreoVars (Name arg_name, Some ityp), body, Some (ArrowType(ityp, otyp)))}
+    | Fun; name = Identifier; LParen; arg = choreo_vars; RParen; Assignment; body = choreographies;
+            {FunG (Name name, arg, body, None)}
+    //arg = l.e Fun funct (l.(x:int)) : person.int := Body 
+    | Fun; name = Identifier; LParen; loc = Identifier; Dot; LParen; bndr = Identifier; Colon; BoolType; RParen; 
+        RParen; Colon; ityp = gtyp; Assignment; body = choreographies;
+            {FunL (Name name, Location loc, Variable (Name bndr, Some BoolType), body, Some (ArrowType(DotType(Location loc, BoolType), ityp)))}
+    | Fun; name = Identifier; LParen; loc = Identifier; Dot; LParen; bndr = Identifier; Colon; IntType; RParen; 
+        RParen; Colon; ityp = gtyp; Assignment; body = choreographies;
+            {FunL (Name name, Location loc, Variable (Name bndr, Some IntType), body, Some (ArrowType(DotType(Location loc, IntType), ityp)))}
+    | Fun; name = Identifier; LParen; loc = Identifier; Dot; LParen; bndr = Identifier; Colon; StringType; RParen; 
+        RParen; Colon; ityp = gtyp; Assignment; body = choreographies;
+            {FunL (Name name, Location loc, Variable (Name bndr, Some StringType), body, Some (ArrowType(DotType(Location loc, StringType), ityp)))}
+    | Fun; name = Identifier; LParen; loc = Identifier; Dot; arg = variable; RParen; Assignment; body = choreographies;
+            {FunL (Name name, Location loc, arg, body, None)}
 
 let application :=
     | LParen; funct = choreographies; RParen; arg = choreographies;
@@ -163,12 +171,11 @@ let let_in :=
     // | e = le; Comm_S; r = Identifier; Dot; b = variable; Terminate; cp = choreographies;
     //     {Let {fst = Assoc {loc = r; arg = b}; snd = Snd {sndr = e; name = r}; thn= cp}}
     | c = choreographies; Comm_S; rcvr = Identifier; Dot; bndr = variable; Terminate; cp = choreographies;
-        {Let (Assoc (Location rcvr, bndr, None), Snd (c, Location rcvr, None), cp, None)}                         
-    | Let; sndr = Identifier; Dot; var = variable; Assignment; rcvr = le; Comm_S; 
-        Identifier; Terminate; In; cp = choreographies;
-        {Let (Assoc (Location sndr, var, None), Snd (rcvr, Location sndr, None), cp, None)}   
-    | Let; sndr = Identifier; Dot; var = variable; Assignment; c = choreographies; In; cp = choreographies;
-        {Let (Assoc (Location sndr, var, None), c, cp, None)}  
+        {Let (Location rcvr, bndr, Snd (c, Location rcvr, None), cp, None)}                         
+    | Let; rcvr = Identifier; Dot; bndr = variable; Assignment; sndr = le; Comm_S; Identifier; Terminate; In; cp = choreographies;
+        {Let (Location rcvr, bndr, Snd (sndr, Location rcvr, None), cp, None)}   
+    | Let; sndr = Identifier; Dot; bndr = variable; Assignment; c = choreographies; In; cp = choreographies;
+        {Let (Location sndr, bndr, c, cp, None)}  
 
 let operator :=
     | lft = sub_expr; Plus; rght = sub_expr; 
