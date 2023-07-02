@@ -64,7 +64,7 @@ let prog :=
     | e = expr; line_end; {Some e}
 
 
-let ltyp :=
+let ltyp ==
     | BoolType; {BoolType}
     | IntType; {IntType}
     | StringType; {StringType}
@@ -75,15 +75,17 @@ let gtyp :=
   | ityp = gtyp; Arrow; otyp = gtyp;
     { ArrowType (ityp, otyp) }
 
-let variable := 
-    | LParen; name = Identifier; Colon; typ = z; RParen; 
+let variable == 
+    | LParen; name = Identifier; Colon; typ = ltyp; RParen; 
         {Variable (Name name, Some typ)}
     | name = Identifier; 
         {Variable (Name name, None)}
 
-let choreo_vars := 
+let choreo_vars == 
     | name = ChoreoVars; Colon; typ = gtyp; 
         {ChoreoVars (Name name, Some typ)}
+    | name = ChoreoVars; 
+        {ChoreoVars (Name name, None)}
 
 let binop :=
     | Gt; {Gt}
@@ -126,22 +128,19 @@ let sub_expr :=
 // fun F (X) : (T1 -> T2) := C1 in C2
 //  fun F (X : T1 ) : T2 := C1 in C2 use this
 // name = ChoreoVars; Colon; ityp = gtyp; 
+//| Fun; name = Identifier; LParen; arg_name = ChoreoVars; Colon; ityp = gtyp; RParen; Assignment; body = choreographies;
+//            {FunG (Name name, ChoreoVars (Name arg_name, Some ityp), body, None)}
+
 let fun_expr :=    
     //arg = choreovars
     | Fun; name = Identifier; LParen; arg_name = ChoreoVars; Colon; ityp = gtyp; RParen; Colon; otyp = gtyp; Assignment; body = choreographies;
             {FunG (Name name, ChoreoVars (Name arg_name, Some ityp), body, Some (ArrowType(ityp, otyp)))}
-    | Fun; name = Identifier; LParen; arg = choreo_vars; RParen; Assignment; body = choreographies;
-            {FunG (Name name, arg, body, None)}
+    | Fun; fname = Identifier; LParen; argument = choreo_vars; RParen; Assignment; body = choreographies;
+            {FunG (Name fname, argument, body, None)}
     //arg = l.e Fun funct (l.(x:int)) : person.int := Body 
-    | Fun; name = Identifier; LParen; loc = Identifier; Dot; LParen; bndr = Identifier; Colon; BoolType; RParen; 
+    | Fun; name = Identifier; LParen; loc = Identifier; Dot; LParen; bndr = Identifier; Colon; otyp = ltyp; RParen; 
         RParen; Colon; ityp = gtyp; Assignment; body = choreographies;
-            {FunL (Name name, Location loc, Variable (Name bndr, Some BoolType), body, Some (ArrowType(DotType(Location loc, BoolType), ityp)))}
-    | Fun; name = Identifier; LParen; loc = Identifier; Dot; LParen; bndr = Identifier; Colon; IntType; RParen; 
-        RParen; Colon; ityp = gtyp; Assignment; body = choreographies;
-            {FunL (Name name, Location loc, Variable (Name bndr, Some IntType), body, Some (ArrowType(DotType(Location loc, IntType), ityp)))}
-    | Fun; name = Identifier; LParen; loc = Identifier; Dot; LParen; bndr = Identifier; Colon; StringType; RParen; 
-        RParen; Colon; ityp = gtyp; Assignment; body = choreographies;
-            {FunL (Name name, Location loc, Variable (Name bndr, Some StringType), body, Some (ArrowType(DotType(Location loc, StringType), ityp)))}
+            {FunL (Name name, Location loc, Variable (Name bndr, Some otyp), body, Some (ArrowType(DotType(Location loc, otyp), ityp)))}
     | Fun; name = Identifier; LParen; loc = Identifier; Dot; arg = variable; RParen; Assignment; body = choreographies;
             {FunL (Name name, Location loc, arg, body, None)}
 
@@ -195,4 +194,3 @@ let eq :=
 
 let expr := 
     | choreographies
-    // | sub_expr

@@ -71,12 +71,23 @@ let rec local_type_check (l_expr_ast: l_expr) =
           | _ -> raise (TypeCheckingFailedException "Product expects left and right arguments to be Integer values") 
         )
       | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating Product")
-      )
-  | _ -> raise (TypeCheckingFailedException "Not executed")
+    )
 
 let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t): tc_ast =
   match expr_ast with
-    | ChoreoVars (Name name, typ) -> GTcast(typ, Some (ChoreoVars (Name name, typ)))
+    | ChoreoVars (Name name, typ) -> 
+      (match ImmutableMap.find_opt (name) typeMap, typ with
+        | Some inf_typ, Some dec_typ when globalType_equal inf_typ dec_typ -> 
+          GTcast(Some inf_typ, Some (ChoreoVars (Name name, Some inf_typ)))
+        | Some _, Some _ ->
+          raise (TypeCheckingFailedException "Choreovar inferred and declared type does not match")
+        | Some inf_typ, None ->
+          GTcast(Some inf_typ, Some (ChoreoVars (Name name, Some inf_typ)))
+        | None, Some dec_typ ->
+          GTcast(Some dec_typ, Some (ChoreoVars (Name name, Some dec_typ)))
+        | None, None ->
+          raise (TypeCheckingFailedException "Choreovar type not declared and can not be inferred")
+      )
     | Branch (ift, thn, el, _ ) ->
       (match type_check ift typeMap, type_check thn typeMap, type_check el typeMap with
         | GTcast(Some DotType(_, BoolType), Some if_ast), GTcast(Some thn_typ, Some thn_ast), 
@@ -117,7 +128,10 @@ let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t): tc_ast
         | GTcast(Some DotType(_, snd_typ), Some snd_ast), GTcast(Some thn_typ, Some thn_ast) 
           when localType_equal snd_typ bndr_typ ->
             GTcast(Some thn_typ, Some (Let (Location loc, Variable(Name bndr, Some bndr_typ), snd_ast, thn_ast, Some thn_typ)))
-        | _ -> raise (TypeCheckingFailedException "Variable should be assigned value of same type")
+        | GTcast(_, _), GTcast(_, _) ->
+          (* let _ = print_endline (string_of_bool(localType_equal snd_typ bndr_typ)) in  *)
+          raise (TypeCheckingFailedException "Variable should be assigned value of same type")
+        | _ -> raise (TypeCheckingFailedException "Let error")
       ) 
     | Let (_, _, _, _, _) -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating Let")    
     | Sync (Location sndr, Direction d, Location rcvr, thn, _) ->
@@ -133,8 +147,9 @@ let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t): tc_ast
           GTcast(Some otyp, Some (Application(fun_ast, arg_ast, Some otyp)))
         | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating Application")
       )
-    |FunG (name, arg, body, Some typ) ->
-      (match type_check arg typeMap, type_check body typeMap with
+    |FunG (name, ChoreoVars(Name bndr_name, Some bndr_typ), body, Some typ) ->
+      let _new_map = ImmutableMap.add bndr_name bndr_typ typeMap in
+      (match type_check (ChoreoVars(Name bndr_name, Some bndr_typ)) _new_map, type_check body _new_map with
         | GTcast(Some arg_typ, Some arg_ast), GTcast(Some body_typ, Some body_ast) 
           when globalType_equal (typ) (ArrowType(arg_typ, body_typ))->
           GTcast(Some (ArrowType(arg_typ, body_typ)), Some (FunG (name, arg_ast, body_ast, Some (ArrowType(arg_typ, body_typ)))))
@@ -142,8 +157,9 @@ let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t): tc_ast
           raise (TypeCheckingFailedException "FunG type mismatch")
         | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating FunG with type defined")
       )
-    |FunG (name, arg, body, None) ->
-      (match type_check arg typeMap, type_check body typeMap with
+    |FunG (name, ChoreoVars(Name bndr_name, Some bndr_typ), body, None) ->
+      let _new_map = ImmutableMap.add bndr_name bndr_typ typeMap in
+      (match type_check (ChoreoVars(Name bndr_name, Some bndr_typ)) _new_map, type_check body _new_map with
         | GTcast(Some arg_typ, Some arg_ast), GTcast(Some body_typ, Some body_ast) ->
           GTcast(Some (ArrowType(arg_typ, body_typ)), Some (FunG (name, arg_ast, body_ast, Some (ArrowType(arg_typ, body_typ)))))
         | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating FunG without type declaration")
@@ -160,12 +176,13 @@ let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t): tc_ast
           raise (TypeCheckingFailedException "FunL type mismatch")
         | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating FunL with type defined")
       )
-    |FunL (name, loc, Variable(Name bndr, Some bndr_typ), body, None) ->
-      (match type_check body typeMap with
+    |FunL (name, Location loc, Variable(Name bndr, Some bndr_typ), body, None) ->
+      let _new_map = ImmutableMap.add (loc ^"."^ bndr) (DotType(Location loc, bndr_typ)) typeMap in
+      (match type_check body _new_map with
         | GTcast(Some body_typ, Some body_ast) ->
-          GTcast(Some (ArrowType(DotType(loc, bndr_typ), body_typ)), 
-          Some (FunL (name, loc, Variable(Name bndr, Some bndr_typ), body_ast, 
-          Some (ArrowType(DotType(loc, bndr_typ), body_typ)))))
+          GTcast(Some (ArrowType(DotType(Location loc, bndr_typ), body_typ)), 
+          Some (FunL (name, Location loc, Variable(Name bndr, Some bndr_typ), body_ast, 
+          Some (ArrowType(DotType(Location loc, bndr_typ), body_typ)))))
         | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating FunL without type defined")
       )
     (* | Calling *)
@@ -175,15 +192,19 @@ let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t): tc_ast
 let _ast = (Expr.Assoc ((Expr.Location "person"),
 (Expr.Variable ((Expr.Name "name"), (Some Expr.StringType))), None))
 
-let ast2 = (Expr.FunG ((Expr.Name "fname"),    
+let ast2 = (Expr.FunG ((Expr.Name "init"),     
 (Expr.ChoreoVars ((Expr.Name "X"),
    (Some (Expr.DotType ((Expr.Location "person1"), Expr.IntType))))),
-(Expr.Assoc ((Expr.Location "person1"),
-   (Expr.Variable ((Expr.Name "name"), (Some Expr.IntType))), None)),
-(Some (Expr.ArrowType (
-         (Expr.DotType ((Expr.Location "person1"), Expr.IntType)),
-         (Expr.DotType ((Expr.Location "person1"), Expr.IntType)))))
-))
+(Expr.Let ((Expr.Location "person2"),
+   (Expr.Variable ((Expr.Name "y"), (Some Expr.IntType))),
+   (Expr.Snd (
+      (Expr.Assoc ((Expr.Location "person1"),
+         (Expr.Variable ((Expr.Name "x"), (Some Expr.IntType))), None)),
+      (Expr.Location "person2"), None)),
+   (Expr.ChoreoVars ((Expr.Name "X"), None)), None)),
+None))
+
+
 (* let ast = Expr.Plus {lft = (Expr.INT 3); rght = (Expr.INT 5);
 typ = (Some typ_int)} *)
 

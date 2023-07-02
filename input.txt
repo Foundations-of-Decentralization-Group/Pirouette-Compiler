@@ -1,2 +1,4 @@
-fun fname (X : person1.int)
- := person1.(name : int)
+fun init 
+(X : person1.int)
+:= person1.(x : int) ~> person2.(y : int); 
+X
