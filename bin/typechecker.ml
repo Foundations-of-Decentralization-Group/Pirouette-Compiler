@@ -16,61 +16,75 @@ let _updated_map = ImmutableMap.add 2 "two" new_map
 let () =
   ImmutableMap.iter (fun k v -> Printf.printf "%d -> %s\n" k v) new_map *)
 
-let rec local_type_check (l_expr_ast: l_expr) = 
+let rec local_type_check (l_expr_ast: l_expr) (loc : location) (typeMap: globalType ImmutableMap.t) = 
   match l_expr_ast with
   | STRING s -> LTcast(Some StringType, Some (STRING s))
   | INT i -> LTcast(Some IntType, Some (INT i))
   | BOOL b -> LTcast(Some BoolType, Some (BOOL b))
-  | Variable(name, typ) -> LTcast(typ, Some (Variable (name, typ)))
+  | Variable(Name name, typ) -> 
+    let Location loc_str = loc in
+    (match ImmutableMap.find_opt (loc_str^"."^name) typeMap, typ with
+      | Some (DotType(Location _, inf_typ)), Some dec_typ 
+        when localType_equal inf_typ dec_typ ->
+        LTcast(Some dec_typ, Some (Variable (Name name, Some dec_typ)))
+      | Some _, Some _ ->
+        raise (TypeCheckingFailedException "inferred type and declared type do not match")
+      | Some (DotType(Location _, inf_typ)), None ->
+        LTcast(Some inf_typ, Some (Variable (Name name, Some inf_typ)))
+      | None, Some dec_typ->
+        LTcast(Some dec_typ, Some (Variable (Name name, Some dec_typ)))
+      | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Variable")
+    )
+
   | Condition (lft, op, rght, _) -> 
-    (match local_type_check lft, local_type_check rght with
+    (match local_type_check lft loc typeMap, local_type_check rght loc typeMap with
       | LTcast(Some typ1, Some ast1), LTcast(Some typ2, Some ast2) -> 
         (match typ1, typ2 with
           | IntType, IntType -> 
             LTcast(Some BoolType, Some (Condition (ast1, op, ast2, Some BoolType)))
           | _ -> raise (TypeCheckingFailedException "Condition expects left and right arguments to be Integer values") 
         )
-      | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating Condition") 
+      | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Condition") 
     )
   | Plus (lft, rght, _) -> 
-    (match local_type_check lft, local_type_check rght with
+    (match local_type_check lft loc typeMap, local_type_check rght loc typeMap with
       | LTcast(Some typ1, Some ast1), LTcast(Some typ2, Some ast2) -> 
         (match typ1, typ2 with
           | IntType, IntType -> 
             LTcast(Some IntType, Some (Plus (ast1, ast2, Some IntType)))
           | _ -> raise (TypeCheckingFailedException "Plus expects left and right arguments to be Integer values") 
         )
-      | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating Plus")
+      | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Plus")
       )
   | Minus (lft, rght, _) -> 
-    (match local_type_check lft, local_type_check rght with
+    (match local_type_check lft loc typeMap, local_type_check rght loc typeMap with
       | LTcast(Some typ1, Some ast1), LTcast(Some typ2, Some ast2) -> 
         (match typ1, typ2 with
           | IntType, IntType -> 
             LTcast(Some IntType, Some (Minus (ast1, ast2, Some IntType)))
           | _ -> raise (TypeCheckingFailedException "Minus expects left and right arguments to be Integer values") 
         )
-      | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating Minus")
+      | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Minus")
       )
   | Division (lft, rght, _) -> 
-    (match local_type_check lft, local_type_check rght with
+    (match local_type_check lft loc typeMap, local_type_check rght loc typeMap with
       | LTcast(Some typ1, Some ast1), LTcast(Some typ2, Some ast2) -> 
         (match typ1, typ2 with
           | IntType, IntType -> 
             LTcast(Some IntType, Some (Division (ast1, ast2, Some IntType)))
           | _ -> raise (TypeCheckingFailedException "Division expects left and right arguments to be Integer values") 
         )
-      | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating Division")
+      | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Division")
       )
   | Product (lft, rght, _) -> 
-    (match local_type_check lft, local_type_check rght with
+    (match local_type_check lft loc typeMap, local_type_check rght loc typeMap with
       | LTcast(Some typ1, Some ast1), LTcast(Some typ2, Some ast2) -> 
         (match typ1, typ2 with
           | IntType, IntType -> 
             LTcast(Some IntType, Some (Product (ast1, ast2, Some IntType)))
           | _ -> raise (TypeCheckingFailedException "Product expects left and right arguments to be Integer values") 
         )
-      | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating Product")
+      | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Product")
     )
 
 let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t): tc_ast =
@@ -96,7 +110,7 @@ let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t): tc_ast
         | _ -> raise (TypeCheckingFailedException "If should contain an expression that resolves to boolean and both branches should evaluate to same type.") 
       )
     | Assoc (loc, Variable(Name name, typ), _) ->
-      (match local_type_check (Variable(Name name, typ)) with 
+      (match local_type_check (Variable(Name name, typ)) loc typeMap with 
         | LTcast(Some typ1, Some ast1) -> 
               GTcast( Some (DotType( loc, typ1)), Some (Assoc(loc, ast1, Some (DotType(loc, typ1)))))
         | LTcast(None, Some Variable(Name l_name, _)) -> 
@@ -106,22 +120,22 @@ let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t): tc_ast
             | Some _ -> raise (TypeCheckingFailedException "Assoc can only have P.t type")
             | None -> raise (TypeCheckingFailedException "Variable type is not declared")
           ) 
-        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating Assoc")
+        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Assoc")
       )
     | Assoc (loc, arg, _) ->
-      (match local_type_check arg with 
+      (match local_type_check arg loc typeMap with 
         | LTcast(Some typ1, Some ast1) -> 
           GTcast(Some (DotType(loc, typ1)), Some (Assoc (loc, ast1, Some (DotType(loc, typ1)))))
-        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating Assoc")
+        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Assoc")
       )
     | Snd (Assoc(loc, arg, typ), rcvng_location, _) ->
         (match type_check (Assoc(loc, arg, typ)) typeMap with 
           | GTcast(Some DotType(_, assoc_typ), Some assoc_ast) -> 
               GTcast(Some (DotType(rcvng_location, assoc_typ)), 
                 Some (Snd(assoc_ast, rcvng_location, Some (DotType(rcvng_location, assoc_typ)))))
-          | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating Snd")
+          | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Snd")
         )
-    | Snd (_, _, _) -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating Snd | sndr can only be Assoc")    
+    | Snd (_, _, _) -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Snd | sndr can only be Assoc")    
     | Let (Location loc, Variable(Name bndr, Some bndr_typ), snd, thn, _) -> 
       let _new_map = ImmutableMap.add (loc ^"."^ bndr) (DotType(Location loc, bndr_typ)) typeMap in
       (match type_check snd _new_map, type_check thn _new_map with
@@ -133,19 +147,19 @@ let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t): tc_ast
           raise (TypeCheckingFailedException "Variable should be assigned value of same type")
         | _ -> raise (TypeCheckingFailedException "Let error")
       ) 
-    | Let (_, _, _, _, _) -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating Let")    
+    | Let (_, _, _, _, _) -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Let")    
     | Sync (Location sndr, Direction d, Location rcvr, thn, _) ->
       (match type_check thn typeMap with
         | GTcast(Some thn_typ, Some thn_ast) -> 
           GTcast(Some thn_typ, Some (Sync (Location sndr, Direction d, Location rcvr, thn_ast, Some thn_typ)))
-        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating Sync")
+        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Sync")
       )
     | Application (funct, arg, _) ->
       (match type_check funct typeMap, type_check arg typeMap with
         | GTcast(Some (ArrowType(ityp, otyp)), Some fun_ast), GTcast(Some arg_typ, Some arg_ast) 
         when globalType_equal ityp arg_typ ->
           GTcast(Some otyp, Some (Application(fun_ast, arg_ast, Some otyp)))
-        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating Application")
+        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Application")
       )
     |FunG (name, ChoreoVars(Name bndr_name, Some bndr_typ), body, Some typ) ->
       let _new_map = ImmutableMap.add bndr_name bndr_typ typeMap in
@@ -155,14 +169,14 @@ let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t): tc_ast
           GTcast(Some (ArrowType(arg_typ, body_typ)), Some (FunG (name, arg_ast, body_ast, Some (ArrowType(arg_typ, body_typ)))))
         | GTcast(_, _), GTcast(_, _) ->
           raise (TypeCheckingFailedException "FunG type mismatch")
-        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating FunG with type defined")
+        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking FunG with type defined")
       )
     |FunG (name, ChoreoVars(Name bndr_name, Some bndr_typ), body, None) ->
       let _new_map = ImmutableMap.add bndr_name bndr_typ typeMap in
       (match type_check (ChoreoVars(Name bndr_name, Some bndr_typ)) _new_map, type_check body _new_map with
         | GTcast(Some arg_typ, Some arg_ast), GTcast(Some body_typ, Some body_ast) ->
           GTcast(Some (ArrowType(arg_typ, body_typ)), Some (FunG (name, arg_ast, body_ast, Some (ArrowType(arg_typ, body_typ)))))
-        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating FunG without type declaration")
+        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking FunG without type declaration")
       )
     |FunL (name, Location loc, Variable(Name bndr, Some bndr_typ), body, Some typ) ->
       let _new_map = ImmutableMap.add (loc ^"."^ bndr) (DotType(Location loc, bndr_typ)) typeMap in
@@ -174,7 +188,7 @@ let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t): tc_ast
           Some (ArrowType(DotType(Location loc, bndr_typ), body_typ)))))
         | GTcast(_, _) ->
           raise (TypeCheckingFailedException "FunL type mismatch")
-        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating FunL with type defined")
+        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking FunL with type defined")
       )
     |FunL (name, Location loc, Variable(Name bndr, Some bndr_typ), body, None) ->
       let _new_map = ImmutableMap.add (loc ^"."^ bndr) (DotType(Location loc, bndr_typ)) typeMap in
@@ -183,7 +197,7 @@ let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t): tc_ast
           GTcast(Some (ArrowType(DotType(Location loc, bndr_typ), body_typ)), 
           Some (FunL (name, Location loc, Variable(Name bndr, Some bndr_typ), body_ast, 
           Some (ArrowType(DotType(Location loc, bndr_typ), body_typ)))))
-        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while evaluating FunL without type defined")
+        | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking FunL without type defined")
       )
     (* | Calling *)
     | _ -> raise (TypeCheckingFailedException "No Case matched") 
@@ -192,17 +206,29 @@ let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t): tc_ast
 let _ast = (Expr.Assoc ((Expr.Location "person"),
 (Expr.Variable ((Expr.Name "name"), (Some Expr.StringType))), None))
 
-let ast2 = (Expr.FunG ((Expr.Name "init"),     
-(Expr.ChoreoVars ((Expr.Name "X"),
-   (Some (Expr.DotType ((Expr.Location "person1"), Expr.IntType))))),
-(Expr.Let ((Expr.Location "person2"),
-   (Expr.Variable ((Expr.Name "y"), (Some Expr.IntType))),
-   (Expr.Snd (
-      (Expr.Assoc ((Expr.Location "person1"),
-         (Expr.Variable ((Expr.Name "x"), (Some Expr.IntType))), None)),
-      (Expr.Location "person2"), None)),
-   (Expr.ChoreoVars ((Expr.Name "X"), None)), None)),
-None))
+let ast2 = (Expr.Application (                 
+  (Expr.FunG ((Expr.Name "fname"),
+     (Expr.ChoreoVars ((Expr.Name "X"),
+        (Some (Expr.DotType ((Expr.Location "p"), Expr.IntType))))),
+     (Expr.Let ((Expr.Location "p"),
+        (Expr.Variable ((Expr.Name "n"), (Some Expr.IntType))),
+        (Expr.ChoreoVars ((Expr.Name "X"), None)),
+        (Expr.Assoc ((Expr.Location "p"),
+           (Expr.Plus ((Expr.Variable ((Expr.Name "n"), None)),
+              (Expr.INT 1), (Some Expr.IntType))),
+           None)),
+        None)),
+     None)),
+  (Expr.Let ((Expr.Location "p"),
+     (Expr.Variable ((Expr.Name "m"), (Some Expr.IntType))),
+     (Expr.Assoc ((Expr.Location "p"), (Expr.INT 3), None)),
+     (Expr.Assoc ((Expr.Location "p"),
+        (Expr.Minus ((Expr.Variable ((Expr.Name "m"), None)), (Expr.INT 1),
+           (Some Expr.IntType))),
+        None)),
+     None)),
+  None))
+
 
 
 (* let ast = Expr.Plus {lft = (Expr.INT 3); rght = (Expr.INT 5);

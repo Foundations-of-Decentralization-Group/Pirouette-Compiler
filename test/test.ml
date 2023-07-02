@@ -3,61 +3,123 @@ open Lexing
 open Expr
 
 (* SUCCESS Test Cases *)
-let test_parse_expr_success _ =
-  let input = "l.e" in
+let test_parse_le_success _ =
+  let input = "person1.(x : int)" in
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
-      let expected = Assoc {loc = "l"; arg = (Expr.Variable "e")}  in
+      let expected = (Assoc ((Location "person1"),
+      (Variable ((Name "x"), (Some IntType))), None))  in
       assert_equal expected expr
   | None -> assert_failure "Failed to parse expression"
 
-let test_parse_function_application_with_brackets_success _ =
-    let input = "(fun funname (X) := X) s.g" in
+  
+let test_parse_send_success _ =
+  let input = "person1.(x : int) ~> person2.(y : int); X" in
+  let lexer = from_string input in
+  match Parser.prog Lexer.read lexer with
+  | Some expr ->
+      let expected =
+        (Expr.Let ((Expr.Location "person2"),
+   (Expr.Variable ((Expr.Name "y"), (Some Expr.IntType))),
+   (Expr.Snd (
+      (Expr.Assoc ((Expr.Location "person1"),
+         (Expr.Variable ((Expr.Name "x"), (Some Expr.IntType))), None)),
+      (Expr.Location "person2"), None)),
+   (Expr.ChoreoVars ((Expr.Name "X"), None)), None)) in
+      assert_equal expected expr
+  | None -> assert_failure "Failed to parse expression"
+
+let test_parse_application_X_success _ =
+    let input = "(fun init 
+    (X : person1.int) : person1.int
+    := person1.(x : int) ~> person2.(y : int); 
+    X) person1.(3+2)" in
     let lexer = from_string input in
     match Parser.prog Lexer.read lexer with
     | Some expr ->
-        let expected = Expr.Application {
-          funct =
-          Expr.Fun {name = "funname"; arg = (Expr.ChoreoVars "X");
-            body = (Expr.ChoreoVars "X")};
-          argument = Expr.Assoc {loc = "s"; arg = (Expr.Variable "g")}}  in
+        let expected = (Expr.Application (                 
+          (Expr.FunG ((Expr.Name "init"),
+             (Expr.ChoreoVars ((Expr.Name "X"),
+                (Some (Expr.DotType ((Expr.Location "person1"), Expr.IntType))))),
+             (Expr.Let ((Expr.Location "person2"),
+                (Expr.Variable ((Expr.Name "y"), (Some Expr.IntType))),
+                (Expr.Snd (
+                   (Expr.Assoc ((Expr.Location "person1"),
+                      (Expr.Variable ((Expr.Name "x"), (Some Expr.IntType))), None)),
+                   (Expr.Location "person2"), None)),
+                (Expr.ChoreoVars ((Expr.Name "X"), None)), None)),
+             (Some (Expr.ArrowType (
+                      (Expr.DotType ((Expr.Location "person1"), Expr.IntType)),
+                      (Expr.DotType ((Expr.Location "person1"), Expr.IntType)))))
+             )),
+          (Expr.Assoc ((Expr.Location "person1"),
+             (Expr.Plus ((Expr.INT 3), (Expr.INT 2), (Some Expr.IntType))), None)),
+          None))  in
         assert_equal expected expr
     | None -> assert_failure "Failed to parse expression"
 
-let test_parse_function_application_with_choreo_body_success _ =
-  let input = "(fun funname (X) := Seller.b ~> Buyer.l; X) s.g" in
+let test_parse_application_local_success _ =
+  let input = "(fun init 
+(person2.(name : string)) : person1.int
+:= person1.(x : int) ~> person2.(y : int); 
+person2.name) person2.\"hello\"" in
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
-      let expected = Expr.Application {
-        funct =
-        Expr.Fun {name = "funname"; arg = (Expr.ChoreoVars "X");
-          body = Expr.Let {fst = Expr.Assoc {loc = "Buyer"; arg = (Expr.Variable "l")}; 
-          snd = Expr.Snd {sndr = Expr.Assoc {loc = "Seller"; arg = (Expr.Variable "b")};
-          name = "Buyer"}; thn = (Expr.ChoreoVars "X")}};
-        argument = Expr.Assoc {loc = "s"; arg = (Expr.Variable "g")}}  in
+      let expected = (Expr.Application (                 
+        (Expr.FunL ((Expr.Name "init"), (Expr.Location "person2"),
+           (Expr.Variable ((Expr.Name "name"), (Some Expr.StringType))),
+           (Expr.Let ((Expr.Location "person2"),
+              (Expr.Variable ((Expr.Name "y"), (Some Expr.IntType))),
+              (Expr.Snd (
+                 (Expr.Assoc ((Expr.Location "person1"),
+                    (Expr.Variable ((Expr.Name "x"), (Some Expr.IntType))), None)),
+                 (Expr.Location "person2"), None)),
+              (Expr.Assoc ((Expr.Location "person2"),
+                 (Expr.Variable ((Expr.Name "name"), None)), None)),
+              None)),
+           (Some (Expr.ArrowType (
+                    (Expr.DotType ((Expr.Location "person2"), Expr.StringType)),
+                    (Expr.DotType ((Expr.Location "person1"), Expr.IntType)))))
+           )),
+        (Expr.Assoc ((Expr.Location "person2"), (Expr.STRING "hello"), None)),
+        None))  in
       assert_equal expected expr
   | None -> assert_failure "Failed to parse expression"
 
-let test_parse_choreo_var_success _ =
-  let input = "X" in
+let test_parse_choreo_var_arrowtype_success _ =
+  let input = "X : Person1.int -> person2.string" in
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
-      let expected = Expr.ChoreoVars "X"  in
+      let expected = (Expr.ChoreoVars ((Expr.Name "X"),  
+      (Some (Expr.ArrowType (
+               (Expr.DotType ((Expr.Location "Person1"), Expr.IntType)),
+               (Expr.DotType ((Expr.Location "person2"), Expr.StringType)))))
+      ))  in
       assert_equal expected expr
   | None -> assert_failure "Failed to parse expression"
 
 let test_parse_fun_expr_success _ =
-  let input = "fun funname (X) := Seller.b ~> Buyer.l; Buyer[R] ~> Seller; X" in
+  let input = "fun init 
+  (X : person1.int)
+  := person1.(x : int) ~> person2.(y : int); 
+  X" in
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
-      let expected = Expr.Fun {name = "funname"; arg = (Expr.ChoreoVars "X"); 
-      body = Expr.Let {fst = Expr.Assoc {loc = "Buyer"; arg = (Expr.Variable "l")}; 
-      snd = Expr.Snd {sndr = Expr.Assoc {loc = "Seller"; arg = (Expr.Variable "b")};
-      name = "Buyer"}; thn = (Expr.Sync {sndr = "Buyer"; d = "R"; rcvr = "Seller"; thn = (Expr.ChoreoVars "X")})};}  in
+      let expected = (Expr.FunG ((Expr.Name "init"),     
+      (Expr.ChoreoVars ((Expr.Name "X"),
+         (Some (Expr.DotType ((Expr.Location "person1"), Expr.IntType))))),
+      (Expr.Let ((Expr.Location "person2"),
+         (Expr.Variable ((Expr.Name "y"), (Some Expr.IntType))),
+         (Expr.Snd (
+            (Expr.Assoc ((Expr.Location "person1"),
+               (Expr.Variable ((Expr.Name "x"), (Some Expr.IntType))), None)),
+            (Expr.Location "person2"), None)),
+         (Expr.ChoreoVars ((Expr.Name "X"), None)), None)),
+      None))  in
       assert_equal expected expr
   | None -> assert_failure "Failed to parse expression"
 
@@ -66,61 +128,106 @@ let test_parse_sync_success _ =
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
-      let expected = Expr.Sync {sndr = "Buyer"; d = "R"; rcvr = "Seller"; thn = (Expr.ChoreoVars "X")}  in
+      let expected = (Expr.Sync ((Expr.Location "Buyer"), (Expr.Direction "R"),
+   (Expr.Location "Seller"), (Expr.ChoreoVars ((Expr.Name "X"), None)), None
+   ))  in
       assert_equal expected expr
   | None -> assert_failure "Failed to parse expression"
 
 let test_parse_if_thn_else_success _ =
-  let input = "if l.e then Buyer[L] ~> Seller; X else Buyer[R] ~> Seller; X" in
+  let input = "if l.(4<5) 
+    then 
+    Buyer[L] ~> Seller; 
+    X : person1.int 
+    else 
+    Buyer[R] ~> Seller; 
+    X : person1.int" in
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
-      let expected = Expr.Branch {ift = Expr.Assoc {loc = "l"; arg = (Expr.Variable "e")};
-        thn = Expr.Sync {sndr = "Buyer"; d = "L"; rcvr = "Seller"; thn = (Expr.ChoreoVars "X")};        
-        el = Expr.Sync {sndr = "Buyer"; d = "R"; rcvr = "Seller"; thn = (Expr.ChoreoVars "X")}}  in
-      assert_equal expected expr
-  | None -> assert_failure "Failed to parse expression"  
-
-let test_parse_map_equation_success _ =
-  let input = "Buyer.s ~> Seller.p; Seller.prices[b] ~> Buyer.c; if Buyer.(c / 2 < price) then X else Y" in
-  let lexer = from_string input in
-  match Parser.prog Lexer.read lexer with
-  | Some expr ->
-      let expected = Expr.Let {fst = Expr.Assoc {loc = "Seller"; arg = (Expr.Variable "p")};
-      snd = Expr.Snd {sndr = Expr.Assoc {loc = "Buyer"; arg = (Expr.Variable "s")}; name = "Seller"};
-      thn = Expr.Let {fst = Expr.Assoc {loc = "Buyer"; arg = (Expr.Variable "c")};
-      snd = Expr.Snd {sndr = Expr.Assoc {loc = "Seller"; arg = Expr.Map {name = "prices"; arg = (Expr.Variable "b")}};
-      name = "Buyer"}; thn = Expr.Branch { ift = Expr.Assoc {loc = "Buyer";
-      arg = Expr.Condition { lft = Expr.Division {lft = (Expr.Variable "c"); rght = (Expr.Value 2)};
-      op = "<"; rght = (Expr.Variable "price")}}; thn = (Expr.ChoreoVars "X"); el = (Expr.ChoreoVars "Y")}}}  
-    in
+      let expected = (Expr.Branch (                      
+        (Expr.Assoc ((Expr.Location "l"),
+           (Expr.Condition ((Expr.INT 4), Expr.Lt, (Expr.INT 5),
+              (Some Expr.BoolType))),
+           None)),
+        (Expr.Sync ((Expr.Location "Buyer"), (Expr.Direction "L"),
+           (Expr.Location "Seller"),
+           (Expr.ChoreoVars ((Expr.Name "X"),
+              (Some (Expr.DotType ((Expr.Location "person1"), Expr.IntType))))),
+           None)),
+        (Expr.Sync ((Expr.Location "Buyer"), (Expr.Direction "R"),
+           (Expr.Location "Seller"),
+           (Expr.ChoreoVars ((Expr.Name "X"),
+              (Some (Expr.DotType ((Expr.Location "person1"), Expr.IntType))))),
+           None)),
+        None)) in
       assert_equal expected expr
   | None -> assert_failure "Failed to parse expression"  
 
 let test_parse_let_in1 _ =
-  let input = "let l.x := l.5 in l.x" in
+  let input = "let l.(x : int) := l.5 in l.x" in
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
-      let expected = Expr.Let {fst = Expr.Assoc {loc = "l"; arg = (Expr.Variable "x")};
-      snd = Expr.Assoc {loc = "l"; arg = (Expr.Value 5)};
-      thn = Expr.Assoc {loc = "l"; arg = (Expr.Variable "x")}}
+      let expected = (Expr.Let ((Expr.Location "l"),     
+   (Expr.Variable ((Expr.Name "x"), (Some Expr.IntType))),
+   (Expr.Assoc ((Expr.Location "l"), (Expr.INT 5), None)),
+   (Expr.Assoc ((Expr.Location "l"), (Expr.Variable ((Expr.Name "x"), None)),
+      None)),
+   None))
+
     in
       assert_equal expected expr
   | None -> assert_failure "Failed to parse expression"  
 
 let test_parse_let_in2 _ =
-  let input = "let l.x := l.5 in l.(x + 3)" in
+  let input = "let l.(x : int) := l.5 in l.(x + 3)" in
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
-      let expected = Expr.Let {fst = Expr.Assoc {loc = "l"; arg = (Expr.Variable "x")};
-      snd = Expr.Assoc {loc = "l"; arg = (Expr.Value 5)};
-      thn = Expr.Assoc {loc = "l"; arg = Expr.Plus {lft = (Expr.Variable "x"); rght = (Expr.Value 3)}}} 
-    in
+      let expected = (Expr.Let ((Expr.Location "l"),     
+      (Expr.Variable ((Expr.Name "x"), (Some Expr.IntType))),
+      (Expr.Assoc ((Expr.Location "l"), (Expr.INT 5), None)),
+      (Expr.Assoc ((Expr.Location "l"),
+         (Expr.Plus ((Expr.Variable ((Expr.Name "x"), None)), (Expr.INT 3),
+            (Some Expr.IntType))),
+         None)),
+      None)) in
       assert_equal expected expr
   | None -> assert_failure "Failed to parse expression"  
 
+let test_parse_application_letin _ =
+  let input = " (fun fname (X : p.int) := let p.(n : int) := X in p.(n + 1))
+  let p.(m : int) := p.3 in p.(m - 1)" in
+  let lexer = from_string input in
+  match Parser.prog Lexer.read lexer with
+  | Some expr ->
+      let expected = (Expr.Application (                 
+        (Expr.FunG ((Expr.Name "fname"),
+           (Expr.ChoreoVars ((Expr.Name "X"),
+              (Some (Expr.DotType ((Expr.Location "p"), Expr.IntType))))),
+           (Expr.Let ((Expr.Location "p"),
+              (Expr.Variable ((Expr.Name "n"), (Some Expr.IntType))),
+              (Expr.ChoreoVars ((Expr.Name "X"), None)),
+              (Expr.Assoc ((Expr.Location "p"),
+                 (Expr.Plus ((Expr.Variable ((Expr.Name "n"), None)),
+                    (Expr.INT 1), (Some Expr.IntType))),
+                 None)),
+              None)),
+           None)),
+        (Expr.Let ((Expr.Location "p"),
+           (Expr.Variable ((Expr.Name "m"), (Some Expr.IntType))),
+           (Expr.Assoc ((Expr.Location "p"), (Expr.INT 3), None)),
+           (Expr.Assoc ((Expr.Location "p"),
+              (Expr.Minus ((Expr.Variable ((Expr.Name "m"), None)), (Expr.INT 1),
+                 (Some Expr.IntType))),
+              None)),
+           None)),
+        None))
+    in
+      assert_equal expected expr
+  | None -> assert_failure "Failed to parse expression"  
+(*
 let test_parse_complex_success _ =
   let input = "Person1.amt_due ~> Person2.d; 
   (fun initpay (X) :=
@@ -152,22 +259,23 @@ let test_parse_complex_success _ =
       argument = Expr.Assoc {loc = "Person2"; arg = (Expr.Variable "d")}}}
     in
       assert_equal expected expr
-  | None -> assert_failure "Failed to parse expression"  
+  | None -> assert_failure "Failed to parse expression"   *)
 
 
 let suite =
   "parser_tests" >::: [
-    "test_parse_expr_success" >:: test_parse_expr_success;
-    "test_parse_function_application_with_brackets_success" >:: test_parse_function_application_with_brackets_success;
-    "test_parse_function_application_with_choreo_body_success" >:: test_parse_function_application_with_choreo_body_success;  
-    "test_parse_choreo_var_success" >:: test_parse_choreo_var_success; 
-    "test_parse_fun_expr_success" >:: test_parse_fun_expr_success;  
+    "test_parse_le_success" >:: test_parse_le_success;
+    "test_parse_send_success" >:: test_parse_send_success;
+    "test_parse_fun_expr_success" >:: test_parse_fun_expr_success; 
+    "test_parse_choreo_var_arrowtype_success" >:: test_parse_choreo_var_arrowtype_success; 
+    "test_parse_application_X_success" >:: test_parse_application_X_success;
+    "test_parse_application_local_success" >:: test_parse_application_local_success;   
     "test_parse_sync_success" >:: test_parse_sync_success;
     "test_parse_if_thn_else_success" >:: test_parse_if_thn_else_success;
-    "test_parse_map_equation_success" >:: test_parse_map_equation_success;
     "test_parse_let_in1" >:: test_parse_let_in1;
     "test_parse_let_in2" >:: test_parse_let_in2;
-    "test_parse_complex_success" >:: test_parse_complex_success;
+    "test_parse_application_letin" >:: test_parse_application_letin;
+    (* "test_parse_complex_success" >:: test_parse_complex_success; *)
     (* Add more test cases here *)
   ]
 
