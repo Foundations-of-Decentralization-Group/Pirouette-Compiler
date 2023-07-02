@@ -1,24 +1,27 @@
+open Basictypes
+
 type ctrl =
-  | Value of int
-  | ChoreoVars of string
-  | Variable of string
-  | Ret of {arg: ctrl}
+  | INT of int
+  | STRING of string
+  | BOOL of bool
+  | ChoreoVars of name * globalType
+  | Variable of name * localType
+  | Ret of ctrl * localType
   | Unit
-  | Snd of {arg: ctrl; loc: string; thn: ctrl}
-  | Rcv of {arg: ctrl; loc: string; thn: ctrl}
-  | Branch of {ift: ctrl; thn : ctrl; el: ctrl}
-  | Choose of {d: string; loc: string; thn: ctrl}
-  | AllowL of {loc: string; thn: ctrl}
-  | AllowR of {loc: string; thn: ctrl}
-  | AllowLR of {loc: string; thnL: ctrl; thnR: ctrl}
-  | Let of {binder: ctrl; arg: ctrl; thn: ctrl}
-  | Fun of {name: string; arg: ctrl; body: ctrl}
-  | Calling of {name: string; arg: ctrl}
-  | Application of { funct : ctrl; argument : ctrl }
-  | Condition of {lft: ctrl; op: string; rght: ctrl}
-  | Map of {name: string; arg: ctrl}
-  | Plus of {lft: ctrl; rght: ctrl}
-  | Minus of {lft: ctrl; rght: ctrl}
-  | Product of {lft: ctrl; rght: ctrl}
-  | Division of {lft: ctrl; rght: ctrl}  
+  | Snd of ctrl * location * ctrl * localType
+  | Rcv of ctrl * location * ctrl * localType
+  | Branch of ctrl * ctrl * ctrl * localType
+  | Choose of direction * location * ctrl * localType
+  | AllowL of location * ctrl * localType
+  | AllowR of location * ctrl * localType
+  | AllowLR of location * ctrl * ctrl * localType
+  | Let of ctrl * ctrl * ctrl * localType
+  | Fun of name * ctrl * ctrl * localType
+  | Calling of name * ctrl * localType
+  | Application of ctrl * ctrl * localType
+  | Condition of ctrl * binop * ctrl * localType
+  | Plus of ctrl * ctrl * localType
+  | Minus of ctrl * ctrl * localType
+  | Product of ctrl * ctrl * localType
+  | Division of ctrl * ctrl * localType
 [@@deriving show]

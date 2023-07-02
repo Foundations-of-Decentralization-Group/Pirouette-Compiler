@@ -1,5 +1,6 @@
 open Expr
 open Containers
+open Basictypes
 
 exception TypeCheckingFailedException of string
 
@@ -202,29 +203,31 @@ let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t): tc_ast
     (* | Calling *)
     | _ -> raise (TypeCheckingFailedException "No Case matched") 
 
-
+(* 
 let _ast = (Expr.Assoc ((Expr.Location "person"),
-(Expr.Variable ((Expr.Name "name"), (Some Expr.StringType))), None))
+(Expr.Variable ((Expr.Name "name"), (Some Expr.StringType))), None)) *)
 
 let ast2 = (Expr.Application (                 
-  (Expr.FunG ((Expr.Name "fname"),
-     (Expr.ChoreoVars ((Expr.Name "X"),
-        (Some (Expr.DotType ((Expr.Location "p"), Expr.IntType))))),
-     (Expr.Let ((Expr.Location "p"),
-        (Expr.Variable ((Expr.Name "n"), (Some Expr.IntType))),
-        (Expr.ChoreoVars ((Expr.Name "X"), None)),
-        (Expr.Assoc ((Expr.Location "p"),
-           (Expr.Plus ((Expr.Variable ((Expr.Name "n"), None)),
-              (Expr.INT 1), (Some Expr.IntType))),
+  (Expr.FunG ((Basictypes.Name "fname"),
+     (Expr.ChoreoVars ((Basictypes.Name "X"),
+        (Some (Basictypes.DotType ((Basictypes.Location "p"),
+                 Basictypes.IntType)))
+        )),
+     (Expr.Let ((Basictypes.Location "p"),
+        (Expr.Variable ((Basictypes.Name "n"), (Some Basictypes.IntType))),
+        (Expr.ChoreoVars ((Basictypes.Name "X"), None)),
+        (Expr.Assoc ((Basictypes.Location "p"),
+           (Expr.Plus ((Expr.Variable ((Basictypes.Name "n"), None)),
+              (Expr.INT 1), (Some Basictypes.IntType))),
            None)),
         None)),
      None)),
-  (Expr.Let ((Expr.Location "p"),
-     (Expr.Variable ((Expr.Name "m"), (Some Expr.IntType))),
-     (Expr.Assoc ((Expr.Location "p"), (Expr.INT 3), None)),
-     (Expr.Assoc ((Expr.Location "p"),
-        (Expr.Minus ((Expr.Variable ((Expr.Name "m"), None)), (Expr.INT 1),
-           (Some Expr.IntType))),
+  (Expr.Let ((Basictypes.Location "p"),
+     (Expr.Variable ((Basictypes.Name "m"), (Some Basictypes.IntType))),
+     (Expr.Assoc ((Basictypes.Location "p"), (Expr.INT 3), None)),
+     (Expr.Assoc ((Basictypes.Location "p"),
+        (Expr.Minus ((Expr.Variable ((Basictypes.Name "m"), None)),
+           (Expr.INT 1), (Some Basictypes.IntType))),
         None)),
      None)),
   None))

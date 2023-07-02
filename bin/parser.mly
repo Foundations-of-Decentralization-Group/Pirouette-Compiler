@@ -1,5 +1,6 @@
 %{
     open Expr
+    open Basictypes
 %}
 
 %token <string> Identifier
