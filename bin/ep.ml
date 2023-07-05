@@ -2,7 +2,7 @@ open Ctrl
 open Expr
 
 module SS = Set.Make(String);;
-
+exception EndpointProjectionFailedException of string
 
 let get_entitities expr : SS.t = 
   let set1 = SS.empty in
@@ -160,146 +160,143 @@ let rec merge_branch (lbranch:ctrl) (rbranch:ctrl) : ctrl option=
           | _ -> None)
     | _ -> None
 
-  (* let rec parse_ast expr currentNode = *)
-let rec parse_ast (expr_ast: expr) (currentNode: string): ctrl option =
+
+
+let rec get_ctrlLType (typ : localType) : ctrlType =
+  match typ with
+  | IntType -> Int
+  | StringType -> String
+  | BoolType -> Bool
+
+let rec get_ctrlGType (typ : globalType) : ctrlType =
+  match typ with
+  | DotType(_, Some typ) -> get_ctrlLType typ
+  | ArrowType(Some ityp, Some otyp) -> CtrlFun (get_ctrlGType ityp, get_ctrlGType otyp) 
+
+let rec local_ep_ast (expr_ast: expr) : l_ctrl option =
   match expr_ast with
-  | Assoc { loc; arg } ->
-    let parsed_arg = parse_ast arg currentNode in
-    (match parsed_arg with
-        | Some parsed_arg when currentNode = loc -> Some (Ret {arg = parsed_arg})
+  | INT x -> Some (INT x)
+  | STRING x -> Some (STRING x)
+  | BOOL x -> Some (BOOL x)
+  | Variable (name, Some typ) -> Some (Variable (name, (get_ctrlLType typ)))
+  | Plus (lft, rght, Some typ) -> 
+    (match local_ep_ast lft, local_ep_ast rght with
+      | Some lft, Some rght -> 
+        Some (Ctrl.Plus (lft, rght, (get_ctrlLType typ)))
+      | _ -> None)
+  | Minus (lft, rght, Some typ) -> 
+    (match local_ep_ast lft, local_ep_ast rght with
+      | Some lft, Some rght -> 
+        Some (Ctrl.Minus (lft, rght, (get_ctrlLType typ)))
+      | _ -> None)
+  | Product (lft, rght, Some typ) -> 
+    (match local_ep_ast lft, local_ep_ast rght with
+      | Some lft, Some rght -> 
+        Some (Ctrl.Product (lft, rght, (get_ctrlLType typ)))
+      | _ -> None)
+  | Division (lft, rght, Some typ) -> 
+    (match local_ep_ast lft, local_ep_ast rght with
+      | Some lft, Some rght -> 
+        Some (Ctrl.Division (lft, rght, (get_ctrlLType typ)))
+      | _ -> None)
+  | Condition (lft, op, rght, Some typ) -> 
+    (match local_ep_ast lft, local_ep_ast rght with
+      | Some lft, Some rght -> 
+        Some (Ctrl.Condition (lft, op, rght, (get_ctrlLType typ)))
+      | _ -> None)
+  | _ -> raise (EndpointProjectionFailedException "EPP failed | Type not found")
+      
+
+    
+
+  (* let rec ep_ast expr currentNode = *)
+let rec ep_ast (expr_ast: expr) (currentNode: location): ctrl option =
+  match expr_ast with
+  | Assoc (loc, arg, Some typ) ->
+    (match local_ep_ast arg with
+        | Some arg when currentNode = loc -> Some (Ret (arg, (get_ctrlGType typ)))
         | Some _ -> Some Unit
         | _ -> None)
-  | Branch { ift = Assoc { loc; arg }; thn; el } ->
-      let parsed_arg = parse_ast arg currentNode in
-      let parsed_thn = parse_ast thn currentNode in
-      let parsed_el = parse_ast el currentNode in
-      (match parsed_arg, parsed_thn, parsed_el with
-        | Some parsed_arg, Some parsed_thn, Some parsed_el 
+  | Branch (ift, thn, el, Some typ) -> p.(m<2)
+      (match ep_ast ift currentNode, ep_ast thn currentNode, ep_ast el currentNode with
+        | Some ift, Some thn, Some el 
             when currentNode = loc -> 
-              Some (Ctrl.Branch {ift = parsed_arg; thn = parsed_thn; el = parsed_el})
+              Some (Ctrl.Branch (ift, thn, el, (get_ctrlGType typ)))
         | Some _, Some parsed_thn, Some parsed_el -> 
             (match merge_branch parsed_thn parsed_el with
             | None -> None
             | Some x -> Some x)
         | _ -> None)
-  | Branch { ift = _; thn = _; el = _} -> None
-  | Sync { sndr; d; rcvr; thn} ->
+  | Sync (sndr, d, rcvr, thn, Some typ) ->
     if currentNode = sndr && currentNode = rcvr then
       None
     else if currentNode = sndr && currentNode != rcvr then
-      let parsed_el = parse_ast thn currentNode in
-      (match parsed_el with
-        |Some parsed_el -> Some (Choose {d; loc = rcvr; thn = parsed_el})
+      (match ep_ast thn currentNode with
+        |Some thn -> Some (Choose (d, rcvr, thn, get_ctrlGType typ))
         | _ -> None)
     else if currentNode = rcvr && currentNode != sndr then
-      let parsed_el = parse_ast thn currentNode in
-      (match parsed_el, d with
-        | Some parsed_el, "L"-> Some (AllowL {loc= sndr; thn = parsed_el})
-        | Some parsed_el, "R"-> Some (AllowR {loc= sndr; thn = parsed_el})
+      (match ep_ast thn currentNode, d with
+        | Some thn, "L"-> Some (AllowL (sndr, thn, get_ctrlGType typ))
+        | Some thn, "R"-> Some (AllowR (sndr, thn, get_ctrlGType typ))
         | _ -> None)
     else
-      parse_ast thn currentNode
-  | Variable x -> Some (Variable x)
-  | Plus {lft; rght} -> 
-    let parsed_lft = parse_ast lft currentNode in
-    let parsed_rght = parse_ast rght currentNode in
-    (match parsed_lft, parsed_rght with
-      | Some parsed_lft, Some parsed_rght -> 
-        Some (Ctrl.Plus {lft = parsed_lft; rght = parsed_rght})
-      | _ -> None)
-    
-  | Minus {lft; rght} -> 
-    let parsed_lft = parse_ast lft currentNode in
-    let parsed_rght = parse_ast rght currentNode in
-    (match parsed_lft, parsed_rght with
-      | Some parsed_lft, Some parsed_rght -> 
-        Some (Ctrl.Minus {lft = parsed_lft; rght = parsed_rght})
-      | _ -> None)
-  | Product {lft; rght} -> 
-    let parsed_lft = parse_ast lft currentNode in
-    let parsed_rght = parse_ast rght currentNode in
-    (match parsed_lft, parsed_rght with
-      | Some parsed_lft, Some parsed_rght -> 
-        Some (Ctrl.Product {lft = parsed_lft; rght = parsed_rght})
-      | _ -> None)
-  | Division {lft; rght} -> 
-    let parsed_lft = parse_ast lft currentNode in
-    let parsed_rght = parse_ast rght currentNode in
-    (match parsed_lft, parsed_rght with
-      | Some parsed_lft, Some parsed_rght -> 
-        Some (Ctrl.Division {lft = parsed_lft; rght = parsed_rght})
-      | _ -> None)
-  | Condition {lft; op; rght} -> 
-    let parsed_lft = parse_ast lft currentNode in
-    let parsed_rght = parse_ast rght currentNode in
-    (match parsed_lft, parsed_rght with
-      | Some parsed_lft, Some parsed_rght -> 
-        Some (Ctrl.Condition {lft = parsed_lft; op; rght = parsed_rght})
-      | _ -> None)
-  | Value x -> Some (Value x)
-  | Map {name; arg} -> 
-    let parsed_arg = parse_ast arg currentNode in
-    (match parsed_arg with
-      | Some parsed_arg -> Some (Ctrl.Map {name; arg = parsed_arg})
-      | _-> None)
-  | Let {fst = Assoc{loc = _; arg = arg_fst}; snd = Snd {sndr = Assoc {loc; arg = arg_snd}; name}; thn} ->
-    let parsed_thn = parse_ast thn currentNode in
-    let parsed_arg_fst = parse_ast arg_fst currentNode in
-    let parsed_arg_snd = parse_ast arg_snd currentNode in
-    (match parsed_thn, parsed_arg_fst, parsed_arg_snd with
+      ep_ast thn currentNode
+
+      (* | Let (_, Variable(Name bndr_arg, Some bndr_typ), Snd (Assoc (loc, arg_snd, Some assoc_typ), rcvr, Some snd_typ), thn, Some thn_typ)-> *)
+
+  | Let (_, bndr_arg, Snd (Assoc (loc, arg_snd, Some assoc_typ), rcvr, Some snd_typ), thn, Some thn_typ)->
+    let parsed_thn = ep_ast thn currentNode in
+    let parsed_bndr_arg = local_ep_ast bndr_arg in
+    let parsed_arg_snd = ep_ast (Assoc (loc, arg_snd, Some assoc_typ)) currentNode in
+    (match parsed_thn, parsed_bndr_arg, parsed_arg_snd with
       | Some parsed_thn, Some _, Some parsed_arg_snd when name != currentNode && currentNode = loc
-        -> Some (Ctrl.Snd {arg = parsed_arg_snd; loc = name; thn = parsed_thn})
-      | Some parsed_thn, Some parsed_arg_fst, Some _ when name = currentNode && currentNode != loc
-      -> Some (Ctrl.Rcv {arg = parsed_arg_fst; loc; thn = parsed_thn})
+        -> Some (Ctrl.Snd (arg = parsed_arg_snd; loc = name; thn = parsed_thn))
+      | Some parsed_thn, Some parsed_bndr_arg, Some _ when name = currentNode && currentNode != loc
+      -> Some (Ctrl.Rcv {arg = parsed_bndr_arg; loc; thn = parsed_thn})
       | _, _, _ when name = currentNode && name = loc -> None
       | Some parsed_thn, _, _ when name != currentNode && currentNode != loc -> Some parsed_thn
       | _ -> None)
   (* remove the fresh thing -> intead of function put let () = E1 in E2 in ctrl
       and let _ = E1 in E2 for ocaml  *)
-  | Let {fst = Assoc{loc; arg}; snd; thn} ->
-    let parsed_arg = parse_ast arg currentNode in
-    let parsed_snd = parse_ast snd currentNode in 
-    let parsed_thn = parse_ast thn currentNode in
-    (match parsed_arg, parsed_snd, parsed_thn with
+  | Let (loc, arg, snd, thn, Some typ) ->
+    (match local_ep_ast arg, ep_ast snd currentNode, ep_ast thn currentNode with
       | Some parsed_arg, Some parsed_snd, Some parsed_thn when loc = currentNode ->
-        Some (Ctrl.Let {binder = parsed_arg; arg = parsed_snd; thn = parsed_thn})
+        Some (Ctrl.Let (parsed_arg, parsed_snd, parsed_thn, (get_ctrlGType typ)))
       | Some _, Some parsed_snd, Some parsed_thn when loc != currentNode ->
-        Some (Ctrl.Let {binder = Unit; arg = parsed_snd; thn = parsed_thn})
+        Some (Ctrl.Let (Unit, parsed_snd, parsed_thn, (get_ctrlGType typ)))
       | _ -> None)
-  | Let {fst = _; snd = _; thn = _} -> None
   (* remove the local function implementation*)
   (* | Fun {name; arg = Assoc {loc; arg = arg2}; body} -> 
-    let parsed_body = parse_ast body currentNode in
-    let parsed_arg = parse_ast arg2 currentNode in
+    let parsed_body = ep_ast body currentNode in
+    let parsed_arg = ep_ast arg2 currentNode in
     (match parsed_body, parsed_arg with 
       | Some parsed_body, Some parsed_arg when loc = currentNode ->
         Some (Ctrl.Fun {name ; arg = parsed_arg; body = parsed_body})
       | Some parsed_body, Some _ when loc != currentNode ->
         Some (Ctrl.Fun {name ; arg = ChoreoVars (get_fresh_cname()); body = parsed_body})
       | _ -> None) *)
-  | Fun {name; arg = ChoreoVars x; body} -> 
-    let parsed_body = parse_ast body currentNode in
-    (match parsed_body with
-      | Some parsed_body -> Some (Ctrl.Fun {name = name ; arg = ChoreoVars x; body = parsed_body})
+  | FunG (name, arg, body, Some typ) -> 
+    let parsed_body = ep_ast body currentNode in
+    (match ep_ast arg currentNode, ep_ast body currentNode with
+      | Some argument, Some parsed_body -> Some (Ctrl.Fun (name, argument, parsed_body, (get_ctrlGType typ)))
       | _ -> None)
-  | Fun {name = _; arg = _; body = _} -> None
-  | Calling {name; arg} ->  
-    let parsed_arg = parse_ast arg currentNode in
+  (* | Calling {name; arg} ->  
+    let parsed_arg = ep_ast arg currentNode in
     (match parsed_arg with
      | Some parsed_arg -> Some (Ctrl.Calling {name; arg = parsed_arg})
-     | _ -> None)
-  | Application {funct; argument} -> 
-    let parsed_funct = parse_ast funct currentNode in
-    let parsed_argument = parse_ast argument currentNode in
-      (match parsed_funct, parsed_argument with
+     | _ -> None) *)
+  | Application (funct, argument, Some typ) ->
+      (match ep_ast funct currentNode, ep_ast argument currentNode with
         | Some parsed_funct, Some parsed_argument ->
-          Some (Ctrl.Application {funct = parsed_funct; argument = parsed_argument})
+          Some (Ctrl.Application (parsed_funct, parsed_argument, (get_ctrlGType typ)))
         | _ -> None)
-  | ChoreoVars x -> Some (ChoreoVars x)
-  | Snd _ -> None 
+  | ChoreoVars (x, Some typ) -> Some (ChoreoVars (x, (get_ctrlGType typ)))
+  | Snd _ -> None
+  | _ -> raise (EndpointProjectionFailedException "Case not executed")
+     
 
 let () = SS.iter (fun entity -> 
-  let res = parse_ast ast entity in
+  let res = ep_ast ast entity in
   let str = "____________________________" ^ entity ^ "___________________________________" in 
   print_endline str;
   let r = match res with

@@ -1,27 +1,29 @@
 open Basictypes
 
-type ctrl =
+type l_ctrl = 
   | INT of int
   | STRING of string
   | BOOL of bool
-  | ChoreoVars of name * globalType
-  | Variable of name * localType
-  | Ret of ctrl * localType
+  | Variable of name * ctrlType
+  | Condition of l_ctrl * binop * ctrl * ctrlType
+  | Plus of l_ctrl * l_ctrl * ctrlType
+  | Minus of l_ctrl * l_ctrl * ctrlType
+  | Product of l_ctrl * l_ctrl * ctrlType
+  | Division of l_ctrl * l_ctrl * ctrlType
+
+type ctrl =
   | Unit
-  | Snd of ctrl * location * ctrl * localType
-  | Rcv of ctrl * location * ctrl * localType
-  | Branch of ctrl * ctrl * ctrl * localType
-  | Choose of direction * location * ctrl * localType
-  | AllowL of location * ctrl * localType
-  | AllowR of location * ctrl * localType
-  | AllowLR of location * ctrl * ctrl * localType
-  | Let of ctrl * ctrl * ctrl * localType
-  | Fun of name * ctrl * ctrl * localType
-  | Calling of name * ctrl * localType
-  | Application of ctrl * ctrl * localType
-  | Condition of ctrl * binop * ctrl * localType
-  | Plus of ctrl * ctrl * localType
-  | Minus of ctrl * ctrl * localType
-  | Product of ctrl * ctrl * localType
-  | Division of ctrl * ctrl * localType
+  | Ret of l_ctrl * ctrlType
+  | ChoreoVars of name * ctrlType
+  | Snd of ctrl * location * ctrl * ctrlType
+  | Rcv of ctrl * location * ctrl * ctrlType
+  | Branch of ctrl * ctrl * ctrl * ctrlType
+  | Choose of direction * location * ctrl * ctrlType
+  | AllowL of location * ctrl * ctrlType
+  | AllowR of location * ctrl * ctrlType
+  | AllowLR of location * ctrl * ctrl * ctrlType
+  | Let of ctrl * ctrl * ctrl * ctrlType
+  | Fun of name * ctrl * ctrl * ctrlType
+  | Calling of name * ctrl * ctrlType
+  | Application of ctrl * ctrl * ctrlType
 [@@deriving show]

@@ -19,6 +19,12 @@ type localType =
   | BoolType
 [@@deriving show]
 
+type ctrlType = 
+  | Int
+  | String
+  | Bool
+  | CtrlFun of ctrlType * ctrlType
+
 type globalType =
   | DotType of location * localType
   | ArrowType of globalType * globalType
@@ -37,3 +43,5 @@ let rec globalType_equal a b = (match (a, b) with
       globalType_equal gt11 gt21 && globalType_equal gt12 gt22
   | _ -> false
 )
+
+
