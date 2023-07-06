@@ -136,7 +136,7 @@ let test_parse_sync_success _ =
   | None -> assert_failure "Failed to parse expression"
 
 let test_parse_if_thn_else_success _ =
-  let input = "if l.(4<5) 
+  let input = "if Buyer.(4<5) 
     then 
     Buyer[L] ~> Seller; 
     X : person1.int 
@@ -147,7 +147,7 @@ let test_parse_if_thn_else_success _ =
   match Parser.prog Lexer.read lexer with
   | Some expr ->
       let expected = (Branch (                      
-        (Assoc ((Location "l"),
+        (Assoc ((Location "Buyer"),
            (Condition ((INT 4), Lt, (INT 5),
               (Some BoolType))),
            None)),

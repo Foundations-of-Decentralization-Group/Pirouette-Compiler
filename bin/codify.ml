@@ -14,35 +14,80 @@ What is the end statment, here we expect Person2 to execute d+3 in local scope,
 But what do we need to do in ocaml code?
 *)
 
+let rec getStrCtrlTyp (typ : ctrlType) (arg : string) : string = 
+  (match typ, arg with 
+    | Int, _-> "int"
+    | Bool, _ -> "bool"
+    | String, _ -> "string"
+    | CtrlFun (t1, _), "fst" -> getStrCtrlTyp t1 ""
+    | CtrlFun (_, t2), "snd" -> getStrCtrlTyp t2 ""
+    | CtrlFun (_, _), _ -> ""
+  )
+
+let getStrBinop (op : binop) : string = 
+  (match op with 
+    | Gt -> _gt
+    | Lt -> _lt
+    | Eq -> _equals
+  )
+
+
+let rec _codify_local (ast: l_ctrl) : string = 
+  (match ast with 
+    | INT x -> string_of_int x
+    | STRING x -> x
+    | BOOL x -> string_of_bool x
+    (* | Variable (Name x, CtrlFun typ) -> x ^ _colon ^ (getStrCtrlTyp (CtrlFun typ) "fst") *)
+    | Variable (Name x, _) -> x 
+    | Condition (lft, op, rght, _) ->
+      let codified_lft = _codify_local lft in
+      let codified_rght = _codify_local rght in 
+        _lParen ^ codified_lft ^ _space ^ (getStrBinop op) ^ _space ^ codified_rght ^ _rParen
+    | Plus (lft, rght, _) ->
+      let codified_lft = _codify_local lft in
+      let codified_rght = _codify_local rght in 
+        _lParen ^ codified_lft ^ _space ^ _plus ^ _space ^ codified_rght ^ _rParen
+    | Minus (lft, rght, _) ->
+      let codified_lft = _codify_local lft in
+      let codified_rght = _codify_local rght in 
+        _lParen ^ codified_lft ^ _space ^ _minus ^ _space ^ codified_rght ^ _rParen 
+    | Product (lft, rght, _)->
+      let codified_lft = _codify_local lft in
+      let codified_rght = _codify_local rght  in 
+        _lParen ^ codified_lft ^ _space ^ _product ^ _space ^ codified_rght ^ _rParen
+    | Division (lft, rght, _) ->
+      let codified_lft = _codify_local lft in
+      let codified_rght = _codify_local rght in 
+        _lParen ^ codified_lft ^ _space ^ _division ^ _space ^ codified_rght ^ _rParen 
+  )
+
 let rec _codify (ast: ctrl) (confMap: string list) (currentEntity: string): string = 
   match ast with
-  | Value x -> string_of_int x
-  | Variable x -> x
-  | ChoreoVars x -> x
-  | Ret {arg} -> _codify arg confMap currentEntity
+  | ChoreoVars (Name x, typ) -> x ^ _colon ^ (getStrCtrlTyp typ "")
+  | Ret (arg, _) -> _codify_local arg
   | Unit -> _unit
-  | Snd {arg; loc; thn} -> 
+  | Snd (arg, Location loc, thn, _) -> 
     let codified_thn = _codify thn confMap currentEntity in 
-    let codified_arg = _codify arg confMap currentEntity in
+    let codified_arg = _codify_local arg in
     _let ^ _space ^ "_" ^ _equals ^ _space ^ _sync ^ _space ^  _lParen ^ _sndmsg ^ _space ^ 
     _space ^ "_channel_" ^ currentEntity ^ _underscore ^ loc ^ _space ^ 
     codified_arg ^ _rParen ^ _space ^ 
     _in ^ _endl ^ codified_thn
-  | Rcv {arg; loc; thn} ->
+  | Rcv (arg, Location loc, thn, _) ->
     let codified_thn = _codify thn confMap currentEntity in 
-    let codified_arg = _codify arg confMap currentEntity in
+    let codified_arg = _codify_local arg in
       _let ^ _space ^ codified_arg ^ _equals ^ _space ^ _sync ^ _space ^  
       _lParen ^ _rcvmsg ^ _space ^ "_channel_" ^ loc ^ _underscore ^ currentEntity ^ 
        _space ^ _rParen ^ _space ^ _in ^ _space ^
       _lParen ^ _endl ^ _tab ^ codified_thn ^ _rParen 
-  | Branch {ift; thn; el} -> 
+  | Branch (ift, thn, el, _) -> 
     let codified_ift = _codify ift confMap currentEntity in 
     let codified_thn = _codify thn confMap currentEntity in
     let codified_el = _codify el confMap currentEntity in
     _if ^ _space ^  codified_ift ^ _endl
     ^_then ^ _space ^  _lParen ^ codified_thn ^ _rParen ^ _endl ^ _else ^ 
     _space ^  _lParen ^ codified_el ^ _rParen
-  | Choose {d; loc; thn} -> 
+  | Choose (Direction d, Location loc, thn, _) -> 
     let codified_thn = _codify thn confMap currentEntity in
     _let ^ _space ^ _underscore ^ _space ^ _equals ^ _space ^ _lParen ^ 
      _sync ^ _space ^  _lParen ^ _sndmsg ^ _space ^ 
@@ -50,65 +95,45 @@ let rec _codify (ast: ctrl) (confMap: string list) (currentEntity: string): stri
     ^ (if d = "L" then "true" else "false") ^ _rParen ^ _rParen ^ _space ^ _in ^ _endl ^ 
     _let ^ _space ^ _underscore ^ _space ^ _equals ^ _space ^ codified_thn ^ 
     _in ^ _space ^ _unit 
-  | AllowL {loc = _; thn = _} ->
+  | AllowL (_, _, _) ->
     raise (InvalidProgramException "AllowL not permitted.")
-  | AllowR {loc = _; thn = _} ->
+  | AllowR (_, _, _) ->
     raise (InvalidProgramException "AllowR not permitted.")
-  | AllowLR {loc; thnL; thnR} ->
+  | AllowLR (Location loc, thnL, thnR, _) ->
     let codified_thnL = _codify thnL confMap currentEntity in
     let codified_thnR = _codify thnR confMap currentEntity in
-    _let ^ _space ^ "___synclbl " ^ _equals ^ _space ^ _sync ^ _space ^  
+    _let ^ _space ^ "___synclbl"  ^ _equals ^ _space ^ _sync ^ _space ^  
       _lParen ^ _rcvmsg ^ _space ^ "_channel_" ^ loc ^ _underscore ^ currentEntity ^ 
        _space ^ _rParen ^ _space ^ _in ^ _space ^
     _if ^ _space ^ _lParen ^ _endl ^ "___synclbl" ^ _rParen ^ _then ^ _space ^ 
     _lParen ^ codified_thnL ^ _rParen ^ _endl ^ _else ^ _space ^ codified_thnR
-  | Let {binder = Unit; arg; thn} -> 
+  | Let (Unit, arg, thn, _) -> 
     let codified_arg = _codify arg confMap currentEntity in
     let codified_thn = _codify thn confMap currentEntity in 
       _let ^ _space ^ _underscore ^ _equals ^ codified_arg ^ _space ^ _in ^ 
       _lParen ^ _endl ^ _tab ^ codified_thn ^ _rParen
-  | Let {binder; arg; thn} ->
+  | Let (binder, arg, thn, typ) ->
   let codified_binder = _codify binder confMap currentEntity in 
   let codified_arg = _codify arg confMap currentEntity in
   let codified_thn = _codify thn confMap currentEntity in 
-    _let ^ _space ^ codified_binder ^ _equals ^ codified_arg ^ _space ^ _in ^ 
+    _let ^ _space ^ codified_binder ^ _colon ^ (getStrCtrlTyp typ "") ^ _equals ^ codified_arg ^ _space ^ _in ^ 
     _lParen ^ _endl ^ _tab ^ codified_thn ^ _rParen
-  | Fun {name; arg; body} ->
+  | Fun (Name name, arg, body, typ) ->
     let codified_arg = _codify arg confMap currentEntity in
     let codified_body = _codify body confMap currentEntity in 
-      _let ^ _space ^ _rec ^ _space ^ name ^ _space ^ codified_arg ^ _space ^ _equals ^ _space ^ 
+      _let ^ _space ^ _rec ^ _space ^ name ^ _space ^ _lParen ^ codified_arg ^_rParen ^ _space 
+      ^ (getStrCtrlTyp typ "snd") ^ _equals ^ _space ^ 
       _lParen ^ codified_body ^ _rParen
-  | Calling {name; arg} -> 
+  | Calling (Name name, arg, _) -> 
     let codified_arg = _codify arg confMap currentEntity in
       name ^ _space ^ codified_arg 
-  | Application {funct = Fun {name; arg; body}; argument} ->
-    let codify_funct = _codify (Fun {name; arg; body}) confMap currentEntity in
+  | Application (Fun (Name name, arg, body, fun_typ), argument, _) ->
+    let codify_funct = _codify (Fun (Name name, arg, body, fun_typ)) confMap currentEntity in
     let codified_argument = _codify argument confMap currentEntity in 
       codify_funct ^ _endl ^ _in ^ _space ^ 
       _let ^ _space ^ _disreg ^ _equals ^ name ^ _space ^ codified_argument ^ _space ^ _in ^ _space
       ^ _unit
-  | Application {funct = _; argument = _} -> ""
-  | Condition {lft; op; rght} ->
-    let codified_lft = _codify lft confMap currentEntity in
-    let codified_rght = _codify rght confMap currentEntity in 
-      _lParen ^ codified_lft ^ _space ^ op ^ _space ^ codified_rght ^ _rParen
-  | Plus {lft; rght} ->
-    let codified_lft = _codify lft confMap currentEntity in
-    let codified_rght = _codify rght confMap currentEntity in 
-      _lParen ^ codified_lft ^ _space ^ _plus ^ _space ^ codified_rght ^ _rParen
-  | Minus {lft; rght} ->
-    let codified_lft = _codify lft confMap currentEntity in
-    let codified_rght = _codify rght confMap currentEntity in 
-      _lParen ^ codified_lft ^ _space ^ _minus ^ _space ^ codified_rght ^ _rParen 
-  | Product {lft; rght} ->
-    let codified_lft = _codify lft confMap currentEntity in
-    let codified_rght = _codify rght confMap currentEntity in 
-      _lParen ^ codified_lft ^ _space ^ _product ^ _space ^ codified_rght ^ _rParen
-  | Division {lft; rght} ->
-    let codified_lft = _codify lft confMap currentEntity in
-    let codified_rght = _codify rght confMap currentEntity in 
-      _lParen ^ codified_lft ^ _space ^ _division ^ _space ^ codified_rght ^ _rParen 
-  | _ -> ""
+  | Application (_, _, _) -> ""
 
 
 
@@ -138,27 +163,82 @@ let file_name = "config.conf"
 type astType = Ast of { code : ctrl; prop : string }
 
 let ast1 = Ast{
-  code = (Ctrl.Application {
-    funct =
-    Ctrl.Fun {name = "loop"; arg = (Ctrl.ChoreoVars "X");
-      body = Ctrl.Calling {name = "loop"; arg = (Ctrl.ChoreoVars "X")}};
-    argument = Ctrl.Ret {arg = (Ctrl.Value 0)}});
-  prop = "person1"
+  code = (Ctrl.Let (Ctrl.Unit, Ctrl.Unit,
+  (Ctrl.AllowLR ((Basictypes.Location "p1"),
+     (Ctrl.Rcv ((Ctrl.Variable ((Basictypes.Name "y"), Basictypes.Int)),
+        (Basictypes.Location "p1"),
+        (Ctrl.Ret ((Ctrl.Variable ((Basictypes.Name "y"), Basictypes.Int)),
+           Basictypes.Int)),
+        Basictypes.Int)),
+     (Ctrl.Rcv ((Ctrl.Variable ((Basictypes.Name "y"), Basictypes.Int)),
+        (Basictypes.Location "p1"),
+        (Ctrl.Ret ((Ctrl.Variable ((Basictypes.Name "y"), Basictypes.Int)),
+           Basictypes.Int)),
+        Basictypes.Int)),
+     Basictypes.Int)),
+  Basictypes.Int));
+  prop = "p2"
 }
 
 let _ast2 = Ast{
-  code = (
-    Ctrl.Let {binder = Ctrl.Unit; arg = Ctrl.Unit;
-  thn =
-  Ctrl.Rcv {arg = (Ctrl.Variable "d"); loc = "person1";
-    thn =
-    Ctrl.Branch {
-      ift =
-      Ctrl.Condition {lft = (Ctrl.Variable "d"); op = "<";
-        rght = (Ctrl.Value 10)};
-      thn = Ctrl.Choose {d = "L"; loc = "person1"; thn = Ctrl.Unit};
-      el = Ctrl.Choose {d = "R"; loc = "person1"; thn = Ctrl.Unit}}}}
-  ); prop = "person2"}
+  code = (Ctrl.Let (
+    (Ctrl.Ret ((Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
+       Basictypes.Int)),
+    (Ctrl.Ret ((Ctrl.INT 5), Basictypes.Int)),
+    (Ctrl.Branch (
+       (Ctrl.Ret (
+          (Ctrl.Condition (
+             (Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
+             Basictypes.Gt, (Ctrl.INT 2), Basictypes.Bool)),
+          Basictypes.Bool)),
+       (Ctrl.Branch (
+          (Ctrl.Ret (
+             (Ctrl.Condition (
+                (Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
+                Basictypes.Gt, (Ctrl.INT 10), Basictypes.Bool)),
+             Basictypes.Bool)),
+          (Ctrl.Choose ((Basictypes.Direction "L"),
+             (Basictypes.Location "p2"),
+             (Ctrl.Snd (
+                (Ctrl.Plus (
+                   (Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
+                   (Ctrl.INT 2), Basictypes.Int)),
+                (Basictypes.Location "p2"), Ctrl.Unit, Basictypes.Int)),
+             Basictypes.Int)),
+          (Ctrl.Choose ((Basictypes.Direction "R"),
+             (Basictypes.Location "p2"),
+             (Ctrl.Snd (
+                (Ctrl.Minus (
+                   (Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
+                   (Ctrl.INT 2), Basictypes.Int)),
+                (Basictypes.Location "p2"), Ctrl.Unit, Basictypes.Int)),
+             Basictypes.Int)),
+          Basictypes.Int)),
+       (Ctrl.Branch (
+          (Ctrl.Ret (
+             (Ctrl.Condition (
+                (Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
+                Basictypes.Gt, (Ctrl.INT 10), Basictypes.Bool)),
+             Basictypes.Bool)),
+          (Ctrl.Choose ((Basictypes.Direction "L"),
+             (Basictypes.Location "p2"),
+             (Ctrl.Snd (
+                (Ctrl.Plus (
+                   (Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
+                   (Ctrl.INT 2), Basictypes.Int)),
+                (Basictypes.Location "p2"), Ctrl.Unit, Basictypes.Int)),
+             Basictypes.Int)),
+          (Ctrl.Choose ((Basictypes.Direction "R"),
+             (Basictypes.Location "p2"),
+             (Ctrl.Snd (
+                (Ctrl.Minus (
+                   (Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
+                   (Ctrl.INT 2), Basictypes.Int)),
+                (Basictypes.Location "p2"), Ctrl.Unit, Basictypes.Int)),
+             Basictypes.Int)),
+          Basictypes.Int)),
+       Basictypes.Int)),
+    Basictypes.Int)); prop = "p1"}
 
 (* Function to output code for an entity *)
 let output_code_for_entity (entity : string) =
@@ -205,4 +285,4 @@ let codify asts file_name =
   (* print_endline code  *)
   _format_and_save_code code _output_file
 
-let () = codify [ast1] file_name 
+let () = codify [ast1; _ast2] file_name 

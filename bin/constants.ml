@@ -25,6 +25,9 @@ let _true: string = "true"
 let _false: string = "false"
 let _underscore: string = "_"
 let _quotify (arg: string) : string = "\"" ^ arg ^ "\""
+let _colon: string = ":"
+let _gt: string = ">"
+let _lt: string = "<"
 
 let _rec: string = "rec"
 let _utilImport: string = "open Unix
