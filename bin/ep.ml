@@ -1,7 +1,13 @@
 open Ctrl
 open Expr
+open Basictypes
 
-module SS = Set.Make(String);;
+(* module SS = Set.Make(String);; *)
+module SS = Set.Make(struct
+  type t = location
+  let compare = compare_location
+end)
+
 exception EndpointProjectionFailedException of string
 
 let get_entitities expr : SS.t = 
@@ -12,23 +18,23 @@ let get_entitities expr : SS.t =
         let acc_thn = aux acc_ift thn in
         let acc_el = aux acc_thn el in
           acc_el
-      | Sync (Location sndr, _, Location rcvr, thn, _) ->
+      | Sync (sndr, _, rcvr, thn, _) ->
         let acc = aux acc thn in
           let acc = SS.union (SS.add sndr acc) (SS.add rcvr acc) in 
             acc
-      | Assoc (Location loc, _, _) ->
+      | Assoc (loc, _, _) ->
           (SS.add loc acc)
-      | FunL (_, Location loc, _, body, _) ->
+      | FunL (_, loc, _, body, _) ->
         let acc = aux acc body in
           (SS.add loc acc)
       | FunG (_, arg, body, _) ->
         let acc_arg = aux acc arg in
         let acc = aux acc_arg body in
           acc
-      | Snd (sndr, Location loc, _) -> 
+      | Snd (sndr, loc, _) -> 
         let acc_sndr = aux acc sndr in
           (SS.add loc acc_sndr)
-      | Let (Location loc, _, snd, thn, _)  ->
+      | Let (loc, _, snd, thn, _)  ->
         let acc_snd = aux acc snd in
         let acc_thn = aux acc_snd thn in
           (SS.add loc acc_thn)
@@ -43,126 +49,117 @@ let get_entitities expr : SS.t =
     in
       aux set1 expr
 
-let ast = (
-  Expr.Application {
-  funct =
-  Expr.Fun {name = "loop"; arg = (Expr.ChoreoVars "X");
-    body = Expr.Calling {name = "loop"; arg = (Expr.ChoreoVars "X")}};
-  argument = Expr.Assoc {loc = "person1"; arg = (Expr.Value 0)}}
-)
-
-let entities : SS.t = 
-  get_entitities ast
-
 let rec merge_branch (lbranch:ctrl) (rbranch:ctrl) : ctrl option= 
-  match lbranch, rbranch with
-    | ChoreoVars x, ChoreoVars y when x = y -> Some (ChoreoVars x)
+  (match lbranch, rbranch with
+    | ChoreoVars (x, x_typ), ChoreoVars (y, y_typ) 
+      when x = y && ctrlType_equal x_typ y_typ -> Some (ChoreoVars (x, x_typ))
     | Unit, Unit -> Some Unit
-    | Ret {arg = x}, Ret {arg = y} when x = y -> Some (Ret {arg = x})
-    | Branch {ift; thn; el}, Branch {ift = ift2; thn = thn2; el = el2} 
-      when ift = ift2 ->
+    | Ret (x, x_typ), Ret (y, y_typ) when x = y && ctrlType_equal x_typ y_typ -> Some (Ret (x, x_typ))
+    | Branch (ift, thn, el, x_typ), Branch (ift2, thn2, el2, y_typ) 
+      when ift = ift2 && ctrlType_equal x_typ y_typ ->
         let merged_thn = merge_branch thn thn2 in
         let merged_el = merge_branch el el2 in
         (match merged_thn, merged_el with
-            | Some merged_thn, Some merged_el -> Some (Ctrl.Branch {ift; thn = merged_thn; el = merged_el})
+            | Some merged_thn, Some merged_el -> Some (Ctrl.Branch (ift, merged_thn, merged_el, x_typ))
             | _ -> None)
-    | Snd {arg; loc; thn}, Snd {arg = arg2; loc = loc2; thn = thn2} 
-      when arg = arg2 && loc = loc2 ->
+    | Snd (arg, loc, thn, x_typ), Snd (arg2, loc2, thn2, y_typ) 
+      when arg = arg2 && loc = loc2 && ctrlType_equal x_typ y_typ ->
         let merged_thn = merge_branch thn thn2 in
         (match merged_thn with
-          | Some merged_thn -> Some (Ctrl.Snd {arg; loc; thn = merged_thn})
+          | Some merged_thn -> Some (Ctrl.Snd (arg, loc, merged_thn, x_typ))
           | _ -> None)
-    | Rcv {arg; loc; thn}, Rcv {arg = arg2; loc = loc2; thn = thn2} 
-      when arg = arg2 && loc = loc2 ->
+    | Rcv (arg, loc, thn, x_typ), Rcv (arg2, loc2, thn2, y_typ) 
+    when arg = arg2 && loc = loc2 && ctrlType_equal x_typ y_typ ->
+      let merged_thn = merge_branch thn thn2 in
+      (match merged_thn with
+        | Some merged_thn -> Some (Ctrl.Rcv (arg, loc, merged_thn, x_typ))
+        | _ -> None)
+    | Choose (d, loc, thn, x_typ), Choose (d2, loc2, thn2, y_typ) 
+      when d = d2 && loc = loc2 && ctrlType_equal x_typ y_typ ->
         let merged_thn = merge_branch thn thn2 in
         (match merged_thn with
-          | Some merged_thn -> Some (Ctrl.Rcv {arg; loc; thn = merged_thn})
-          | _ -> None)
-    | Choose {d; loc; thn}, Choose {d = d2; loc = loc2; thn = thn2} 
-      when d = d2 && loc = loc2 ->
-        let merged_thn = merge_branch thn thn2 in
-        (match merged_thn with
-          | Some merged_thn -> Some (Ctrl.Choose {d; loc; thn = merged_thn})
+          | Some merged_thn -> Some (Ctrl.Choose (d, loc, merged_thn, x_typ))
           | _ -> None)
     (* LL *)
-    | AllowL {loc; thn}, AllowL {loc = loc2; thn = thn2} 
-      when loc = loc2 ->
+    | AllowL (loc, thn, x_typ), AllowL (loc2, thn2, y_typ) 
+      when loc = loc2 && ctrlType_equal x_typ y_typ ->
         let merged_thn = merge_branch thn thn2 in
         (match merged_thn with
-          | Some merged_thn -> Some (Ctrl.AllowL {loc; thn = merged_thn})
+          | Some merged_thn -> Some (Ctrl.AllowL (loc, merged_thn, x_typ))
           | _ -> None)
     (* LR *)
-    | AllowL {loc; thn}, AllowR {loc = loc2; thn = thn2}
-      when loc = loc2 ->
-        Some (AllowLR {loc; thnL = thn; thnR = thn2})
+    | AllowL (loc, thn, x_typ), AllowR (loc2, thn2, y_typ) 
+      when loc = loc2 && ctrlType_equal x_typ y_typ ->
+        Some (AllowLR (loc, thn, thn2, x_typ))
     (* LLR *)
-    | AllowL {loc; thn}, AllowLR {loc = loc2; thnL; thnR} 
-      when loc = loc2->
+    | AllowL (loc, thn, l_typ) , AllowLR (loc2, thnL, thnR, lr_typ) 
+      when loc = loc2 && ctrlType_equal l_typ lr_typ ->
         let merged_thn = merge_branch thn thnL in
         (match merged_thn with
-          | Some merged_thn -> Some (Ctrl.AllowLR {loc; thnL = merged_thn; thnR})
+          | Some merged_thn -> Some (Ctrl.AllowLR (loc, merged_thn, thnR, lr_typ))
           | _ -> None)
     (* RL *)
-    | AllowR {loc; thn}, AllowL {loc = loc2; thn = thn2} 
-      when loc = loc2 ->
-        Some (AllowLR {loc; thnL = thn2; thnR = thn})
+    | AllowR (loc, thn, x_typ), AllowL (loc2, thn2, y_typ) 
+      when loc = loc2 && ctrlType_equal x_typ y_typ ->
+        Some (AllowLR (loc, thn2, thn, x_typ))
     (* RR *)
-    | AllowR {loc; thn}, AllowR {loc = loc2; thn = thn2} 
-      when loc = loc2->
+    | AllowR (loc, thn, x_typ), AllowR (loc2, thn2, y_typ) 
+      when loc = loc2 && ctrlType_equal x_typ y_typ ->
         let merged_thn = merge_branch thn thn2 in
         (match merged_thn with
-          | Some merged_thn -> Some (Ctrl.AllowR {loc; thn = merged_thn})
+          | Some merged_thn -> Some (Ctrl.AllowR (loc, merged_thn, x_typ))
           | _ -> None)
     (* RLR *)
-    | AllowR {loc; thn}, AllowLR {loc = loc2; thnL; thnR} 
-      when loc = loc2 ->
+    | AllowR (loc, thn, x_typ), AllowLR (loc2, thnL, thnR, y_typ) 
+      when loc = loc2 && ctrlType_equal x_typ y_typ  ->
         let merged_thn = merge_branch thn thnR in
         (match merged_thn with
-          | Some merged_thn -> Some (Ctrl.AllowLR {loc; thnL; thnR = merged_thn})
+          | Some merged_thn -> Some (Ctrl.AllowLR (loc, thnL, merged_thn, y_typ))
           | _ -> None)
     (* LRL *)
-    | AllowLR {loc; thnL; thnR}, AllowL {loc = loc2; thn} 
-      when loc = loc2 ->
+    | AllowLR (loc, thnL, thnR, x_typ), AllowL (loc2, thn, y_typ)
+      when loc = loc2 && ctrlType_equal x_typ y_typ ->
         let merged_thn = merge_branch thnL thn in
         (match merged_thn with
-          | Some merged_thn -> Some (Ctrl.AllowLR {loc; thnL = merged_thn; thnR})
+          | Some merged_thn -> Some (Ctrl.AllowLR (loc, merged_thn, thnR, x_typ))
           | _ -> None)
     (* LRR *)
-    | AllowLR {loc; thnL; thnR}, AllowR {loc = loc2; thn}
-      when loc = loc2 ->
+    | AllowLR (loc, thnL, thnR, x_typ), AllowR (loc2, thn, y_typ)
+      when loc = loc2 && ctrlType_equal x_typ y_typ ->
         let merged_thn = merge_branch thnR thn in
         (match merged_thn with
-          | Some merged_thn -> Some (Ctrl.AllowLR {loc; thnL; thnR = merged_thn})
+          | Some merged_thn -> Some (Ctrl.AllowLR (loc, thnL, merged_thn, x_typ))
           | _ -> None)
     (* LRLR *)
-    | AllowLR {loc; thnL; thnR}, AllowLR {loc = loc2; thnL = thnL2; thnR = thnR2} 
-      when loc = loc2 ->
+    | AllowLR (loc, thnL, thnR, x_typ), AllowLR (loc2, thnL2, thnR2, y_typ) 
+      when loc = loc2 && ctrlType_equal x_typ y_typ ->
         let merged_thn_l = merge_branch thnL thnL2 in
         let merged_thn_r = merge_branch thnR thnR2 in
         (match merged_thn_l, merged_thn_r with
-          | Some merged_thn_l, Some merged_thn_r -> Some (Ctrl.AllowLR {loc; thnL = merged_thn_l; thnR = merged_thn_r})
+          | Some merged_thn_l, Some merged_thn_r -> Some (Ctrl.AllowLR (loc, merged_thn_l, merged_thn_r, x_typ))
           | _ -> None)
-    | Let {binder; arg; thn}, Let {binder = binder2; arg = arg2; thn = thn2}
-        when binder = binder2 -> 
+    | Let (binder, arg, thn, x_typ), Let (binder2, arg2, thn2, y_typ)
+        when binder = binder2 && ctrlType_equal x_typ y_typ -> 
         let merged_arg = merge_branch arg arg2 in
         let merged_thn = merge_branch thn thn2 in
         (match merged_arg, merged_thn with
-          | Some merged_arg, Some merged_thn -> Some (Ctrl.Let {binder; arg = merged_arg; thn = merged_thn})
+          | Some merged_arg, Some merged_thn -> Some (Ctrl.Let (binder, merged_arg, merged_thn, x_typ))
           | _ -> None)
-    | Fun {name; arg; body}, Fun {name = name2; arg = arg2; body = body2} 
-        when name = name2 && arg = arg2 && body = body2 ->
-          Some (Fun {name; arg; body})
-    | Application {funct; argument}, Application {funct = funct2; argument = argument2} ->
+    | Fun (name, arg, body, x_typ), Fun (name2, arg2, body2, y_typ) 
+        when name = name2 && arg = arg2 && body = body2 && ctrlType_equal x_typ y_typ ->
+          Some (Fun (name, arg, body, x_typ))
+    | Application (funct, argument, x_typ), Application (funct2, argument2, y_typ) 
+      when ctrlType_equal x_typ y_typ ->
       let merged_funct = merge_branch funct funct2 in
       let merged_argument = merge_branch argument argument2 in
       (match merged_funct, merged_argument with
-          | Some merged_funct, Some merged_argument -> Some (Ctrl.Application {funct = merged_funct; argument = merged_argument})
+          | Some merged_funct, Some merged_argument -> Some (Ctrl.Application (merged_funct, merged_argument, x_typ))
           | _ -> None)
     | _ -> None
+  )
 
 
-
-let rec get_ctrlLType (typ : localType) : ctrlType =
+let get_ctrlLType (typ : localType) : ctrlType =
   match typ with
   | IntType -> Int
   | StringType -> String
@@ -170,10 +167,10 @@ let rec get_ctrlLType (typ : localType) : ctrlType =
 
 let rec get_ctrlGType (typ : globalType) : ctrlType =
   match typ with
-  | DotType(_, Some typ) -> get_ctrlLType typ
-  | ArrowType(Some ityp, Some otyp) -> CtrlFun (get_ctrlGType ityp, get_ctrlGType otyp) 
+  | DotType(_, typ) -> get_ctrlLType typ
+  | ArrowType(ityp, otyp) -> CtrlFun (get_ctrlGType ityp, get_ctrlGType otyp) 
 
-let rec local_ep_ast (expr_ast: expr) : l_ctrl option =
+let rec local_ep_ast (expr_ast: l_expr) : l_ctrl option =
   match expr_ast with
   | INT x -> Some (INT x)
   | STRING x -> Some (STRING x)
@@ -205,9 +202,7 @@ let rec local_ep_ast (expr_ast: expr) : l_ctrl option =
         Some (Ctrl.Condition (lft, op, rght, (get_ctrlLType typ)))
       | _ -> None)
   | _ -> raise (EndpointProjectionFailedException "EPP failed | Type not found")
-      
-
-    
+       
 
   (* let rec ep_ast expr currentNode = *)
 let rec ep_ast (expr_ast: expr) (currentNode: location): ctrl option =
@@ -217,8 +212,8 @@ let rec ep_ast (expr_ast: expr) (currentNode: location): ctrl option =
         | Some arg when currentNode = loc -> Some (Ret (arg, (get_ctrlGType typ)))
         | Some _ -> Some Unit
         | _ -> None)
-  | Branch (ift, thn, el, Some typ) -> p.(m<2)
-      (match ep_ast ift currentNode, ep_ast thn currentNode, ep_ast el currentNode with
+  | Branch (Assoc(loc, arg, assoc_typ), thn, el, Some typ) -> 
+      (match ep_ast (Assoc(loc, arg, assoc_typ)) currentNode, ep_ast thn currentNode, ep_ast el currentNode with
         | Some ift, Some thn, Some el 
             when currentNode = loc -> 
               Some (Ctrl.Branch (ift, thn, el, (get_ctrlGType typ)))
@@ -227,12 +222,12 @@ let rec ep_ast (expr_ast: expr) (currentNode: location): ctrl option =
             | None -> None
             | Some x -> Some x)
         | _ -> None)
-  | Sync (sndr, d, rcvr, thn, Some typ) ->
+  | Sync (sndr, Direction d, rcvr, thn, Some typ) ->
     if currentNode = sndr && currentNode = rcvr then
       None
     else if currentNode = sndr && currentNode != rcvr then
       (match ep_ast thn currentNode with
-        |Some thn -> Some (Choose (d, rcvr, thn, get_ctrlGType typ))
+        |Some thn -> Some (Choose (Direction d, rcvr, thn, get_ctrlGType typ))
         | _ -> None)
     else if currentNode = rcvr && currentNode != sndr then
       (match ep_ast thn currentNode, d with
@@ -242,24 +237,20 @@ let rec ep_ast (expr_ast: expr) (currentNode: location): ctrl option =
     else
       ep_ast thn currentNode
 
-      (* | Let (_, Variable(Name bndr_arg, Some bndr_typ), Snd (Assoc (loc, arg_snd, Some assoc_typ), rcvr, Some snd_typ), thn, Some thn_typ)-> *)
-
-  | Let (_, bndr_arg, Snd (Assoc (loc, arg_snd, Some assoc_typ), rcvr, Some snd_typ), thn, Some thn_typ)->
+  | Let (_, bndr_arg, Snd (Assoc (loc, arg_snd, Some _), rcvr, Some _), thn, Some thn_typ)->
     let parsed_thn = ep_ast thn currentNode in
     let parsed_bndr_arg = local_ep_ast bndr_arg in
-    let parsed_arg_snd = ep_ast (Assoc (loc, arg_snd, Some assoc_typ)) currentNode in
+    let parsed_arg_snd = local_ep_ast arg_snd in
     (match parsed_thn, parsed_bndr_arg, parsed_arg_snd with
-      | Some parsed_thn, Some _, Some parsed_arg_snd when name != currentNode && currentNode = loc
-        -> Some (Ctrl.Snd (arg = parsed_arg_snd; loc = name; thn = parsed_thn))
-      | Some parsed_thn, Some parsed_bndr_arg, Some _ when name = currentNode && currentNode != loc
-      -> Some (Ctrl.Rcv {arg = parsed_bndr_arg; loc; thn = parsed_thn})
-      | _, _, _ when name = currentNode && name = loc -> None
-      | Some parsed_thn, _, _ when name != currentNode && currentNode != loc -> Some parsed_thn
+      | Some parsed_thn, Some _, Some parsed_arg_snd when rcvr != currentNode && currentNode = loc
+        -> Some (Ctrl.Snd (parsed_arg_snd, rcvr, parsed_thn, (get_ctrlGType thn_typ)))
+      | Some parsed_thn, Some parsed_bndr_arg, Some _ when rcvr = currentNode && currentNode != loc 
+        -> Some (Ctrl.Rcv (parsed_bndr_arg, loc, parsed_thn, (get_ctrlGType thn_typ)))
+      | Some parsed_thn, _, _ when rcvr != currentNode && currentNode != loc -> Some parsed_thn
       | _ -> None)
-  (* remove the fresh thing -> intead of function put let () = E1 in E2 in ctrl
-      and let _ = E1 in E2 for ocaml  *)
-  | Let (loc, arg, snd, thn, Some typ) ->
-    (match local_ep_ast arg, ep_ast snd currentNode, ep_ast thn currentNode with
+
+  | Let (loc, Variable(var_name, Some var_typ), snd, thn, Some typ) ->
+    (match ep_ast (Assoc(loc, Variable(var_name, Some var_typ), Some (DotType(loc, var_typ)))) currentNode, ep_ast snd currentNode, ep_ast thn currentNode with
       | Some parsed_arg, Some parsed_snd, Some parsed_thn when loc = currentNode ->
         Some (Ctrl.Let (parsed_arg, parsed_snd, parsed_thn, (get_ctrlGType typ)))
       | Some _, Some parsed_snd, Some parsed_thn when loc != currentNode ->
@@ -276,7 +267,6 @@ let rec ep_ast (expr_ast: expr) (currentNode: location): ctrl option =
         Some (Ctrl.Fun {name ; arg = ChoreoVars (get_fresh_cname()); body = parsed_body})
       | _ -> None) *)
   | FunG (name, arg, body, Some typ) -> 
-    let parsed_body = ep_ast body currentNode in
     (match ep_ast arg currentNode, ep_ast body currentNode with
       | Some argument, Some parsed_body -> Some (Ctrl.Fun (name, argument, parsed_body, (get_ctrlGType typ)))
       | _ -> None)
@@ -295,9 +285,62 @@ let rec ep_ast (expr_ast: expr) (currentNode: location): ctrl option =
   | _ -> raise (EndpointProjectionFailedException "Case not executed")
      
 
+let ast = (Expr.Application (                 
+  (Expr.FunG ((Basictypes.Name "fname"),
+     (Expr.ChoreoVars ((Basictypes.Name "X"),
+        (Some (Basictypes.DotType ((Basictypes.Location "p"),
+                 Basictypes.IntType)))
+        )),
+     (Expr.Let ((Basictypes.Location "p"),
+        (Expr.Variable ((Basictypes.Name "n"), (Some Basictypes.IntType))),
+        (Expr.ChoreoVars ((Basictypes.Name "X"),
+           (Some (Basictypes.DotType ((Basictypes.Location "p"),
+                    Basictypes.IntType)))
+           )),
+        (Expr.Assoc ((Basictypes.Location "p"),
+           (Expr.Plus (
+              (Expr.Variable ((Basictypes.Name "n"),
+                 (Some Basictypes.IntType))),
+              (Expr.INT 1), (Some Basictypes.IntType))),
+           (Some (Basictypes.DotType ((Basictypes.Location "p"),
+                    Basictypes.IntType)))
+           )),
+        (Some (Basictypes.DotType ((Basictypes.Location "p"),
+                 Basictypes.IntType)))
+        )),
+     (Some (Basictypes.ArrowType (
+              (Basictypes.DotType ((Basictypes.Location "p"),
+                 Basictypes.IntType)),
+              (Basictypes.DotType ((Basictypes.Location "p"),
+                 Basictypes.IntType))
+              )))
+     )),
+  (Expr.Let ((Basictypes.Location "p"),
+     (Expr.Variable ((Basictypes.Name "m"), (Some Basictypes.IntType))),
+     (Expr.Assoc ((Basictypes.Location "p"), (Expr.INT 3),
+        (Some (Basictypes.DotType ((Basictypes.Location "p"),
+                 Basictypes.IntType)))
+        )),
+     (Expr.Assoc ((Basictypes.Location "p"),
+        (Expr.Minus (
+           (Expr.Variable ((Basictypes.Name "m"), (Some Basictypes.IntType)
+              )),
+           (Expr.INT 1), (Some Basictypes.IntType))),
+        (Some (Basictypes.DotType ((Basictypes.Location "p"),
+                 Basictypes.IntType)))
+        )),
+     (Some (Basictypes.DotType ((Basictypes.Location "p"),
+              Basictypes.IntType)))
+     )),
+  (Some (Basictypes.DotType ((Basictypes.Location "p"), Basictypes.IntType)))
+  ))
+
+let entities : SS.t = get_entitities ast
+
 let () = SS.iter (fun entity -> 
   let res = ep_ast ast entity in
-  let str = "____________________________" ^ entity ^ "___________________________________" in 
+  let Location str_entity = entity in
+  let str = "____________________________" ^ str_entity ^ "___________________________________" in 
   print_endline str;
   let r = match res with
     | Some res -> show_ctrl res
