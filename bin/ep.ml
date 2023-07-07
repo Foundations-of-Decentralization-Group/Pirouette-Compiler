@@ -157,7 +157,7 @@ let rec merge_branch (lbranch:ctrl) (rbranch:ctrl) : ctrl option=
           | _ -> None)
     | _ -> None
   )
-
+  
 
 let get_ctrlLType (typ : localType) : ctrlType =
   match typ with
@@ -285,55 +285,184 @@ let rec ep_ast (expr_ast: expr) (currentNode: location): ctrl option =
   | _ -> raise (EndpointProjectionFailedException "Case not executed")
      
 
-let ast = (Expr.Application (                 
-  (Expr.FunG ((Basictypes.Name "fname"),
-     (Expr.ChoreoVars ((Basictypes.Name "X"),
-        (Some (Basictypes.DotType ((Basictypes.Location "p"),
-                 Basictypes.IntType)))
-        )),
-     (Expr.Let ((Basictypes.Location "p"),
-        (Expr.Variable ((Basictypes.Name "n"), (Some Basictypes.IntType))),
-        (Expr.ChoreoVars ((Basictypes.Name "X"),
-           (Some (Basictypes.DotType ((Basictypes.Location "p"),
-                    Basictypes.IntType)))
-           )),
-        (Expr.Assoc ((Basictypes.Location "p"),
-           (Expr.Plus (
-              (Expr.Variable ((Basictypes.Name "n"),
-                 (Some Basictypes.IntType))),
-              (Expr.INT 1), (Some Basictypes.IntType))),
-           (Some (Basictypes.DotType ((Basictypes.Location "p"),
-                    Basictypes.IntType)))
-           )),
-        (Some (Basictypes.DotType ((Basictypes.Location "p"),
-                 Basictypes.IntType)))
-        )),
-     (Some (Basictypes.ArrowType (
-              (Basictypes.DotType ((Basictypes.Location "p"),
-                 Basictypes.IntType)),
-              (Basictypes.DotType ((Basictypes.Location "p"),
-                 Basictypes.IntType))
-              )))
-     )),
-  (Expr.Let ((Basictypes.Location "p"),
-     (Expr.Variable ((Basictypes.Name "m"), (Some Basictypes.IntType))),
-     (Expr.Assoc ((Basictypes.Location "p"), (Expr.INT 3),
-        (Some (Basictypes.DotType ((Basictypes.Location "p"),
-                 Basictypes.IntType)))
-        )),
-     (Expr.Assoc ((Basictypes.Location "p"),
-        (Expr.Minus (
-           (Expr.Variable ((Basictypes.Name "m"), (Some Basictypes.IntType)
-              )),
-           (Expr.INT 1), (Some Basictypes.IntType))),
-        (Some (Basictypes.DotType ((Basictypes.Location "p"),
-                 Basictypes.IntType)))
-        )),
-     (Some (Basictypes.DotType ((Basictypes.Location "p"),
-              Basictypes.IntType)))
-     )),
-  (Some (Basictypes.DotType ((Basictypes.Location "p"), Basictypes.IntType)))
-  ))
+let ast = (Expr.Let ((Basictypes.Location "p1"),
+(Expr.Variable ((Basictypes.Name "x"), (Some Basictypes.IntType))),
+(Expr.Assoc ((Basictypes.Location "p1"), (Expr.INT 5),
+   (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+            Basictypes.IntType)))
+   )),
+(Expr.Let ((Basictypes.Location "p2"),
+   (Expr.Variable ((Basictypes.Name "y"), (Some Basictypes.IntType))),
+   (Expr.Assoc ((Basictypes.Location "p2"), (Expr.INT 10),
+      (Some (Basictypes.DotType ((Basictypes.Location "p2"),
+               Basictypes.IntType)))
+      )),
+   (Expr.Branch (
+      (Expr.Assoc ((Basictypes.Location "p1"),
+         (Expr.Condition (
+            (Expr.Variable ((Basictypes.Name "x"),
+               (Some Basictypes.IntType))),
+            Basictypes.Gt, (Expr.INT 2), (Some Basictypes.BoolType))),
+         (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                  Basictypes.BoolType)))
+         )),
+      (Expr.Branch (
+         (Expr.Assoc ((Basictypes.Location "p1"),
+            (Expr.Condition (
+               (Expr.Variable ((Basictypes.Name "x"),
+                  (Some Basictypes.IntType))),
+               Basictypes.Gt, (Expr.INT 10), (Some Basictypes.BoolType))),
+            (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                     Basictypes.BoolType)))
+            )),
+         (Expr.Sync ((Basictypes.Location "p1"),
+            (Basictypes.Direction "L"), (Basictypes.Location "p2"),
+            (Expr.Let ((Basictypes.Location "p1"),
+               (Expr.Variable ((Basictypes.Name "z"),
+                  (Some Basictypes.IntType))),
+               (Expr.Snd (
+                  (Expr.Assoc ((Basictypes.Location "p2"),
+                     (Expr.Plus (
+                        (Expr.Variable ((Basictypes.Name "y"),
+                           (Some Basictypes.IntType))),
+                        (Expr.INT 2), (Some Basictypes.IntType))),
+                     (Some (Basictypes.DotType (
+                              (Basictypes.Location "p2"),
+                              Basictypes.IntType)))
+                     )),
+                  (Basictypes.Location "p1"),
+                  (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                           Basictypes.IntType)))
+                  )),
+               (Expr.Assoc ((Basictypes.Location "p1"),
+                  (Expr.Variable ((Basictypes.Name "z"),
+                     (Some Basictypes.IntType))),
+                  (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                           Basictypes.IntType)))
+                  )),
+               (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                        Basictypes.IntType)))
+               )),
+            (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                     Basictypes.IntType)))
+            )),
+         (Expr.Sync ((Basictypes.Location "p1"),
+            (Basictypes.Direction "R"), (Basictypes.Location "p2"),
+            (Expr.Let ((Basictypes.Location "p1"),
+               (Expr.Variable ((Basictypes.Name "z"),
+                  (Some Basictypes.IntType))),
+               (Expr.Snd (
+                  (Expr.Assoc ((Basictypes.Location "p2"),
+                     (Expr.Minus (
+                        (Expr.Variable ((Basictypes.Name "y"),
+                           (Some Basictypes.IntType))),
+                        (Expr.INT 2), (Some Basictypes.IntType))),
+                     (Some (Basictypes.DotType (
+                              (Basictypes.Location "p2"),
+                              Basictypes.IntType)))
+                     )),
+                  (Basictypes.Location "p1"),
+                  (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                           Basictypes.IntType)))
+                  )),
+               (Expr.Assoc ((Basictypes.Location "p1"),
+                  (Expr.Variable ((Basictypes.Name "z"),
+                     (Some Basictypes.IntType))),
+                  (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                           Basictypes.IntType)))
+                  )),
+               (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                        Basictypes.IntType)))
+               )),
+            (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                     Basictypes.IntType)))
+            )),
+         (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                  Basictypes.IntType)))
+         )),
+      (Expr.Branch (
+         (Expr.Assoc ((Basictypes.Location "p1"),
+            (Expr.Condition (
+               (Expr.Variable ((Basictypes.Name "x"),
+                  (Some Basictypes.IntType))),
+               Basictypes.Gt, (Expr.INT 10), (Some Basictypes.BoolType))),
+            (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                     Basictypes.BoolType)))
+            )),
+         (Expr.Sync ((Basictypes.Location "p1"),
+            (Basictypes.Direction "L"), (Basictypes.Location "p2"),
+            (Expr.Let ((Basictypes.Location "p1"),
+               (Expr.Variable ((Basictypes.Name "z"),
+                  (Some Basictypes.IntType))),
+               (Expr.Snd (
+                  (Expr.Assoc ((Basictypes.Location "p2"),
+                     (Expr.Plus (
+                        (Expr.Variable ((Basictypes.Name "y"),
+                           (Some Basictypes.IntType))),
+                        (Expr.INT 2), (Some Basictypes.IntType))),
+                     (Some (Basictypes.DotType (
+                              (Basictypes.Location "p2"),
+                              Basictypes.IntType)))
+                     )),
+                  (Basictypes.Location "p1"),
+                  (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                           Basictypes.IntType)))
+                  )),
+               (Expr.Assoc ((Basictypes.Location "p1"),
+                  (Expr.Variable ((Basictypes.Name "z"),
+                     (Some Basictypes.IntType))),
+                  (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                           Basictypes.IntType)))
+                  )),
+               (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                        Basictypes.IntType)))
+               )),
+            (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                     Basictypes.IntType)))
+            )),
+         (Expr.Sync ((Basictypes.Location "p1"),
+            (Basictypes.Direction "R"), (Basictypes.Location "p2"),
+            (Expr.Let ((Basictypes.Location "p1"),
+               (Expr.Variable ((Basictypes.Name "z"),
+                  (Some Basictypes.IntType))),
+               (Expr.Snd (
+                  (Expr.Assoc ((Basictypes.Location "p2"),
+                     (Expr.Minus (
+                        (Expr.Variable ((Basictypes.Name "y"),
+                           (Some Basictypes.IntType))),
+                        (Expr.INT 2), (Some Basictypes.IntType))),
+                     (Some (Basictypes.DotType (
+                              (Basictypes.Location "p2"),
+                              Basictypes.IntType)))
+                     )),
+                  (Basictypes.Location "p1"),
+                  (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                           Basictypes.IntType)))
+                  )),
+               (Expr.Assoc ((Basictypes.Location "p1"),
+                  (Expr.Variable ((Basictypes.Name "z"),
+                     (Some Basictypes.IntType))),
+                  (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                           Basictypes.IntType)))
+                  )),
+               (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                        Basictypes.IntType)))
+               )),
+            (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                     Basictypes.IntType)))
+            )),
+         (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+                  Basictypes.IntType)))
+         )),
+      (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+               Basictypes.IntType)))
+      )),
+   (Some (Basictypes.DotType ((Basictypes.Location "p1"),
+            Basictypes.IntType)))
+   )),
+(Some (Basictypes.DotType ((Basictypes.Location "p1"), Basictypes.IntType
+         )))
+))
 
 let entities : SS.t = get_entitities ast
 

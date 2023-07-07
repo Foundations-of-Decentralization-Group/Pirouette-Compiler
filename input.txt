@@ -1,3 +1,5 @@
-(fun fname (X : p.int) := 
-let p.(n : int) := X in p.(n + 1))
-let p.(m : int) := p.3 in p.(m - 1)
+let p1.(x : int) := p1.5 in let p2.(y : int) := p2.10 in if p1.(x > 2)
+then if p1.(x > 10) then p1[L] ~> p2; p2.(y + 2) ~> p1.(z : int); p1.z
+else p1[R] ~> p2; p2.(y - 2) ~> p1.(z : int); p1.z 
+else if p1.(x > 10) then p1[L] ~> p2; p2.(y + 2) ~> p1.(z : int); p1.z
+else p1[R] ~> p2; p2.(y - 2) ~> p1.(z : int); p1.z

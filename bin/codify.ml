@@ -31,7 +31,6 @@ let getStrBinop (op : binop) : string =
     | Eq -> _equals
   )
 
-
 let rec _codify_local (ast: l_ctrl) : string = 
   (match ast with 
     | INT x -> string_of_int x
@@ -73,10 +72,10 @@ let rec _codify (ast: ctrl) (confMap: string list) (currentEntity: string): stri
     _space ^ "_channel_" ^ currentEntity ^ _underscore ^ loc ^ _space ^ 
     codified_arg ^ _rParen ^ _space ^ 
     _in ^ _endl ^ codified_thn
-  | Rcv (arg, Location loc, thn, _) ->
+  | Rcv (Variable(name, typ), Location loc, thn, _) ->
     let codified_thn = _codify thn confMap currentEntity in 
-    let codified_arg = _codify_local arg in
-      _let ^ _space ^ codified_arg ^ _equals ^ _space ^ _sync ^ _space ^  
+    let codified_arg = _codify_local (Variable(name, typ)) in
+      _let ^ _space ^ codified_arg ^ _colon ^ (getStrCtrlTyp typ "") ^ _equals ^ _space ^ _sync ^ _space ^  
       _lParen ^ _rcvmsg ^ _space ^ "_channel_" ^ loc ^ _underscore ^ currentEntity ^ 
        _space ^ _rParen ^ _space ^ _in ^ _space ^
       _lParen ^ _endl ^ _tab ^ codified_thn ^ _rParen 
@@ -102,7 +101,7 @@ let rec _codify (ast: ctrl) (confMap: string list) (currentEntity: string): stri
   | AllowLR (Location loc, thnL, thnR, _) ->
     let codified_thnL = _codify thnL confMap currentEntity in
     let codified_thnR = _codify thnR confMap currentEntity in
-    _let ^ _space ^ "___synclbl"  ^ _equals ^ _space ^ _sync ^ _space ^  
+    _let ^ _space ^ "___synclbl : bool"  ^ _equals ^ _space ^ _sync ^ _space ^  
       _lParen ^ _rcvmsg ^ _space ^ "_channel_" ^ loc ^ _underscore ^ currentEntity ^ 
        _space ^ _rParen ^ _space ^ _in ^ _space ^
     _if ^ _space ^ _lParen ^ _endl ^ "___synclbl" ^ _rParen ^ _then ^ _space ^ 
@@ -118,10 +117,11 @@ let rec _codify (ast: ctrl) (confMap: string list) (currentEntity: string): stri
   let codified_thn = _codify thn confMap currentEntity in 
     _let ^ _space ^ codified_binder ^ _colon ^ (getStrCtrlTyp typ "") ^ _equals ^ codified_arg ^ _space ^ _in ^ 
     _lParen ^ _endl ^ _tab ^ codified_thn ^ _rParen
-  | Fun (Name name, arg, body, typ) ->
-    let codified_arg = _codify arg confMap currentEntity in
+  | Fun (Name name, ChoreoVars(ch_name, ch_typ), body, typ) ->
+    let codified_arg = _codify (ChoreoVars(ch_name, ch_typ)) confMap currentEntity in
     let codified_body = _codify body confMap currentEntity in 
-      _let ^ _space ^ _rec ^ _space ^ name ^ _space ^ _lParen ^ codified_arg ^_rParen ^ _space 
+      _let ^ _space ^ _rec ^ _space ^ name ^ _space ^ _lParen ^ codified_arg ^ _colon ^ 
+      (getStrCtrlTyp ch_typ "") ^_rParen ^ _space ^ _colon 
       ^ (getStrCtrlTyp typ "snd") ^ _equals ^ _space ^ 
       _lParen ^ codified_body ^ _rParen
   | Calling (Name name, arg, _) -> 
@@ -134,7 +134,7 @@ let rec _codify (ast: ctrl) (confMap: string list) (currentEntity: string): stri
       _let ^ _space ^ _disreg ^ _equals ^ name ^ _space ^ codified_argument ^ _space ^ _in ^ _space
       ^ _unit
   | Application (_, _, _) -> ""
-
+  | _ -> raise (InvalidProgramException "Invalid Program construct encountered")
 
 
 open Printf
@@ -164,16 +164,21 @@ type astType = Ast of { code : ctrl; prop : string }
 
 let ast1 = Ast{
   code = (Ctrl.Let (Ctrl.Unit, Ctrl.Unit,
-  (Ctrl.AllowLR ((Basictypes.Location "p1"),
-     (Ctrl.Rcv ((Ctrl.Variable ((Basictypes.Name "y"), Basictypes.Int)),
-        (Basictypes.Location "p1"),
-        (Ctrl.Ret ((Ctrl.Variable ((Basictypes.Name "y"), Basictypes.Int)),
-           Basictypes.Int)),
+  (Ctrl.Let (
+     (Ctrl.Ret ((Ctrl.Variable ((Basictypes.Name "y"), Basictypes.Int)),
         Basictypes.Int)),
-     (Ctrl.Rcv ((Ctrl.Variable ((Basictypes.Name "y"), Basictypes.Int)),
-        (Basictypes.Location "p1"),
-        (Ctrl.Ret ((Ctrl.Variable ((Basictypes.Name "y"), Basictypes.Int)),
-           Basictypes.Int)),
+     (Ctrl.Ret ((Ctrl.INT 10), Basictypes.Int)),
+     (Ctrl.AllowLR ((Basictypes.Location "p1"),
+        (Ctrl.Snd (
+           (Ctrl.Plus (
+              (Ctrl.Variable ((Basictypes.Name "y"), Basictypes.Int)),
+              (Ctrl.INT 2), Basictypes.Int)),
+           (Basictypes.Location "p1"), Ctrl.Unit, Basictypes.Int)),
+        (Ctrl.Snd (
+           (Ctrl.Minus (
+              (Ctrl.Variable ((Basictypes.Name "y"), Basictypes.Int)),
+              (Ctrl.INT 2), Basictypes.Int)),
+           (Basictypes.Location "p1"), Ctrl.Unit, Basictypes.Int)),
         Basictypes.Int)),
      Basictypes.Int)),
   Basictypes.Int));
@@ -185,56 +190,66 @@ let _ast2 = Ast{
     (Ctrl.Ret ((Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
        Basictypes.Int)),
     (Ctrl.Ret ((Ctrl.INT 5), Basictypes.Int)),
-    (Ctrl.Branch (
-       (Ctrl.Ret (
-          (Ctrl.Condition (
-             (Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
-             Basictypes.Gt, (Ctrl.INT 2), Basictypes.Bool)),
-          Basictypes.Bool)),
+    (Ctrl.Let (Ctrl.Unit, Ctrl.Unit,
        (Ctrl.Branch (
           (Ctrl.Ret (
              (Ctrl.Condition (
                 (Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
-                Basictypes.Gt, (Ctrl.INT 10), Basictypes.Bool)),
+                Basictypes.Gt, (Ctrl.INT 2), Basictypes.Bool)),
              Basictypes.Bool)),
-          (Ctrl.Choose ((Basictypes.Direction "L"),
-             (Basictypes.Location "p2"),
-             (Ctrl.Snd (
-                (Ctrl.Plus (
+          (Ctrl.Branch (
+             (Ctrl.Ret (
+                (Ctrl.Condition (
                    (Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
-                   (Ctrl.INT 2), Basictypes.Int)),
-                (Basictypes.Location "p2"), Ctrl.Unit, Basictypes.Int)),
+                   Basictypes.Gt, (Ctrl.INT 10), Basictypes.Bool)),
+                Basictypes.Bool)),
+             (Ctrl.Choose ((Basictypes.Direction "L"),
+                (Basictypes.Location "p2"),
+                (Ctrl.Rcv (
+                   (Ctrl.Variable ((Basictypes.Name "z"), Basictypes.Int)),
+                   (Basictypes.Location "p2"),
+                   (Ctrl.Ret (
+                      (Ctrl.Variable ((Basictypes.Name "z"), Basictypes.Int)),
+                      Basictypes.Int)),
+                   Basictypes.Int)),
+                Basictypes.Int)),
+             (Ctrl.Choose ((Basictypes.Direction "R"),
+                (Basictypes.Location "p2"),
+                (Ctrl.Rcv (
+                   (Ctrl.Variable ((Basictypes.Name "z"), Basictypes.Int)),
+                   (Basictypes.Location "p2"),
+                   (Ctrl.Ret (
+                      (Ctrl.Variable ((Basictypes.Name "z"), Basictypes.Int)),
+                      Basictypes.Int)),
+                   Basictypes.Int)),
+                Basictypes.Int)),
              Basictypes.Int)),
-          (Ctrl.Choose ((Basictypes.Direction "R"),
-             (Basictypes.Location "p2"),
-             (Ctrl.Snd (
-                (Ctrl.Minus (
+          (Ctrl.Branch (
+             (Ctrl.Ret (
+                (Ctrl.Condition (
                    (Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
-                   (Ctrl.INT 2), Basictypes.Int)),
-                (Basictypes.Location "p2"), Ctrl.Unit, Basictypes.Int)),
-             Basictypes.Int)),
-          Basictypes.Int)),
-       (Ctrl.Branch (
-          (Ctrl.Ret (
-             (Ctrl.Condition (
-                (Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
-                Basictypes.Gt, (Ctrl.INT 10), Basictypes.Bool)),
-             Basictypes.Bool)),
-          (Ctrl.Choose ((Basictypes.Direction "L"),
-             (Basictypes.Location "p2"),
-             (Ctrl.Snd (
-                (Ctrl.Plus (
-                   (Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
-                   (Ctrl.INT 2), Basictypes.Int)),
-                (Basictypes.Location "p2"), Ctrl.Unit, Basictypes.Int)),
-             Basictypes.Int)),
-          (Ctrl.Choose ((Basictypes.Direction "R"),
-             (Basictypes.Location "p2"),
-             (Ctrl.Snd (
-                (Ctrl.Minus (
-                   (Ctrl.Variable ((Basictypes.Name "x"), Basictypes.Int)),
-                   (Ctrl.INT 2), Basictypes.Int)),
-                (Basictypes.Location "p2"), Ctrl.Unit, Basictypes.Int)),
+                   Basictypes.Gt, (Ctrl.INT 10), Basictypes.Bool)),
+                Basictypes.Bool)),
+             (Ctrl.Choose ((Basictypes.Direction "L"),
+                (Basictypes.Location "p2"),
+                (Ctrl.Rcv (
+                   (Ctrl.Variable ((Basictypes.Name "z"), Basictypes.Int)),
+                   (Basictypes.Location "p2"),
+                   (Ctrl.Ret (
+                      (Ctrl.Variable ((Basictypes.Name "z"), Basictypes.Int)),
+                      Basictypes.Int)),
+                   Basictypes.Int)),
+                Basictypes.Int)),
+             (Ctrl.Choose ((Basictypes.Direction "R"),
+                (Basictypes.Location "p2"),
+                (Ctrl.Rcv (
+                   (Ctrl.Variable ((Basictypes.Name "z"), Basictypes.Int)),
+                   (Basictypes.Location "p2"),
+                   (Ctrl.Ret (
+                      (Ctrl.Variable ((Basictypes.Name "z"), Basictypes.Int)),
+                      Basictypes.Int)),
+                   Basictypes.Int)),
+                Basictypes.Int)),
              Basictypes.Int)),
           Basictypes.Int)),
        Basictypes.Int)),

@@ -7,7 +7,7 @@
 
 let whitespace = [' ' '\t']+
 let newline = '\r' | '\n' | "\r\n" 
-let string = [^ 'L' 'R' '(' ')' '\\' '.' '#' ' ' '\t' '\n' '\t' '*' '-' '/' '+' '[' ']' ';' '<' '>' '=']+
+let string = [^ 'L' 'R' '(' ')' '\\' '.' '#' ' ' '\t' '\n' '\t' '*' '-' '/' '+' '[' ']' ';' '<' '>' '=' '\r']+
 let digit = ['0'-'9']
 let choreographic_vars = ['A'-'Z']
 let int = '-'? digit+
@@ -48,8 +48,8 @@ rule read =
         | "bool" {BoolType}
         | "int" {IntType}
         | "string" {StringType}
-        | string {Identifier (lexeme lexbuf)}
         | newline { read lexbuf }
+        | string {Identifier (lexeme lexbuf)}
         | eof {EOF}
         | "#" {skip_line lexbuf}
         | _ {raise (SyntaxError ("Lexer - Illegal character: " ^ Lexing.lexeme lexbuf)) }

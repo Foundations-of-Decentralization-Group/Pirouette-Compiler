@@ -28,7 +28,7 @@ let rec local_type_check (l_expr_ast: l_expr) (loc : location) (typeMap: globalT
       | Some (DotType(Location _, inf_typ)), Some dec_typ 
         when localType_equal inf_typ dec_typ ->
         LTcast(Some dec_typ, Some (Variable (Name name, Some dec_typ)))
-      | Some _, Some _ ->
+      | Some _, Some _ -> 
         raise (TypeCheckingFailedException "inferred type and declared type do not match")
       | Some (DotType(Location _, inf_typ)), None ->
         LTcast(Some inf_typ, Some (Variable (Name name, Some inf_typ)))
@@ -211,89 +211,96 @@ let _ast = (Expr.Assoc ((Expr.Location "person"),
 let ast2 = (Expr.Let ((Basictypes.Location "p1"),
 (Expr.Variable ((Basictypes.Name "x"), (Some Basictypes.IntType))),
 (Expr.Assoc ((Basictypes.Location "p1"), (Expr.INT 5), None)),
-(Expr.Branch (
-   (Expr.Assoc ((Basictypes.Location "p1"),
-      (Expr.Condition ((Expr.Variable ((Basictypes.Name "x"), None)),
-         Basictypes.Gt, (Expr.INT 2), (Some Basictypes.BoolType))),
-      None)),
+(Expr.Let ((Basictypes.Location "p2"),
+   (Expr.Variable ((Basictypes.Name "y"), (Some Basictypes.IntType))),
+   (Expr.Assoc ((Basictypes.Location "p2"), (Expr.INT 10), None)),
    (Expr.Branch (
       (Expr.Assoc ((Basictypes.Location "p1"),
          (Expr.Condition ((Expr.Variable ((Basictypes.Name "x"), None)),
-            Basictypes.Gt, (Expr.INT 10), (Some Basictypes.BoolType))),
+            Basictypes.Gt, (Expr.INT 2), (Some Basictypes.BoolType))),
          None)),
-      (Expr.Sync ((Basictypes.Location "p1"), (Basictypes.Direction "L"),
-         (Basictypes.Location "p2"),
-         (Expr.Let ((Basictypes.Location "p2"),
-            (Expr.Variable ((Basictypes.Name "y"),
-               (Some Basictypes.IntType))),
-            (Expr.Snd (
+      (Expr.Branch (
+         (Expr.Assoc ((Basictypes.Location "p1"),
+            (Expr.Condition (
+               (Expr.Variable ((Basictypes.Name "x"), None)),
+               Basictypes.Gt, (Expr.INT 10), (Some Basictypes.BoolType))),
+            None)),
+         (Expr.Sync ((Basictypes.Location "p1"),
+            (Basictypes.Direction "L"), (Basictypes.Location "p2"),
+            (Expr.Let ((Basictypes.Location "p1"),
+               (Expr.Variable ((Basictypes.Name "z"),
+                  (Some Basictypes.IntType))),
+               (Expr.Snd (
+                  (Expr.Assoc ((Basictypes.Location "p2"),
+                     (Expr.Plus (
+                        (Expr.Variable ((Basictypes.Name "y"), None)),
+                        (Expr.INT 2), (Some Basictypes.IntType))),
+                     None)),
+                  (Basictypes.Location "p1"), None)),
                (Expr.Assoc ((Basictypes.Location "p1"),
-                  (Expr.Plus (
-                     (Expr.Variable ((Basictypes.Name "x"), None)),
-                     (Expr.INT 2), (Some Basictypes.IntType))),
-                  None)),
-               (Basictypes.Location "p2"), None)),
-            (Expr.Assoc ((Basictypes.Location "p2"),
-               (Expr.Variable ((Basictypes.Name "y"), None)), None)),
+                  (Expr.Variable ((Basictypes.Name "z"), None)), None)),
+               None)),
+            None)),
+         (Expr.Sync ((Basictypes.Location "p1"),
+            (Basictypes.Direction "R"), (Basictypes.Location "p2"),
+            (Expr.Let ((Basictypes.Location "p1"),
+               (Expr.Variable ((Basictypes.Name "z"),
+                  (Some Basictypes.IntType))),
+               (Expr.Snd (
+                  (Expr.Assoc ((Basictypes.Location "p2"),
+                     (Expr.Minus (
+                        (Expr.Variable ((Basictypes.Name "y"), None)),
+                        (Expr.INT 2), (Some Basictypes.IntType))),
+                     None)),
+                  (Basictypes.Location "p1"), None)),
+               (Expr.Assoc ((Basictypes.Location "p1"),
+                  (Expr.Variable ((Basictypes.Name "z"), None)), None)),
+               None)),
             None)),
          None)),
-      (Expr.Sync ((Basictypes.Location "p1"), (Basictypes.Direction "R"),
-         (Basictypes.Location "p2"),
-         (Expr.Let ((Basictypes.Location "p2"),
-            (Expr.Variable ((Basictypes.Name "y"),
-               (Some Basictypes.IntType))),
-            (Expr.Snd (
-               (Expr.Assoc ((Basictypes.Location "p1"),
-                  (Expr.Minus (
-                     (Expr.Variable ((Basictypes.Name "x"), None)),
-                     (Expr.INT 2), (Some Basictypes.IntType))),
-                  None)),
-               (Basictypes.Location "p2"), None)),
-            (Expr.Assoc ((Basictypes.Location "p2"),
-               (Expr.Variable ((Basictypes.Name "y"), None)), None)),
+      (Expr.Branch (
+         (Expr.Assoc ((Basictypes.Location "p1"),
+            (Expr.Condition (
+               (Expr.Variable ((Basictypes.Name "x"), None)),
+               Basictypes.Gt, (Expr.INT 10), (Some Basictypes.BoolType))),
             None)),
-         None)),
-      None)),
-   (Expr.Branch (
-      (Expr.Assoc ((Basictypes.Location "p1"),
-         (Expr.Condition ((Expr.Variable ((Basictypes.Name "x"), None)),
-            Basictypes.Gt, (Expr.INT 10), (Some Basictypes.BoolType))),
-         None)),
-      (Expr.Sync ((Basictypes.Location "p1"), (Basictypes.Direction "L"),
-         (Basictypes.Location "p2"),
-         (Expr.Let ((Basictypes.Location "p2"),
-            (Expr.Variable ((Basictypes.Name "y"),
-               (Some Basictypes.IntType))),
-            (Expr.Snd (
+         (Expr.Sync ((Basictypes.Location "p1"),
+            (Basictypes.Direction "L"), (Basictypes.Location "p2"),
+            (Expr.Let ((Basictypes.Location "p1"),
+               (Expr.Variable ((Basictypes.Name "z"),
+                  (Some Basictypes.IntType))),
+               (Expr.Snd (
+                  (Expr.Assoc ((Basictypes.Location "p2"),
+                     (Expr.Plus (
+                        (Expr.Variable ((Basictypes.Name "y"), None)),
+                        (Expr.INT 2), (Some Basictypes.IntType))),
+                     None)),
+                  (Basictypes.Location "p1"), None)),
                (Expr.Assoc ((Basictypes.Location "p1"),
-                  (Expr.Plus (
-                     (Expr.Variable ((Basictypes.Name "x"), None)),
-                     (Expr.INT 2), (Some Basictypes.IntType))),
-                  None)),
-               (Basictypes.Location "p2"), None)),
-            (Expr.Assoc ((Basictypes.Location "p2"),
-               (Expr.Variable ((Basictypes.Name "y"), None)), None)),
+                  (Expr.Variable ((Basictypes.Name "z"), None)), None)),
+               None)),
             None)),
-         None)),
-      (Expr.Sync ((Basictypes.Location "p1"), (Basictypes.Direction "R"),
-         (Basictypes.Location "p2"),
-         (Expr.Let ((Basictypes.Location "p2"),
-            (Expr.Variable ((Basictypes.Name "y"),
-               (Some Basictypes.IntType))),
-            (Expr.Snd (
+         (Expr.Sync ((Basictypes.Location "p1"),
+            (Basictypes.Direction "R"), (Basictypes.Location "p2"),
+            (Expr.Let ((Basictypes.Location "p1"),
+               (Expr.Variable ((Basictypes.Name "z"),
+                  (Some Basictypes.IntType))),
+               (Expr.Snd (
+                  (Expr.Assoc ((Basictypes.Location "p2"),
+                     (Expr.Minus (
+                        (Expr.Variable ((Basictypes.Name "y"), None)),
+                        (Expr.INT 2), (Some Basictypes.IntType))),
+                     None)),
+                  (Basictypes.Location "p1"), None)),
                (Expr.Assoc ((Basictypes.Location "p1"),
-                  (Expr.Minus (
-                     (Expr.Variable ((Basictypes.Name "x"), None)),
-                     (Expr.INT 2), (Some Basictypes.IntType))),
-                  None)),
-               (Basictypes.Location "p2"), None)),
-            (Expr.Assoc ((Basictypes.Location "p2"),
-               (Expr.Variable ((Basictypes.Name "y"), None)), None)),
+                  (Expr.Variable ((Basictypes.Name "z"), None)), None)),
+               None)),
             None)),
          None)),
       None)),
    None)),
 None))
+
 
 
 
