@@ -4,8 +4,15 @@
  (modules parser))
 
 (library
+ (name basictypes)
+ (modules basictypes)
+ (preprocess
+  (pps ppx_deriving.show)))
+
+(library
  (name expr)
  (modules expr)
+ (libraries basictypes)
  (preprocess
   (pps ppx_deriving.show)))
 
@@ -16,23 +23,51 @@
 
 (library
   (name parser)
-  (libraries expr)
+  (libraries expr basictypes)
   (modules parser))
+
+(library
+  (name utils)
+  (libraries unix)
+  (modules))
 
 (library
  (name ctrl)
  (modules ctrl)
+ (libraries basictypes)
  (preprocess
   (pps ppx_deriving.show)))
+
+(library
+ (name constants)
+ (modules constants))
 
 (executable
  (name main)
  (public_name main)
  (modules main)
- (libraries expr parser lexer))
+ (libraries expr parser unix lexer threads.posix stdune))
 
 (executable
  (name ep)
  (public_name ep)
  (modules ep)
  (libraries expr ctrl))
+
+(executable
+ (name typechecker)
+ (public_name typechecker)
+ (modules typechecker)
+ (libraries expr containers basictypes))
+
+(executable
+ (name codify)
+ (public_name codify)
+ (modules codify utils)
+ (libraries expr ctrl constants unix basictypes))
+
+(executable
+ (name output)
+ (public_name output)
+ (modules output)
+ (libraries threads.posix stdune))
