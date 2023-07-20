@@ -1,5 +1,5 @@
 open Lexing
-open Expr
+open Pirouette.Expr
 
 let loop lexer =
   flush stdout;

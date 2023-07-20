@@ -23,7 +23,7 @@
 
 (library
   (name parser)
-  (libraries expr basictypes)
+  (libraries pirouette basictypes)
   (modules parser))
 
 (library
@@ -46,7 +46,7 @@
  (name main)
  (public_name main)
  (modules main)
- (libraries expr parser unix lexer threads.posix stdune))
+ (libraries pirouette parser unix lexer threads.posix stdune))
 
 (executable
  (name ep)
@@ -71,3 +71,10 @@
  (public_name output)
  (modules output)
  (libraries threads.posix stdune))
+
+(library
+ (name pirouette)
+ (modules pirouette)
+ (libraries basictypes)
+ (preprocess
+  (pps ppx_deriving.show)))

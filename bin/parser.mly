@@ -1,5 +1,6 @@
 %{
-    open Expr
+    open Pirouette.Expr
+    open Pirouette.LocalExpr
     open Basictypes
 %}
 
@@ -54,7 +55,7 @@
 %left Product Division
 %nonassoc LParen RParen LSqParen RSqParen
 
-%start <Expr.expr option> prog
+%start <expr option> prog
 
 %%
 

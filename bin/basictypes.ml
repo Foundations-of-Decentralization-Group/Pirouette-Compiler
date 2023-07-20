@@ -59,3 +59,33 @@ let rec ctrlType_equal a b = (match (a, b) with
 )
 
 
+module LocalMap = Map.Make(String)
+
+module ImmutableMap = struct
+  include LocalMap
+  type local_map = localType LocalMap.t
+  
+  let get_local_map (typeMap: globalType ImmutableMap.t) (Location loc: location) : localType LocalMap.t = 
+    (match ImmutableMap.find_opt loc typeMap with
+     | Some localmap -> localmap
+     | None -> LocalMap.empty
+    ) 
+  
+  let add_map (typeMap: globalType ImmutableMap.t) (Location loc: location) (arg: string) (typ: localType) : globalType ImmutableMap.t = 
+    let nestedMap = 
+      try
+        ImmutableMap.find loc typeMap
+      with Not_found -> ImmutableMap.empty
+    in
+    let updatedNestedMap = ImmutableMap.add arg typ nestedMap in
+    ImmutableMap.add loc updatedNestedMap typeMap
+end
+
+module ChoreoMap = Map.Make(String)
+
+
+
+(* let myNestedMap = NestedMap.add "key1" 10 NestedMap.empty
+let mainMap = MainMap.add "outer_key" myNestedMap MainMap.empty *)
+
+
