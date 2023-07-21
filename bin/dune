@@ -58,13 +58,13 @@
  (name typechecker)
  (public_name typechecker)
  (modules typechecker)
- (libraries expr containers basictypes))
+ (libraries containers basictypes pirouette))
 
 (executable
  (name codify)
  (public_name codify)
  (modules codify utils)
- (libraries expr ctrl constants unix basictypes))
+ (libraries pirouette ctrl constants unix basictypes))
 
 (executable
  (name output)

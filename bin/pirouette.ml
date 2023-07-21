@@ -113,7 +113,7 @@ module Expr = struct
     | GTcast of globalType option * expr option
 
 
-  let rec type_check (expr_ast: expr) (typeMap: globalType ImmutableMap.t) (choreoMap: globalType ChoreoMap.t): tc_ast =
+  let rec type_check (expr_ast: expr) (typeMap: localType LocalMap.t ImmutableMap.t) (choreoMap: globalType ChoreoMap.t): tc_ast =
     match expr_ast with
       | ChoreoVars (Name name, typ) -> 
         (match ChoreoMap.find_opt (name) choreoMap, typ with
@@ -140,8 +140,7 @@ module Expr = struct
           | LTcast(Some typ1, Some ast1) -> 
                 GTcast( Some (DotType( loc, typ1)), Some (Assoc(loc, ast1, Some (DotType(loc, typ1)))))
           | LTcast(None, Some Variable(Name l_name, _)) -> 
-            let Location loc_str = loc in
-            (match ImmutableMap.find_opt (loc_str^"."^name) typeMap with
+            (match find_map typeMap loc name with
               | Some (DotType(l, typ)) -> GTcast(Some (DotType(l, typ)), Some(Assoc (loc, Variable(Name l_name, Some typ), Some (DotType(l, typ)))))
               | Some _ -> raise (TypeCheckingFailedException "Assoc can only have P.t type")
               | None -> raise (TypeCheckingFailedException "Variable type is not declared")
@@ -163,17 +162,17 @@ module Expr = struct
             | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Snd")
           )
       | Snd (_, _, _) -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Snd | sndr can only be Assoc")    
-      | Let (Location loc, Variable(Name bndr, Some bndr_typ), snd, thn, _) -> 
-        let _new_map = ImmutableMap.add_map typeMap loc bndr bndr_typ in
+      | Let (loc, Variable(Name bndr, Some bndr_typ), snd, thn, _) -> 
+        let _new_map = add_map typeMap loc bndr bndr_typ in
         (* let _new_map = ImmutableMap.add (loc ^"."^ bndr) (DotType(Location loc, bndr_typ)) typeMap in *)
         (match type_check snd _new_map choreoMap, type_check thn _new_map choreoMap with
           | GTcast(Some DotType(_, snd_typ), Some snd_ast), GTcast(Some thn_typ, Some thn_ast) 
             when localType_equal snd_typ bndr_typ ->
-              GTcast(Some thn_typ, Some (Let (Location loc, Variable(Name bndr, Some bndr_typ), snd_ast, thn_ast, Some thn_typ)))
+              GTcast(Some thn_typ, Some (Let (loc, Variable(Name bndr, Some bndr_typ), snd_ast, thn_ast, Some thn_typ)))
           | GTcast(_, _), GTcast(_, _) ->
             (* let _ = print_endline (string_of_bool(localType_equal snd_typ bndr_typ)) in  *)
             raise (TypeCheckingFailedException "Variable should be assigned value of same type")
-          | _ -> raise (TypeCheckingFailedException "Let error")
+          (* | _ -> raise (TypeCheckingFailedException "Let error") *)
         ) 
       | Let (_, _, _, _, _) -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Let")    
       | Sync (Location sndr, Direction d, Location rcvr, thn, _) ->
@@ -190,41 +189,41 @@ module Expr = struct
           | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Application")
         )
       |FunG (name, ChoreoVars(Name bndr_name, Some bndr_typ), body, Some typ) ->
-        let _new_map = ChoreoMap.add bndr_name bndr_typ typeMap in
+        let _new_map = ChoreoMap.add bndr_name bndr_typ choreoMap in
         (match type_check (ChoreoVars(Name bndr_name, Some bndr_typ)) typeMap _new_map, type_check body typeMap _new_map with
           | GTcast(Some arg_typ, Some arg_ast), GTcast(Some body_typ, Some body_ast) 
             when globalType_equal (typ) (ArrowType(arg_typ, body_typ))->
             GTcast(Some (ArrowType(arg_typ, body_typ)), Some (FunG (name, arg_ast, body_ast, Some (ArrowType(arg_typ, body_typ)))))
           | GTcast(_, _), GTcast(_, _) ->
             raise (TypeCheckingFailedException "FunG type mismatch")
-          | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking FunG with type defined")
+          (* | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking FunG with type defined") *)
         )
       |FunG (name, ChoreoVars(Name bndr_name, Some bndr_typ), body, None) ->
-        let _new_map = ChoreoMap.add bndr_name bndr_typ typeMap in
-        (match type_check (ChoreoVars(Name bndr_name, Some bndr_typ)) _new_map, type_check body _new_map with
+        let _new_map = ChoreoMap.add bndr_name bndr_typ choreoMap in
+        (match type_check (ChoreoVars(Name bndr_name, Some bndr_typ)) typeMap _new_map, type_check body typeMap _new_map with
           | GTcast(Some arg_typ, Some arg_ast), GTcast(Some body_typ, Some body_ast) ->
             GTcast(Some (ArrowType(arg_typ, body_typ)), Some (FunG (name, arg_ast, body_ast, Some (ArrowType(arg_typ, body_typ)))))
           | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking FunG without type declaration")
         )
-      |FunL (name, Location loc, Variable(Name bndr, Some bndr_typ), body, Some typ) ->
-        let _new_map = ImmutableMap.add_map typeMap loc bndr bndr_typ in
-        (match type_check body _new_map with
+      |FunL (name, loc, Variable(Name bndr, Some bndr_typ), body, Some typ) ->
+        let _new_map = add_map typeMap loc bndr bndr_typ in
+        (match type_check body _new_map choreoMap with
           | GTcast(Some body_typ, Some body_ast) 
-            when globalType_equal (typ) (ArrowType(DotType(Location loc, bndr_typ), body_typ))->
-            GTcast(Some (ArrowType(DotType(Location loc, bndr_typ), body_typ)), 
-            Some (FunL (name, Location loc, Variable(Name bndr, Some bndr_typ), body_ast, 
-            Some (ArrowType(DotType(Location loc, bndr_typ), body_typ)))))
+            when globalType_equal (typ) (ArrowType(DotType(loc, bndr_typ), body_typ))->
+            GTcast(Some (ArrowType(DotType(loc, bndr_typ), body_typ)), 
+            Some (FunL (name, loc, Variable(Name bndr, Some bndr_typ), body_ast, 
+            Some (ArrowType(DotType(loc, bndr_typ), body_typ)))))
           | GTcast(_, _) ->
             raise (TypeCheckingFailedException "FunL type mismatch")
-          | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking FunL with type defined")
+          (* | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking FunL with type defined") *)
         )
-      |FunL (name, Location loc, Variable(Name bndr, Some bndr_typ), body, None) ->
-        let _new_map = ImmutableMap.add_map typeMap loc bndr bndr_typ in
-        (match type_check body _new_map with
+      |FunL (name, loc, Variable(Name bndr, Some bndr_typ), body, None) ->
+        let _new_map = add_map typeMap loc bndr bndr_typ in
+        (match type_check body _new_map choreoMap with
           | GTcast(Some body_typ, Some body_ast) ->
-            GTcast(Some (ArrowType(DotType(Location loc, bndr_typ), body_typ)), 
-            Some (FunL (name, Location loc, Variable(Name bndr, Some bndr_typ), body_ast, 
-            Some (ArrowType(DotType(Location loc, bndr_typ), body_typ)))))
+            GTcast(Some (ArrowType(DotType(loc, bndr_typ), body_typ)), 
+            Some (FunL (name, loc, Variable(Name bndr, Some bndr_typ), body_ast, 
+            Some (ArrowType(DotType(loc, bndr_typ), body_typ)))))
           | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking FunL without type defined")
         )
       (* | Calling *)
