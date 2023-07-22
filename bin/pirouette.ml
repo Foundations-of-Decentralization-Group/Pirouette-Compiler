@@ -93,7 +93,19 @@ end;;
 
 
 module Expr = struct
-  include LocalExpr
+  (* *************Imports************ *)
+  open LocalExpr
+
+  (* *************Modules************ *)
+  module LocationSet = Set.Make(struct
+    type t = location
+    let compare = compare_location
+  end)
+
+  (* *************Exceptions************ *)
+  exception TypeCheckingFailedException of string
+  
+  (* *************Types************ *)
   type expr =
     | ChoreoVars of name * globalType option
     | Branch of expr * expr * expr * globalType option
@@ -107,12 +119,10 @@ module Expr = struct
     | Application of expr * expr * globalType option
   [@@deriving show]
 
-  exception TypeCheckingFailedException of string
-
   type tc_ast = 
     | GTcast of globalType option * expr option
 
-
+  (* *************Methods************ *)
   let rec type_check (expr_ast: expr) (typeMap: localType LocalMap.t ImmutableMap.t) (choreoMap: globalType ChoreoMap.t): tc_ast =
     match expr_ast with
       | ChoreoVars (Name name, typ) -> 
@@ -229,6 +239,44 @@ module Expr = struct
       (* | Calling *)
       | _ -> raise (TypeCheckingFailedException "No Case matched") 
   
+  let get_entitities expr : LocationSet.t = 
+    let set1 = LocationSet.empty in
+      let rec aux acc expr = match expr with
+        | Branch (ift, thn, el, _) -> 
+          let acc_ift = aux acc ift in
+          let acc_thn = aux acc_ift thn in
+          let acc_el = aux acc_thn el in
+            acc_el
+        | Sync (sndr, _, rcvr, thn, _) ->
+          let acc = aux acc thn in
+            let acc = LocationSet.union (LocationSet.add sndr acc) (LocationSet.add rcvr acc) in 
+              acc
+        | Assoc (loc, _, _) ->
+            (LocationSet.add loc acc)
+        | FunL (_, loc, _, body, _) ->
+          let acc = aux acc body in
+            (LocationSet.add loc acc)
+        | FunG (_, arg, body, _) ->
+          let acc_arg = aux acc arg in
+          let acc = aux acc_arg body in
+            acc
+        | Snd (sndr, loc, _) -> 
+          let acc_sndr = aux acc sndr in
+            (LocationSet.add loc acc_sndr)
+        | Let (loc, _, snd, thn, _)  ->
+          let acc_snd = aux acc snd in
+          let acc_thn = aux acc_snd thn in
+            (LocationSet.add loc acc_thn)
+        | Application (funct, argument, _) -> 
+          let acc_funct = aux acc funct in
+          let acc = aux acc_funct argument in
+            acc
+        | Calling (_, arg, _) ->
+          let acc_arg = aux acc arg in
+          acc_arg 
+        | ChoreoVars _ -> acc
+      in
+        aux set1 expr
 end;;
 (* module Expr : sig
   include LocalExpr

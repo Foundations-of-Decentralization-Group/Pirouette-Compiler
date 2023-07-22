@@ -52,13 +52,13 @@
  (name ep)
  (public_name ep)
  (modules ep)
- (libraries expr ctrl))
+ (libraries pirouette expr ctrl))
 
 (executable
  (name typechecker)
  (public_name typechecker)
  (modules typechecker)
- (libraries containers basictypes pirouette))
+ (libraries pirouette expr containers basictypes))
 
 (executable
  (name codify)
@@ -76,5 +76,12 @@
  (name pirouette)
  (modules pirouette)
  (libraries basictypes)
+ (preprocess
+  (pps ppx_deriving.show)))
+
+(library
+ (name controlang)
+ (modules controlang)
+ (libraries basictypes pirouette)
  (preprocess
   (pps ppx_deriving.show)))
