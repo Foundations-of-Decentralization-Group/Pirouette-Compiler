@@ -23,12 +23,6 @@ type localType =
   | BoolType
 [@@deriving show]
 
-type ctrlType = 
-  | Int
-  | String
-  | Bool
-  | CtrlFun of ctrlType * ctrlType
-[@@deriving show]
 
 type globalType =
   | DotType of location * localType
@@ -49,14 +43,6 @@ let rec globalType_equal a b = (match (a, b) with
   | _ -> false
 )
 
-let rec ctrlType_equal a b = (match (a, b) with
-  | (Int, Int) -> true
-  | (String, String) -> true
-  | (Bool, Bool) -> true
-  | (CtrlFun (gt11, gt12), CtrlFun (gt21, gt22)) ->
-    ctrlType_equal gt11 gt21 && ctrlType_equal gt12 gt22
-  | _ -> false
-)
 
 
 module LocalMap = Map.Make(String)
