@@ -8,7 +8,10 @@ open Printf
 
 exception InvalidProgramException of string
 
-module Ocaml_backend : Backend = struct
+module Ocaml_backend(Com : Comm) : Backend = struct
+
+  let ext = ".ml"
+
   let rec ctrl_to_local_type (typ : Controlang.ctrlType) (arg : string) : string = 
     (match typ, arg with 
       | Int, _-> "int"
@@ -63,16 +66,13 @@ module Ocaml_backend : Backend = struct
     | Snd (arg, Location loc, thn, _) -> 
       let codified_thn = codify thn confMap currentEntity in 
       let codified_arg = codify_local arg in
-      _let ^ _space ^ "_" ^ _equals ^ _space ^ _sync ^ _space ^  _lParen ^ _sndmsg ^ _space ^ 
-      _space ^ "_channel_" ^ currentEntity ^ _underscore ^ loc ^ _space ^ 
-      codified_arg ^ _rParen ^ _space ^ 
+      Com.send loc currentEntity codified_arg  ^ _space ^ 
       _in ^ _endl ^ codified_thn
     | Rcv (Variable(name, typ), Location loc, thn, _) ->
       let codified_thn = codify thn confMap currentEntity in 
       let codified_arg = codify_local (Variable(name, typ)) in
-        _let ^ _space ^ codified_arg ^ _colon ^ (ctrl_to_local_type typ "") ^ _equals ^ _space ^ _sync ^ _space ^  
-        _lParen ^ _rcvmsg ^ _space ^ "_channel_" ^ loc ^ _underscore ^ currentEntity ^ 
-         _space ^ _rParen ^ _space ^ _in ^ _space ^
+      let local_type = ctrl_to_local_type typ "" in
+        Com.rcv loc currentEntity codified_arg local_type ^ _space ^ _in ^ _space ^
         _lParen ^ _endl ^ _tab ^ codified_thn ^ _rParen 
     | Branch (ift, thn, el, _) -> 
       let codified_ift = codify ift confMap currentEntity in 
@@ -83,11 +83,8 @@ module Ocaml_backend : Backend = struct
       _space ^  _lParen ^ codified_el ^ _rParen
     | Choose (Direction d, Location loc, thn, _) -> 
       let codified_thn = codify thn confMap currentEntity in
-      _let ^ _space ^ _underscore ^ _space ^ _equals ^ _space ^ _lParen ^ 
-       _sync ^ _space ^  _lParen ^ _sndmsg ^ _space ^ 
-      _space ^ "_channel_" ^ currentEntity ^ _underscore ^ loc ^ _space
-      ^ (if d = "L" then "true" else "false") ^ _rParen ^ _rParen ^ _space ^ _in ^ _endl ^ 
-      _let ^ _space ^ _underscore ^ _space ^ _equals ^ _space ^ codified_thn ^ 
+      Com.send loc currentEntity (if d = "L" then "true" else "false")  ^ _space ^ 
+      _in ^ _endl ^ _let ^ _space ^ _underscore ^ _space ^ _equals ^ _space ^ codified_thn ^ 
       _in ^ _space ^ _unit 
     | AllowL (_, _, _) ->
       raise (InvalidProgramException "AllowL not permitted.")
@@ -96,9 +93,7 @@ module Ocaml_backend : Backend = struct
     | AllowLR (Location loc, thnL, thnR, _) ->
       let codified_thnL = codify thnL confMap currentEntity in
       let codified_thnR = codify thnR confMap currentEntity in
-      _let ^ _space ^ "___synclbl : bool"  ^ _equals ^ _space ^ _sync ^ _space ^  
-        _lParen ^ _rcvmsg ^ _space ^ "_channel_" ^ loc ^ _underscore ^ currentEntity ^ 
-         _space ^ _rParen ^ _space ^ _in ^ _space ^
+      Com.rcv loc currentEntity "___synclbl" "bool" ^ _space ^ _in ^ _space ^
       _if ^ _space ^ _lParen ^ _endl ^ "___synclbl" ^ _rParen ^ _then ^ _space ^ 
       _lParen ^ codified_thnL ^ _rParen ^ _endl ^ _else ^ _space ^ codified_thnR
     | Let (Unit, arg, thn, _) -> 
@@ -131,7 +126,6 @@ module Ocaml_backend : Backend = struct
     | Application (_, _, _) -> ""
     | _ -> raise (InvalidProgramException "Invalid Program construct encountered")
 
-  let send _loc _med _value = ""
 
   let format_and_save_code code output_file =
     let tmp_input_file = "_tmp.ml" in
@@ -152,49 +146,13 @@ module Ocaml_backend : Backend = struct
       printf "Code formatted and saved successfully.\n"
     end
 
-  (* Function to output code for an entity *)
-  let output_code_for_entity (entity : string) =
-    let thread_code = "let " ^ _underscore ^ entity ^ " = Thread.create " ^ entity ^ " () in " in
-    thread_code
-
-  (* Function to iterate over a list of entities *)
-  let _getThreadBp (entities : string list) =
-    let code_strings = List.map output_code_for_entity entities in
-    let joined_code = String.concat "\n" code_strings in
-    let join_code = List.map (fun entity -> "Thread.join " ^ _underscore ^ entity ^ ";") entities in
-    let joined_join_code = String.concat "\n" join_code in
-    joined_code ^ "\n" ^ joined_join_code
-
-  let output_code_for_pair (p1 : string) (p2 : string) =
-    let channel_p1_p2 = "let _channel_" ^ p1 ^ "_" ^ p2 ^ " = Evt.new_channel () in " in
-    let channel_p2_p1 = "let _channel_" ^ p2 ^ "_" ^ p1 ^ " = Evt.new_channel () in " in
-    channel_p1_p2 ^ "\n" ^ channel_p2_p1
-
-  let init (entities : string list) =
-    let buffer = Buffer.create 256 in
-    let rec iterate_pairs = function
-      | [] -> () (* Base case: empty list *)
-      | [_] -> () (* Base case: only one entity left, no pair to create *)
-      | p1 :: rest ->
-        List.iter (fun p2 ->
-          let code = output_code_for_pair p1 p2 in
-          Buffer.add_string buffer code;
-          Buffer.add_char buffer '\n') rest;
-        iterate_pairs rest
-    in
-    iterate_pairs entities;
-    Buffer.contents buffer
-
-
-  
-
   let main asts confMap op_file_name =
     let code = _threadImport ^ _commonBp ^ _lParen ^
-                init confMap ^ 
+                Com.init confMap ^ 
                 (List.map (fun ast -> match ast with | Ast{code; prop} -> 
                   _let ^ _space ^ prop ^ "() = " ^ 
                   _lParen ^ codify code confMap prop ^ _rParen ^ _space ^ _in ^ _space) asts 
-                  |> String.concat "\n \n") ^ _getThreadBp confMap ^ _rParen in
+                  |> String.concat "\n \n") ^ Com.exit confMap ^ _rParen in
     (* print_endline code  *)
     format_and_save_code code op_file_name
 
