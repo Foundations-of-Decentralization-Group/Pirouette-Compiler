@@ -1,6 +1,6 @@
 open OUnit2
 open Lexing
-open Expr
+open Pirouette.Expr
 open Basictypes
 
 (* SUCCESS Test Cases *)

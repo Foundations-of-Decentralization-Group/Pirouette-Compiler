@@ -9,12 +9,6 @@
  (preprocess
   (pps ppx_deriving.show)))
 
-(library
- (name expr)
- (modules expr)
- (libraries basictypes)
- (preprocess
-  (pps ppx_deriving.show)))
 
 (library
   (name lexer)
@@ -23,20 +17,13 @@
 
 (library
   (name parser)
-  (libraries expr basictypes)
+  (libraries pirouette basictypes)
   (modules parser))
 
 (library
   (name utils)
   (libraries unix)
-  (modules))
-
-(library
- (name ctrl)
- (modules ctrl)
- (libraries basictypes)
- (preprocess
-  (pps ppx_deriving.show)))
+  (modules utils))
 
 (library
  (name constants)
@@ -46,28 +33,52 @@
  (name main)
  (public_name main)
  (modules main)
- (libraries expr parser unix lexer threads.posix stdune))
+ (libraries pirouette parser unix lexer threads.posix stdune))
 
-(executable
- (name ep)
- (public_name ep)
- (modules ep)
- (libraries expr ctrl))
 
-(executable
- (name typechecker)
- (public_name typechecker)
- (modules typechecker)
- (libraries expr containers basictypes))
-
-(executable
- (name codify)
- (public_name codify)
- (modules codify utils)
- (libraries expr ctrl constants unix basictypes))
 
 (executable
  (name output)
  (public_name output)
  (modules output)
  (libraries threads.posix stdune))
+
+(library
+ (name pirouette)
+ (modules pirouette)
+ (libraries basictypes)
+ (preprocess
+  (pps ppx_deriving.show)))
+
+(library
+ (name controlang)
+ (modules controlang)
+ (libraries basictypes pirouette)
+ (preprocess
+  (pps ppx_deriving.show)))
+
+
+(library
+ (name backend_intf)
+ (modules backend_intf)
+ (libraries controlang)
+ )
+
+ (library
+ (name ocaml_interthread)
+ (modules ocaml_interthread)
+ (libraries backend_intf constants)
+ )
+
+(library
+ (name ocaml_backend)
+ (modules ocaml_backend)
+ (libraries backend_intf constants controlang basictypes ocaml_interthread)
+ )
+
+
+(executable
+ (name exec)
+ (public_name exec)
+ (modules exec)
+ (libraries ocaml_backend backend_intf utils ocaml_interthread))

@@ -23,12 +23,6 @@ type localType =
   | BoolType
 [@@deriving show]
 
-type ctrlType = 
-  | Int
-  | String
-  | Bool
-  | CtrlFun of ctrlType * ctrlType
-[@@deriving show]
 
 type globalType =
   | DotType of location * localType
@@ -49,13 +43,45 @@ let rec globalType_equal a b = (match (a, b) with
   | _ -> false
 )
 
-let rec ctrlType_equal a b = (match (a, b) with
-  | (Int, Int) -> true
-  | (String, String) -> true
-  | (Bool, Bool) -> true
-  | (CtrlFun (gt11, gt12), CtrlFun (gt21, gt22)) ->
-    ctrlType_equal gt11 gt21 && ctrlType_equal gt12 gt22
-  | _ -> false
-)
+
+
+module LocalMap = Map.Make(String)
+
+module ImmutableMap = struct   
+  include LocalMap
+  type local_map = localType LocalMap.t
+end
+
+let get_local_map (typeMap: localType LocalMap.t ImmutableMap.t) (Location loc: location) : localType LocalMap.t = 
+  (match ImmutableMap.find_opt loc typeMap with
+   | Some localmap -> localmap
+   | None -> LocalMap.empty
+  ) 
+
+let add_map (typeMap: localType LocalMap.t ImmutableMap.t) (Location loc: location) (arg: string) (typ: localType) : localType LocalMap.t ImmutableMap.t = 
+  let nestedMap = 
+    try
+      ImmutableMap.find loc typeMap
+    with Not_found -> ImmutableMap.empty
+  in
+  let updatedNestedMap = ImmutableMap.add arg typ nestedMap in
+  ImmutableMap.add loc updatedNestedMap typeMap
+
+let find_map (typeMap: localType LocalMap.t ImmutableMap.t) (loc: location) (arg: string) : globalType option = 
+  let localMap = get_local_map typeMap loc in
+  if LocalMap.is_empty localMap then
+    None
+  else
+    (match LocalMap.find_opt arg localMap with
+    | Some typ -> Some (DotType(loc, typ))
+    | None -> None
+    ) 
+
+module ChoreoMap = Map.Make(String)
+
+
+
+(* let myNestedMap = NestedMap.add "key1" 10 NestedMap.empty
+let mainMap = MainMap.add "outer_key" myNestedMap MainMap.empty *)
 
 
