@@ -1,6 +1,7 @@
-open Ocaml_backend
 open Backend_intf
 open Utils
+open Ocaml_interthread
+open Ocaml_backend
 
 exception InvalidProgramException of string
 
@@ -116,15 +117,23 @@ let ast2 = Ast{ code =
       Controlang.Int)),
    Controlang.Int)); prop = "p2"}
 
+let op_file_path = "bin/output"
 
-let operation lang ctrl_ast = 
+type language =
+  | OCaml
+[@@deriving show]
+
+let operation lang ctrl_ast process_impl = 
    let confMap = read_config_file "config.conf" in
-   match lang with
-      | "ocaml" -> Ocaml_backend.main ctrl_ast confMap "bin/output.ml"
+   match lang, process_impl with
+      | OCaml, InterThread -> 
+         let module Ocaml_InterThread = Ocaml_backend(Ocaml_interthread) in
+         let output_file_name = op_file_path ^ Ocaml_InterThread.ext  in
+         Ocaml_InterThread.main ctrl_ast confMap output_file_name
       | _ -> raise (InvalidProgramException "Invalid Program construct encountered")
 
 
 (* Test the implementation *)
-let () = operation "ocaml" [ast1; ast2]
+let () = operation OCaml [ast1; ast2] InterThread
 
 
