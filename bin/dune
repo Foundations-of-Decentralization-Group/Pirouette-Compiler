@@ -1,3 +1,5 @@
+(include_subdirs unqualified)
+
 (ocamllex lexer)
 
 (menhir
@@ -8,7 +10,6 @@
  (modules basictypes)
  (preprocess
   (pps ppx_deriving.show)))
-
 
 (library
   (name lexer)
@@ -25,17 +26,11 @@
   (libraries unix)
   (modules utils))
 
-(library
- (name constants)
- (modules constants))
-
 (executable
  (name main)
  (public_name main)
  (modules main)
  (libraries pirouette parser unix lexer threads.posix stdune))
-
-
 
 (executable
  (name output)
@@ -57,25 +52,24 @@
  (preprocess
   (pps ppx_deriving.show)))
 
+(library
+ (name constants)
+ (modules constants))
 
 (library
  (name backend_intf)
  (modules backend_intf)
- (libraries controlang)
- )
+ (libraries controlang))
 
  (library
  (name ocaml_interthread)
  (modules ocaml_interthread)
- (libraries backend_intf constants)
- )
+ (libraries backend_intf constants))
 
 (library
  (name ocaml_backend)
  (modules ocaml_backend)
- (libraries backend_intf constants controlang basictypes ocaml_interthread)
- )
-
+ (libraries backend_intf constants controlang basictypes ocaml_interthread))
 
 (executable
  (name exec)
