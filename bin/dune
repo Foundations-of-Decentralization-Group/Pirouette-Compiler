@@ -64,10 +64,16 @@
  (libraries controlang)
  )
 
+ (library
+ (name ocaml_interthread)
+ (modules ocaml_interthread)
+ (libraries backend_intf constants)
+ )
+
 (library
  (name ocaml_backend)
  (modules ocaml_backend)
- (libraries backend_intf constants controlang basictypes)
+ (libraries backend_intf constants controlang basictypes ocaml_interthread)
  )
 
 
@@ -75,4 +81,4 @@
  (name exec)
  (public_name exec)
  (modules exec)
- (libraries ocaml_backend backend_intf utils))
+ (libraries ocaml_backend backend_intf utils ocaml_interthread))
