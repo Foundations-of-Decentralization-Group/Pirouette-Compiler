@@ -25,7 +25,7 @@ module type Backend = sig
   val ext : string
   val codify : ctrl -> string list -> string -> string
   val format_and_save_code : string -> string -> unit
-  val main : astType list -> string list -> string -> unit
+  val main : astType list ref -> string list -> string -> unit
   val ctrl_to_local_type : Controlang.ctrlType -> string -> string
 end
 

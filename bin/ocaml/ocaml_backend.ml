@@ -146,12 +146,12 @@ module Ocaml_backend(Com : Comm) : Backend = struct
       printf "Code formatted and saved successfully.\n"
     end
 
-  let main asts confMap op_file_name =
+  let main (asts : astType list ref) confMap op_file_name =
     let code = _threadImport ^ _commonBp ^ _lParen ^
                 Com.init confMap ^ 
                 (List.map (fun ast -> match ast with | Ast{code; prop} -> 
                   _let ^ _space ^ prop ^ "() = " ^ 
-                  _lParen ^ codify code confMap prop ^ _rParen ^ _space ^ _in ^ _space) asts 
+                  _lParen ^ codify code confMap prop ^ _rParen ^ _space ^ _in ^ _space) !asts 
                   |> String.concat "\n \n") ^ Com.exit confMap ^ _rParen in
     (* print_endline code  *)
     format_and_save_code code op_file_name
