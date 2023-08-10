@@ -6,8 +6,7 @@ We present an implementation of Pirouette _(Andrew K. Hirsch and Deepak Garg)_, 
 ### Limitations
 
 
- - FunL and FunG in parser.ml and expr.ml to be replaced by Fun _(only args that a function can take are ChoreoVars)_ 
- - Adress a limitation where Uppercase variable names (ChoreoVars) are not recognized in OCaml translation.
+ - Address a limitation where Uppercase variable names (ChoreoVars) are not recognized in OCaml translation.
  - Redundant Code in Ctrl.ml to be replaced with Expr.ml
  - Test coverage to be improved for all modules 
  - End to end flow should be established across multiple phases

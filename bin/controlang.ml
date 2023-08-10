@@ -277,7 +277,7 @@ module Ctrl = struct
         | Some parsed_body, Some _ when loc != currentNode ->
           Some (Fun {name ; arg = ChoreoVars (get_fresh_cname()); body = parsed_body})
         | _ -> None) *)
-    | FunG (name, arg, body, Some typ) -> 
+    | Fun (name, arg, body, Some typ) -> 
       (match expr_to_ctrl arg currentNode, expr_to_ctrl body currentNode with
         | Some argument, Some parsed_body -> Some (Fun (name, argument, parsed_body, (get_ctrlGType typ)))
         | _ -> None)

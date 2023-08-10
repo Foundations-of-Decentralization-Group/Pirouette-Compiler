@@ -40,7 +40,7 @@ let test_parse_application_X_success _ =
     match Parser.prog Lexer.read lexer with
     | Some expr ->
         let expected = (Application (                 
-          (FunG ((Name "init"),
+          (Fun ((Name "init"),
              (ChoreoVars ((Name "X"),
                 (Some (DotType ((Location "person1"), IntType))))),
              (Let ((Location "person2"),
@@ -60,7 +60,7 @@ let test_parse_application_X_success _ =
         assert_equal expected expr
     | None -> assert_failure "Failed to parse expression"
 
-let test_parse_application_local_success _ =
+(* let test_parse_application_local_success _ =
   let input = "(fun init 
 (person2.(name : string)) : person1.int
 := person1.(x : int) ~> person2.(y : int); 
@@ -87,7 +87,7 @@ person2.name) person2.\"hello\"" in
         (Assoc ((Location "person2"), (STRING "hello"), None)),
         None))  in
       assert_equal expected expr
-  | None -> assert_failure "Failed to parse expression"
+  | None -> assert_failure "Failed to parse expression" *)
 
 let test_parse_choreo_var_arrowtype_success _ =
   let input = "X : Person1.int -> person2.string" in
@@ -110,7 +110,7 @@ let test_parse_fun_expr_success _ =
   let lexer = from_string input in
   match Parser.prog Lexer.read lexer with
   | Some expr ->
-      let expected = (FunG ((Name "init"),     
+      let expected = (Fun ((Name "init"),     
       (ChoreoVars ((Name "X"),
          (Some (DotType ((Location "person1"), IntType))))),
       (Let ((Location "person2"),
@@ -204,7 +204,7 @@ let test_parse_application_letin _ =
   match Parser.prog Lexer.read lexer with
   | Some expr ->
       let expected = (Application (                 
-        (FunG ((Name "fname"),
+        (Fun ((Name "fname"),
            (ChoreoVars ((Name "X"),
               (Some (DotType ((Location "p"), IntType))))),
            (Let ((Location "p"),
@@ -270,7 +270,7 @@ let suite =
     "test_parse_fun_expr_success" >:: test_parse_fun_expr_success; 
     "test_parse_choreo_var_arrowtype_success" >:: test_parse_choreo_var_arrowtype_success; 
     "test_parse_application_X_success" >:: test_parse_application_X_success;
-    "test_parse_application_local_success" >:: test_parse_application_local_success;   
+    (* "test_parse_application_local_success" >:: test_parse_application_local_success;    *)
     "test_parse_sync_success" >:: test_parse_sync_success;
     "test_parse_if_thn_else_success" >:: test_parse_if_thn_else_success;
     "test_parse_let_in1" >:: test_parse_let_in1;
