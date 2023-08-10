@@ -259,6 +259,20 @@ module Ctrl = struct
           -> Some (Rcv (parsed_bndr_arg, loc, parsed_thn, (get_ctrlGType thn_typ)))
         | Some parsed_thn, _, _ when rcvr != currentNode && currentNode != loc -> Some parsed_thn
         | _ -> None)
+
+      (* Sender is choreovar X~>p2.x*)
+    (* | Let (_, bndr_arg, Snd (ChoreoVars (Name name, Some _), rcvr, Some _), thn, Some thn_typ)->
+      let parsed_thn = expr_to_ctrl thn currentNode in
+      let parsed_bndr_arg = lexpr_to_lctrl bndr_arg in
+      let parsed_arg_snd = lexpr_to_lctrl arg_snd in
+      (match parsed_thn, parsed_bndr_arg, parsed_arg_snd with
+        | Some parsed_thn, Some _, Some parsed_arg_snd when rcvr != currentNode && currentNode = loc
+          -> Some (Snd (parsed_arg_snd, rcvr, parsed_thn, (get_ctrlGType thn_typ)))
+        | Some parsed_thn, Some parsed_bndr_arg, Some _ when rcvr = currentNode && currentNode != loc 
+          -> Some (Rcv (parsed_bndr_arg, loc, parsed_thn, (get_ctrlGType thn_typ)))
+        | Some parsed_thn, _, _ when rcvr != currentNode && currentNode != loc -> Some parsed_thn
+        | _ -> None) *)
+
   
     | Let (loc, Variable(var_name, Some var_typ), snd, thn, Some typ) ->
       (match expr_to_ctrl (Assoc(loc, Variable(var_name, Some var_typ), Some (DotType(loc, var_typ)))) currentNode, expr_to_ctrl snd currentNode, expr_to_ctrl thn currentNode with

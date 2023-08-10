@@ -171,6 +171,14 @@ module Expr = struct
                   Some (Snd(assoc_ast, rcvng_location, Some (DotType(rcvng_location, assoc_typ)))))
             | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Snd")
           )
+                (* GTcast(Some (DotType(rcvng_location, assoc_typ)),  *)
+      | Snd (ChoreoVars(Name x, typ), rcvng_location, _) ->
+        (match type_check (ChoreoVars(Name x, typ)) typeMap choreoMap with
+          | GTcast(Some DotType(_, typ), Some ast) -> 
+            GTcast(Some (DotType(rcvng_location, typ)), 
+              Some (Snd(ast, rcvng_location, Some (DotType(rcvng_location, typ)))))
+          | _ -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Snd with choreovar as sender")
+         )
       | Snd (_, _, _) -> raise (TypeCheckingFailedException "Invalid Program exception while Type checking Snd | sndr can only be Assoc")    
       | Let (loc, Variable(Name bndr, Some bndr_typ), snd, thn, _) -> 
         let _new_map = add_map typeMap loc bndr bndr_typ in

@@ -4,6 +4,7 @@ open Controlang.Ctrl
 open Controlang.LocalCtrl
 open Basictypes
 open Printf
+open String
 
 
 exception InvalidProgramException of string
@@ -60,7 +61,7 @@ module Ocaml_backend(Com : Comm) : Backend = struct
 
   let rec codify (ast: ctrl) (confMap: string list) (currentEntity: string): string = 
     match ast with
-    | ChoreoVars (Name x, typ) -> x ^ _colon ^ (ctrl_to_local_type typ "")
+    | ChoreoVars (Name x, typ) -> "_" ^ lowercase_ascii x ^ _colon ^ (ctrl_to_local_type typ "")
     | Ret (arg, _) -> codify_local arg
     | Unit -> _unit
     | Snd (arg, Location loc, thn, _) -> 
@@ -110,8 +111,7 @@ module Ocaml_backend(Com : Comm) : Backend = struct
     | Fun (Name name, ChoreoVars(ch_name, ch_typ), body, typ) ->
       let codified_arg = codify (ChoreoVars(ch_name, ch_typ)) confMap currentEntity in
       let codified_body = codify body confMap currentEntity in 
-        _let ^ _space ^ _rec ^ _space ^ name ^ _space ^ _lParen ^ codified_arg ^ _colon ^ 
-        (ctrl_to_local_type ch_typ "") ^_rParen ^ _space ^ _colon 
+        _let ^ _space ^ _rec ^ _space ^ name ^ _space ^ _lParen ^ codified_arg ^_rParen ^ _space ^ _colon 
         ^ (ctrl_to_local_type typ "snd") ^ _equals ^ _space ^ 
         _lParen ^ codified_body ^ _rParen
     (* | Calling (Name name, arg, _) -> 
