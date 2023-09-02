@@ -16,10 +16,16 @@ exception EndPointProjectionFailedException of string
 let result_list : astType list ref = ref []
 
 let base_dir = "bin/"
-let output_file_name = "output"
 
 type language =
   | OCaml
+
+let extract_before_dot input_string =
+  try
+    let dot_index = String.index input_string '.' in
+    String.sub input_string 0 dot_index
+  with Not_found -> input_string 
+;; 
 
 let getLang (lang_name: string): language = 
   match lang_name with
@@ -48,12 +54,13 @@ let read_config_file (filename : string) : string list =
       Core.In_channel.close in_channel;
       List.rev !config_list
 
-let operation lang ctrl_ast process_impl = 
+let operation lang ctrl_ast process_impl output_file = 
+  let extracted_file_name = extract_before_dot output_file in
   let confMap = read_config_file "config.conf" in
   match lang, process_impl with
       | OCaml, InterThread -> 
         let module Ocaml_InterThread = Ocaml_backend(Ocaml_interthread) in
-        let output_file_name = base_dir ^ "ocaml/" ^ output_file_name ^ Ocaml_InterThread.ext  in
+        let output_file_name = base_dir ^ "ocaml/" ^ extracted_file_name ^ Ocaml_InterThread.ext  in
         Ocaml_InterThread.main ctrl_ast confMap output_file_name
       | _ -> raise (InvalidProgramException "Invalid Program construct encountered")
 
@@ -96,7 +103,7 @@ let read_file file_name =
                   in
                   result_list := Ast{code = r; prop = str_entity} :: !result_list
                 ) entities;
-                operation (getLang language) result_list (getCommMedium comm_type)
+                operation (getLang language) result_list (getCommMedium comm_type) _output_file
               | _ -> raise (TypeCheckingFailedException "Typechecking Failed"))
           | None -> Printf.printf "Couldnt resolve !\n\n"
        )
