@@ -25,7 +25,9 @@
  (name main)
  (public_name main)
  (modules main)
- (libraries pirouette parser lexer controlang ocaml_backend backend_intf ocaml_interthread))
+  (preprocess
+  (pps ppx_let ppx_jane))
+ (libraries pirouette parser lexer controlang ocaml_backend backend_intf ocaml_interthread core_unix.command_unix core))
 
 (executable
  (name output)
