@@ -67,12 +67,21 @@ module Ocaml_backend(Com : Comm) : Backend = struct
     | Snd (arg, Location loc, thn, _) -> 
       let codified_thn = codify thn confMap currentEntity in 
       let codified_arg = codify_local arg in
-      Com.send loc currentEntity codified_arg  confMap ^ _space ^ 
+      let typ = getLCtrlType arg in
+      (* let local_type = ctrl_to_local_type typ "" in *)
+      Com.send loc currentEntity codified_arg confMap typ ^ _space ^ 
       _in ^ _endl ^ codified_thn
     | Rcv (Variable(name, typ), Location loc, thn, _) ->
       let codified_thn = codify thn confMap currentEntity in 
       let codified_arg = codify_local (Variable(name, typ)) in
       let local_type = ctrl_to_local_type typ "" in
+      (* let rcv_code =  Com.rcv loc currentEntity codified_arg local_type in 
+      (match local_type with
+        | "int" -> "(int_of_string" ^ rcv_code ^ ")"
+        | "string" -> rcv_code
+        | "bool" -> "(bool_of_string" ^ rcv_code ^ ")"
+        | _ -> raise (InvalidProgramException "Invalid type encountered")
+      ) ^ _in ^ _space ^ _lParen ^ _endl ^ _tab ^ codified_thn ^ _rParen *)
         Com.rcv loc currentEntity codified_arg local_type ^ _space ^ _in ^ _space ^
         _lParen ^ _endl ^ _tab ^ codified_thn ^ _rParen 
     | Branch (ift, thn, el, _) -> 
@@ -84,7 +93,7 @@ module Ocaml_backend(Com : Comm) : Backend = struct
       _space ^  _lParen ^ codified_el ^ _rParen
     | Choose (Direction d, Location loc, thn, _) -> 
       let codified_thn = codify thn confMap currentEntity in
-      Com.send loc currentEntity (if d = "L" then "true" else "false")  confMap ^ _space ^ 
+      Com.send loc currentEntity (if d = "L" then "true" else "false")  confMap "bool" ^ _space ^ 
       _in ^ _endl ^ _let ^ _space ^ _underscore ^ _space ^ _equals ^ _space ^ codified_thn ^ 
       _in ^ _space ^ _unit 
     | AllowL (_, _, _) ->

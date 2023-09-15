@@ -38,14 +38,14 @@ let open_port port =
   bind server_sock server_addr;
   server_sock
 
-let receive_message server_sock =
+let receive_message server_sock _ =
   let buffer_size = 1024 in
   let buffer = Bytes.create buffer_size in
   let received_bytes, _ = recvfrom server_sock buffer 0 buffer_size [] in
   let message = Bytes.sub_string buffer 0 received_bytes in
   message
 
-let send_message message loc =
+let send_message message loc=
   let sock = socket PF_INET SOCK_DGRAM 0 in
   let server_addr = ADDR_INET (inet_addr_of_string \"127.0.0.1\", loc) in
   let _ = sendto sock (Bytes.of_string message) 0 (String.length message) [] server_addr in

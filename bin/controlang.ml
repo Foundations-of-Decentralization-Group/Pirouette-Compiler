@@ -36,6 +36,20 @@ module LocalCtrl = struct
     | StringType -> String
     | BoolType -> Bool
 
+  let get_ctrlTypeToLCtrlType (typ : ctrlType) : string =
+    match typ with
+    | Int -> "int"
+    | String -> "string"
+    | Bool -> "bool"
+    | _ -> ""
+  
+  let getLCtrlType = function
+  | STRING _ -> "string"
+  | BOOL _ -> "bool"
+  | Variable (_, typ) -> get_ctrlTypeToLCtrlType typ
+  | Condition (_, _, _, typ) -> get_ctrlTypeToLCtrlType typ
+  | _ -> "int" 
+
   let rec lexpr_to_lctrl (expr_ast: l_expr) : l_ctrl option =
     match expr_ast with
     | INT x -> Some (INT x)

@@ -42,7 +42,7 @@ module Ocaml_interthread : Comm = struct
     iterate_pairs entities_list;
     Buffer.contents buffer
 
-  let send to_loc from_loc codified_arg _ = _let ^ _space ^ "_" ^ _equals 
+  let send to_loc from_loc codified_arg _ _ = _let ^ _space ^ "_" ^ _equals 
   ^ _space ^ _sync ^ _space ^  _lParen ^ _sndmsg ^ _space ^ 
   _space ^ "_channel_" ^ from_loc ^ _underscore ^ to_loc ^ _space ^ 
   codified_arg ^ _rParen

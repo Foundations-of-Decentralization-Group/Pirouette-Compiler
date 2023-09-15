@@ -16,7 +16,7 @@ type astType = Ast of { code : ctrl; prop : string }
 
 module type Comm = sig
   val init : (string, int) Hashtbl.t -> string -> string
-  val send : string -> string -> string -> (string, int) Hashtbl.t -> string
+  val send : string -> string -> string -> (string, int) Hashtbl.t -> string -> string
   val rcv : string -> string -> string -> string -> string
   val exit : (string, int) Hashtbl.t -> string
 end
