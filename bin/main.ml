@@ -4,6 +4,7 @@ open Basictypes
 open Controlang.Ctrl
 open Backend_intf
 open Ocaml_interthread
+open Ocaml_distributed
 open Ocaml_backend
 open Core
 open Stdlib
@@ -35,9 +36,10 @@ let getLang (lang_name: string): language =
 let getCommMedium (comm_medium: string) = 
   match comm_medium with
     | "inter-thread" -> InterThread
+    | "distributed" -> Distributed
     | _ -> raise (InvalidProgramException "Invalid Program construct encountered")
 
-let read_config_file (filename : string) : string list =
+(* let read_config_file (filename : string) : string list =
   let config_list = ref [] in
   let in_channel = Core.In_channel.create filename in
   try
@@ -52,7 +54,30 @@ let read_config_file (filename : string) : string list =
   with
   | End_of_file ->
       Core.In_channel.close in_channel;
-      List.rev !config_list
+      List.rev !config_list *)
+
+let read_config_file (filename : string) : (string, int) Hashtbl.t =
+  let config_table = Hashtbl.create 10 in
+  let in_channel = open_in filename in
+  try
+    while true do
+      let line = input_line in_channel in
+      match String.split_on_char '=' line with
+      | [ key; value ] ->
+          let key = String.trim key in
+          let value = int_of_string (String.trim value) in
+          Hashtbl.add config_table key value
+      | _ -> failwith ("Invalid line: " ^ line)
+    done;
+    config_table
+  with
+  | End_of_file ->
+      close_in in_channel;
+      config_table
+  | exn ->
+      close_in_noerr in_channel;
+      raise exn
+      
 
 let operation lang ctrl_ast process_impl output_file = 
   let extracted_file_name = extract_before_dot output_file in
@@ -61,8 +86,11 @@ let operation lang ctrl_ast process_impl output_file =
       | OCaml, InterThread -> 
         let module Ocaml_InterThread = Ocaml_backend(Ocaml_interthread) in
         let output_file_name = base_dir ^ "ocaml/" ^ extracted_file_name ^ Ocaml_InterThread.ext  in
-        Ocaml_InterThread.main ctrl_ast confMap output_file_name
-      | _ -> raise (InvalidProgramException "Invalid Program construct encountered")
+        Ocaml_InterThread.main ctrl_ast confMap output_file_name InterThread
+      | OCaml, Distributed -> 
+        let module Ocaml_Distributed = Ocaml_backend(Ocaml_distributed) in
+        let output_file_ext = base_dir ^ "ocaml/"  in
+        Ocaml_Distributed.main ctrl_ast confMap output_file_ext Distributed
 
 let read_file file_name =
   let in_channel = In_channel.create file_name in

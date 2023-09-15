@@ -27,12 +27,18 @@
  (modules main)
   (preprocess
   (pps ppx_let ppx_jane))
- (libraries pirouette parser lexer controlang ocaml_backend backend_intf ocaml_interthread core_unix.command_unix core))
+ (libraries pirouette parser lexer controlang ocaml_backend backend_intf ocaml_interthread ocaml_distributed core_unix.command_unix core))
 
 (executable
  (name output)
  (public_name output)
  (modules output)
+ (libraries threads.posix stdune))
+
+(executable
+ (name exec)
+ (public_name exec)
+ (modules exec)
  (libraries threads.posix stdune))
 
 (library
@@ -61,6 +67,11 @@
  (library
  (name ocaml_interthread)
  (modules ocaml_interthread)
+ (libraries backend_intf constants))
+
+ (library
+ (name ocaml_distributed)
+ (modules ocaml_distributed)
  (libraries backend_intf constants))
 
 (library
