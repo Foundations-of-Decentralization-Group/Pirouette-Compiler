@@ -1,2 +1,4 @@
 (library
- (name helloworld))
+ (name choreoAst)
+ (modules local_ast ast_ml)
+ )
