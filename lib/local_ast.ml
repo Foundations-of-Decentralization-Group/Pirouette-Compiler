@@ -1,74 +1,56 @@
 module rec L_P_TREE : sig
+  type var = Var of string
 
-  module Var : sig
-    type t = Var of string
-  end
+  and value =
+    | Int of int
+    | String of string
+    | Bool of bool
 
-  module Val : sig
-    type t = 
-      | Int of int
-      | String of string
-      | Bool of bool
-  end
+  and lpattern =
+    | Left of lpattern
+    | Right of lpattern
+    | Val of value
+    | Pair of (lpattern * lpattern)
+    | Var of var
+    | Wild
 
-  module LPattern : sig
-    type t =
-      | Left of t
-      | Right of t
-      | Val of Val.t
-      | Pair of (t * t)
-      | Var of L_P_TREE.Var.t
-      | Wild
-  end
+  and local_assignment =
+    | LVarAsgn of { assign: (var * lpattern); expr: local_expr }
 
-  module LocalAssignment: sig
-    type t = 
-      | LVarAsgn of {assign: (Var.t * t); 
-          expr: L_P_TREE.LocalExpr.t}
-  end
+  and operation =
+    | Add of (local_expr * local_expr)
+    | Subtract of (local_expr * local_expr)
+    | Product of (local_expr * local_expr)
+    | Divide of (local_expr * local_expr)
+    | Lt of (local_expr * local_expr)
+    | Gt of (local_expr * local_expr)
+    | Lte of (local_expr * local_expr)
+    | Gte of (local_expr * local_expr)
+    | Eq of (local_expr * local_expr)
+    | Neq of (local_expr * local_expr)
+    | And of (local_expr * local_expr)
+    | Or of (local_expr * local_expr)
 
-  module Operation : sig
-    type t = 
-      | Add of (L_P_TREE.LocalExpr.t * L_P_TREE.LocalExpr.t)
-      | Subtract of (L_P_TREE.LocalExpr.t * L_P_TREE.LocalExpr.t)
-      | Product of (L_P_TREE.LocalExpr.t * L_P_TREE.LocalExpr.t)
-      | Divide of (L_P_TREE.LocalExpr.t * L_P_TREE.LocalExpr.t)
-      | Lt of (L_P_TREE.LocalExpr.t * L_P_TREE.LocalExpr.t)
-      | Gt of (L_P_TREE.LocalExpr.t * L_P_TREE.LocalExpr.t)
-      | Lte of (L_P_TREE.LocalExpr.t * L_P_TREE.LocalExpr.t)
-      | Gte of (L_P_TREE.LocalExpr.t * L_P_TREE.LocalExpr.t)
-      | Eq of (L_P_TREE.LocalExpr.t * L_P_TREE.LocalExpr.t)
-      | Neq of (L_P_TREE.LocalExpr.t * L_P_TREE.LocalExpr.t)
-      | And of (L_P_TREE.LocalExpr.t * L_P_TREE.LocalExpr.t)
-      | Or of (L_P_TREE.LocalExpr.t * L_P_TREE.LocalExpr.t)
-  end 
+  and pair = local_expr * local_expr
 
-  module Pair : sig
-    type t = L_P_TREE.LocalExpr.t * L_P_TREE.LocalExpr.t
-  end
+  and match_expr = {
+    matcher: match_expr;
+    branches: (lpattern * match_expr) list
+  }
 
-  module Match : sig
-    type t = {
-      matcher: t;
-      branches: (LPattern.t * t) list
-    }
-  end
-
-  module LocalExpr : sig
-    type t = 
-      | Unit
-      | Val of Val.t
-      | Var of Var.t
-      | Binop of Operation.t
-      | Let of {
-          assignment: LocalAssignment.t;
-          in_: t
-        }
-      | Pair of Pair.t
-      | Fst of Pair.t
-      | Snd of Pair.t 
-      | Match of Match.t
-      | Left of Match.t
-      | Right of Match.t
-  end
+  and local_expr =
+    | Unit
+    | Val of value
+    | Var of var
+    | Binop of operation
+    | Let of {
+        assignment: local_assignment;
+        in_: local_expr
+      }
+    | Pair of pair
+    | Fst of pair
+    | Snd of pair
+    | Match of match_expr
+    | Left of match_expr
+    | Right of match_expr
 end = L_P_TREE
