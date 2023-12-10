@@ -20,19 +20,19 @@ module rec S_P_TREE : sig
     | Var of var
     | Wild
 
-  and sugaredSend = 
-    | SendWithBinder of {
-        sender: location;
-        receiver: location;
-        binder: var;
-        expression: local_expr;
-        then_: choreography;
-      }
-    | SendWithoutBinder of {
-        sender: location;
-        receiver: location;
-        choreo: choreography;
-      }
+  and sendWithBinder =  {
+    sender: location;
+    receiver: location;
+    binder: var;
+    expression: local_expr;
+    then_: choreography;
+  }
+
+  and sendWithoutBinder = {
+    sender: location;
+    receiver: location;
+    choreo: choreography;
+  }
 
   and syncData = {
     sender: location;
@@ -57,7 +57,8 @@ module rec S_P_TREE : sig
     | Unit
     | ChoreoVar of {data: var; position: position}
     | Expression of {data: (location * local_expr); position: position}
-    | Send of {data: sugaredSend; position: position}
+    | SendWithoutBinder of {data: sendWithoutBinder; position: position}
+    | SendWitBinder of {data: sendWithBinder; position: position}
     | Branch of {data: (choreography * choreography * choreography); position: position}
     | Sync of {data: syncData; position: position;}
     | Let of {data: letData; position: position;}
