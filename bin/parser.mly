@@ -46,11 +46,12 @@
 %nonassoc Then 
 %nonassoc Else
 %nonassoc Terminate
-%right Assignment
+%nonassoc Assignment
 %nonassoc Comm_S
 %nonassoc Dot
 %nonassoc Colon
-%left Gt Lt Eq 
+%nonassoc Gt Lt Eq 
+%left Arrow
 %left Plus Minus
 %left Product Division
 %nonassoc LParen RParen LSqParen RSqParen
@@ -89,7 +90,7 @@ let choreo_vars ==
     | name = ChoreoVars; 
         {ChoreoVars (Name name, None)}
 
-let binop :=
+%inline binop :
     | Gt; {Gt}
     | Lt; {Lt}
     | Eq; {Eq}
@@ -173,7 +174,7 @@ let let_in :=
     //     {Let {fst = Assoc {loc = r; arg = b}; snd = Snd {sndr = e; name = r}; thn= cp}}
     | c = choreographies; Comm_S; rcvr = Identifier; Dot; bndr = variable; Terminate; cp = choreographies;
         {Let (Location rcvr, bndr, Snd (c, Location rcvr, None), cp, None)}                         
-    | Let; rcvr = Identifier; Dot; bndr = variable; Assignment; sndr = le; Comm_S; Identifier; Terminate; In; cp = choreographies;
+    | Let; rcvr = Identifier; Dot; bndr = variable; Assignment; sndr = choreographies; Comm_S; Identifier; Terminate; In; cp = choreographies;
         {Let (Location rcvr, bndr, Snd (sndr, Location rcvr, None), cp, None)}   
     | Let; sndr = Identifier; Dot; bndr = variable; Assignment; c = choreographies; In; cp = choreographies;
         {Let (Location sndr, bndr, c, cp, None)}  
