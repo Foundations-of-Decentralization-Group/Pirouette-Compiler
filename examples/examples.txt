@@ -1,0 +1,263 @@
+------------------------------------------------------------------------
+Send + Function Calling with Multiple Arguments
+------------------------------------------------------------------------
+BuyerSeller: P1.int -> P1.int -> P2.int
+BuyerSeller X Y =
+    let P1.(x: int) = X 
+        P1.(y: int) = Y 
+        P2.(a: int) 
+        P1.z = P1.(x + y) in
+        P1.z ~> P2.a; P2.a
+
+BuyerSeller P1.5 P1.3
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+Function Calling + Declaration Block
+------------------------------------------------------------------------
+Factorial: P1.int -> P1.int
+Factorial X =
+    let P1.(x: int) = X in
+        if P1.(x == 0 || x == 1)
+            then P1.1
+        else
+            let P1.y = Factorial P1.(x - 1)
+            P1.(x * y)
+
+Factorial P1.5
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+Let + Declaration Block + Send + Recieve + if_thn_else + sync
+------------------------------------------------------------------------
+let P1.(x: int) = P1.5 
+    P1.(y: int) = P2.10 
+    P2.(z: int) in
+        if P1.(x > 2)
+            then P1[L] ~> P2;
+                P2.(y + 2) ~> P1.z; P1.z
+            else P1[R] ~> P2;
+                P2.(y - 2) ~> P1.z; P1.z
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+Scoping + Let + Declaration Block + Send + Recieve
+------------------------------------------------------------------------
+let P1.(x: int) = P1.5 
+    P2.(z: int) 
+    P2.(y: int) = P2.10
+    P2.(w: int)
+    P2.(z: int) in
+        P1.x ~> P2.z;
+        let P1.x = P1.10 in
+            P1.x ~> P2.w;
+            P2.(y + z + w);         //Outputs 25
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+Pair + if_thn_else + Function + let_in
+------------------------------------------------------------------------
+let X : P1.int 
+    Y : P2.int
+    init: P1.int -> P2.int -> P1.int * P2.int
+    init X Y = 
+        (if P1.(x > 1)
+            then P1.(x + 5)
+            else P1.(x + 1),
+        if P2.(y < 5) 
+            then P2.(y + 2)
+            else P2.(y + 10))
+    in init P1.2 P2.6
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+Function with multiple arguments + let_in
+------------------------------------------------------------------------
+Sum: P1.int -> P1.int -> P1.int
+Sum X Y =
+    let P1.(x: int) = X 
+        P1.(y: int) = Y in
+        P1.(x + y)
+
+Sum P1.7 P1.3
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+Pair (Simple)
+------------------------------------------------------------------------
+AddAndMultiply: P1.int -> P2.int -> P1.int * P2.int
+AddAndMultiply X Y =
+    let P1.(x: int) = X 
+        P2.(y: int) = Y in
+        (P1.(x + y), P2.(x * y))
+
+AddAndMultiply P1.5 P2.3
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+Nth Fibonacci Number (Recursive Function + Send + Receive)
+------------------------------------------------------------------------
+Fibonacci: P1.int -> P1.int
+Fibonacci X =
+    if P1.(x <= 1)
+        then P1.1
+    else
+        let P1.a = Fibonacci P1.(x - 1)
+            P1.b = Fibonacci P1.(x - 2) in
+        P1.(a + b)
+
+Fibonacci P1.6
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+Function Composition
+------------------------------------------------------------------------
+Square: P1.int -> P1.int
+Square X = P1.(x * x)
+
+Double: P1.int -> P1.int
+Double X = P1.(2 * x)
+
+Compose: P1.int -> P1.int
+Compose X = Double (Square X)
+
+Compose P1.4
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+Send + Pair + Fst + Snd
+------------------------------------------------------------------------
+let Pair: P1.int -> P2.int
+    Pair X Y =
+        let P1.(x : int) = X
+            P2.(y : int) = Y
+        in  (P1.(x + 1), P2.(y - 1))
+in
+    Pair P1.5 P2.10 ~> P2.p;
+    P2.(fst p + snd p)  // Outputs 14
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+isDateValid + Match + Binop (&& >= <=) + Send ChoreoVar + Function 
+------------------------------------------------------------------------
+isDateValid : P2.int -> P2.bool
+isDateValid D = 
+    let P2.(d : int) = D in
+    P2.(d >= 1 && d <= 31)
+
+isYearValid : P4.int -> P4.bool
+isYearValid Y = 
+    let P4.(y : int) = Y in
+    P4.(y >= 2000 && y <= 2099)
+
+isMonthValid : P3.string -> P3.bool
+isMonthValid M = 
+    let P3.(m : string) = M in
+        P3.(match m with 
+                | 'Jan' -> true
+                | 'Feb' -> true
+                | 'Mar' -> true
+                | 'Apr' -> true
+                | 'May' -> true
+                | 'Jun' -> true
+                | 'Jul' -> true
+                | 'Aug' -> true
+                | 'Oct' -> true
+                | 'Nov' -> true
+                | 'Dec' -> true
+                | _ -> false
+            )
+
+let validate_date: P1.int -> P1.string -> P1.int -> P1.bool
+    P1.(dateValid : bool)
+    P1.(monthValid : bool)
+    P1.(yearValid : bool)
+    validate_date D M Y = 
+        D ~> P2.(date: int);
+        M ~> P3.(month: string);
+        Y ~> P4.(year: int);
+        (isDateValid P2.date) ~> P1.dateValid;
+        (isMonthValid P3.month) ~> P1.monthValid;
+        (isYearValid P4.year) ~> P1.yearValid;
+        P1.(dateValid && monthValid && yearValid)
+in validate_date 30 'Apr' 1996
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+isDateValid + Match + Binop (&& >= <=) + Send ChoreoVar + Function 
+------------------------------------------------------------------------
+isProductPriceValid : P2.float -> P2.bool
+isProductPriceValid Price = P2.(Price >= 10.0)
+
+isDiscountValid : P3.float -> P3.float -> P3.bool
+isDiscountValid Price Discount = 
+    let P3.(p : float) = Price
+        P3.(d : discount) = Discount in
+        P3.(d >= 0.0 && d <= p * 0.2)
+
+validate_product : P1.float -> P1.float -> P1.float -> P1.bool
+validate_product Price Discount FinalPrice =
+    let P1.(priceValid : bool)
+        P1.(discountValid : bool) in
+        P1.(productPrice : float) = Price 
+        P1.(finalPrice : float) = FinalPrice 
+        Price ~> P2.(productPrice: float);
+        Price ~> P3.(productPrice: float);
+        Discount ~> P3.(discount: float);
+        (isProductPriceValid P2.productPrice) ~> P1.priceValid;
+        (isDiscountValid P3.productPrice P3.discount) ~> P1.discountValid;
+        P1.(priceValid && discountValid && finalPrice <= productPrice)
+in validate_product P1.12.0 P1.2.0 P1.10.0
+
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
+isDateValid + Match + Binop (&& >= <=) + Send ChoreoVar + Function 
+------------------------------------------------------------------------
+isPriceValid : P2.float -> P2.bool
+isPriceValid Price = 
+    match Price with
+        | P2.l -> P2.(l >= 20.0)
+        | _ -> P2.false
+
+isRatingValid : P3.float -> P3.bool
+isRatingValid Rating = 
+    match Rating with
+        | P3.rating -> P3.(rating >= 4.0)
+        | _ -> P3.false
+
+recommend_product : P1.float -> P1.float -> P1.float -> P1.string -> P1.string
+P1.(priceValid : bool)
+P1.(ratingValid : bool)
+recommend_product Price AvgPrice AvgRating Category =
+    Price ~> P2.(productPrice: float);
+    AvgPrice ~> P2.(averagePrice: float);
+    AvgRating ~> P3.(averageRating: float);
+    (isPriceValid P2.productPrice) ~> P1.priceValid;
+    (isRatingValid P3.averageRating) ~> P1.ratingValid;
+    if P1.(priceValid && ratingValid) then
+        match Category with
+        | P1.'Electronics' -> P1[Electronics] ~> P2; 
+                            if P2.(productPrice < averagePrice) 
+                            then
+                                P2[L] ~> P1; 
+                                P1.'Recommended'
+                            else
+                                P2[R] ~> P1;  
+                                P1.'Not Recommended' 
+        | P1.'Clothing'  -> P1[Clothing] ~> P2; 
+                            if P3.(averageRating > 4.5)
+                            then
+                                P3[L] ~> P1; 
+                                P1.'Recommended'
+                            else
+                                P3[R] ~> P1;  
+                                P1.'Not Recommended'
+        | _ -> P1.'Not Recommended'
+    else
+        P1.'Not Recommended'
+in recommend_product P1.25.0 P1.30.0 P1.4.7 P1.'Electronics'
+
+------------------------------------------------------------------------
