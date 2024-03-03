@@ -19,19 +19,14 @@ let parse' f s =
 let parse_program s =
   parse' Parser.program s
 
-let rec dump_network_type = function
-  | Unit _ -> "unit"
-  | TMap (nt1, nt2) -> "map (" ^ dump_network_type nt1 ^ ", " ^ dump_network_type nt2 ^ ")"
-  | TProd (nt1, nt2) -> "product (" ^ dump_network_type nt1 ^ ", " ^ dump_network_type nt2 ^ ")"
-  | TSum (nt1, nt2) -> "sum (" ^ dump_network_type nt1 ^ ", " ^ dump_network_type nt2 ^ ")"
-
-let dump_atom = function
-  | Int i ->
-      "Int " ^ string_of_int i
-  | Float f ->
-      "Float " ^ string_of_float f
-  | Word s ->
-      "Word \"" ^ s ^ "\""
-
-let dump_program (Program atoms) =
-  "[" ^ (String.concat ", " (List.map dump_atom atoms)) ^ "]"
+let dump_program (Prog decl_block) =
+  let rec dump_decl_block = function
+    | [] -> ""
+    | (Decl (id, t)) :: rest ->
+      "Decl(" ^ id ^ ", " ^ (dump_type t) ^ ");\n" ^ (dump_decl_block rest)
+  and dump_type = function
+    | Int -> "Int"
+    | Bool -> "Bool"
+    | Fun (t1, t2) -> "Fun(" ^ (dump_type t1) ^ ", " ^ (dump_type t2) ^ ")"
+  in
+  "Program {\n" ^ (dump_decl_block decl_block) ^ "}\n"

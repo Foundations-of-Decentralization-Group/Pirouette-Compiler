@@ -45,7 +45,6 @@ let rec repl _ =
   let input = read_line () in
   let (Program program) = parse_program input in
   try
-    let result = eval_program program [] in
     let output = dump_program (Program result) in
     print_endline output;
     print_endline "";

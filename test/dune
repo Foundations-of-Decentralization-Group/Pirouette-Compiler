@@ -1,0 +1,3 @@
+(tests
+ (names parser_test)
+ (libraries parser_core ounit2))
