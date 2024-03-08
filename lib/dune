@@ -4,7 +4,10 @@
 
 (library
  (name parser_core)
- (flags
-  ; menhir generates instances of the "unused rec flag"
-  ; warning
-  (:standard -w -39)))
+ (libraries yojson))
+
+(rule
+ (target _parser.conflicts)
+ (deps parser.conflicts)
+ (action (copy %{deps} %{target}))
+ (mode (promote (until-clean))))

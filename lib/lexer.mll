@@ -2,6 +2,8 @@
   open Lexing
   open Parser
 
+  exception SyntaxError of string
+
   let advance_line lexbuf =
     let pos = lexbuf.lex_curr_p in
     lexbuf.lex_curr_p <- { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
@@ -11,6 +13,7 @@ let digit = ['0'-'9']
 let alpha = ['a'-'z' 'A'-'Z']
 let whitespace = [' ' '\t']+
 let newline = '\r' | '\n' | "\r\n"
+let escape = '\\' ['"' '\\' '/' 'b' 'f' 'n' 'r' 't']
 
 let integer = '-'? digit+
 let identifier = (alpha | '_' ) (alpha | digit | '_')*
@@ -67,7 +70,7 @@ rule token = parse
   | "snd"              { SND }
   | "left"             { LEFT }
   | "right"            { RIGHT }
-  | "send"             { SEND }
+  (* | "send"             { SEND }
   | "to"               { TO }
   | "receive"          { RECEIVE }
   | "from"             { FROM }
@@ -75,14 +78,14 @@ rule token = parse
   | "for"              { FOR }
   | "allow"            { ALLOW }
   | "choice"           { CHOICE }
-  | "ret"              { RET }
+  | "ret"              { RET } *)
   | eof                { EOF }
   | _                  { raise (Failure ("Character not allowed in source text: '" ^ Lexing.lexeme lexbuf ^ "'")) }
 
-and read_string buffer = parse
-  | '"' { Buffer.contents buffer }  (* End of string *)
-  | '\\' ['/' '\\' 'b' 'f' 'n' 'r' 't' ] as escaped_char {
-      let c = match escaped_char with
+and read_string buf = parse
+  | '"'       { Buffer.contents buf }
+  | '\\' ('/' | '\\' | 'b' | 'f' | 'n' | 'r' | 't' as esc) {
+      let c = match esc with
         | '/'  -> '/'
         | '\\' -> '\\'
         | 'b'  -> '\b'
@@ -90,13 +93,13 @@ and read_string buffer = parse
         | 'n'  -> '\n'
         | 'r'  -> '\r'
         | 't'  -> '\t'
-        | _    -> raise (SyntaxError ("Illegal escape sequence: \\" ^ (String.make 1 any)))
-      in Buffer.add_char buffer c;
-      read_string buffer lexbuf
+        | _    -> assert false
+      in Buffer.add_char buf c;
+      read_string buf lexbuf
     }
-  | [^ '"' '\\']+ as str { (* Non-special characters *)
-      Buffer.add_string buffer str;
-      read_string buffer lexbuf
+  | [^ '"' '\\']+ as text {
+      Buffer.add_string buf text;
+      read_string buf lexbuf
     }
   | eof { raise (SyntaxError "String is not terminated") }
   | _   { raise (SyntaxError "Illegal string character") }

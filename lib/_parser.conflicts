@@ -1,0 +1,1324 @@
+
+** Conflict (shift/reduce) in state 200.
+** Token involved: ID
+** This state is reached from program after reading:
+
+var_id ASSIGN choreo_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+(?)
+
+** In state 200, looking ahead at ID, shifting is permitted
+** because of the following sub-derivation:
+
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              choreo_expr choreo_expr 
+                          loc_id DOT local_expr 
+                          . ID 
+
+** In state 200, looking ahead at ID, reducing production
+** statement -> var_id ASSIGN choreo_expr
+** is permitted because of the following sub-derivation:
+
+statement list(statement) // lookahead token appears because list(statement) can begin with ID
+var_id ASSIGN choreo_expr . 
+
+** Conflict (shift/reduce) in state 199.
+** Tokens involved: TILDE_ARROW SND RIGHT MATCH LPAREN LET LEFT IF ID FUN FST
+** The following explanations concentrate on token TILDE_ARROW.
+** This state is reached from program after reading:
+
+var_id ASSIGN SND choreo_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              (?)
+
+** In state 199, looking ahead at TILDE_ARROW, shifting is permitted
+** because of the following sub-derivation:
+
+SND choreo_expr 
+    choreo_expr . TILDE_ARROW loc_id 
+
+** In state 199, looking ahead at TILDE_ARROW, reducing production
+** choreo_expr -> SND choreo_expr
+** is permitted because of the following sub-derivation:
+
+choreo_expr TILDE_ARROW loc_id // lookahead token appears
+SND choreo_expr . 
+
+** Conflict (shift/reduce) in state 198.
+** Tokens involved: TILDE_ARROW SND RIGHT MATCH LPAREN LET LEFT IF ID FUN FST
+** The following explanations concentrate on token TILDE_ARROW.
+** This state is reached from program after reading:
+
+var_id ASSIGN RIGHT choreo_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              (?)
+
+** In state 198, looking ahead at TILDE_ARROW, shifting is permitted
+** because of the following sub-derivation:
+
+RIGHT choreo_expr 
+      choreo_expr . TILDE_ARROW loc_id 
+
+** In state 198, looking ahead at TILDE_ARROW, reducing production
+** choreo_expr -> RIGHT choreo_expr
+** is permitted because of the following sub-derivation:
+
+choreo_expr TILDE_ARROW loc_id // lookahead token appears
+RIGHT choreo_expr . 
+
+** Conflict (shift/reduce) in state 194.
+** Tokens involved: VERTICAL TILDE_ARROW SND RIGHT MATCH LPAREN LET LEFT IF ID FUN FST
+** The following explanations concentrate on token TILDE_ARROW.
+** This state is reached from program after reading:
+
+var_id ASSIGN MATCH choreo_expr WITH pattern ARROW choreo_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              (?)
+
+** In state 194, looking ahead at TILDE_ARROW, shifting is permitted
+** because of the following sub-derivation:
+
+MATCH choreo_expr WITH loption(separated_nonempty_list(VERTICAL,case)) 
+                       separated_nonempty_list(VERTICAL,case) 
+                       pattern ARROW choreo_expr 
+                                     choreo_expr . TILDE_ARROW loc_id 
+
+** In state 194, looking ahead at TILDE_ARROW, reducing production
+** separated_nonempty_list(VERTICAL,case) -> pattern ARROW choreo_expr
+** is permitted because of the following sub-derivation:
+
+choreo_expr TILDE_ARROW loc_id // lookahead token appears
+MATCH choreo_expr WITH loption(separated_nonempty_list(VERTICAL,case)) // lookahead token is inherited
+                       separated_nonempty_list(VERTICAL,case) // lookahead token is inherited
+                       pattern ARROW choreo_expr . 
+
+** Conflict (shift/reduce) in state 190.
+** Tokens involved: RIGHT LPAREN LEFT ID
+** The following explanations concentrate on token RIGHT.
+** This state is reached from program after reading:
+
+var_id ASSIGN MATCH choreo_expr WITH
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              (?)
+
+** In state 190, looking ahead at RIGHT, reducing production
+** loption(separated_nonempty_list(VERTICAL,case)) ->
+** is permitted because of the following sub-derivation:
+
+choreo_expr choreo_expr // lookahead token appears because choreo_expr can begin with RIGHT
+MATCH choreo_expr WITH loption(separated_nonempty_list(VERTICAL,case)) // lookahead token is inherited
+                       . 
+
+** In state 190, looking ahead at RIGHT, shifting is permitted
+** because of the following sub-derivation:
+
+MATCH choreo_expr WITH loption(separated_nonempty_list(VERTICAL,case)) 
+                       separated_nonempty_list(VERTICAL,case) 
+                       pattern ARROW choreo_expr 
+                       . RIGHT pattern 
+
+** Conflict (shift/reduce) in state 184.
+** Tokens involved: TILDE_ARROW SND RIGHT MATCH LPAREN LET LEFT IF ID FUN FST
+** The following explanations concentrate on token TILDE_ARROW.
+** This state is reached from program after reading:
+
+var_id ASSIGN LET decl_block IN choreo_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              (?)
+
+** In state 184, looking ahead at TILDE_ARROW, shifting is permitted
+** because of the following sub-derivation:
+
+LET decl_block IN choreo_expr 
+                  choreo_expr . TILDE_ARROW loc_id 
+
+** In state 184, looking ahead at TILDE_ARROW, reducing production
+** choreo_expr -> LET decl_block IN choreo_expr
+** is permitted because of the following sub-derivation:
+
+choreo_expr TILDE_ARROW loc_id // lookahead token appears
+LET decl_block IN choreo_expr . 
+
+** Conflict (shift/reduce) in state 180.
+** Token involved: ID
+** This state is reached from program after reading:
+
+fun_id list(pattern) ASSIGN choreo_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+(?)
+
+** In state 180, looking ahead at ID, shifting is permitted
+** because of the following sub-derivation:
+
+statement list(statement) 
+fun_id list(pattern) ASSIGN choreo_expr 
+                            choreo_expr choreo_expr 
+                                        loc_id DOT local_expr 
+                                        . ID 
+
+** In state 180, looking ahead at ID, reducing production
+** statement -> fun_id list(pattern) ASSIGN choreo_expr
+** is permitted because of the following sub-derivation:
+
+statement list(statement) // lookahead token appears because list(statement) can begin with ID
+fun_id list(pattern) ASSIGN choreo_expr . 
+
+** Conflict (shift/reduce) in state 175.
+** Tokens involved: PLUS CROSS ARROW
+** The following explanations concentrate on token PLUS.
+** This state is reached from program after reading:
+
+fun_id COLON choreo_type ARROW choreo_type
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+(?)
+
+** In state 175, looking ahead at PLUS, reducing production
+** choreo_type -> choreo_type ARROW choreo_type
+** is permitted because of the following sub-derivation:
+
+fun_id COLON choreo_type ARROW choreo_type 
+             choreo_type PLUS choreo_type // lookahead token appears
+             choreo_type ARROW choreo_type . 
+
+** In state 175, looking ahead at PLUS, shifting is permitted
+** because of the following sub-derivation:
+
+fun_id COLON choreo_type ARROW choreo_type 
+                               choreo_type . PLUS choreo_type 
+
+** Conflict (shift/reduce) in state 155.
+** Token involved: ID
+** This state is reached from program after reading:
+
+loc_id DOT var_id ASSIGN choreo_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+(?)
+
+** In state 155, looking ahead at ID, shifting is permitted
+** because of the following sub-derivation:
+
+statement list(statement) 
+loc_id DOT var_id ASSIGN choreo_expr 
+                         choreo_expr choreo_expr 
+                                     loc_id DOT local_expr 
+                                     . ID 
+
+** In state 155, looking ahead at ID, reducing production
+** statement -> loc_id DOT var_id ASSIGN choreo_expr
+** is permitted because of the following sub-derivation:
+
+statement list(statement) // lookahead token appears because list(statement) can begin with ID
+loc_id DOT var_id ASSIGN choreo_expr . 
+
+** Conflict (shift/reduce) in state 154.
+** Tokens involved: TILDE_ARROW SND RIGHT MATCH LPAREN LET LEFT IF ID FUN FST
+** The following explanations concentrate on token TILDE_ARROW.
+** This state is reached from program after reading:
+
+var_id ASSIGN LEFT choreo_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              (?)
+
+** In state 154, looking ahead at TILDE_ARROW, shifting is permitted
+** because of the following sub-derivation:
+
+LEFT choreo_expr 
+     choreo_expr . TILDE_ARROW loc_id 
+
+** In state 154, looking ahead at TILDE_ARROW, reducing production
+** choreo_expr -> LEFT choreo_expr
+** is permitted because of the following sub-derivation:
+
+choreo_expr TILDE_ARROW loc_id // lookahead token appears
+LEFT choreo_expr . 
+
+** Conflict (shift/reduce) in state 153.
+** Tokens involved: TILDE_ARROW SND RIGHT MATCH LPAREN LET LEFT IF ID FUN FST
+** The following explanations concentrate on token TILDE_ARROW.
+** This state is reached from program after reading:
+
+var_id ASSIGN IF choreo_expr THEN choreo_expr ELSE choreo_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              (?)
+
+** In state 153, looking ahead at TILDE_ARROW, shifting is permitted
+** because of the following sub-derivation:
+
+IF choreo_expr THEN choreo_expr ELSE choreo_expr 
+                                     choreo_expr . TILDE_ARROW loc_id 
+
+** In state 153, looking ahead at TILDE_ARROW, reducing production
+** choreo_expr -> IF choreo_expr THEN choreo_expr ELSE choreo_expr
+** is permitted because of the following sub-derivation:
+
+choreo_expr TILDE_ARROW loc_id // lookahead token appears
+IF choreo_expr THEN choreo_expr ELSE choreo_expr . 
+
+** Conflict (shift/reduce) in state 148.
+** Tokens involved: TILDE_ARROW SND RIGHT MATCH LPAREN LET LEFT IF ID FUN FST
+** The following explanations concentrate on token TILDE_ARROW.
+** This state is reached from program after reading:
+
+var_id ASSIGN FUN fun_id ARROW choreo_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              (?)
+
+** In state 148, looking ahead at TILDE_ARROW, shifting is permitted
+** because of the following sub-derivation:
+
+FUN fun_id ARROW choreo_expr 
+                 choreo_expr . TILDE_ARROW loc_id 
+
+** In state 148, looking ahead at TILDE_ARROW, reducing production
+** choreo_expr -> FUN fun_id ARROW choreo_expr
+** is permitted because of the following sub-derivation:
+
+choreo_expr TILDE_ARROW loc_id // lookahead token appears
+FUN fun_id ARROW choreo_expr . 
+
+** Conflict (shift/reduce) in state 147.
+** Tokens involved: TILDE_ARROW SND RIGHT MATCH LPAREN LET LEFT IF ID FUN FST
+** The following explanations concentrate on token TILDE_ARROW.
+** This state is reached from program after reading:
+
+var_id ASSIGN FST choreo_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              (?)
+
+** In state 147, looking ahead at TILDE_ARROW, shifting is permitted
+** because of the following sub-derivation:
+
+FST choreo_expr 
+    choreo_expr . TILDE_ARROW loc_id 
+
+** In state 147, looking ahead at TILDE_ARROW, reducing production
+** choreo_expr -> FST choreo_expr
+** is permitted because of the following sub-derivation:
+
+choreo_expr TILDE_ARROW loc_id // lookahead token appears
+FST choreo_expr . 
+
+** Conflict (shift/reduce) in state 146.
+** Tokens involved: TILDE_ARROW SND RIGHT MATCH LPAREN LET LEFT IF ID FUN FST
+** The following explanations concentrate on token TILDE_ARROW.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT local_expr TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              (?)
+
+** In state 146, looking ahead at TILDE_ARROW, reducing production
+** choreo_expr -> loc_id DOT local_expr TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr
+** is permitted because of the following sub-derivation:
+
+choreo_expr TILDE_ARROW loc_id // lookahead token appears
+loc_id DOT local_expr TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr . 
+
+** In state 146, looking ahead at TILDE_ARROW, shifting is permitted
+** because of the following sub-derivation:
+
+loc_id DOT local_expr TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr 
+                                                              choreo_expr . TILDE_ARROW loc_id 
+
+** Conflict (shift/reduce) in state 140.
+** Token involved: TILDE_ARROW
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              (?)
+
+** In state 140, looking ahead at TILDE_ARROW, reducing production
+** choreo_expr -> loc_id DOT local_expr
+** is permitted because of the following sub-derivation:
+
+choreo_expr TILDE_ARROW loc_id // lookahead token appears
+loc_id DOT local_expr . 
+
+** In state 140, looking ahead at TILDE_ARROW, shifting is permitted
+** because of the following sub-derivation:
+
+loc_id DOT local_expr . TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr 
+
+** Conflict (shift/reduce) in state 139.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT SND local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 139, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+SND local_expr 
+    local_expr . TIMES local_expr 
+
+** In state 139, looking ahead at TIMES, reducing production
+** local_expr -> SND local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+SND local_expr . 
+
+** Conflict (shift/reduce) in state 138.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT RIGHT local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 138, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+RIGHT local_expr 
+      local_expr . TIMES local_expr 
+
+** In state 138, looking ahead at TIMES, reducing production
+** local_expr -> RIGHT local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+RIGHT local_expr . 
+
+** Conflict (shift/reduce) in state 135.
+** Tokens involved: VERTICAL TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT MATCH local_expr WITH local_pattern ARROW local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 135, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+MATCH local_expr WITH loption(separated_nonempty_list(VERTICAL,local_case)) 
+                      separated_nonempty_list(VERTICAL,local_case) 
+                      local_pattern ARROW local_expr 
+                                          local_expr . TIMES local_expr 
+
+** In state 135, looking ahead at TIMES, reducing production
+** separated_nonempty_list(VERTICAL,local_case) -> local_pattern ARROW local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+MATCH local_expr WITH loption(separated_nonempty_list(VERTICAL,local_case)) // lookahead token is inherited
+                      separated_nonempty_list(VERTICAL,local_case) // lookahead token is inherited
+                      local_pattern ARROW local_expr . 
+
+** Conflict (shift/reduce) in state 118.
+** Tokens involved: RIGHT LPAREN LEFT ID
+** The following explanations concentrate on token RIGHT.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT MATCH local_expr WITH
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              (?)
+
+** In state 118, looking ahead at RIGHT, shifting is permitted
+** because of the following sub-derivation:
+
+loc_id DOT local_expr 
+           MATCH local_expr WITH loption(separated_nonempty_list(VERTICAL,local_case)) 
+                                 separated_nonempty_list(VERTICAL,local_case) 
+                                 local_pattern ARROW local_expr 
+                                 . RIGHT local_pattern 
+
+** In state 118, looking ahead at RIGHT, reducing production
+** loption(separated_nonempty_list(VERTICAL,local_case)) ->
+** is permitted because of the following sub-derivation:
+
+choreo_expr choreo_expr // lookahead token appears because choreo_expr can begin with RIGHT
+loc_id DOT local_expr // lookahead token is inherited
+           MATCH local_expr WITH loption(separated_nonempty_list(VERTICAL,local_case)) // lookahead token is inherited
+                                 . 
+
+** Conflict (shift/reduce) in state 112.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT LET var_id ASSIGN local_expr IN local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 112, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+LET var_id ASSIGN local_expr IN local_expr 
+                                local_expr . TIMES local_expr 
+
+** In state 112, looking ahead at TIMES, reducing production
+** local_expr -> LET var_id ASSIGN local_expr IN local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+LET var_id ASSIGN local_expr IN local_expr . 
+
+** Conflict (shift/reduce) in state 109.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT LEFT local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 109, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+LEFT local_expr 
+     local_expr . TIMES local_expr 
+
+** In state 109, looking ahead at TIMES, reducing production
+** local_expr -> LEFT local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+LEFT local_expr . 
+
+** Conflict (shift/reduce) in state 108.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT local_expr AND local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 108, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+local_expr AND local_expr 
+               local_expr . TIMES local_expr 
+
+** In state 108, looking ahead at TIMES, reducing production
+** local_expr -> local_expr AND local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+local_expr AND local_expr . 
+
+** Conflict (shift/reduce) in state 106.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT local_expr DIV local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 106, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+local_expr DIV local_expr 
+               local_expr . TIMES local_expr 
+
+** In state 106, looking ahead at TIMES, reducing production
+** local_expr -> local_expr DIV local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+local_expr DIV local_expr . 
+
+** Conflict (shift/reduce) in state 104.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT local_expr EQ local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 104, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+local_expr EQ local_expr 
+              local_expr . TIMES local_expr 
+
+** In state 104, looking ahead at TIMES, reducing production
+** local_expr -> local_expr EQ local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+local_expr EQ local_expr . 
+
+** Conflict (shift/reduce) in state 102.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT local_expr GEQ local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 102, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+local_expr GEQ local_expr 
+               local_expr . TIMES local_expr 
+
+** In state 102, looking ahead at TIMES, reducing production
+** local_expr -> local_expr GEQ local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+local_expr GEQ local_expr . 
+
+** Conflict (shift/reduce) in state 100.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT local_expr GT local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 100, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+local_expr GT local_expr 
+              local_expr . TIMES local_expr 
+
+** In state 100, looking ahead at TIMES, reducing production
+** local_expr -> local_expr GT local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+local_expr GT local_expr . 
+
+** Conflict (shift/reduce) in state 98.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT local_expr LEQ local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 98, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+local_expr LEQ local_expr 
+               local_expr . TIMES local_expr 
+
+** In state 98, looking ahead at TIMES, reducing production
+** local_expr -> local_expr LEQ local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+local_expr LEQ local_expr . 
+
+** Conflict (shift/reduce) in state 96.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT local_expr LT local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 96, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+local_expr LT local_expr 
+              local_expr . TIMES local_expr 
+
+** In state 96, looking ahead at TIMES, reducing production
+** local_expr -> local_expr LT local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+local_expr LT local_expr . 
+
+** Conflict (shift/reduce) in state 94.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT local_expr MINUS local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 94, looking ahead at TIMES, reducing production
+** local_expr -> local_expr MINUS local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+local_expr MINUS local_expr . 
+
+** In state 94, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+local_expr MINUS local_expr 
+                 local_expr . TIMES local_expr 
+
+** Conflict (shift/reduce) in state 92.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT local_expr NEQ local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 92, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+local_expr NEQ local_expr 
+               local_expr . TIMES local_expr 
+
+** In state 92, looking ahead at TIMES, reducing production
+** local_expr -> local_expr NEQ local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+local_expr NEQ local_expr . 
+
+** Conflict (shift/reduce) in state 90.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT local_expr OR local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 90, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+local_expr OR local_expr 
+              local_expr . TIMES local_expr 
+
+** In state 90, looking ahead at TIMES, reducing production
+** local_expr -> local_expr OR local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+local_expr OR local_expr . 
+
+** Conflict (shift/reduce) in state 88.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT local_expr PLUS local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 88, looking ahead at TIMES, reducing production
+** local_expr -> local_expr PLUS local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+local_expr PLUS local_expr . 
+
+** In state 88, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+local_expr PLUS local_expr 
+                local_expr . TIMES local_expr 
+
+** Conflict (shift/reduce) in state 86.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT local_expr TIMES local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 86, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+local_expr TIMES local_expr 
+                 local_expr . TIMES local_expr 
+
+** In state 86, looking ahead at TIMES, reducing production
+** local_expr -> local_expr TIMES local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+local_expr TIMES local_expr . 
+
+** Conflict (shift/reduce) in state 84.
+** Tokens involved: TIMES PLUS OR NEQ MINUS LT LEQ GT GEQ EQ DIV AND
+** The following explanations concentrate on token TIMES.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id DOT FST local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              loc_id DOT local_expr 
+                         (?)
+
+** In state 84, looking ahead at TIMES, shifting is permitted
+** because of the following sub-derivation:
+
+FST local_expr 
+    local_expr . TIMES local_expr 
+
+** In state 84, looking ahead at TIMES, reducing production
+** local_expr -> FST local_expr
+** is permitted because of the following sub-derivation:
+
+local_expr TIMES local_expr // lookahead token appears
+FST local_expr . 
+
+** Conflict (shift/reduce) in state 66.
+** Tokens involved: TILDE_ARROW SND RIGHT MATCH LPAREN LET LEFT IF ID FUN FST
+** The following explanations concentrate on token TILDE_ARROW.
+** This state is reached from program after reading:
+
+var_id ASSIGN choreo_expr choreo_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              (?)
+
+** In state 66, looking ahead at TILDE_ARROW, shifting is permitted
+** because of the following sub-derivation:
+
+choreo_expr choreo_expr 
+            choreo_expr . TILDE_ARROW loc_id 
+
+** In state 66, looking ahead at TILDE_ARROW, reducing production
+** choreo_expr -> choreo_expr choreo_expr
+** is permitted because of the following sub-derivation:
+
+choreo_expr TILDE_ARROW loc_id // lookahead token appears
+choreo_expr choreo_expr . 
+
+** Conflict (shift/reduce) in state 63.
+** Tokens involved: TILDE_ARROW SND RIGHT MATCH LPAREN LET LEFT IF ID FUN FST
+** The following explanations concentrate on token TILDE_ARROW.
+** This state is reached from program after reading:
+
+var_id ASSIGN loc_id LBRACKET sync_label RBRACKET TILDE_ARROW loc_id SEMICOLON choreo_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id ASSIGN choreo_expr 
+              (?)
+
+** In state 63, looking ahead at TILDE_ARROW, shifting is permitted
+** because of the following sub-derivation:
+
+loc_id LBRACKET sync_label RBRACKET TILDE_ARROW loc_id SEMICOLON choreo_expr 
+                                                                 choreo_expr . TILDE_ARROW loc_id 
+
+** In state 63, looking ahead at TILDE_ARROW, reducing production
+** choreo_expr -> loc_id LBRACKET sync_label RBRACKET TILDE_ARROW loc_id SEMICOLON choreo_expr
+** is permitted because of the following sub-derivation:
+
+choreo_expr TILDE_ARROW loc_id // lookahead token appears
+loc_id LBRACKET sync_label RBRACKET TILDE_ARROW loc_id SEMICOLON choreo_expr . 
+
+** Conflict (reduce/reduce) in state 25.
+** Tokens involved: COLON ASSIGN
+** The following explanations concentrate on token COLON.
+** This state is reached from program after reading:
+
+ID
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+(?)
+
+** In state 25, looking ahead at COLON, reducing production
+** fun_id -> ID
+** is permitted because of the following sub-derivation:
+
+fun_id COLON choreo_type ARROW choreo_type // lookahead token appears
+ID . 
+
+** In state 25, looking ahead at COLON, reducing production
+** var_id -> ID
+** is permitted because of the following sub-derivation:
+
+var_id COLON choreo_type // lookahead token appears
+ID . 
+
+** Conflict (shift/reduce) in state 24.
+** Tokens involved: PLUS CROSS ARROW
+** The following explanations concentrate on token PLUS.
+** This state is reached from program after reading:
+
+var_id COLON choreo_type ARROW choreo_type
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id COLON choreo_type 
+             (?)
+
+** In state 24, looking ahead at PLUS, reducing production
+** choreo_type -> choreo_type ARROW choreo_type
+** is permitted because of the following sub-derivation:
+
+choreo_type PLUS choreo_type // lookahead token appears
+choreo_type ARROW choreo_type . 
+
+** In state 24, looking ahead at PLUS, shifting is permitted
+** because of the following sub-derivation:
+
+choreo_type ARROW choreo_type 
+                  choreo_type . PLUS choreo_type 
+
+** Conflict (shift/reduce) in state 22.
+** Tokens involved: PLUS CROSS ARROW
+** The following explanations concentrate on token PLUS.
+** This state is reached from program after reading:
+
+var_id COLON choreo_type CROSS choreo_type
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id COLON choreo_type 
+             (?)
+
+** In state 22, looking ahead at PLUS, reducing production
+** choreo_type -> choreo_type CROSS choreo_type
+** is permitted because of the following sub-derivation:
+
+choreo_type PLUS choreo_type // lookahead token appears
+choreo_type CROSS choreo_type . 
+
+** In state 22, looking ahead at PLUS, shifting is permitted
+** because of the following sub-derivation:
+
+choreo_type CROSS choreo_type 
+                  choreo_type . PLUS choreo_type 
+
+** Conflict (shift/reduce) in state 20.
+** Tokens involved: PLUS CROSS ARROW
+** The following explanations concentrate on token PLUS.
+** This state is reached from program after reading:
+
+var_id COLON choreo_type PLUS choreo_type
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id COLON choreo_type 
+             (?)
+
+** In state 20, looking ahead at PLUS, shifting is permitted
+** because of the following sub-derivation:
+
+choreo_type PLUS choreo_type 
+                 choreo_type . PLUS choreo_type 
+
+** In state 20, looking ahead at PLUS, reducing production
+** choreo_type -> choreo_type PLUS choreo_type
+** is permitted because of the following sub-derivation:
+
+choreo_type PLUS choreo_type // lookahead token appears
+choreo_type PLUS choreo_type . 
+
+** Conflict (shift/reduce) in state 17.
+** Tokens involved: PLUS CROSS
+** The following explanations concentrate on token PLUS.
+** This state is reached from program after reading:
+
+var_id COLON loc_id DOT local_type CROSS local_type
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id COLON choreo_type 
+             loc_id DOT local_type 
+                        (?)
+
+** In state 17, looking ahead at PLUS, reducing production
+** local_type -> local_type CROSS local_type
+** is permitted because of the following sub-derivation:
+
+local_type PLUS local_type // lookahead token appears
+local_type CROSS local_type . 
+
+** In state 17, looking ahead at PLUS, shifting is permitted
+** because of the following sub-derivation:
+
+local_type CROSS local_type 
+                 local_type . PLUS local_type 
+
+** Conflict (shift/reduce) in state 15.
+** Tokens involved: PLUS CROSS
+** The following explanations concentrate on token PLUS.
+** This state is reached from program after reading:
+
+var_id COLON loc_id DOT local_type PLUS local_type
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id COLON choreo_type 
+             loc_id DOT local_type 
+                        (?)
+
+** In state 15, looking ahead at PLUS, shifting is permitted
+** because of the following sub-derivation:
+
+local_type PLUS local_type 
+                local_type . PLUS local_type 
+
+** In state 15, looking ahead at PLUS, reducing production
+** local_type -> local_type PLUS local_type
+** is permitted because of the following sub-derivation:
+
+local_type PLUS local_type // lookahead token appears
+local_type PLUS local_type . 
+
+** Conflict (shift/reduce) in state 13.
+** Tokens involved: PLUS CROSS
+** The following explanations concentrate on token PLUS.
+** This state is reached from program after reading:
+
+var_id COLON loc_id DOT local_type
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id COLON choreo_type 
+             (?)
+
+** In state 13, looking ahead at PLUS, reducing production
+** choreo_type -> loc_id DOT local_type
+** is permitted because of the following sub-derivation:
+
+choreo_type PLUS choreo_type // lookahead token appears
+loc_id DOT local_type . 
+
+** In state 13, looking ahead at PLUS, shifting is permitted
+** because of the following sub-derivation:
+
+loc_id DOT local_type 
+           local_type . PLUS local_type 
