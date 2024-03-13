@@ -33,7 +33,6 @@ rule read = parse
   | '-'                { MINUS }
   | '*'                { TIMES }
   | '/'                { DIV }
-  | ('x' | 'X')        { CROSS } (* cannot use 'x' | 'X' for identifier *)
   | "&&"               { AND }
   | "||"               { OR }
   | "="                { EQ }

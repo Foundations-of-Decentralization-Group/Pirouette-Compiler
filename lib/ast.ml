@@ -5,8 +5,6 @@ type value =
 
 type loc_id = LocId of string
 type var_id = VarId of string
-type fun_id = FunId of string
-type type_id = TypeId of string
 type sync_label = LabelId of string
 
 type bin_op =
@@ -77,12 +75,12 @@ type choreo_expr =
   | Unit
   | Var of var_id
   | LocExpr of loc_id * local_expr
-  | LocSend of loc_id * local_expr * loc_id * var_id * choreo_expr
+  (* | LocSend of loc_id * local_expr * loc_id * var_id * choreo_expr *)
   | Send of choreo_expr * loc_id
   | Sync of loc_id * sync_label * loc_id * choreo_expr
   | If of choreo_expr * choreo_expr * choreo_expr
   | Let of decl_block * choreo_expr
-  | FunDef of fun_id * choreo_expr
+  | FunDef of var_id * choreo_expr
   | FunApp of choreo_expr * choreo_expr
   | Pair of choreo_expr * choreo_expr
   | Fst of choreo_expr
@@ -92,12 +90,13 @@ type choreo_expr =
   | Match of choreo_expr * (pattern * choreo_expr) list
 
 and statement =
-  | VarDecl of var_id * choreo_type
-  | FunDecl of fun_id * choreo_type * choreo_type
-  | LocVarDecl of loc_id * var_id * loc_id * local_type
-  | TypeDecl of type_id * choreo_type
+  (* | VarDecl of var_id * choreo_type *)
+  (* | FunDecl of var_id * choreo_type * choreo_type *)
+  (* | LocVarDecl of loc_id * var_id * loc_id * local_type *)
+  | VarDecl of pattern * choreo_type
+  | TypeDecl of var_id * choreo_type
   | VarAssign of var_id * choreo_expr
-  | FunAssign of fun_id * pattern list * choreo_expr
+  | FunAssign of var_id * pattern list * choreo_expr
   | LocVarAssign of loc_id * var_id * choreo_expr
 
 and decl_block = statement list
@@ -105,7 +104,7 @@ and decl_block = statement list
 type network_expr =
   | Unit
   | Var of var_id
-  | FunDef of fun_id * network_expr
+  | FunDef of var_id * network_expr
   | FunApp of network_expr * network_expr
   | If of network_expr * network_expr * network_expr
   | Match of network_expr * pattern * network_expr

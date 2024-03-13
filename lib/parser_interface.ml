@@ -22,14 +22,14 @@ and dump_program (Prog statements) =
   `Assoc [ ("decl_block", `List (List.map dump_stmt statements)) ]
 
 and dump_stmt = function
-  | VarDecl (VarId id, t) ->
+  (* | VarDecl (VarId id, t) ->
       `Assoc
         [
           ( "VarDecl",
             `Assoc [ ("id", `String id); ("choreo_type", dump_choreo_type t) ]
           );
-        ]
-  | FunDecl (FunId id, t1, t2) ->
+        ] *)
+  (* | FunDecl (VarId id, t1, t2) ->
       `Assoc
         [
           ( "FunDecl",
@@ -39,8 +39,8 @@ and dump_stmt = function
                 ("choreo_t1", dump_choreo_type t1);
                 ("choreo_t2", dump_choreo_type t2);
               ] );
-        ]
-  | LocVarDecl (LocId loc1, VarId var, LocId loc2, t) ->
+        ] *)
+  (* | LocVarDecl (LocId loc1, VarId var, LocId loc2, t) ->
       `Assoc
         [
           ( "LocVarDecl",
@@ -51,8 +51,15 @@ and dump_stmt = function
                 ("loc2", `String loc2);
                 ("local_type", dump_local_type t);
               ] );
+        ] *)
+  | VarDecl (p, t) ->
+      `Assoc
+        [
+          ( "VarDecl",
+            `Assoc [ ("pattern", dump_pattern p); ("choreo_type", dump_choreo_type t) ]
+          );
         ]
-  | TypeDecl (TypeId id, t) ->
+  | TypeDecl (VarId id, t) ->
       `Assoc
         [
           ( "TypeDecl",
@@ -66,7 +73,7 @@ and dump_stmt = function
             `Assoc [ ("var", `String id); ("choreo_expr", dump_choreo_expr e) ]
           );
         ]
-  | FunAssign (FunId id, ps, e) ->
+  | FunAssign (VarId id, ps, e) ->
       `Assoc
         [
           ( "FunAssign",
@@ -109,19 +116,6 @@ and dump_choreo_expr = function
               [ ("loc", `String loc); ("local_expr", dump_local_expr e) ]
           );
         ]
-  | LocSend (LocId loc1, e, LocId loc2, VarId var, e') ->
-      `Assoc
-        [
-          ( "LocSend",
-            `Assoc
-              [
-                ("loc1", `String loc1);
-                ("local_expr", dump_local_expr e);
-                ("loc2", `String loc2);
-                ("var", `String var);
-                ("choreo_expr", dump_choreo_expr e');
-              ] );
-        ]
   | Send (e, LocId loc) ->
       `Assoc
         [
@@ -163,7 +157,7 @@ and dump_choreo_expr = function
                 ("choreo_expr", dump_choreo_expr e);
               ] );
         ]
-  | FunDef (FunId id, e) ->
+  | FunDef (VarId id, e) ->
       `Assoc
         [
           ( "FunDef",

@@ -8,7 +8,7 @@
 %token TRUE FALSE
 %token UNIT_T INT_T STRING_T BOOL_T
 %token FUN TYPE
-%token PLUS MINUS TIMES DIV CROSS
+%token PLUS MINUS TIMES DIV
 %token AND OR
 %token EQ NEQ LT LEQ GT GEQ
 %token LPAREN RPAREN LBRACKET RBRACKET
@@ -39,8 +39,6 @@
 %type <Ast.value> value
 %type <Ast.loc_id> loc_id
 %type <Ast.var_id> var_id
-%type <Ast.fun_id> fun_id
-%type <Ast.type_id> type_id
 %type <Ast.sync_label> sync_label
 
 %nonassoc IN
@@ -51,7 +49,7 @@
 %left DOT
 %nonassoc TILDE_ARROW
 %right ARROW
-%left PLUS CROSS
+%left PLUS TIMES
 
 
 %start program
@@ -65,25 +63,26 @@ decl_block:
   | list(statement) { $1 }
 
 statement:
-  | FUN fun_id COLON choreo_type ARROW choreo_type { FunDecl ($2, $4, $6) } // FIX: id : t1->t2
-  | var_id COLON choreo_type                       { VarDecl ($1, $3) }
-  | loc_id DOT var_id COLON loc_id DOT local_type  { LocVarDecl ($1, $3, $5, $7) }
-  | TYPE type_id ASSIGN choreo_type                { TypeDecl ($2, $4) }
+  // | FUN var_id COLON choreo_type ARROW choreo_type { FunDecl ($2, $4, $6) } // FIX: id : t1->t2
+  // | var_id COLON choreo_type                       { VarDecl ($1, $3) }
+  // | loc_id DOT var_id COLON loc_id DOT local_type  { LocVarDecl ($1, $3, $5, $7) }
+  | pattern COLON choreo_type                    {VarDecl ($1, $3)}
+  | TYPE var_id ASSIGN choreo_type                { TypeDecl ($2, $4) }
   | var_id ASSIGN choreo_expr                      { VarAssign ($1, $3) }
-  | FUN fun_id list(pattern) ASSIGN choreo_expr    { FunAssign ($2, $3, $5) }
+  | FUN var_id list(pattern) ASSIGN choreo_expr    { FunAssign ($2, $3, $5) }
   | loc_id DOT var_id ASSIGN choreo_expr           { LocVarAssign ($1, $3, $5) }
 
 choreo_expr:
   | LPAREN RPAREN                                                                { Unit }
   | var_id                                                                       { Var $1 }
   | loc_id DOT local_expr                                                        { LocExpr ($1, $3) }
-  | loc_id DOT local_expr TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr    { LocSend ($1, $3, $5, $7, $9) }
+  | loc_id DOT local_expr TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr    { Let ([LocVarAssign ($5, $7, Send (LocExpr ($1, $3), $5))], $9) } // LocSend ($1, $3, $5, $7, $9) } //  Let and send
   | choreo_expr TILDE_ARROW loc_id                                               { Send ($1, $3) }
   | IF choreo_expr THEN choreo_expr ELSE choreo_expr                             { If ($2, $4, $6) }
   | loc_id LBRACKET sync_label RBRACKET TILDE_ARROW loc_id SEMICOLON choreo_expr { Sync ($1, $3, $6, $8) }
   | LET decl_block IN choreo_expr                                                { Let ($2, $4) }
-  | FUN fun_id ARROW choreo_expr                                                 { FunDef ($2, $4) }
-  | LPAREN choreo_expr choreo_expr RPAREN                                        { FunApp ($2, $3) } // FIX: cheoreo_expr choreo_expr ~> loc_id
+  | FUN var_id ARROW choreo_expr                                                 { FunDef ($2, $4) }
+  | LPAREN choreo_expr choreo_expr RPAREN                                        { FunApp ($2, $3) } // Left factoring FIX: cheoreo_expr choreo_expr ~> loc_id
   | LPAREN choreo_expr COMMA choreo_expr RPAREN                                  { Pair ($2, $4) }
   | FST choreo_expr                                                              { Fst $2 }
   | SND choreo_expr                                                              { Snd $2 }
@@ -124,7 +123,7 @@ choreo_type:
   | UNIT_T                        { TUnit }
   | loc_id DOT local_type         { TLoc ($1, $3) }
   | choreo_type ARROW choreo_type { TSend ($1, $3) }
-  | choreo_type CROSS choreo_type { TProd ($1, $3) }
+  | choreo_type TIMES choreo_type { TProd ($1, $3) }
   | choreo_type PLUS choreo_type  { TSum ($1, $3) }
 
 local_type:
@@ -132,7 +131,7 @@ local_type:
   | INT_T                       { TInt }
   | STRING_T                    { TString }
   | BOOL_T                      { TBool }
-  | local_type CROSS local_type { TProd ($1, $3) }
+  | local_type TIMES local_type { TProd ($1, $3) }
   | local_type PLUS local_type  { TSum ($1, $3) }
   
 loc_id:
@@ -140,12 +139,6 @@ loc_id:
 
 var_id:
   | ID { VarId $1 }
-
-fun_id:
-  | ID { FunId $1 }
-
-type_id:
-  | ID { TypeId $1 }
 
 sync_label:
   | ID { LabelId $1 }
