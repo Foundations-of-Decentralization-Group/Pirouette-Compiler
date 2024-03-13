@@ -1,5 +1,5 @@
 open OUnit2
-open Parser_core.Ast
+open Parser_core.Choreo_ast
 open Parser_core.Parser_interface
 
 let peq (s : string) (v : 'a) =

@@ -1,5 +1,6 @@
 %{
-  open Ast
+  open Local_ast
+  open Choreo_ast
 %}
 
 %token <string> ID
@@ -26,20 +27,20 @@
 // %token RET
 %token EOF
 
-%type <Ast.program> program
-%type <Ast.decl_block> decl_block
-%type <Ast.statement> statement
-%type <Ast.choreo_expr> choreo_expr
-%type <Ast.local_expr> local_expr
-%type <Ast.pattern> pattern
-%type <Ast.local_pattern> local_pattern
-%type <Ast.choreo_type> choreo_type
-%type <Ast.local_type> local_type
-%type <Ast.bin_op> bin_op
-%type <Ast.value> value
-%type <Ast.loc_id> loc_id
-%type <Ast.var_id> var_id
-%type <Ast.sync_label> sync_label
+%type <Choreo_ast.program> program
+%type <Choreo_ast.decl_block> decl_block
+%type <Choreo_ast.statement> statement
+%type <Choreo_ast.choreo_expr> choreo_expr
+%type <Local_ast.local_expr> local_expr
+%type <Choreo_ast.pattern> pattern
+%type <Local_ast.local_pattern> local_pattern
+%type <Choreo_ast.choreo_type> choreo_type
+%type <Local_ast.local_type> local_type
+%type <Local_ast.bin_op> bin_op
+%type <Local_ast.value> value
+%type <Local_ast.loc_id> loc_id
+%type <Local_ast.var_id> var_id
+%type <Local_ast.sync_label> sync_label
 
 %nonassoc IN
 %right ELSE

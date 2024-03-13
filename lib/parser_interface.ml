@@ -1,4 +1,5 @@
-open Ast
+open Local_ast
+open Choreo_ast
 open Lexer
 open Lexing
 open Yojson.Basic
