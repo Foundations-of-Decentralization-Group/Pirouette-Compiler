@@ -6,8 +6,8 @@
  (name parser_core)
  (libraries yojson))
 
-(rule
- (target _parser.conflicts)
- (deps parser.conflicts)
- (action (copy %{deps} %{target}))
- (mode (promote (until-clean))))
+; (rule
+;  (target _parser.conflicts)
+;  (deps parser.conflicts)
+;  (action (copy %{deps} %{target}))
+;  (mode (promote (until-clean))))

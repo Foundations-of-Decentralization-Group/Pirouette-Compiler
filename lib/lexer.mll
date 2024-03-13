@@ -4,40 +4,36 @@
 
   exception SyntaxError of string
 
-  let advance_line lexbuf =
+  let next_line lexbuf =
     let pos = lexbuf.lex_curr_p in
-    lexbuf.lex_curr_p <- { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = pos.pos_cnum }
+    lexbuf.lex_curr_p <- { pos with pos_lnum = pos.pos_lnum + 1; pos_bol = lexbuf.lex_curr_pos }
 }
 
 let digit = ['0'-'9']
 let alpha = ['a'-'z' 'A'-'Z']
-let whitespace = [' ' '\t']+
+let white = [' ' '\t']+
 let newline = '\r' | '\n' | "\r\n"
-let escape = '\\' ['"' '\\' '/' 'b' 'f' 'n' 'r' 't']
 
 let integer = '-'? digit+
 let identifier = (alpha | '_' ) (alpha | digit | '_')*
 
-rule token = parse
-  | whitespace         { token lexbuf }
+rule read = parse
+  | white              { read lexbuf }
   | "--"               { read_single_line_comment lexbuf }
   | "{-"               { read_multi_line_comment lexbuf }
-  | identifier as s    { ID (s) }
-  | integer as s       { INT (int_of_string s) }
-  | '"'                { STRING (read_string (Buffer.create 16) lexbuf) }
-  | "unit"             { UNIT_T }
-  | "int"              { INT_T }
-  | "string"           { STRING_T }
-  | "bool"             { BOOL_T }
-  | "fun"              { FUN }
-  | "type"             { TYPE }
-  | "true"             { TRUE }
-  | "false"            { FALSE }
+  | '('                { LPAREN }
+  | ')'                { RPAREN }
+  | '['                { LBRACKET }
+  | ']'                { RBRACKET }
+  | ','                { COMMA }
+  | '.'                { DOT }
+  | ':'                { COLON }
+  | ';'                { SEMICOLON }
   | '+'                { PLUS }
   | '-'                { MINUS }
   | '*'                { TIMES }
   | '/'                { DIV }
-  | 'x'                { CROSS }
+  | ('x' | 'X')        { CROSS } (* cannot use 'x' | 'X' for identifier *)
   | "&&"               { AND }
   | "||"               { OR }
   | "="                { EQ }
@@ -46,19 +42,19 @@ rule token = parse
   | "<="               { LEQ }
   | ">"                { GT }
   | ">="               { GEQ }
-  | '('                { LPAREN }
-  | ')'                { RPAREN }
-  | '['                { LBRACKET }
-  | ']'                { RBRACKET }
-  | '.'                { DOT }
-  | ','                { COMMA }
-  | ':'                { COLON }
-  | ';'                { SEMICOLON }
   | '|'                { VERTICAL }
   | '_'                { UNDERSCORE }
   | ":="               { ASSIGN }
   | "->"               { ARROW }
   | "~>"               { TILDE_ARROW }
+  | "unit"             { UNIT_T }
+  | "int"              { INT_T }
+  | "string"           { STRING_T }
+  | "bool"             { BOOL_T }
+  | "fun"              { FUN }
+  | "type"             { TYPE }
+  | "true"             { TRUE }
+  | "false"            { FALSE }
   | "if"               { IF }
   | "then"             { THEN }
   | "else"             { ELSE }
@@ -70,7 +66,7 @@ rule token = parse
   | "snd"              { SND }
   | "left"             { LEFT }
   | "right"            { RIGHT }
-  (* | "send"             { SEND }
+  (* | "send"          { SEND }
   | "to"               { TO }
   | "receive"          { RECEIVE }
   | "from"             { FROM }
@@ -79,13 +75,17 @@ rule token = parse
   | "allow"            { ALLOW }
   | "choice"           { CHOICE }
   | "ret"              { RET } *)
+  | integer as s       { INT (int_of_string s) }
+  | identifier as s    { ID (s) }
+  | '"'                { read_string (Buffer.create 17) lexbuf }
+  | newline            { next_line lexbuf; read lexbuf }
   | eof                { EOF }
-  | _                  { raise (Failure ("Character not allowed in source text: '" ^ Lexing.lexeme lexbuf ^ "'")) }
+  | _                  { raise (SyntaxError ("Unexpected char: " ^ Lexing.lexeme lexbuf)) }
 
 and read_string buf = parse
-  | '"'       { Buffer.contents buf }
-  | '\\' ('/' | '\\' | 'b' | 'f' | 'n' | 'r' | 't' as esc) {
-      let c = match esc with
+  | '"'       { STRING (Buffer.contents buf) }
+  | '\\' ('/' | '\\' | 'b' | 'f' | 'n' | 'r' | 't' as esc)
+    { let c = match esc with
         | '/'  -> '/'
         | '\\' -> '\\'
         | 'b'  -> '\b'
@@ -97,20 +97,20 @@ and read_string buf = parse
       in Buffer.add_char buf c;
       read_string buf lexbuf
     }
-  | [^ '"' '\\']+ as text {
-      Buffer.add_string buf text;
+  | [^ '"' '\\']+
+    { Buffer.add_string buf (Lexing.lexeme lexbuf);
       read_string buf lexbuf
     }
+  | _   { raise (SyntaxError ("Illegal string character: " ^ Lexing.lexeme lexbuf)) }
   | eof { raise (SyntaxError "String is not terminated") }
-  | _   { raise (SyntaxError "Illegal string character") }
 
 and read_single_line_comment = parse
-  | newline { advance_line lexbuf; token lexbuf }
-  | eof     { EOF }
+  | newline { next_line lexbuf; read lexbuf }
   | _       { read_single_line_comment lexbuf }
+  | eof     { EOF }
 
 and read_multi_line_comment = parse
-  | "-}"    { token lexbuf }
-  | newline { advance_line lexbuf; read_multi_line_comment lexbuf }
-  | eof     { raise (SyntaxError "Comment is not terminated") }
+  | "-}"    { read lexbuf }
+  | newline { next_line lexbuf; read_multi_line_comment lexbuf }
   | _       { read_multi_line_comment lexbuf }
+  | eof     { raise (SyntaxError "Comment is not terminated") }

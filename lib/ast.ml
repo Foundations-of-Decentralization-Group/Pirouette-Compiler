@@ -1,13 +1,13 @@
+type value =
+  [ `Int of int
+  | `String of string
+  | `Bool of bool ]
+
 type loc_id = LocId of string
 type var_id = VarId of string
 type fun_id = FunId of string
 type type_id = TypeId of string
 type sync_label = LabelId of string
-
-type value =
-  | Int of int
-  | String of string
-  | Bool of bool
 
 type bin_op =
   | Plus
@@ -62,7 +62,6 @@ type pattern =
 
 type local_expr =
   | Unit
-  | Int of int
   | Val of value
   | Var of var_id
   | BinOp of local_expr * bin_op * local_expr
