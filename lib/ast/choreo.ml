@@ -1,4 +1,4 @@
-open Local_ast
+open Local
 
 type choreo_type =
   | TUnit

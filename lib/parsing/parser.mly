@@ -1,6 +1,6 @@
 %{
-  open Local_ast
-  open Choreo_ast
+  open Ast.Local
+  open Ast.Choreo
 %}
 
 %token <string> ID
@@ -20,27 +20,22 @@
 %token IF THEN ELSE
 %token FST SND LEFT RIGHT
 %token MATCH WITH
-// %token SEND TO
-// %token RECEIVE FROM
-// %token CHOOSE FOR
-// %token ALLOW CHOICE
-// %token RET
 %token EOF
 
-%type <Choreo_ast.program> program
-%type <Choreo_ast.decl_block> decl_block
-%type <Choreo_ast.statement> statement
-%type <Choreo_ast.choreo_expr> choreo_expr
-%type <Local_ast.local_expr> local_expr
-%type <Choreo_ast.pattern> pattern
-%type <Local_ast.local_pattern> local_pattern
-%type <Choreo_ast.choreo_type> choreo_type
-%type <Local_ast.local_type> local_type
-%type <Local_ast.bin_op> bin_op
-%type <Local_ast.value> value
-%type <Local_ast.loc_id> loc_id
-%type <Local_ast.var_id> var_id
-%type <Local_ast.sync_label> sync_label
+%type <Ast.Choreo.program> program
+%type <Ast.Choreo.decl_block> decl_block
+%type <Ast.Choreo.statement> statement
+%type <Ast.Choreo.choreo_expr> choreo_expr
+%type <Ast.Local.local_expr> local_expr
+%type <Ast.Choreo.pattern> pattern
+%type <Ast.Local.local_pattern> local_pattern
+%type <Ast.Choreo.choreo_type> choreo_type
+%type <Ast.Local.local_type> local_type
+%type <Ast.Local.bin_op> bin_op
+%type <Ast.Local.value> value
+%type <Ast.Local.loc_id> loc_id
+%type <Ast.Local.var_id> var_id
+%type <Ast.Local.sync_label> sync_label
 
 %nonassoc IN
 %right ELSE

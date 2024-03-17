@@ -1,23 +1,7 @@
-open Local_ast
-open Choreo_ast
-open Lexer
-open Lexing
+open Choreo
 open Yojson.Basic
 
-let pos_string pos =
-  let l = string_of_int pos.pos_lnum
-  and c = string_of_int (pos.pos_cnum - pos.pos_bol + 1) in
-  "line " ^ l ^ ", column " ^ c
-
-let parse_program lexbuf =
-  try Parser.program Lexer.read lexbuf with
-  | SyntaxError msg ->
-      raise (Failure ("Syntax error: " ^ msg ^ " at " ^ pos_string lexbuf.lex_curr_p))
-  | Parser.Error ->
-      raise (Failure ("Parse error at " ^ pos_string lexbuf.lex_curr_p))
-
-(* Printing utilities *)
-let rec dump_ast prog = dump_program prog |> pretty_to_string
+let rec dump_choreo_ast prog = dump_program prog |> pretty_to_string
 
 and dump_program (Prog statements) =
   `Assoc [ ("decl_block", `List (List.map dump_stmt statements)) ]

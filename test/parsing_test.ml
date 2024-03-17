@@ -1,6 +1,8 @@
 open OUnit2
-open Parser_core.Choreo_ast
-open Parser_core.Parser_interface
+open Ast.Local
+open Ast.Choreo
+(* open Ast.Net *)
+open Parsing.Interface
 
 let peq (s : string) (v : 'a) =
   let lexbuf = Lexing.from_string s in

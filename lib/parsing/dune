@@ -1,0 +1,13 @@
+; (rule
+;  (target _parser.conflicts)
+;  (deps parser.conflicts)
+;  (action (copy %{deps} %{target}))
+;  (mode (promote (until-clean))))
+
+(ocamllex lexer)
+(menhir
+ (modules parser))
+
+(library
+ (name parsing)
+ (libraries ast))
