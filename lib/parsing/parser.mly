@@ -4,7 +4,7 @@
 %}
 
 %token <string> ID
-%token <int> INT
+%token <int>    INT
 %token <string> STRING
 %token TRUE FALSE
 %token UNIT_T INT_T STRING_T BOOL_T
@@ -15,7 +15,7 @@
 %token LPAREN RPAREN LBRACKET RBRACKET
 %token COMMA DOT COLON SEMICOLON
 %token VERTICAL UNDERSCORE
-%token ASSIGN ARROW TILDE_ARROW
+%token COLONEQ ARROW TILDE_ARROW
 %token LET IN
 %token IF THEN ELSE
 %token FST SND LEFT RIGHT
@@ -26,10 +26,10 @@
 %type <Ast.Choreo.decl_block> decl_block
 %type <Ast.Choreo.statement> statement
 %type <Ast.Choreo.choreo_expr> choreo_expr
-%type <Ast.Local.local_expr> local_expr
 %type <Ast.Choreo.pattern> pattern
-%type <Ast.Local.local_pattern> local_pattern
 %type <Ast.Choreo.choreo_type> choreo_type
+%type <Ast.Local.local_expr> local_expr
+%type <Ast.Local.local_pattern> local_pattern
 %type <Ast.Local.local_type> local_type
 %type <Ast.Local.bin_op> bin_op
 %type <Ast.Local.value> value
@@ -38,14 +38,18 @@
 %type <Ast.Local.sync_label> sync_label
 
 %nonassoc IN
-%right ELSE
+// %right ELSE
 %nonassoc VERTICAL
 %nonassoc FST SND LEFT RIGHT
-%left SEMICOLON
-%left DOT
-%nonassoc TILDE_ARROW
+// %left TILDE_ARROW
+// %left SEMICOLON
+%right OR
+%right AND
+%left EQ NEQ LT LEQ GT GEQ
 %right ARROW
-%left PLUS TIMES
+%left PLUS MINUS
+%left TIMES DIV
+%left DOT
 
 
 %start program
@@ -59,45 +63,54 @@ decl_block:
   | list(statement) { $1 }
 
 statement:
-  // | FUN var_id COLON choreo_type ARROW choreo_type { FunDecl ($2, $4, $6) } // FIX: id : t1->t2
-  // | var_id COLON choreo_type                       { VarDecl ($1, $3) }
-  // | loc_id DOT var_id COLON loc_id DOT local_type  { LocVarDecl ($1, $3, $5, $7) }
-  | pattern COLON choreo_type                    {VarDecl ($1, $3)}
-  | TYPE var_id ASSIGN choreo_type                { TypeDecl ($2, $4) }
-  | var_id ASSIGN choreo_expr                      { VarAssign ($1, $3) }
-  | FUN var_id list(pattern) ASSIGN choreo_expr    { FunAssign ($2, $3, $5) }
-  | loc_id DOT var_id ASSIGN choreo_expr           { LocVarAssign ($1, $3, $5) }
+  | pattern COLON choreo_type                       { VarDecl ($1, $3)}
+  | TYPE var_id COLONEQ choreo_type                 { TypeDecl ($2, $4) }
+  | var_id COLONEQ choreo_expr                      { VarAssign ($1, $3) }
+  | FUN var_id list(pattern) COLONEQ choreo_expr    { FunAssign ($2, $3, $5) }
+  | loc_id DOT var_id COLONEQ choreo_expr           { LocVarAssign ($1, $3, $5) }
 
+/* Associativity increases from expr to expr3, with each precedence level falling through to the next. */
 choreo_expr:
-  | LPAREN RPAREN                                                                { Unit }
-  | var_id                                                                       { Var $1 }
-  | loc_id DOT local_expr                                                        { LocExpr ($1, $3) }
-  | loc_id DOT local_expr TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr    { Let ([LocVarAssign ($5, $7, Send (LocExpr ($1, $3), $5))], $9) } // LocSend ($1, $3, $5, $7, $9) } //  Let and send
-  | choreo_expr TILDE_ARROW loc_id                                               { Send ($1, $3) }
   | IF choreo_expr THEN choreo_expr ELSE choreo_expr                             { If ($2, $4, $6) }
-  | loc_id LBRACKET sync_label RBRACKET TILDE_ARROW loc_id SEMICOLON choreo_expr { Sync ($1, $3, $6, $8) }
   | LET decl_block IN choreo_expr                                                { Let ($2, $4) }
   | FUN var_id ARROW choreo_expr                                                 { FunDef ($2, $4) }
-  | LPAREN choreo_expr choreo_expr RPAREN                                        { FunApp ($2, $3) } // Left factoring FIX: cheoreo_expr choreo_expr ~> loc_id
-  | LPAREN choreo_expr COMMA choreo_expr RPAREN                                  { Pair ($2, $4) }
   | FST choreo_expr                                                              { Fst $2 }
   | SND choreo_expr                                                              { Snd $2 }
   | LEFT choreo_expr                                                             { Left $2 }
   | RIGHT choreo_expr                                                            { Right $2 }
+  | LPAREN choreo_expr COMMA choreo_expr RPAREN                                  { Pair ($2, $4) }
   | MATCH choreo_expr WITH nonempty_list(case)                                   { Match ($2, $4) }
+  | loc_id LBRACKET sync_label RBRACKET TILDE_ARROW loc_id SEMICOLON choreo_expr { Sync ($1, $3, $6, $8) }
+  | loc_id DOT local_expr TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr    { Let ([LocVarAssign ($1, $7, Send (LocExpr($1, $3), $5))], $9) }
+  | choreo_expr1                                                                 { $1 }
+
+choreo_expr1:
+  | choreo_expr1 TILDE_ARROW loc_id                                              { Send ($1, $3) }
+  | choreo_expr2                                                                 { $1 }
+
+choreo_expr2:
+  | choreo_expr2 choreo_expr3                                                    { FunApp ($1, $2) }
+  | choreo_expr3                                                                 { $1 }
+
+choreo_expr3:
+  | LPAREN RPAREN                                                                { Unit }
+  | var_id                                                                       { Var $1 }
+  | loc_id DOT local_expr                                                        { LocExpr ($1, $3) }
+  | LPAREN choreo_expr RPAREN                                                    { $2 }
 
 local_expr:
   | LPAREN RPAREN                                   { Unit }
   | value                                           { Val $1 }                                                                    
   | var_id                                          { Var $1 }
-  | LPAREN local_expr bin_op local_expr RPAREN      { BinOp ($2, $3, $4) } // FIX: L.e bin_op e
-  | LET var_id ASSIGN local_expr IN local_expr      { Let ($2, $4, $6) }
+  | local_expr bin_op local_expr                    { BinOp ($1, $2, $3) }
+  | LET var_id COLONEQ local_expr IN local_expr     { Let ($2, $4, $6) }
   | LPAREN local_expr COMMA local_expr RPAREN       { Pair ($2, $4) }
-  | FST local_expr                                  { Fst ($2) }
-  | SND local_expr                                  { Snd ($2) }
-  | LEFT local_expr                                 { Left ($2) }
-  | RIGHT local_expr                                { Right ($2) }
+  | FST local_expr                                  { Fst $2 }
+  | SND local_expr                                  { Snd $2 }
+  | LEFT local_expr                                 { Left $2 }
+  | RIGHT local_expr                                { Right $2 }
   | MATCH local_expr WITH nonempty_list(local_case) { Match ($2, $4) }
+  | LPAREN local_expr RPAREN                        { $2 }
 
 pattern:
   | UNDERSCORE                          { Default }
@@ -121,6 +134,7 @@ choreo_type:
   | choreo_type ARROW choreo_type { TSend ($1, $3) }
   | choreo_type TIMES choreo_type { TProd ($1, $3) }
   | choreo_type PLUS choreo_type  { TSum ($1, $3) }
+  | LPAREN choreo_type RPAREN     { $2 }
 
 local_type:
   | UNIT_T                      { TUnit }
@@ -129,6 +143,7 @@ local_type:
   | BOOL_T                      { TBool }
   | local_type TIMES local_type { TProd ($1, $3) }
   | local_type PLUS local_type  { TSum ($1, $3) }
+  | LPAREN local_type RPAREN    { $2 }
   
 loc_id:
   | ID { LocId $1 }
@@ -146,7 +161,7 @@ value:
   | FALSE  { `Bool false }
 
 %inline case:
-  | VERTICAL pattern ARROW choreo_expr      { ($2, $4) }
+  | VERTICAL pattern ARROW choreo_expr1     { ($2, $4) }
 
 %inline local_case:
   | VERTICAL local_pattern ARROW local_expr { ($2, $4) }

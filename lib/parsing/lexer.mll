@@ -43,7 +43,7 @@ rule read = parse
   | ">="               { GEQ }
   | '|'                { VERTICAL }
   | '_'                { UNDERSCORE }
-  | ":="               { ASSIGN }
+  | ":="               { COLONEQ }
   | "->"               { ARROW }
   | "~>"               { TILDE_ARROW }
   | "unit"             { UNIT_T }

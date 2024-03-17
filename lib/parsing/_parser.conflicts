@@ -1,0 +1,65 @@
+
+** Conflict (shift/reduce) in state 161.
+** Token involved: TILDE_ARROW
+** This state is reached from program after reading:
+
+var_id COLONEQ loc_id DOT local_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+statement list(statement) 
+var_id COLONEQ choreo_expr 
+               (?)
+
+** In state 161, looking ahead at TILDE_ARROW, shifting is permitted
+** because of the following sub-derivation:
+
+loc_id DOT local_expr . TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr 
+
+** In state 161, looking ahead at TILDE_ARROW, reducing production
+** choreo_expr3 -> loc_id DOT local_expr
+** is permitted because of the following sub-derivation:
+
+choreo_expr1 
+choreo_expr1 TILDE_ARROW loc_id // lookahead token appears
+choreo_expr2 // lookahead token is inherited
+choreo_expr3 // lookahead token is inherited
+loc_id DOT local_expr . 
+
+** Conflict (shift/reduce) in state 92.
+** Tokens involved: LPAREN ID
+** The following explanations concentrate on token LPAREN.
+** This state is reached from program after reading:
+
+var_id COLONEQ choreo_expr2
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+program 
+decl_block EOF 
+list(statement) 
+(?)
+
+** In state 92, looking ahead at LPAREN, reducing production
+** choreo_expr1 -> choreo_expr2
+** is permitted because of the following sub-derivation:
+
+statement list(statement) // lookahead token appears because list(statement) can begin with LPAREN
+var_id COLONEQ choreo_expr // lookahead token is inherited
+               choreo_expr1 // lookahead token is inherited
+               choreo_expr2 . 
+
+** In state 92, looking ahead at LPAREN, shifting is permitted
+** because of the following sub-derivation:
+
+statement list(statement) 
+var_id COLONEQ choreo_expr 
+               choreo_expr1 
+               choreo_expr2 
+               choreo_expr2 choreo_expr3 
+                            . LPAREN RPAREN 
