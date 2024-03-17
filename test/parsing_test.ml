@@ -21,4 +21,4 @@ let suite =
          >::: [ "Basic Declarations" >:: test_declarations_basic ];
        ]
 
-let _ = run_test_tt_main suite
+let () = run_test_tt_main suite
