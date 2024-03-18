@@ -1,0 +1,567 @@
+\documentclass{article}
+% \documentclass{notes}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{pl-syntax/pl-syntax}
+\usepackage{mathpartir}
+\usepackage{stmaryrd}
+
+
+
+\title{Pirouette - Theory}
+\author{\textbf{Shruti Gupta} \and \textbf{Prashant Godhwani}}
+\date{September 2023}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Syntax}  \begin{syntax}
+
+    \categoryFromSet[Locations]{\ell}{\mathcal{L}} 
+
+    \category[Synchronization Labels]{d}
+    \alternative{L}
+    \alternative{R}
+
+    \category[Choreography]{C}
+    % Each alternative is introduced on its own line.
+    \alternative{\mathbf{()}}
+    \alternative{X}
+    \alternative{\ell . e}
+    \alternative{\ell_1 . e \leadsto \ell_2; \ C }    
+    \alternative{\textbf{if } \ell . e \textbf{ then } C_1 \textbf{ else } C_2}
+    \\
+    \alternative{\ell_1 [d] \leadsto \ell_2  ; \ C }  
+    \alternative{ \textbf{let } \ell . x \Coloneqq C_1 \textbf{ in } C_2}
+    \alternative{\textbf{fun } X \Rightarrow C}
+    \alternative{C_1 \  C_2}
+    \\
+    \alternative{(C_1, C_2)}
+    \alternative{\textbf{fst } C}
+    \alternative{\textbf{snd } C}
+    \alternative{\textbf{left } C}
+    \alternative{\textbf{right } C}
+    \\
+    \alternative{\textbf{match } C \textbf{ with  left} \  X \Rightarrow C_1 \textbf{;  right} \  Y \Rightarrow C_2}
+
+
+
+    % You can add vertical spacing between categories to visually group them.
+    % \separate
+    % You can pass the amount of space explicitly if you want to manually control it:
+    % \separate[5ex]
+
+
+     \category[Local Expressions]{e}
+     \alternative{()}
+    \alternative{num}
+    \alternative{x}
+    \alternative{e_1 \ binop \ e_2}
+    \alternative{\textbf{let} \ x = e_1 \ in \ e_2}
+    \alternative{(e_1, e_2)} 
+    \alternative{\textbf{fst } e} \\
+    \alternative{\textbf{snd } e}
+    \alternative{\textbf{left } e}
+    \alternative{\textbf{right } e}
+    \alternative{\textbf{match } e \textbf{ with  left} \  x \Rightarrow e_1 \textbf{;  right} \  y \Rightarrow e_2}
+    
+    \category[Network Expressions]{E}
+    \alternative{X}
+    \alternative{\mathbf{()}}
+    \alternative{\textbf{fun } X \Rightarrow E}
+    \alternative{E_1 \ E_2 }
+    \alternative{\textsf{ret}(e)}
+    \\
+    \alternative{\textsf{let ret}(x) = E_1 \ \textsf{in} \ E_2}
+    \alternative{\textsf{send } e \textsf{ to } \ell ; \  E}
+    \alternative{\textsf{receive } x \textsf{ from } \ell ; \  E}
+    \\
+    \alternative{\textsf{if } E_1 \textsf{ then } E_2 \textsf{ else }  E_3}
+    \alternative{\textsf{choose } d \textsf{ for } \ell ; \  E}
+    \\
+    \alternative{\textsf{allow } \ell \textsf{ choice L} \Rightarrow E_1 \ ; \ \textsf{R} \Rightarrow E_2}
+     % \alternative{\textsf{allow } \ell \textsf{ choice } [ \ | \ d \to E\ ]^*}
+    \alternative{(E_1, E_2)}
+    \\
+    \alternative{\textbf{fst } E}
+    \alternative{\textbf{snd } E}
+    \alternative{\textbf{left } E}
+    \alternative{\textbf{right } E}
+    \\
+    \alternative{\textbf{match } E \textbf{ with  left} \  X \Rightarrow E_1 \textbf{;  right} \  Y \Rightarrow E_2}
+
+    \category[Choreographic Types]{\tau}
+    \alternative{\textbf{unit}}
+    \alternative{\ell.t}
+    \alternative{\tau_1 \rightarrow \tau_2}
+    \alternative{\tau_1 \times \tau_2}
+    \alternative{\tau_1 + \tau_2}
+
+    \category[Local Types]{t}
+    \alternative{\textbf{unit}}
+    \alternative{\textbf{int}}
+    \alternative{\textbf{bool}}
+    \alternative{\textbf{string}}
+    \alternative{t_1 \times t_2}
+    \alternative{t_1 + t_2}
+
+
+    \category[Network Types]{T}
+    \alternative{\textbf{unit}}
+    \alternative{\boxed{t}}
+    \alternative{T_1 \rightarrow T_2}
+    \alternative{T_1 \times T_2}
+    \alternative{T_1 + T_2}
+
+  \end{syntax}
+
+\section{Type System}
+\subsection{Local Language}
+\begin{mathpar}
+\inferrule [ Loc - unit ]
+{ \; }
+{ \Gamma \vdash \textsf{( ) : unit} } \and
+\inferrule [ Loc - var ]
+{ \textsf{$x : t$} \in \Gamma }
+{ \Gamma \vdash \textsf{$x : t$}  } \and
+\inferrule [ Loc - pair ]
+{ \Gamma \vdash \textsf{$e_1 : t_1$} \quad \Gamma \vdash \textsf{$e_2 : t_2$} }
+{ \Gamma \vdash \textsf{$(e_1, e_2) : t_1 \times t_2$}  } \and
+\inferrule [ Loc - fst ]
+{ \Gamma \vdash \textsf{$e : t_1 \times t_2$} }
+{ \Gamma \vdash \textsf{fst $ e : t_1 $} } \and
+\inferrule [ Loc - snd ]
+{ \Gamma \vdash \textsf{$e : t_1 \times t_2$} }
+{ \Gamma \vdash \textsf{snd $ e : t_2 $} } \and
+\inferrule [ Loc - left ]
+{ \Gamma \vdash \textsf{$ e_1 : t_1$} }
+{ \Gamma \vdash \textsf{left $ e_1 : t_1 + t_2 $} } \and
+\inferrule [ Loc - right ]
+{ \Gamma \vdash \textsf{$ e_2 : t_2$} }
+{ \Gamma \vdash \textsf{right $ e_2 : t_1 + t_2 $} } \and
+\inferrule [ Loc - match ]
+{ \Gamma \vdash \textsf{$ e : t_1+t_2$} \quad \Gamma \textsf{, x : $t_1$} \vdash \textsf{$ e_1 : t_3$} \quad \Gamma \textsf{, y : $t_2$} \vdash \textsf{$ e_2 : t_3$}  }
+{ \Gamma \vdash \textsf{(match e with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$) : $ t_3 $} } 
+
+\end{mathpar}
+
+
+\subsection{Network Language}
+\begin{mathpar}
+\inferrule [ Network - unit ]
+{ \; }
+{ \Gamma ;\Delta \vdash \textsf{( ) : unit} } \and
+\inferrule [ Network - var ]
+{ \textsf{$X : T$} \in \Delta }
+{ \Gamma ;\Delta \vdash \textsf{$X : T$}  } \and
+\inferrule [ ret ]
+{ \Gamma ;\Delta\vdash \textsf{$e : t$} }
+{ \Gamma ;\Delta\vdash \textsf{ret $ (e) : \boxed{t}$}  } \and
+\inferrule [ Network - fun ]
+{ \Gamma ;\Delta \textsf{, $X : T_1$} \vdash \textsf{$E : T_2$} }
+{ \Gamma ;\Delta \vdash \textsf{fun $X \Rightarrow E : T_1 \to T_2$}  } \and
+\inferrule [ Network - app ]
+{ \Gamma ;\Delta \vdash \textsf{$E_1 : T_1 \to T_2$} \quad \Gamma ;\Delta \vdash \textsf{$E_2 : T_1$} }
+{ \Gamma ;\Delta \vdash \textsf{$E_1 E_2 : T_2$}  } \and
+\inferrule [ Network - if ]
+{ \Gamma ;\Delta \vdash \textsf{$E_1 : T_1$} \quad \Gamma ;\Delta \vdash \textsf{$E_2 : T_2$} \quad \Gamma ;\Delta \vdash \textsf{$E_3 : T_2$} }
+{ \Gamma ;\Delta \vdash \textsf{if $ E_1$ then  $E_2$ else $E_3: T_2$}  } \and
+\inferrule [ Network - def ]
+{ \Gamma ;\Delta \vdash \textsf{$E_1 : \boxed{t}$} \quad \Gamma, \textsf{$x : t$} ;\Delta \vdash \textsf{$E_2 : T_2$} }
+{ \Gamma ;\Delta \vdash \textsf{let ret $ (x) = E_1$ in $E_2 : T_2$}  } \and
+\inferrule [ Network - send ]
+{ \Gamma ;\Delta \vdash \textsf{$e : t$} \quad \Gamma ;\Delta \vdash \textsf{$E : T$} }
+{ \Gamma ;\Delta \vdash \textsf{send $e$ to $\ell; E : T$}  } \and
+\inferrule [ Network - rcv ]
+{ \Gamma , x : t ;\Delta \vdash \textsf{$E : T$} }
+{ \Gamma ;\Delta \vdash \textsf{receive $x$ from $\ell; E : T$}  } \and
+\inferrule [ Network - choose ]
+{\Gamma ;\Delta \vdash \textsf{$E : T$} }
+{ \Gamma ;\Delta \vdash \textsf{choose $d$ for $\ell; E : T$}  } \and
+\inferrule [ Network - allow ]
+{ \Gamma ;\Delta \vdash \textsf{$E_1 : T$} \quad \Gamma ;\Delta \vdash \textsf{$E_2 : T$} }
+{ \Gamma ;\Delta \vdash \textsf{(allow $\ell $ choice   L $\Rightarrow E_1 \; ;$  R $\Rightarrow E_2$) : $ T $} } \and
+\inferrule [ Network - pair ]
+{ \Gamma ;\Delta \vdash \textsf{$E_1 : T_1$} \quad \Gamma ;\Delta \vdash \textsf{$E_2 : T_2$} }
+{ \Gamma ;\Delta \vdash \textsf{$(E_1, E_2) : T_1 \times T_2$}  } \and
+\inferrule [ Network - fst ]
+{ \Gamma ;\Delta \vdash \textsf{$E : T_1 \times T_2$} }
+{ \Gamma ;\Delta \vdash \textsf{fst $E : T_1 $} } \and
+\inferrule [ Network - snd ]
+{ \Gamma ;\Delta \vdash \textsf{$E : T_1 \times T_2$} }
+{ \Gamma ;\Delta \vdash \textsf{snd $E : T_2 $} } \and
+\inferrule [ Network - left ]
+{ \Gamma ;\Delta \vdash \textsf{$ E_1 : T_1$} }
+{ \Gamma ;\Delta \vdash \textsf{left $E_1 : T_1 + T_2 $} } \and
+\inferrule [ Network - right ]
+{ \Gamma ;\Delta \vdash \textsf{$ E_2 : T_2$} }
+{ \Gamma ;\Delta \vdash \textsf{right $E_2 : T_1 + T_2 $} } \and
+
+\inferrule [ Network - match ]
+{ \Gamma \vdash \textsf{$ E : T_1+T_2$} \quad \Gamma;\Delta, X : T_1 \vdash  E_1 : T_3 \quad \Gamma;\Delta , Y : T_2 \vdash E_2 : T_3  }
+{ \Gamma \vdash \textsf{(match E with left X $\Rightarrow E_1$ ; right Y $\Rightarrow E_2$) : $ T_3 $} } 
+
+\end{mathpar}
+
+\subsection{Choreography}
+
+\begin{mathpar}
+\inferrule [ unit ]
+{ \; }
+{ \Gamma ; \Delta \vdash \textsf{( ) : unit} } \and
+\inferrule [ var ]
+{ \textsf{$X : \tau$} \in \Delta }
+{ \Gamma ;\Delta \vdash \textsf{$X : \tau$}  } \and
+\inferrule [ done ]
+{ \Gamma_{|\ell} \vdash \textsf{$e : t$} }
+{ \Gamma ; \Delta \vdash \textsf{$\ell.e : \ell.t $} } \and
+\inferrule [ send ]
+{ \Gamma ; \Delta \vdash C : \ell.t}
+{ \Gamma;\Delta \vdash C \leadsto \ell_2 : \ell_2.t} \and
+\inferrule [ sync ]
+{ \Gamma;\Delta \vdash C : \tau}
+{ \Gamma;\Delta \vdash \ell_1[d] \leadsto \ell_2 ; C : \tau} \and
+\inferrule [ if ]
+{ \Gamma;\Delta \vdash C_1 : \tau_1 \quad \Gamma;\Delta\vdash C_2 : \tau_2 \quad \Gamma;\Delta \vdash C_3 : \tau_2 }
+{ \Gamma;\Delta \vdash \textsf{if } C_1 \textsf{ then } C_2 \textsf{ else } C_3: T_2  } \and
+\inferrule [ def ]
+{ \Gamma;\Delta \vdash C_1 : \ell.t \quad \Gamma, \ell.x : t ;\Delta \vdash C_2 : \tau_2 }
+{ \Gamma;\Delta \vdash \textsf{let } \ell.x = C_1 \textsf{ in } C_2 : \tau_2 } \and
+\inferrule [ fun ]
+{ \Gamma ;\Delta , X : \tau_1 \vdash C : \tau_2 }
+{ \Gamma ;\Delta \vdash \textsf{fun}\; X \Rightarrow C : \tau_1 \to \tau_2  } \and
+\inferrule [ app ]
+{ \Gamma;\Delta \vdash C_1 : \tau_1 \to \tau_2 \quad \Gamma;\Delta \vdash C_2 : \tau_1 }
+{ \Gamma;\Delta \vdash C_1 C_2 : \tau_2  } \and
+\inferrule [ pair ]
+{ \Gamma ; \Delta \vdash \textsf{$C_1 : \tau_1$} \quad \Gamma ; \Delta \vdash \textsf{$C_2 : \tau_2$} }
+{ \Gamma ; \Delta \vdash \textsf{$(C_1, C_2) : \tau_1 \times \tau_2$}  } \and
+\inferrule [ fst ]
+{ \Gamma ; \Delta \vdash C : \tau_1 \times \tau_2 }
+{ \Gamma ; \Delta \vdash \textsf{fst $C : \tau_1 $} } \and
+\inferrule [ snd ]
+{ \Gamma ; \Delta \vdash \textsf{$C : \tau_1 \times \tau_2$} }
+{ \Gamma ; \Delta \vdash \textsf{snd $C : \tau_2 $} } \\
+\inferrule [ left ]
+{ \Gamma ; \Delta \vdash \textsf{$ C : \tau_1$} }
+{ \Gamma ; \Delta \vdash \textsf{left $C : \tau_1 + \tau_2 $} } \and
+\inferrule [ right ]
+{ \Gamma ; \Delta \vdash \textsf{$ C : \tau_2$} }
+{ \Gamma ; \Delta \vdash \textsf{right $C : \tau_1 + \tau_2 $} } \and
+
+\inferrule [ match ]
+{ \Gamma ; \Delta \vdash \textsf{$ C : \tau_1+\tau_2$} \quad \Gamma ; \Delta \textsf{, X : $\tau_1$} \vdash \textsf{$ C_1 : \tau_3$} \quad \Gamma ; \Delta \textsf{, Y : $\tau_2$} \vdash \textsf{$ C_2 : \tau_3$}  }
+{ \Gamma ; \Delta \vdash \textsf{(match C with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$) : $ \tau_3 $} } 
+
+\end{mathpar}
+
+\section{Theorems}
+\textbf{Theorem 1.} (\textit{Local Progress}): For every choreography $\cdot \vdash e : t$ either $  \exists \ e'.\ e \to e'$  or $e$ is a value
+  \\
+\textit{Proof.} We will start with induction on e \\
+\textbf{Case e = ()} \\
+() is a value and we are done \\ \\
+\textbf{Case e = num} \\
+num is a value and we are done \\ \\
+\textbf{Case e = $e_1$ binop $e_2$} \\
+IH1 $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
+if $e_1 \to e'_1$ then $e_1$ binop $e_2 \to e'_1$ binop $e_2$ \\
+if $e_1$ is a value, IH2 $e_2$ is either a value or $  \exists \ e'_2.\ e_2 \to e'_2 $ \\
+if $e_2$ is a value, then $e_1$ binop $e_2 \to$ a value given $e_1$ and $e_2$ are numbers \\
+if $e_2 \to e'_2$ then $e_1$ binop $e_2 \to e_1$ binop $e'_2$ \\ \\
+\textbf{Case e = let x = $e_1$ in $ e_2$}   \textbf{//doubt}\\
+IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
+if $e_1 \to e'_1$ then let x = $e_1$ in $ e_2 \to $ let x = $e'_1$ in $ e_2$\\
+if $e_1$ is a value, IH2 $e_2$ is either a value or $  \exists \ e'_2.\ e_2 \to e'_2 $ \\
+if $e_2$ is a value, let x = $e_1$ in $ e_2 \to e_2$ \\
+if $e_2 \to e'_2$ then let x = $e_1$ in $ e_2 \to e'_2[x \mapsto e_1]$ \\ \\
+\textbf{Case e = $(e_1,e_2)$} \\
+IH1 $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
+if $e_1 \to e'_1$ then $(e_1,e_2) \to (e'_1, e_2)$\\
+if $e_1$ is a value, IH2 $e_2$ is either a value or $  \exists \ e'_2.\ e_2 \to e'_2 $ \\
+if $e_2$ is a value, then $(e_1,e_2)$ is a value \\
+if $e_2 \to e'_2$ then $(e_1,e_2) \to (e_1,e'_2)$ \\ \\
+\textbf{Case e = fst $e_1$} \\
+IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
+if $e_1 \to e'_1$ then fst $e_1 \to$ fst $e'_1$\\
+if $e_1$ is a value, this means $e_1$ is a pair of values as $e_1: t_1 x t_2$
+ so if $e_1 = (v_1, v_2)$ then fst $e_1 \to$ $v_1$\\ \\
+\textbf{Case e = snd $e_1$} \\
+IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
+if $e_1 \to e'_1$ then snd $e_1 \to$ snd $e'_1$\\
+if $e_1$ is a value, this means $e_1$ is a pair of values as $e_1: t_1 x t_2$
+ so if $e_1 = (v_1, v_2)$ then snd $e_1 \to$ $v_2$\\ \\
+\textbf{Case e = left $e_1$} \\
+IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
+if $e_1 \to e'_1$ then left $e_1 \to$ left $e'_1$\\
+if $e_1$ is a value,then left $e_1$ is a value\\ \\
+\textbf{Case e = right $e_1$} \\
+IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
+if $e_1 \to e'_1$ then right $e_1 \to$ right $e'_1$\\
+if $e_1$ is a value,then right $e_1$ is a value\\ \\
+\textbf{Case e = match $e_1$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3$}   \textbf{//doubt}\\
+IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
+if $e_1 \to e'_1$ then match $e_1$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 \to $ match $e'_1$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3$\\
+if $e_1$ is a value \\ \\
+
+\textbf{Theorem 2.} (\textit{Local Preservation}): If $\Gamma \vdash e : t$ and  $e \to e'$ then $\Gamma \vdash e' : t$
+  \\
+\textit{Proof.} We will start with induction on $\Gamma \vdash e : t$ \\
+\textbf{Case $\Gamma \vdash e : unit$} \\
+ $\Gamma \vdash $ ( ) : unit. It doesn't take a step and we are done \\ \\
+\textbf{Case e = x}       \quad doubt\\ 
+$\Gamma \vdash $ x : t. It doesn't take a step and we are done \\ \\
+\textbf{Case $\Gamma \vdash e : t_1 X t_2$ } \\
+This means e = $(e_1, e_2)$ \\
+IH If $\Gamma \vdash e_1 : t_1$ and  $e_1 \to e'_1$ then $\Gamma \vdash e'_1 : t_1$ \\
+Now we know, $(e_1,e_2) \to (e'_1, e_2)$ and $\Gamma \vdash (e_1, e_2) : t_1 X t_2$ \\
+Using IH we can say $\Gamma \vdash (e'_1, e_2) : t_1 X t_2$ \\\\
+\textbf{Case $\Gamma \vdash$ fst $e : t_1$ } \\
+This means $e : t_1Xt_2$ \\
+IH If $\Gamma \vdash e : t_1Xt_2$ and  $e \to e'$ then $\Gamma \vdash e' : t_1Xt_2$ \\
+Now we know, fst $e \to$ fst $e'$ and $\Gamma \vdash$ fst $e : t_1$ \\
+Using IH we can say $\Gamma \vdash$ fst $ e' : t_1$ \\\\
+\textbf{Case $\Gamma \vdash$ snd $e : t_2$ } \\
+This means $e : t_1Xt_2$ \\
+IH If $\Gamma \vdash e : t_1Xt_2$ and  $e \to e'$ then $\Gamma \vdash e' : t_1Xt_2$ \\
+Now we know, snd $e \to$ snd $e'$ and $\Gamma \vdash$ snd $e : t_2$ \\
+Using IH we can say $\Gamma \vdash$ snd $ e' : t_2$ \\\\
+\textbf{Case $\Gamma \vdash$ left $e : t_1+t_2$ } \\
+This means $e : t_1$ \\
+IH If $\Gamma \vdash e : t_1$ and  $e \to e'$ then $\Gamma \vdash e' : t_1$ \\
+Now we know, left $e \to$ left $e'$ and $\Gamma \vdash$ left $e : t_1+t_2$ \\
+Using IH we can say $\Gamma \vdash$ left $ e' : t_1+t_2$ \\\\
+\textbf{Case $\Gamma \vdash$ right $e : t_1+t_2$ } \\
+This means $e : t_2$ \\
+IH If $\Gamma \vdash e : t_2$ and  $e \to e'$ then $\Gamma \vdash e' : t_2$ \\
+Now we know, right $e \to$ right $e'$ and $\Gamma \vdash$ right $e : t_1+t_2$ \\
+Using IH we can say $\Gamma \vdash$ right $ e' : t_1+t_2$ \\\\
+
+\textbf{Case $\Gamma \vdash$ match $e$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 : t_3$ } \\
+This means $e : t_1 + t_2$ \\
+IH If $\Gamma \vdash e : t_1+t_2$ and  $e \to e'$ then $\Gamma \vdash e' : t_1+t_2$ \\
+Now we know, match $e$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 \to$
+match $e'$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3$ and $\Gamma \vdash$ match $e$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 : t_3$ \\
+Using IH we can say $\Gamma \vdash$ match $e'$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 : t_3$ \\\\
+
+
+\section{Operational Semantics}
+\subsection{Network Language}
+\begin{mathpar}
+\textsf{fst} (E_1, E_2)  \to E_1 \and
+ \textsf{snd} (E_1, E_2)  \to E_2 \and
+\textsf{(match \ inl \ E \ with \ inl X} \Rightarrow E_1 \textsf{; inr Y} \Rightarrow E_2) \to E_1\ [X \mapsto E] \and
+\textsf{(match \ inr \ E \ with \ inl X} \Rightarrow E_1 \textsf{; inr Y} \Rightarrow E_2) \to E_2\ [Y \mapsto E]
+\end{mathpar}
+\\
+\subsection{Choreography}
+\begin{mathpar}
+\textsf{fst} (C_1, C_2)  \to C_1 \and
+ \textsf{snd} (C_1, C_2)  \to C_2 \and
+\textsf{(match \ inl \ C \ with \ inl X} \Rightarrow C_1 \textsf{; inr Y} \Rightarrow C_2) \to C_1\ [X \mapsto C] \and
+\textsf{(match \ inr \ C \ with \ inl X} \Rightarrow C_1 \textsf{; inr Y} \Rightarrow C_2) \to C_2\ [Y \mapsto C]
+\end{mathpar}
+
+\section{Glossary}
+$$
+\ell \textsf{ involved in } \tau = 
+    \begin{array}{l}
+    \ell \in locs (\tau)
+    \end{array}
+$$
+$$
+ \ell \in locs (\tau) = \textsf{ getLoc is a function that recursively traverses over } \tau \textsf{ to construct } locs (\tau)
+$$
+
+$$
+ locs (\tau) = \left\{
+    \begin{array}{ll}
+    \phi & \textsf{if } \tau = \textbf{unit}\\
+    \{\ell\} & \textsf{if } \tau = \ell.e\\
+        \textsf{getLoc } \tau_1 \cup \textsf{getLoc } \tau_2 & \textsf{if } \tau = \tau_1 \to \tau_2 \textsf{ or } \tau_1 + \tau_2 \textsf{ or } \tau_1 \times \tau_2 \\
+    \end{array}
+\right.
+$$
+
+\section{Endpoint Projection}
+
+$$
+ \llbracket     (C_1, \ C_2) \rrbracket _\ell = \left\{
+    \begin{array}{l l}
+    (\llbracket     C_1 \rrbracket _\ell ,\  \llbracket     C_2 \rrbracket _\ell)  & 
+    \textsf{if } (C_1, C_2) : \tau_1 \times \tau_2 \textsf{ and } \ell \textsf{ is involved in } C_1,  C_2, \tau_1, \ \tau_2 \\
+    \begin{array}{l}
+    \textsf{let x = } \llbracket C_1 \rrbracket _\ell \textsf{ in} \\
+    \textsf{let \_ = } \llbracket C_2 \rrbracket _\ell \textsf{ in x}
+    \end{array} & \textsf{if } (C_1, C_2) : \tau_1 \times \tau_2 \textsf{ and } \ell \textsf{ is involved in } C_1, C_2 \textsf{ and } \tau_1 \textsf{ but not in } \tau_2  \\
+    \llbracket     C_1 \rrbracket _\ell; \llbracket     C_2 \rrbracket _\ell & \textsf{if } (C_1, C_2) : \tau_1 \times \tau_2 \textsf{ and } \ell \textsf{ is involved in }  C_1 \textsf{ or }  C_2 \\ 
+    \textbf{()} & \textsf{otherwise}
+    \end{array}
+\right.
+$$
+
+$$
+ \llbracket  \textbf{fst } C \rrbracket _\ell = \left\{
+    \begin{array}{ll}
+    \textbf{fst }\llbracket     C \rrbracket _\ell & \textsf{if } C : \tau_1 \times \tau_2 \textsf{ and } \ell \textsf{ is involved in } C,  \tau_1 \textsf{ and } \tau_2\\
+    \llbracket C \rrbracket _\ell & \textsf{if } C : \tau_1 \times \tau_2 \textsf{ and } \ell \textsf{ is involved in } C  \\
+    \textbf{()} & \textsf{otherwise}
+    \end{array}
+\right.
+$$
+
+$$
+ \llbracket  \textbf{snd} C \rrbracket _\ell = \left\{
+    \begin{array}{ll}
+    \textbf{snd }\llbracket     C \rrbracket _\ell & \textsf{if } C : \tau_1 \times \tau_2 \textsf{ and } \ell \textsf{ is involved in } C,  \tau_1 \textsf{ and } \tau_2\\
+    \llbracket C \rrbracket _\ell & \textsf{if } C : \tau_1 \times \tau_2 \textsf{ and } \ell \textsf{ is involved in } C  \\
+    \textbf{()} & \textsf{otherwise}
+    \end{array}
+\right.
+$$
+
+$$
+ \llbracket  \textbf{inl } C \rrbracket _\ell = \left\{
+    \begin{array}{ll}
+    \textbf{inl }\llbracket     C \rrbracket _\ell & \textsf{if } C : \tau_1 \textsf{ and } \ell \textsf{ is involved in } C \textsf{ and } \tau_1 \\
+    \llbracket     C \rrbracket _\ell & \textsf{if } C : \tau_1 \textsf{ and } \ell \textsf{ is involved in } C \textsf{ but not in } \tau_1 \\
+    \textbf{()} & \textsf{if } C : \tau_1 \textsf{ and } \ell \textsf{ is not involved in } C \textsf{ and } \tau_1
+    \end{array}
+\right.
+$$
+
+$$
+ \llbracket  \textbf{inr } C \rrbracket _\ell = \left\{
+    \begin{array}{ll}
+    \textbf{inr }\llbracket     C \rrbracket _\ell & \textsf{if } C : \tau_2 \textsf{ and } \ell \textsf{ is involved in } C \textsf{ and } \tau_2 \\
+    \llbracket     C \rrbracket _\ell & \textsf{if } C : \tau_2 \textsf{ and } \ell \textsf{ is involved in } C \textsf{ but not in } \tau_2 \\
+    \textbf{()} & \textsf{if } C : \tau_2 \textsf{ and } \ell \textsf{ is not involved in } C \textsf{ and } \tau_2
+    \end{array}
+\right.
+$$
+
+$$\begin{array}{l}
+ \llbracket  \textbf{match } C \textbf{ in inl X } \Rightarrow C_1 \textbf{; inr Y } \Rightarrow C_2 \rrbracket _\ell\\ \\ \;\;= \left\{
+    \begin{array}{l l}
+    \textbf{match }\llbracket C \rrbracket _\ell \textbf{ in inl X } \Rightarrow \llbracket C_1 \rrbracket _\ell \textbf{; inr Y } \Rightarrow \llbracket C_2 \rrbracket _\ell & 
+    \begin{array}{l}
+    \textsf{if } C : \tau_1 + \tau_2 \textsf{ and } \ell \textsf{ is involved in} \\ \textsf{both } \tau_1 \textsf{ and }\tau_2 
+    \end{array}    \\
+    \llbracket C \rrbracket _\ell \textbf{; } \llbracket C_1 \rrbracket _\ell \sqcup \llbracket C_2 \rrbracket _\ell & 
+    \begin{array}{l}
+    \textsf{if } C : \tau_1 + \tau_2 \textsf{ and } \ell \textsf{ is involved in } \\ \tau_1 \textsf{ or } \tau_2 \textsf{ or } C
+    \end{array}    \\
+    \llbracket C_1 \rrbracket _\ell \sqcup \llbracket C_2 \rrbracket _\ell & 
+    \begin{array}{l}
+    \textsf{if } C : \tau_1 + \tau_2 \textsf{ and } \ell \textsf{ is not involved in} \\ C, \ \tau_1 \textsf{ and } \tau_2 
+    \end{array}
+    \end{array}
+\right.
+\end{array}
+$$
+
+\section{Type Projection} 
+$$
+ \llbracket  \textbf{unit} \rrbracket _\ell =
+    \begin{array}{ll}
+    \textbf{unit}
+    \end{array}
+$$
+
+$$
+ \llbracket  \ell_1 . t \rrbracket _{\ell_2} = \left\{
+    \begin{array}{ll}
+    t & \textsf{if } \ell_1 = \ell_2 \\
+    \textbf{unit} & \textsf{otherwise}
+    \end{array}
+\right.
+$$
+
+$$
+ \llbracket  \tau_1 \to \tau_2 \rrbracket _\ell = \left\{
+    \begin{array}{ll}
+    \llbracket  \tau_1 \rrbracket _\ell \to \llbracket  \tau_2 \rrbracket _\ell & \textsf{if } \ell \textsf{ is involved in } \tau_1 \textsf{ or } \tau_2 \textsf{ or both}\\
+    \textbf{unit} & \textsf{otherwise}
+    \end{array}
+\right.
+$$
+
+$$
+ \llbracket  \tau_1 + \tau_2 \rrbracket _\ell = \left\{
+    \begin{array}{ll}
+    \llbracket  \tau_1 \rrbracket_\ell + \llbracket  \tau_2 \rrbracket _\ell & \textsf{if } \ell \textsf{ is involved in } \tau_1 \textsf{ or } \tau_2 \textsf{ or both}\\
+    \textbf{unit} & \textsf{otherwise}
+    \end{array}
+\right.
+$$
+
+$$
+ \llbracket  \tau_1 \times \tau_2 \rrbracket _\ell = \left\{
+    \begin{array}{ll}
+    \llbracket  \tau_1 \rrbracket_\ell \times \llbracket  \tau_2 \rrbracket _\ell & \textsf{if } \ell \textsf{ is involved in } \tau_1 \textsf{ and } \tau_2 \\
+    \llbracket  \tau_1 \rrbracket_\ell & \textsf{if } \ell \textsf{ is involved in } \tau_1 \textsf{ but not } \tau_2 \\
+    \llbracket  \tau_2 \rrbracket_\ell & \textsf{if } \ell \textsf{ is involved in } \tau_2 \textsf{ but not } \tau_1 \\
+    \textbf{unit} & \textsf{otherwise}
+    \end{array}
+\right.
+$$
+
+\section{Lemmas}
+$$
+    \begin{array}{ll}
+    \textbf{Lemma 1 : If } \ell \textbf{ is not involved in } \tau \textbf{ then } \llbracket  \tau \rrbracket_\ell = \textbf{unit}
+    \\
+    \textbf{Proof : } \textsf{By Induction on } \tau \\
+    \\
+     \textbf{Case } \tau = \textbf{unit : } \\
+   \quad \textsf{From type projection we know, }   \llbracket 
+   \textbf{unit} \rrbracket _\ell = \textsf{unit} \\
+   \\
+   \textbf{Case } \tau = \ell.t\textbf{ : } \\
+    \quad \textsf{Here we know that, } \ell_1 \neq \ell \, \  \textsf{as } \ell \textsf{ is not involved in } \tau \\
+    \quad \textsf{so using type projection for } \llbracket 
+   \ell_1.t\rrbracket _\ell \\ \quad \textsf{we can say, }
+   \llbracket 
+   \ell_1.t\rrbracket _\ell = \textbf{unit } \\
+   \\
+   \textbf{Case } \tau = \llbracket  \tau_1 \to \tau_2 \rrbracket _\ell \textbf{: } \\
+   \quad \textsf{By IH, } \ell \textsf{ is not involved in } \tau_1 \textsf{ and } \ell \textsf{ is not involved in } \tau_2\\
+    \quad \textsf{so using type projection for } \llbracket 
+   \tau_1 \to \tau_2\rrbracket _\ell \\ \quad \textsf{we can say, }
+   \llbracket 
+   \tau_1 \to \tau_2\rrbracket _\ell = \textbf{unit } \\
+   \\
+   \textbf{Case } \tau = \llbracket  \tau_1 + \tau_2 \rrbracket _\ell \textbf{: } \\
+   \quad \textsf{By IH, } \ell \textsf{ is not involved in } \tau_1 \textsf{ and } \ell \textsf{ is not involved in } \tau_2\\
+    \quad \textsf{so using type projection for } \llbracket 
+   \tau_1 + \tau_2\rrbracket _\ell \\ \quad \textsf{we can say, }
+   \llbracket 
+   \tau_1 + \tau_2\rrbracket _\ell = \textbf{unit } \\
+   \\
+   \textbf{Case } \tau = \llbracket  \tau_1 \times \tau_2 \rrbracket _\ell \textbf{: } \\
+   \quad \textsf{By IH, } \ell \textsf{ is not involved in } \tau_1 \textsf{ and } \ell \textsf{ is not involved in } \tau_2\\
+    \quad \textsf{so using type projection for } \llbracket 
+   \tau_1 \times \tau_2\rrbracket _\ell \\ \quad \textsf{we can say, }
+   \llbracket 
+   \tau_1 * \tau_2\rrbracket _\ell = \textbf{unit } \\
+   
+    
+    \\
+    \\
+    \textbf{Lemma 2 : If } \ell \notin locs(C) \textbf{ then }\llbracket  C \rrbracket_\ell = \textbf{()}
+    \\
+    \\
+    \textbf{Lemma 3 : If } \vdash C : \tau, \textbf{ then } \vdash \llbracket  C \rrbracket_\ell : \llbracket  \tau \rrbracket_\ell
+    \end{array}
+$$
+
+
+
+\end{document}
+
+
+
+% $[\![ (C_1,\ C_2) ]\!]_\ell = ([\![ C_1]\!]_\ell ,\ [\![ C_2]\!]_\ell)$

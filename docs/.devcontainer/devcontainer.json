@@ -1,0 +1,20 @@
+{
+  "image": "docker.io/hegerdes/vscode-latex:latest",
+  "remoteUser": "latex",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "James-Yu.latex-workshop",
+        "znck.grammarly"
+      ],
+      "settings": {
+        "grammarly.files.include": [
+          "**/readme.md",
+          "**/README.md",
+          "**/*.txt",
+          "**/*.tex"
+        ]
+      }
+    }
+  }
+}
