@@ -1,10 +1,10 @@
 
-** Conflict (shift/reduce) in state 94.
+** Conflict (shift/reduce) in state 92.
 ** Tokens involved: LPAREN ID
 ** The following explanations concentrate on token LPAREN.
 ** This state is reached from program after reading:
 
-var_id COLONEQ choreo_expr2
+pattern COLONEQ choreo_expr2
 
 ** The derivations that appear below have the following common factor:
 ** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
@@ -14,21 +14,21 @@ decl_block EOF
 list(statement) 
 (?)
 
-** In state 94, looking ahead at LPAREN, reducing production
+** In state 92, looking ahead at LPAREN, reducing production
 ** choreo_expr1 -> choreo_expr2
 ** is permitted because of the following sub-derivation:
 
 statement list(statement) // lookahead token appears because list(statement) can begin with LPAREN
-var_id COLONEQ choreo_expr // lookahead token is inherited
-               choreo_expr1 // lookahead token is inherited
-               choreo_expr2 . 
+pattern COLONEQ choreo_expr // lookahead token is inherited
+                choreo_expr1 // lookahead token is inherited
+                choreo_expr2 . 
 
-** In state 94, looking ahead at LPAREN, shifting is permitted
+** In state 92, looking ahead at LPAREN, shifting is permitted
 ** because of the following sub-derivation:
 
 statement list(statement) 
-var_id COLONEQ choreo_expr 
-               choreo_expr1 TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr 
-               choreo_expr2 
-               choreo_expr2 choreo_expr3 
-                            . LPAREN RPAREN 
+pattern COLONEQ choreo_expr 
+                choreo_expr1 TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr 
+                choreo_expr2 
+                choreo_expr2 choreo_expr3 
+                             . LPAREN RPAREN 

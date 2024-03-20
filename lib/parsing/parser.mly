@@ -38,11 +38,8 @@
 %type <Ast.Local.sync_label> sync_label
 
 %nonassoc IN
-// %right ELSE
 %nonassoc VERTICAL
 %nonassoc FST SND LEFT RIGHT
-// %left TILDE_ARROW
-// %left SEMICOLON
 %right OR
 %right AND
 %left EQ NEQ LT LEQ GT GEQ
@@ -57,17 +54,15 @@
 %%
 
 program:
-  | decl_block EOF { Prog($1) }
+  | decl_block EOF { Prog $1 }
 
 decl_block:
   | list(statement) { $1 }
 
 statement:
-  | pattern COLON choreo_type                       { VarDecl ($1, $3)}
-  | TYPE var_id COLONEQ choreo_type                 { TypeDecl ($2, $4) }
-  | var_id COLONEQ choreo_expr                      { VarAssign ($1, $3) }
-  | FUN var_id list(pattern) COLONEQ choreo_expr    { FunAssign ($2, $3, $5) }
-  | loc_id DOT var_id COLONEQ choreo_expr           { LocVarAssign ($1, $3, $5) }
+  | pattern COLON choreo_type       { Decl ($1, $3)}
+  | pattern COLONEQ choreo_expr     { Assign ($1, $3) }
+  | TYPE var_id COLONEQ choreo_type { TypeDecl ($2, $4) }
 
 /* Associativity increases from expr to expr3, with each precedence level falling through to the next. */
 choreo_expr:
@@ -81,7 +76,7 @@ choreo_expr:
   | LPAREN choreo_expr COMMA choreo_expr RPAREN                                  { Pair ($2, $4) }
   | MATCH choreo_expr WITH nonempty_list(case)                                   { Match ($2, $4) }
   | loc_id LBRACKET sync_label RBRACKET TILDE_ARROW loc_id SEMICOLON choreo_expr { Sync ($1, $3, $6, $8) }
-  | choreo_expr1 TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr             { Let ([LocVarAssign ($3, $5, Send ($1, $3))], $7) }
+  | choreo_expr1 TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr             { Let ([Assign (LocPatt ($3, Var $5), Send ($1, $3))], $7) }
   | choreo_expr1                                                                 { $1 }
 
 choreo_expr1:
@@ -115,8 +110,8 @@ local_expr:
 pattern:
   | UNDERSCORE                          { Default }
   | var_id                              { Var $1 }
-  | LPAREN pattern COMMA pattern RPAREN { Pair ($2, $4) }
   | loc_id DOT local_pattern            { LocPatt ($1, $3) }
+  | LPAREN pattern COMMA pattern RPAREN { Pair ($2, $4) }
   | LEFT pattern                        { Left $2 }
   | RIGHT pattern                       { Right $2 }
   | LPAREN pattern RPAREN               { $2 }

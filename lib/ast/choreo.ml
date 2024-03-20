@@ -34,14 +34,9 @@ type choreo_expr =
   | Match of choreo_expr * (pattern * choreo_expr) list
 
 and statement =
-  (* | VarDecl of var_id * choreo_type *)
-  (* | FunDecl of var_id * choreo_type * choreo_type *)
-  (* | LocVarDecl of loc_id * var_id * loc_id * local_type *)
-  | VarDecl of pattern * choreo_type
+  | Decl of pattern * choreo_type
+  | Assign of pattern * choreo_expr
   | TypeDecl of var_id * choreo_type
-  | VarAssign of var_id * choreo_expr
-  | FunAssign of var_id * pattern list * choreo_expr
-  | LocVarAssign of loc_id * var_id * choreo_expr
 
 and decl_block = statement list
 

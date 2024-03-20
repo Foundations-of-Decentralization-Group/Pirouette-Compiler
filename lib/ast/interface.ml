@@ -3,45 +3,22 @@ open Yojson.Basic
 
 let rec dump_choreo_ast prog = dump_program prog |> pretty_to_string
 
-and dump_program (Prog statements) =
-  `Assoc [ ("decl_block", `List (List.map dump_stmt statements)) ]
+and dump_program (Prog stmts) =
+  `Assoc [ ("decl_block", `List (List.map dump_stmt stmts)) ]
 
 and dump_stmt = function
-  (* | VarDecl (VarId id, t) ->
+  | Decl (p, t) ->
       `Assoc
         [
-          ( "VarDecl",
-            `Assoc [ ("id", `String id); ("choreo_type", dump_choreo_type t) ]
-          );
-        ] *)
-  (* | FunDecl (VarId id, t1, t2) ->
-      `Assoc
-        [
-          ( "FunDecl",
-            `Assoc
-              [
-                ("id", `String id);
-                ("choreo_t1", dump_choreo_type t1);
-                ("choreo_t2", dump_choreo_type t2);
-              ] );
-        ] *)
-  (* | LocVarDecl (LocId loc1, VarId var, LocId loc2, t) ->
-      `Assoc
-        [
-          ( "LocVarDecl",
-            `Assoc
-              [
-                ("loc1", `String loc1);
-                ("var", `String var);
-                ("loc2", `String loc2);
-                ("local_type", dump_local_type t);
-              ] );
-        ] *)
-  | VarDecl (p, t) ->
-      `Assoc
-        [
-          ( "VarDecl",
+          ( "Decl",
             `Assoc [ ("pattern", dump_pattern p); ("choreo_type", dump_choreo_type t) ]
+          );
+        ]
+  | Assign (p, e) ->
+      `Assoc
+        [
+          ( "Assign",
+            `Assoc [ ("pattern", dump_pattern p); ("choreo_expr", dump_choreo_expr e) ]
           );
         ]
   | TypeDecl (VarId id, t) ->
@@ -50,35 +27,6 @@ and dump_stmt = function
           ( "TypeDecl",
             `Assoc [ ("id", `String id); ("choreo_type", dump_choreo_type t) ]
           );
-        ]
-  | VarAssign (VarId id, e) ->
-      `Assoc
-        [
-          ( "VarAssign",
-            `Assoc [ ("var", `String id); ("choreo_expr", dump_choreo_expr e) ]
-          );
-        ]
-  | FunAssign (VarId id, ps, e) ->
-      `Assoc
-        [
-          ( "FunAssign",
-            `Assoc
-              [
-                ("fun", `String id);
-                ("patterns", `List (List.map dump_pattern ps));
-                ("choreo_expr", dump_choreo_expr e);
-              ] );
-        ]
-  | LocVarAssign (LocId loc, VarId var, e) ->
-      `Assoc
-        [
-          ( "LocVarAssign",
-            `Assoc
-              [
-                ("loc", `String loc);
-                ("var", `String var);
-                ("choreo_expr", dump_choreo_expr e);
-              ] );
         ]
 
 and dump_choreo_expr = function
