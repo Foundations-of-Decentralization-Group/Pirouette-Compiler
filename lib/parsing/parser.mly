@@ -81,7 +81,7 @@ choreo_expr:
   | LPAREN choreo_expr COMMA choreo_expr RPAREN                                  { Pair ($2, $4) }
   | MATCH choreo_expr WITH nonempty_list(case)                                   { Match ($2, $4) }
   | loc_id LBRACKET sync_label RBRACKET TILDE_ARROW loc_id SEMICOLON choreo_expr { Sync ($1, $3, $6, $8) }
-  | loc_id DOT local_expr TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr    { Let ([LocVarAssign ($1, $7, Send (LocExpr($1, $3), $5))], $9) }
+  | choreo_expr1 TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr             { Let ([LocVarAssign ($3, $5, Send ($1, $3))], $7) }
   | choreo_expr1                                                                 { $1 }
 
 choreo_expr1:
@@ -119,6 +119,7 @@ pattern:
   | loc_id DOT local_pattern            { LocPatt ($1, $3) }
   | LEFT pattern                        { Left $2 }
   | RIGHT pattern                       { Right $2 }
+  | LPAREN pattern RPAREN               { $2 }
   
 local_pattern:
   | UNDERSCORE                                      { Default }
@@ -127,6 +128,7 @@ local_pattern:
   | LPAREN local_pattern COMMA local_pattern RPAREN { Pair ($2, $4) }
   | LEFT local_pattern                              { Left $2 }
   | RIGHT local_pattern                             { Right $2 }
+  | LPAREN local_pattern RPAREN                     { $2 }
 
 choreo_type:
   | UNIT_T                        { TUnit }
