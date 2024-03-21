@@ -65,21 +65,12 @@ rule read = parse
   | "snd"              { SND }
   | "left"             { LEFT }
   | "right"            { RIGHT }
-  (* | "send"          { SEND }
-  | "to"               { TO }
-  | "receive"          { RECEIVE }
-  | "from"             { FROM }
-  | "choose"           { CHOOSE }
-  | "for"              { FOR }
-  | "allow"            { ALLOW }
-  | "choice"           { CHOICE }
-  | "ret"              { RET } *)
   | integer as s       { INT (int_of_string s) }
   | identifier as s    { ID (s) }
   | '"'                { read_string (Buffer.create 17) lexbuf }
   | newline            { next_line lexbuf; read lexbuf }
-  | eof                { EOF }
   | _                  { raise (SyntaxError ("Unexpected char: " ^ Lexing.lexeme lexbuf)) }
+  | eof                { EOF }
 
 and read_string buf = parse
   | '"'       { STRING (Buffer.contents buf) }

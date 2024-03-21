@@ -59,10 +59,11 @@ program:
 decl_block:
   | list(statement) { $1 }
 
+/* TODO: Removing the need for semicolons */
 statement:
-  | pattern COLON choreo_type       { Decl ($1, $3)}
-  | pattern COLONEQ choreo_expr     { Assign ($1, $3) }
-  | TYPE var_id COLONEQ choreo_type { TypeDecl ($2, $4) }
+  | pattern COLON choreo_type SEMICOLON        { Decl ($1, $3)}
+  | pattern COLONEQ choreo_expr SEMICOLON      { Assign ($1, $3) }
+  | TYPE var_id COLONEQ choreo_type SEMICOLON? { TypeDecl ($2, $4) }
 
 /* Associativity increases from expr to expr3, with each precedence level falling through to the next. */
 choreo_expr:

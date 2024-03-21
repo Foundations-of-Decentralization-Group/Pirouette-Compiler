@@ -19,7 +19,6 @@ type choreo_expr =
   | Unit
   | Var of var_id
   | LocExpr of loc_id * local_expr
-  (* | LocSend of loc_id * local_expr * loc_id * var_id * choreo_expr *)
   | Send of choreo_expr * loc_id
   | Sync of loc_id * sync_label * loc_id * choreo_expr
   | If of choreo_expr * choreo_expr * choreo_expr
