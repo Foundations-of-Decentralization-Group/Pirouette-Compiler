@@ -7,7 +7,7 @@
 
 let whitespace = [' ' '\t']+
 let newline = '\r' | '\n' | "\r\n" 
-let string = [^ 'L' 'R' '(' ')' '\\' '.' '#' ' ' '\t' '\n' '\t' '*' '-' '/' '+' '[' ']' ';' '<' '>' '=' '\r']+
+let string = [^ 'L' 'R' '(' ')' '\\' '.' '#' ' ' '\t' '\n' '\t' '*' '-' '/' '+' '[' ']' ';' '<' '>' '=' '\r' '_']+
 let digit = ['0'-'9']
 let choreographic_vars = ['A'-'Z']
 let int = '-'? digit+

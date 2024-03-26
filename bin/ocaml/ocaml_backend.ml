@@ -4,6 +4,7 @@ open Controlang.Ctrl
 open Controlang.LocalCtrl
 open Basictypes
 open Printf
+open String
 
 
 exception InvalidProgramException of string
@@ -58,20 +59,29 @@ module Ocaml_backend(Com : Comm) : Backend = struct
           _lParen ^ codified_lft ^ _space ^ _division ^ _space ^ codified_rght ^ _rParen 
     )
 
-  let rec codify (ast: ctrl) (confMap: string list) (currentEntity: string): string = 
+  let rec codify (ast: ctrl) (confMap: (string, int) Hashtbl.t) (currentEntity: string): string = 
     match ast with
-    | ChoreoVars (Name x, typ) -> x ^ _colon ^ (ctrl_to_local_type typ "")
+    | ChoreoVars (Name x, typ) -> "_" ^ lowercase_ascii x ^ _colon ^ (ctrl_to_local_type typ "")
     | Ret (arg, _) -> codify_local arg
     | Unit -> _unit
     | Snd (arg, Location loc, thn, _) -> 
       let codified_thn = codify thn confMap currentEntity in 
       let codified_arg = codify_local arg in
-      Com.send loc currentEntity codified_arg  ^ _space ^ 
+      let typ = getLCtrlType arg in
+      (* let local_type = ctrl_to_local_type typ "" in *)
+      Com.send loc currentEntity codified_arg confMap typ ^ _space ^ 
       _in ^ _endl ^ codified_thn
     | Rcv (Variable(name, typ), Location loc, thn, _) ->
       let codified_thn = codify thn confMap currentEntity in 
       let codified_arg = codify_local (Variable(name, typ)) in
       let local_type = ctrl_to_local_type typ "" in
+      (* let rcv_code =  Com.rcv loc currentEntity codified_arg local_type in 
+      (match local_type with
+        | "int" -> "(int_of_string" ^ rcv_code ^ ")"
+        | "string" -> rcv_code
+        | "bool" -> "(bool_of_string" ^ rcv_code ^ ")"
+        | _ -> raise (InvalidProgramException "Invalid type encountered")
+      ) ^ _in ^ _space ^ _lParen ^ _endl ^ _tab ^ codified_thn ^ _rParen *)
         Com.rcv loc currentEntity codified_arg local_type ^ _space ^ _in ^ _space ^
         _lParen ^ _endl ^ _tab ^ codified_thn ^ _rParen 
     | Branch (ift, thn, el, _) -> 
@@ -83,7 +93,7 @@ module Ocaml_backend(Com : Comm) : Backend = struct
       _space ^  _lParen ^ codified_el ^ _rParen
     | Choose (Direction d, Location loc, thn, _) -> 
       let codified_thn = codify thn confMap currentEntity in
-      Com.send loc currentEntity (if d = "L" then "true" else "false")  ^ _space ^ 
+      Com.send loc currentEntity (if d = "L" then "true" else "false")  confMap "bool" ^ _space ^ 
       _in ^ _endl ^ _let ^ _space ^ _underscore ^ _space ^ _equals ^ _space ^ codified_thn ^ 
       _in ^ _space ^ _unit 
     | AllowL (_, _, _) ->
@@ -110,8 +120,7 @@ module Ocaml_backend(Com : Comm) : Backend = struct
     | Fun (Name name, ChoreoVars(ch_name, ch_typ), body, typ) ->
       let codified_arg = codify (ChoreoVars(ch_name, ch_typ)) confMap currentEntity in
       let codified_body = codify body confMap currentEntity in 
-        _let ^ _space ^ _rec ^ _space ^ name ^ _space ^ _lParen ^ codified_arg ^ _colon ^ 
-        (ctrl_to_local_type ch_typ "") ^_rParen ^ _space ^ _colon 
+        _let ^ _space ^ _rec ^ _space ^ name ^ _space ^ _lParen ^ codified_arg ^_rParen ^ _space ^ _colon 
         ^ (ctrl_to_local_type typ "snd") ^ _equals ^ _space ^ 
         _lParen ^ codified_body ^ _rParen
     (* | Calling (Name name, arg, _) -> 
@@ -146,15 +155,23 @@ module Ocaml_backend(Com : Comm) : Backend = struct
       printf "Code formatted and saved successfully.\n"
     end
 
-  let main asts confMap op_file_name =
-    let code = _threadImport ^ _commonBp ^ _lParen ^
-                Com.init confMap ^ 
-                (List.map (fun ast -> match ast with | Ast{code; prop} -> 
-                  _let ^ _space ^ prop ^ "() = " ^ 
-                  _lParen ^ codify code confMap prop ^ _rParen ^ _space ^ _in ^ _space) asts 
-                  |> String.concat "\n \n") ^ Com.exit confMap ^ _rParen in
-    (* print_endline code  *)
-    format_and_save_code code op_file_name
 
+  let main (asts : astType list ref) confMap op_file_name comm_type =
+    match comm_type with
+      | InterThread -> 
+        let code = _threadImport ^ _commonBp ^ _lParen ^
+          Com.init confMap "" ^ 
+          (List.map (fun ast -> match ast with | Ast{code; prop} -> 
+            _let ^ _space ^ prop ^ "() = " ^ 
+            _lParen ^ codify code confMap prop ^ _rParen ^ _space ^ _in ^ _space) !asts 
+            |> String.concat "\n \n") ^ Com.exit confMap ^ _rParen
+        in format_and_save_code code op_file_name
+      | Distributed -> 
+        let _ = (List.map (fun ast -> match ast with | Ast{code; prop} -> 
+          let code = _utilImport ^ _endl ^  _commonBp ^ _lParen ^ Com.init confMap prop ^ 
+           _lParen ^ codify code confMap (op_file_name ^ prop ^ ".ml") ^ _rParen ^ Com.exit confMap ^ _rParen in
+          format_and_save_code code (op_file_name ^ prop ^ ".ml")
+          (* print_endline code  *)
+          ) !asts ) in ()
 end
 

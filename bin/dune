@@ -21,21 +21,24 @@
   (libraries pirouette basictypes)
   (modules parser))
 
-(library
-  (name utils)
-  (libraries unix)
-  (modules utils))
-
 (executable
  (name main)
  (public_name main)
  (modules main)
- (libraries pirouette parser unix lexer threads.posix stdune))
+  (preprocess
+  (pps ppx_let ppx_jane))
+ (libraries pirouette parser lexer controlang ocaml_backend backend_intf ocaml_interthread ocaml_distributed core_unix.command_unix core))
 
 (executable
  (name output)
  (public_name output)
  (modules output)
+ (libraries threads.posix stdune))
+
+(executable
+ (name exec)
+ (public_name exec)
+ (modules exec)
  (libraries threads.posix stdune))
 
 (library
@@ -66,13 +69,13 @@
  (modules ocaml_interthread)
  (libraries backend_intf constants))
 
+ (library
+ (name ocaml_distributed)
+ (modules ocaml_distributed)
+ (libraries backend_intf constants))
+
 (library
  (name ocaml_backend)
  (modules ocaml_backend)
  (libraries backend_intf constants controlang basictypes ocaml_interthread))
 
-(executable
- (name exec)
- (public_name exec)
- (modules exec)
- (libraries ocaml_backend backend_intf utils ocaml_interthread))

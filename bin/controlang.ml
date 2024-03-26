@@ -36,6 +36,20 @@ module LocalCtrl = struct
     | StringType -> String
     | BoolType -> Bool
 
+  let get_ctrlTypeToLCtrlType (typ : ctrlType) : string =
+    match typ with
+    | Int -> "int"
+    | String -> "string"
+    | Bool -> "bool"
+    | _ -> ""
+  
+  let getLCtrlType = function
+  | STRING _ -> "string"
+  | BOOL _ -> "bool"
+  | Variable (_, typ) -> get_ctrlTypeToLCtrlType typ
+  | Condition (_, _, _, typ) -> get_ctrlTypeToLCtrlType typ
+  | _ -> "int" 
+
   let rec lexpr_to_lctrl (expr_ast: l_expr) : l_ctrl option =
     match expr_ast with
     | INT x -> Some (INT x)
@@ -259,6 +273,20 @@ module Ctrl = struct
           -> Some (Rcv (parsed_bndr_arg, loc, parsed_thn, (get_ctrlGType thn_typ)))
         | Some parsed_thn, _, _ when rcvr != currentNode && currentNode != loc -> Some parsed_thn
         | _ -> None)
+
+      (* Sender is choreovar X~>p2.x*)
+    (* | Let (_, bndr_arg, Snd (ChoreoVars (Name name, Some _), rcvr, Some _), thn, Some thn_typ)->
+      let parsed_thn = expr_to_ctrl thn currentNode in
+      let parsed_bndr_arg = lexpr_to_lctrl bndr_arg in
+      let parsed_arg_snd = lexpr_to_lctrl arg_snd in
+      (match parsed_thn, parsed_bndr_arg, parsed_arg_snd with
+        | Some parsed_thn, Some _, Some parsed_arg_snd when rcvr != currentNode && currentNode = loc
+          -> Some (Snd (parsed_arg_snd, rcvr, parsed_thn, (get_ctrlGType thn_typ)))
+        | Some parsed_thn, Some parsed_bndr_arg, Some _ when rcvr = currentNode && currentNode != loc 
+          -> Some (Rcv (parsed_bndr_arg, loc, parsed_thn, (get_ctrlGType thn_typ)))
+        | Some parsed_thn, _, _ when rcvr != currentNode && currentNode != loc -> Some parsed_thn
+        | _ -> None) *)
+
   
     | Let (loc, Variable(var_name, Some var_typ), snd, thn, Some typ) ->
       (match expr_to_ctrl (Assoc(loc, Variable(var_name, Some var_typ), Some (DotType(loc, var_typ)))) currentNode, expr_to_ctrl snd currentNode, expr_to_ctrl thn currentNode with
@@ -277,7 +305,7 @@ module Ctrl = struct
         | Some parsed_body, Some _ when loc != currentNode ->
           Some (Fun {name ; arg = ChoreoVars (get_fresh_cname()); body = parsed_body})
         | _ -> None) *)
-    | FunG (name, arg, body, Some typ) -> 
+    | Fun (name, arg, body, Some typ) -> 
       (match expr_to_ctrl arg currentNode, expr_to_ctrl body currentNode with
         | Some argument, Some parsed_body -> Some (Fun (name, argument, parsed_body, (get_ctrlGType typ)))
         | _ -> None)

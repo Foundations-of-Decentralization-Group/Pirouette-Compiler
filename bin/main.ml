@@ -1,29 +1,139 @@
 open Lexing
 open Pirouette.Expr
+open Basictypes
+open Controlang.Ctrl
+open Backend_intf
+open Ocaml_interthread
+open Ocaml_distributed
+open Ocaml_backend
+open Core
+open Stdlib
 
-let loop lexer =
-  flush stdout;
-  match Parser.prog Lexer.read lexer with
-    | Some t ->
-        Printf.printf "%s\n\n" (show_expr t)
-    | None -> Printf.printf "Couldnt resolve !\n\n"
+
+exception InvalidProgramException of string
+exception EndPointProjectionFailedException of string
+
+
+let result_list : astType list ref = ref []
+
+let base_dir = "bin/"
+
+type language =
+  | OCaml
+
+let extract_before_dot input_string =
+  try
+    let dot_index = String.index input_string '.' in
+    String.sub input_string 0 dot_index
+  with Not_found -> input_string 
+;; 
+
+let getLang (lang_name: string): language = 
+  match lang_name with
+    | "ocaml" -> OCaml
+    | _ -> raise (InvalidProgramException "Invalid Program construct encountered")
+
+let getCommMedium (comm_medium: string) = 
+  match comm_medium with
+    | "inter-thread" -> InterThread
+    | "distributed" -> Distributed
+    | _ -> raise (InvalidProgramException "Invalid Program construct encountered")
+
+(* let read_config_file (filename : string) : string list =
+  let config_list = ref [] in
+  let in_channel = Core.In_channel.create filename in
+  try
+    while true do
+      match Core.In_channel.input_line in_channel with
+      | Some line ->
+          let key = String.trim line in
+          config_list := key :: !config_list
+      | None -> raise End_of_file
+    done;
+    !config_list
+  with
+  | End_of_file ->
+      Core.In_channel.close in_channel;
+      List.rev !config_list *)
+
+let read_config_file (filename : string) : (string, int) Hashtbl.t =
+  let config_table = Hashtbl.create 10 in
+  let in_channel = open_in filename in
+  try
+    while true do
+      let line = input_line in_channel in
+      match String.split_on_char '=' line with
+      | [ key; value ] ->
+          let key = String.trim key in
+          let value = int_of_string (String.trim value) in
+          Hashtbl.add config_table key value
+      | _ -> failwith ("Invalid line: " ^ line)
+    done;
+    config_table
+  with
+  | End_of_file ->
+      close_in in_channel;
+      config_table
+  | exn ->
+      close_in_noerr in_channel;
+      raise exn
+      
+
+let operation lang ctrl_ast process_impl output_file = 
+  let extracted_file_name = extract_before_dot output_file in
+  let confMap = read_config_file "config.conf" in
+  match lang, process_impl with
+      | OCaml, InterThread -> 
+        let module Ocaml_InterThread = Ocaml_backend(Ocaml_interthread) in
+        let output_file_name = base_dir ^ "ocaml/" ^ extracted_file_name ^ Ocaml_InterThread.ext  in
+        Ocaml_InterThread.main ctrl_ast confMap output_file_name InterThread
+      | OCaml, Distributed -> 
+        let module Ocaml_Distributed = Ocaml_backend(Ocaml_distributed) in
+        let output_file_ext = base_dir ^ "ocaml/"  in
+        Ocaml_Distributed.main ctrl_ast confMap output_file_ext Distributed
 
 let read_file file_name =
-  let in_channel = open_in file_name in
+  let in_channel = In_channel.create file_name in
   let rec read_lines acc =
-    try
-      let line = input_line in_channel in
-      read_lines (line :: acc)
-    with End_of_file ->
-      close_in in_channel;
-      List.rev acc
+    match In_channel.input_line in_channel with
+    | Some line -> read_lines (line :: acc)
+    | None ->
+        In_channel.close in_channel;
+        List.rev acc
   in
   read_lines []
 
-let () =
-  let file_name = "./input.txt" in
-  let lines = read_file file_name in
-  let content = String.concat "\n" lines in
-  let lexer = from_string content in
-  (* print_endline content; *)
-  loop lexer
+  let () =
+  Command_unix.run ~version:"1.0" ~build_info:"RWO" 
+    (Command.basic
+       ~summary:"Process and manipulate data."
+       (let open Command.Let_syntax in
+        let%map_open language = anon ("language" %: string)
+        and comm_type = anon ("comm_type" %: string)
+        and _file_name = anon ("file_name" %: string)
+        and _config_file = anon ("config_file" %: string)
+        and _output_file = anon ("output_file" %: string) in
+        fun () ->
+          let lines = read_file _file_name in
+          let content = String.concat "\n" lines in
+          let lexer = from_string content in
+          match Parser.prog Lexer.read lexer with
+          | Some t ->
+            (match type_check t ImmutableMap.empty ChoreoMap.empty with
+              | GTcast(_, Some ast) ->
+                let entities : LocationSet.t = get_entitities ast in
+                LocationSet.iter (fun entity -> 
+                  let res = expr_to_ctrl ast entity in
+                  let Location str_entity = entity in
+                  let r = match res with
+                    | Some res -> res
+                    | None -> raise (EndPointProjectionFailedException "EPP Failed")
+                  in
+                  result_list := Ast{code = r; prop = str_entity} :: !result_list
+                ) entities;
+                operation (getLang language) result_list (getCommMedium comm_type) _output_file
+              | _ -> raise (TypeCheckingFailedException "Typechecking Failed"))
+          | None -> Printf.printf "Couldnt resolve !\n\n"
+       )
+    )
+
