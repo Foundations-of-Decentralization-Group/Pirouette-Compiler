@@ -1,7 +1,7 @@
 (lang dune 3.14)
 (using menhir 3.0)
 
-(name pirouette)
+(name pirc)
 
 (generate_opam_files true)
 
@@ -17,7 +17,7 @@
 (documentation https://url/to/documentation)
 
 (package
- (name pirouette)
+ (name pirc)
  (synopsis "A short synopsis")
  (description "A longer description")
  (depends ocaml dune ocamllex menhir ounit2 yojson)
