@@ -5,15 +5,10 @@
     "vscode": {
       "extensions": [
         "James-Yu.latex-workshop",
-        "znck.grammarly"
+        "valentjn.vscode-ltex"
       ],
       "settings": {
-        "grammarly.files.include": [
-          "**/readme.md",
-          "**/README.md",
-          "**/*.txt",
-          "**/*.tex"
-        ]
+        "latex-workshop.latex.autoClean.run": "onBuilt"
       }
     }
   }
