@@ -1,1 +1,0 @@
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Foundations-of-Decentralization-Group/Pirouette-Compiler/tree/document?quickstart=1)
