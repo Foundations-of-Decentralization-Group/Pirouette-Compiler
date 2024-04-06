@@ -1,9 +1,4 @@
-open Choreo
-open Yojson.Basic
-
-let rec dump_choreo_ast prog = dump_program prog |> pretty_to_string
-
-and dump_program (Prog stmts) =
+let rec dump_decl_block (stmts: Choreo.decl_block) =
   `Assoc [ ("decl_block", `List (List.map dump_stmt stmts)) ]
 
 and dump_stmt = function
@@ -11,14 +6,14 @@ and dump_stmt = function
       `Assoc
         [
           ( "Decl",
-            `Assoc [ ("pattern", dump_pattern p); ("choreo_type", dump_choreo_type t) ]
+            `Assoc [ ("choreo_pattern", dump_choreo_pattern p); ("choreo_type", dump_choreo_type t) ]
           );
         ]
   | Assign (p, e) ->
       `Assoc
         [
           ( "Assign",
-            `Assoc [ ("pattern", dump_pattern p); ("choreo_expr", dump_choreo_expr e) ]
+            `Assoc [ ("choreo_pattern", dump_choreo_pattern p); ("choreo_expr", dump_choreo_expr e) ]
           );
         ]
   | TypeDecl (VarId id, t) ->
@@ -113,7 +108,7 @@ and dump_choreo_expr = function
             `Assoc
               [
                 ("choreo_expr", dump_choreo_expr e);
-                ("cases", `List (List.map dump_case cases));
+                ("cases", `List (List.map dump_choreo_case cases));
               ] );
         ]
 
@@ -166,22 +161,22 @@ and dump_local_expr = function
               ] );
         ]
 
-and dump_case (p, e) =
-  `Assoc [ ("pattern", dump_pattern p); ("choreo_expr", dump_choreo_expr e) ]
+and dump_choreo_case (p, e) =
+  `Assoc [ ("choreo_pattern", dump_choreo_pattern p); ("choreo_expr", dump_choreo_expr e) ]
 
 and dump_local_case (p, e) =
   `Assoc [ ("local_patt", dump_local_pattern p); ("local_expr", dump_local_expr e) ]
 
-and dump_pattern = function
+and dump_choreo_pattern = function
   | Default -> `String "Default"
   | Var (VarId id) ->
       `Assoc [ ("Var", `String id) ]
   | Left p ->
-      `Assoc [ ("Left", dump_pattern p) ]
+      `Assoc [ ("Left", dump_choreo_pattern p) ]
   | Right p ->
-      `Assoc [ ("Right", dump_pattern p) ]
+      `Assoc [ ("Right", dump_choreo_pattern p) ]
   | Pair (p1, p2) ->
-      `Assoc [ ("Pair", `List [ dump_pattern p1; dump_pattern p2 ]) ]
+      `Assoc [ ("Pair", `List [ dump_choreo_pattern p1; dump_choreo_pattern p2 ]) ]
   | LocPatt (LocId loc, p) ->
       `Assoc
         [
@@ -246,3 +241,5 @@ and dump_bin_op = function
   | Leq   -> `String "Leq"
   | Gt    -> `String "Gt"
   | Geq   -> `String "Geq"
+
+let dump_choreo_ast (Choreo.Prog prog) = dump_decl_block prog |> Yojson.Basic.pretty_to_string

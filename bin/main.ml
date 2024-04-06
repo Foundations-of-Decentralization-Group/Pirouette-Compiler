@@ -1,4 +1,4 @@
-open Ast.Interface
+open Ast.Dump
 open Parsing.Interface
 
 let () =

@@ -24,13 +24,13 @@
 
 %type <Ast.Choreo.program> program
 %type <Ast.Choreo.decl_block> decl_block
-%type <Ast.Choreo.statement> statement
-%type <Ast.Choreo.choreo_expr> choreo_expr
-%type <Ast.Choreo.pattern> pattern
-%type <Ast.Choreo.choreo_type> choreo_type
-%type <Ast.Local.local_expr> local_expr
-%type <Ast.Local.local_pattern> local_pattern
-%type <Ast.Local.local_type> local_type
+%type <Ast.Choreo.stmt> stmt
+%type <Ast.Choreo.expr> choreo_expr
+%type <Ast.Choreo.pattern> choreo_pattern
+%type <Ast.Choreo.typ> choreo_type
+%type <Ast.Local.expr> local_expr
+%type <Ast.Local.pattern> local_pattern
+%type <Ast.Local.typ> local_type
 %type <Ast.Local.bin_op> bin_op
 %type <Ast.Local.value> value
 %type <Ast.Local.loc_id> loc_id
@@ -57,13 +57,13 @@ program:
   | decl_block EOF { Prog $1 }
 
 decl_block:
-  | list(statement) { $1 }
+  | list(stmt) { $1 }
 
 /* TODO: Removing the need for semicolons */
-statement:
-  | pattern COLON choreo_type SEMICOLON        { Decl ($1, $3)}
-  | pattern COLONEQ choreo_expr SEMICOLON      { Assign ($1, $3) }
-  | TYPE var_id COLONEQ choreo_type SEMICOLON? { TypeDecl ($2, $4) }
+stmt:
+  | choreo_pattern COLON choreo_type SEMICOLON        { Decl ($1, $3)}
+  | choreo_pattern COLONEQ choreo_expr SEMICOLON      { Assign ($1, $3) }
+  | TYPE var_id COLONEQ choreo_type SEMICOLON?        { TypeDecl ($2, $4) }
 
 /* Associativity increases from expr to expr3, with each precedence level falling through to the next. */
 choreo_expr:
@@ -75,7 +75,7 @@ choreo_expr:
   | LEFT choreo_expr                                                             { Left $2 }
   | RIGHT choreo_expr                                                            { Right $2 }
   | LPAREN choreo_expr COMMA choreo_expr RPAREN                                  { Pair ($2, $4) }
-  | MATCH choreo_expr WITH nonempty_list(case)                                   { Match ($2, $4) }
+  | MATCH choreo_expr WITH nonempty_list(choreo_case)                            { Match ($2, $4) }
   | loc_id LBRACKET sync_label RBRACKET TILDE_ARROW loc_id SEMICOLON choreo_expr { Sync ($1, $3, $6, $8) }
   | choreo_expr1 TILDE_ARROW loc_id DOT var_id SEMICOLON choreo_expr             { Let ([Assign (LocPatt ($3, Var $5), Send ($1, $3))], $7) }
   | choreo_expr1                                                                 { $1 }
@@ -108,14 +108,14 @@ local_expr:
   | MATCH local_expr WITH nonempty_list(local_case) { Match ($2, $4) }
   | LPAREN local_expr RPAREN                        { $2 }
 
-pattern:
-  | UNDERSCORE                          { Default }
-  | var_id                              { Var $1 }
-  | loc_id DOT local_pattern            { LocPatt ($1, $3) }
-  | LPAREN pattern COMMA pattern RPAREN { Pair ($2, $4) }
-  | LEFT pattern                        { Left $2 }
-  | RIGHT pattern                       { Right $2 }
-  | LPAREN pattern RPAREN               { $2 }
+choreo_pattern:
+  | UNDERSCORE                                 { Default }
+  | var_id                                     { Var $1 }
+  | loc_id DOT local_pattern                   { LocPatt ($1, $3) }
+  | LPAREN choreo_pattern COMMA choreo_pattern RPAREN { Pair ($2, $4) }
+  | LEFT choreo_pattern                        { Left $2 }
+  | RIGHT choreo_pattern                       { Right $2 }
+  | LPAREN choreo_pattern RPAREN               { $2 }
   
 local_pattern:
   | UNDERSCORE                                      { Default }
@@ -158,11 +158,11 @@ value:
   | TRUE   { `Bool true }
   | FALSE  { `Bool false }
 
-%inline case:
-  | VERTICAL pattern ARROW choreo_expr1     { ($2, $4) }
+%inline choreo_case:
+  | VERTICAL choreo_pattern ARROW choreo_expr1 { ($2, $4) }
 
 %inline local_case:
-  | VERTICAL local_pattern ARROW local_expr { ($2, $4) }
+  | VERTICAL local_pattern ARROW local_expr    { ($2, $4) }
 
 %inline bin_op:
   | PLUS  { Plus }
