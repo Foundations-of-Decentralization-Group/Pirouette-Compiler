@@ -31,8 +31,8 @@
     \alternative{\mathbf{()}}
     \alternative{X}
     \alternative{\ell . e}
-    \alternative{\ell_1 . e \leadsto \ell_2; \ C }    
-    \alternative{\textbf{if } \ell . e \textbf{ then } C_1 \textbf{ else } C_2}
+    \alternative{C \leadsto \ell}    
+    \alternative{\textbf{if } C \textbf{ then } C_1 \textbf{ else } C_2}
     \\
     \alternative{\ell_1 [d] \leadsto \ell_2  ; \ C }  
     \alternative{ \textbf{let } \ell . x \Coloneqq C_1 \textbf{ in } C_2}
@@ -259,9 +259,9 @@
 \end{mathpar}
 
 \section{Theorems}
-\textbf{Theorem 1.} (\textit{Local Progress}): For every choreography $\cdot \vdash e : t$ either $  \exists \ e'.\ e \to e'$  or $e$ is a value
+\textbf{Theorem 1.} (\textit{Local Progress}): For every expression $\cdot \vdash e : t$ either $  \exists \ e'.\ e \to e'$  or $e$ is a value
   \\
-\textit{Proof.} We will start with induction on e \\
+\textit{Proof.} We will start with induction on e \\\\
 \textbf{Case e = ()} \\
 () is a value and we are done \\ \\
 \textbf{Case e = num} \\
@@ -272,12 +272,6 @@ if $e_1 \to e'_1$ then $e_1$ binop $e_2 \to e'_1$ binop $e_2$ \\
 if $e_1$ is a value, IH2 $e_2$ is either a value or $  \exists \ e'_2.\ e_2 \to e'_2 $ \\
 if $e_2$ is a value, then $e_1$ binop $e_2 \to$ a value given $e_1$ and $e_2$ are numbers \\
 if $e_2 \to e'_2$ then $e_1$ binop $e_2 \to e_1$ binop $e'_2$ \\ \\
-\textbf{Case e = let x = $e_1$ in $ e_2$}   \textbf{//doubt}\\
-IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
-if $e_1 \to e'_1$ then let x = $e_1$ in $ e_2 \to $ let x = $e'_1$ in $ e_2$\\
-if $e_1$ is a value, IH2 $e_2$ is either a value or $  \exists \ e'_2.\ e_2 \to e'_2 $ \\
-if $e_2$ is a value, let x = $e_1$ in $ e_2 \to e_2$ \\
-if $e_2 \to e'_2$ then let x = $e_1$ in $ e_2 \to e'_2[x \mapsto e_1]$ \\ \\
 \textbf{Case e = $(e_1,e_2)$} \\
 IH1 $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
 if $e_1 \to e'_1$ then $(e_1,e_2) \to (e'_1, e_2)$\\
@@ -302,18 +296,15 @@ if $e_1$ is a value,then left $e_1$ is a value\\ \\
 IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
 if $e_1 \to e'_1$ then right $e_1 \to$ right $e'_1$\\
 if $e_1$ is a value,then right $e_1$ is a value\\ \\
-\textbf{Case e = match $e_1$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3$}   \textbf{//doubt}\\
-IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
-if $e_1 \to e'_1$ then match $e_1$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 \to $ match $e'_1$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3$\\
-if $e_1$ is a value \\ \\
+
 
 \textbf{Theorem 2.} (\textit{Local Preservation}): If $\Gamma \vdash e : t$ and  $e \to e'$ then $\Gamma \vdash e' : t$
   \\
-\textit{Proof.} We will start with induction on $\Gamma \vdash e : t$ \\
+\textit{Proof.} We will start with induction on $\Gamma \vdash e : t$ \\\\
 \textbf{Case $\Gamma \vdash e : unit$} \\
- $\Gamma \vdash $ ( ) : unit. It doesn't take a step and we are done \\ \\
-\textbf{Case e = x}       \quad doubt\\ 
-$\Gamma \vdash $ x : t. It doesn't take a step and we are done \\ \\
+ $\Gamma \vdash $ ( ) : unit. () doesn't take a step and we are done \\ \\
+\textbf{Case x : t}      \\ 
+$\Gamma \vdash $ x : t. x doesn't take a step and we are done \\ \\
 \textbf{Case $\Gamma \vdash e : t_1 X t_2$ } \\
 This means e = $(e_1, e_2)$ \\
 IH If $\Gamma \vdash e_1 : t_1$ and  $e_1 \to e'_1$ then $\Gamma \vdash e'_1 : t_1$ \\
@@ -338,14 +329,102 @@ Using IH we can say $\Gamma \vdash$ left $ e' : t_1+t_2$ \\\\
 This means $e : t_2$ \\
 IH If $\Gamma \vdash e : t_2$ and  $e \to e'$ then $\Gamma \vdash e' : t_2$ \\
 Now we know, right $e \to$ right $e'$ and $\Gamma \vdash$ right $e : t_1+t_2$ \\
-Using IH we can say $\Gamma \vdash$ right $ e' : t_1+t_2$ \\\\
-
-\textbf{Case $\Gamma \vdash$ match $e$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 : t_3$ } \\
+Using IH we can say $\Gamma \vdash$ right $ e' : t_1+t_2$ \\
+\\
+\textbf{Case $\Gamma; x: t_1, y: t_2 \vdash$ match $e$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 : t_3$ } \\
 This means $e : t_1 + t_2$ \\
 IH If $\Gamma \vdash e : t_1+t_2$ and  $e \to e'$ then $\Gamma \vdash e' : t_1+t_2$ \\
 Now we know, match $e$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 \to$
 match $e'$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3$ and $\Gamma \vdash$ match $e$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 : t_3$ \\
-Using IH we can say $\Gamma \vdash$ match $e'$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 : t_3$ \\\\
+Using IH we can say $\Gamma \vdash$ match $e'$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 : t_3$ 
+\\\\
+\\
+\textbf{Theorem 3.} (\textit{Progress}): For every choreography $\cdot \vdash C : \tau$ either $  \exists \ C'.\ C \to C'$  or $C$ is a value
+  \\
+\textit{Proof.} We will start with induction on C \\\\
+\textbf{Case C = ()} \\
+() is a value and we are done \\ \\
+\textbf{Case C = $\ell.e$} \\
+we know from local progress, e is either a value or $ \exists \ e'.\ e \to e'$  \\
+So, if e is a value, $\ell.e$ is a value and we are done \\
+If $ \exists \ e'.\ e \to e'$ then, $ \ell. e \to \ell.e'$
+\\ \\
+\textbf{Case C = $C_1 \leadsto \ell$} \\
+IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to C'_1 $ \\
+if $C_1 \to C'_1$ then $C_1 \leadsto \ell \to C'_1 \leadsto \ell$ \\
+if $C_1$ is a value,  \textbf{//doubt} 
+\\
+\textbf{Case C = if $C_1$ then $C_2$ else $C_3$} \\
+\\
+\textbf{Case C = $(C_1,C_2)$} \\
+IH1 $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to C'_1 $ \\
+if $C_1 \to C'_1$ then $(C_1,C_2) \to (C'_1, C_2)$\\
+if $C_1$ is a value, IH2 $C_2$ is either a value or $  \exists \ C'_2.\ C_2 \to C'_2 $ \\
+if $C_2$ is a value, then $(C_1,C_2)$ is a value \\
+if $C_2 \to C'_2$ then $(C_1,C_2) \to (C_1,C'_2)$ \\ \\
+\textbf{Case C = fst $C_1$} \\
+IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to C'_1 $ \\
+if $C_1 \to C'_1$ then fst $C_1 \to$ fst $C'_1$\\
+if $C_1$ is a value, this means $C_1$ is a pair of values as $C_1: \tau_1$ x $\tau_2$
+ so if $C_1 = (v_1, v_2)$ then fst $C_1 \to$ $v_1$\\ \\
+\textbf{Case C = snd $C_1$} \\
+IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to C'_1 $ \\
+if $C_1 \to C'_1$ then snd $C_1 \to$ snd $C'_1$\\
+if $C_1$ is a value, this means $C_1$ is a pair of values as $C_1: \tau_1$ x $\tau_2$
+ so if $C_1 = (v_1, v_2)$ then snd $C_1 \to$ $v_2$\\ \\
+\textbf{Case C = left $C_1$} \\
+IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to C'_1 $ \\
+if $C_1 \to C'_1$ then left $C_1 \to$ left $C'_1$\\
+if $C_1$ is a value,then left $C_1$ is a value\\ \\
+\textbf{Case C = right $C_1$} \\
+IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to C'_1 $ \\
+if $C_1 \to C'_1$ then right $C_1 \to$ right $C'_1$\\
+if $C_1$ is a value,then right $C_1$ is a value\\ \\
+\\
+\textbf{Theorem 4.} (\textit{Preservation}): If $\Gamma;\Delta \vdash C : \tau$ and  $C \to C'$ then $\Gamma;\Delta \vdash C' : \tau$
+  \\
+\textit{Proof.} We will start with induction on $\Gamma;\Delta \vdash C : \tau$ \\ \\
+\textbf{Case $\Gamma; \Delta \vdash C : unit$} \\
+ $\Gamma; \Delta \vdash $ ( ) : unit. () doesn't take a step and we are done \\ \\
+\textbf{Case $\Gamma; \Delta \vdash X : \tau$}       \\ 
+$\Gamma; \Delta \vdash X : \tau$. X doesn't take a step and we are done \\ \\
+\textbf{Case $\Gamma; \Delta \vdash C : \ell.t$}       \\ 
+This means C = $\ell.e$ \\
+Using local preservation we can say that, if $\Gamma \vdash e : t$ and  $e \to e'$ then $\Gamma \vdash e' : t$
+Now we know, $\ell.e \to \ell.e'$ and $\Gamma; \Delta; \Delta \vdash C : \ell.t$  \\
+Using local preservation, $\Gamma;\Delta \vdash C' : \ell.t$ where $C' = \ell.e'$
+\\ \\
+\textbf{Case $\Gamma;\Delta \vdash C : \tau_1 $ x $ \tau_2$ } \\
+This means C = $(C_1, C_2)$ \\
+IH If $\Gamma; \Delta \vdash C_1 : \tau_1$ and  $C_1 \to C'_1$ then $\Gamma;\Delta \vdash C'_1 : \tau_1$ \\
+Now we know, $(C_1,C_2) \to (C'_1, C_2)$ and $\Gamma; \Delta \vdash (C_1, C_2) : \tau_1$ x $\tau_2$ \\
+Using IH we can say $\Gamma;\Delta \vdash (C'_1, C_2) : \tau_1$ x $ \tau_2$ \\\\
+\textbf{Case $\Gamma; \Delta\vdash$ fst $C : \tau_1$ } \\
+This means $C : \tau_1$ x $\tau_2$ \\
+IH If $\Gamma; \Delta \vdash C : \tau_1$ x $\tau_2$ and  $C \to c'$ then $\Gamma; \Delta \vdash C' : \tau_1$ x $\tau_2$ \\
+Now we know, fst $C \to$ fst $C'$ and $\Gamma;\Delta \vdash$ fst $C : \tau_1$ \\
+Using IH we can say $\Gamma; \Delta \vdash$ fst $ C' : \tau_1$ \\\\
+\textbf{Case $\Gamma; \Delta \vdash$ snd $C : \tau_2$ } \\
+This means $C : \tau_1$ x $\tau_2$ \\
+IH If $\Gamma; \Delta \vdash C : \tau_1$ x $\tau_2$ and  $C \to C'$ then $\Gamma; \Delta \vdash C' : \tau_1$ x $\tau_2$ \\
+Now we know, snd $C \to$ snd $C'$ and $\Gamma; \Delta \vdash$ snd $C : \tau_2$ \\
+Using IH we can say $\Gamma; \Delta \vdash$ snd $ C' : \tau_2$ \\\\
+\textbf{Case $\Gamma; \Delta \vdash$ left $C : \tau_1+\tau_2$ } \\
+This means $C : \tau_1$ \\
+IH If $\Gamma; \Delta \vdash C : \tau_1$ and  $C \to C'$ then $\Gamma;\Delta \vdash C' : \tau_1$ \\
+Now we know, left $C \to$ left $C'$ and $\Gamma; \Delta \vdash$ left $C : \tau_1+\tau_2$ \\
+Using IH we can say $\Gamma; \Delta \vdash$ left $ C' : \tau_1+\tau_2$ \\\\
+\textbf{Case $\Gamma; \Delta \vdash$ right $C : \tau_1+\tau_2$ } \\
+This means $C : \tau_2$ \\
+IH If $\Gamma; \Delta \vdash C : \tau_2$ and  $C \to C'$ then $\Gamma; \Delta \vdash C' : \tau_2$ \\
+Now we know, right $C \to$ right $C'$ and $\Gamma; \Delta \vdash$ right $C : \tau_1+\tau_2$ \\
+Using IH we can say $\Gamma;\Delta \vdash$ right $ C' : \tau_1+\tau_2$ \\\\
+\textbf{Case $\Gamma;\Delta \vdash$ match $C$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3 : \tau_3$ } \\
+This means $C : \tau_1 + \tau_2$ \\
+IH If $\Gamma;\Delta \vdash C : \tau_1+\tau_2$ and  $C \to C'$ then $\Gamma; \Delta \vdash C' : \tau_1+\tau_2$ \\
+Now we know, match $C$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3 \to$
+match $C'$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3$ and $\Gamma; \Delta \vdash$ match $C$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3 : \tau_3$ \\
+Using IH we can say, $\Gamma; \Delta \vdash$ match $C'$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3 : \tau_3$ \\\\
 
 
 \section{Operational Semantics}
@@ -561,7 +640,3 @@ $$
 
 
 \end{document}
-
-
-
-% $[\![ (C_1,\ C_2) ]\!]_\ell = ([\![ C_1]\!]_\ell ,\ [\![ C_2]\!]_\ell)$

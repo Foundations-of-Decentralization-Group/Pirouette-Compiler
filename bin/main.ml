@@ -3,7 +3,7 @@ open Parsing.Interface
 
 let () =
   if Array.length Sys.argv < 2 then (
-    print_endline "Usage: <executable> <sourcefile>";
+    print_endline "USAGE: pirc <file>";
     exit 1)
   else
     let filename = Sys.argv.(1) in
