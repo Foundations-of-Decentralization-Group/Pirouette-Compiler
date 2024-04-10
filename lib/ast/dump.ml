@@ -1,5 +1,5 @@
-let rec dump_decl_block (stmts: Choreo.decl_block) =
-  `Assoc [ ("decl_block", `List (List.map dump_stmt stmts)) ]
+let rec dump_stmt_block (stmts: Choreo.stmt_block) =
+  `Assoc [ ("stmt_block", `List (List.map dump_stmt stmts)) ]
 
 and dump_stmt = function
   | Decl (p, t) ->
@@ -16,7 +16,7 @@ and dump_stmt = function
             `Assoc [ ("choreo_pattern", dump_choreo_pattern p); ("choreo_expr", dump_choreo_expr e) ]
           );
         ]
-  | TypeDecl (VarId id, t) ->
+  | TypeDecl (TypId id, t) ->
       `Assoc
         [
           ( "TypeDecl",
@@ -75,21 +75,21 @@ and dump_choreo_expr = function
                 ("else", dump_choreo_expr e3);
               ] );
         ]
-  | Let (decl_block, e) ->
+  | Let (stmts, e) ->
       `Assoc
         [
           ( "Let",
             `Assoc
               [
-                ("decl_block", `List (List.map dump_stmt decl_block));
+                ("stmt_block", `List (List.map dump_stmt stmts));
                 ("choreo_expr", dump_choreo_expr e);
               ] );
         ]
-  | FunDef (VarId id, e) ->
+  | FunDef (p, e) ->
       `Assoc
         [
           ( "FunDef",
-            `Assoc [ ("id", `String id); ("choreo_expr", dump_choreo_expr e) ]
+            `Assoc [ ("pattern", dump_choreo_pattern p); ("choreo_expr", dump_choreo_expr e) ]
           );
         ]
   | FunApp (e1, e2) ->
@@ -211,8 +211,8 @@ and dump_choreo_type = function
               [ ("loc", `String loc); ("local_type", dump_local_type t) ]
           );
         ]
-  | TSend (t1, t2) ->
-      `Assoc [ ("TSend", `List [ dump_choreo_type t1; dump_choreo_type t2 ]) ]
+  | TMap (t1, t2) ->
+      `Assoc [ ("TMap", `List [ dump_choreo_type t1; dump_choreo_type t2 ]) ]
   | TProd (t1, t2) ->
       `Assoc [ ("TProd", `List [ dump_choreo_type t1; dump_choreo_type t2 ]) ]
   | TSum (t1, t2) ->
@@ -242,4 +242,4 @@ and dump_bin_op = function
   | Gt    -> `String "Gt"
   | Geq   -> `String "Geq"
 
-let dump_choreo_ast (Choreo.Prog prog) = dump_decl_block prog |> Yojson.Basic.pretty_to_string
+let dump_choreo_ast (Choreo.Prog prog) = dump_stmt_block prog |> Yojson.Basic.pretty_to_string

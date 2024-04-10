@@ -1,13 +1,13 @@
 open Format
 
-(* decl_block {
+(* stmt_block {
      stmt1
      stmt2
      stmt3
      ...
    }
 *)
-let rec print_decl_block ppf (stmts : Choreo.decl_block) =
+let rec print_stmt_block ppf (stmts : Choreo.stmt_block) =
   fprintf ppf "@[<v 2>DeclBlock {@,%a@,}@]"
     (pp_print_list ~pp_sep:pp_print_newline print_stmt) stmts
 
@@ -39,7 +39,7 @@ and print_stmt ppf = function
    Send (expr) -> loc
    Sync loc1[label] ~> loc2; (expr)
    If (condition) then (expr1) else (expr2)
-   Let {decl_block} in (expr)
+   Let {stmt_block} in (expr)
    FunDef id -> (expr)
    FunApp ((fun) (arg))
    Pair ((expr1), (expr2))
@@ -68,8 +68,8 @@ and print_choreo_expr ppf = function
       fprintf ppf "Sync@ %s[%s] ~>@ %s;@ (@[<hv2>%a@])" loc1 label loc2 print_choreo_expr e
   | If (e1, e2, e3) ->
       fprintf ppf "If@ (@[<hv2>%a@]) then@ (@[<hv2>%a@]) else@ (@[<hv2>%a@])" print_choreo_expr e1 print_choreo_expr e2 print_choreo_expr e3
-  | Let (decl_block, e) ->
-      fprintf ppf "Let@ @[<v2>{@,%a@,}@] in (@[<hv2>%a@])" print_decl_block decl_block print_choreo_expr e
+  | Let (stmt_block, e) ->
+      fprintf ppf "Let@ @[<v2>{@,%a@,}@] in (@[<hv2>%a@])" print_stmt_block stmt_block print_choreo_expr e
   | FunDef (VarId id, e) ->
       fprintf ppf "FunDef %s ->@ (@[<hv2>%a@])" id print_choreo_expr e
   | FunApp (e1, e2) ->

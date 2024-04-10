@@ -5,6 +5,7 @@ type value =
 
 type loc_id = LocId of string
 type var_id = VarId of string
+type typ_id = TypId of string
 type sync_label = LabelId of string
 
 type bin_op =

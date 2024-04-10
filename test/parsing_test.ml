@@ -13,11 +13,11 @@ let test_declarations_basic _ =
   (* peq "var : loc.bool" (Prog [ VarDecl (VarId "var", TLoc (LocId "loc", TBool)) ]);
      peq "fun fn : loc.int -> loc.int" (Prog [FunDecl (FunId "fn", TLoc (LocId "loc", TInt), TLoc (LocId "loc", TInt)) ]);
      peq "loc.var : loc.string" (Prog [ LocVarDecl (LocId "loc", VarId "var", LocId "loc", TString) ]); *)
-  peq "type new := unit" (Prog [ TypeDecl (VarId "new", TUnit) ])
+  peq "type new := unit" (Prog [ TypeDecl (TypId "new", TUnit) ])
 
 let new_decl _ =
   peq "type x := P1.int"
-    (Prog [ TypeDecl (VarId "x", TLoc (LocId "P1", TInt)) ])
+    (Prog [ TypeDecl (TypId "x", TLoc (LocId "P1", TInt)) ])
 
 let int_assign _ =
   peq "x := P1.5;"
