@@ -1,0 +1,23 @@
+Pir:
+if R.(3+5 > 2-1)
+then R[L] ~> S;
+  	 R."Sent"
+  	 S.(1,true) ~> R
+else R[R] ~> S;
+  	 R."why"
+  	 S.(0,false) ~> R
+
+NetIR:
+S: 
+Allow R choice
+| L => send (1,true) to R
+| R => send (0,false) to R
+
+R:
+if 3+5 > 2-1
+then choose L for S
+	 "Sent"
+	 receive from S
+else choose R for S
+	 "why"
+	 receive from S

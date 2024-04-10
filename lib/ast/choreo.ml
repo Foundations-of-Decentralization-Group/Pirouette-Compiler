@@ -1,7 +1,7 @@
 type typ =
   | TUnit
   | TLoc of Local.loc_id * Local.typ
-  | TSend of typ * typ
+  | TMap of typ * typ
   | TProd of typ * typ
   | TSum of typ * typ
 
@@ -20,8 +20,8 @@ type expr =
   | Send of expr * Local.loc_id
   | Sync of Local.loc_id * Local.sync_label * Local.loc_id * expr
   | If of expr * expr * expr
-  | Let of decl_block * expr
-  | FunDef of Local.var_id * expr
+  | Let of stmt_block * expr
+  | FunDef of pattern * expr
   | FunApp of expr * expr
   | Pair of expr * expr
   | Fst of expr
@@ -33,8 +33,8 @@ type expr =
 and stmt =
   | Decl of pattern * typ
   | Assign of pattern * expr
-  | TypeDecl of Local.var_id * typ
+  | TypeDecl of Local.typ_id * typ
 
-and decl_block = stmt list
+and stmt_block = stmt list
 
-type program = Prog of decl_block
+type program = Prog of stmt_block
