@@ -1,14 +1,22 @@
 open Ast.Dump
+open Ast.Print
 open Parsing.Interface
 
+let usage_msg = "USAGE: pirc <file> [-ast-dump]"
+let ast_dump = ref false
+let file_ic = ref stdin
+
+let anon_fun filename =
+  file_ic := open_in filename
+
+let speclist = [("-ast-dump", Arg.Set ast_dump, "Dump the AST as JSON")]
+
 let () =
-  if Array.length Sys.argv < 2 then (
-    print_endline "USAGE: pirc <file>";
-    exit 1)
+  Arg.parse speclist anon_fun usage_msg;
+
+  let lexbuf = Lexing.from_channel !file_ic in
+  let program = parse_program lexbuf in
+  if !ast_dump then
+    dump_choreo_ast Format.std_formatter program
   else
-    let filename = Sys.argv.(1) in
-    let file_ic = open_in filename in
-    let lexbuf = Lexing.from_channel file_ic in
-    let program = parse_program lexbuf in
-    print_endline (dump_choreo_ast program);
-    close_in file_ic
+    print_choreo_ast Format.std_formatter program

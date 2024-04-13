@@ -242,4 +242,4 @@ and dump_bin_op = function
   | Gt    -> `String "Gt"
   | Geq   -> `String "Geq"
 
-let dump_choreo_ast (Choreo.Prog prog) = dump_stmt_block prog |> Yojson.Basic.pretty_to_string
+let dump_choreo_ast ppf (Choreo.Prog prog) = Yojson.Basic.pretty_print ppf (dump_stmt_block prog)

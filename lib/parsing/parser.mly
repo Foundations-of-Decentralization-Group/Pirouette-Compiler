@@ -59,6 +59,7 @@ program:
 
 stmt_block:
   | list(stmt) { $1 }
+  | LPAREN list(stmt) RPAREN { $2 }
 
 /* TODO: Removing the need for semicolons */
 stmt:
@@ -100,7 +101,7 @@ local_expr:
   | value                                           { Val $1 }                                                                    
   | var_id                                          { Var $1 }
   | local_expr bin_op local_expr                    { BinOp ($1, $2, $3) }
-  | LET var_id COLONEQ local_expr IN local_expr     { Let ($2, $4, $6) }
+  | LET var_id EQ local_expr IN local_expr          { Let ($2, $4, $6) }
   | LPAREN local_expr COMMA local_expr RPAREN       { Pair ($2, $4) }
   | FST local_expr                                  { Fst $2 }
   | SND local_expr                                  { Snd $2 }
