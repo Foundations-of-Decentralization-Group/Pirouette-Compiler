@@ -448,58 +448,58 @@ Using IH we can say, $\Gamma; \Delta \vdash$ match $C'$ with left $X \Rightarrow
 
 \begin{mathpar}
 \inferrule [loc - binop ]
-{ e_1 \to e'_1 }
-{ e_1 \textsf{ binop } e_2 \to e'_1 \textsf{ binop } e_2  } \and
+{ e_1 \to_e e'_1 }
+{ e_1 \textsf{ binop } e_2 \to_e  e'_1 \textsf{ binop } e_2  } \and
 \inferrule [ ]
-{ e_2 \to e'_2    }
-{ e_1 \textsf{ binop } e_2 \to e_1 \textsf{ binop } e'_2  } \and
+{ e_2 \to_e e'_2    }
+{ e_1 \textsf{ binop } e_2 \to_e e_1 \textsf{ binop } e'_2  } \and
 \inferrule [ ]
-{ e_1 \to v_1 \quad e_2 \to v_2    }
-{ e_1 \textsf{ binop } e_2 \to v_1 \textsf{ binop } v_2 \textsf{ (binop $\neq$ division) }} \and
+{ e_1 \to_e v_1 \quad e_2 \to_e v_2    }
+{ e_1 \textsf{ binop } e_2 \to_e v_1 \textsf{ binop } v_2 \textsf{ (binop $\neq$ division) }} \and
 
 \inferrule [loc - pair ]
-{ e_1 \to e'_1 }
-{ (e_1, e_2) \to (e'_1, e_2)  } \and
+{ e_1 \to_e e'_1 }
+{ (e_1, e_2) \to_e (e'_1, e_2)  } \and
 \inferrule [ ]
-{ e_1 \to v \quad e_2 \to e'_2    }
-{ (e_1, e_2) \to (v, e'_2)  } \and
+{ e_1 \to_e v \quad e_2 \to_e e'_2    }
+{ (e_1, e_2) \to_e (v, e'_2)  } \and
 \inferrule [ ]
-{ e_1 \to v_1 \quad e_2 \to v_2    }
-{ (e_1, e_2) \to (v_1, v_2) } \and
+{ e_1 \to_e v_1 \quad e_2 \to_e v_2    }
+{ (e_1, e_2) \to_e (v_1, v_2) } \and
 
 \inferrule [loc - fst ]
-{ e \to e' }
-{ \textsf{fst } e \to \textsf{fst } e' } \and
+{ e \to_e e' }
+{ \textsf{fst } e \to_e \textsf{fst } e' } \and
 \inferrule [ ]
-{ e \to v \quad v = (v_1, v_2) }
-{ \textsf{fst } e \to v_1 } \and
+{ e \to_e v \quad v = (v_1, v_2) }
+{ \textsf{fst } e \to_e v_1 } \and
 \inferrule [loc - snd ]
-{ e \to e' }
-{ \textsf{snd } e \to \textsf{snd } e' } \and
+{ e \to_e e' }
+{ \textsf{snd } e \to_e \textsf{snd } e' } \and
 \inferrule [ ]
-{ e \to v \quad v = (v_1, v_2) }
-{ \textsf{snd } e \to v_2 } \and
+{ e \to_e v \quad v = (v_1, v_2) }
+{ \textsf{snd } e \to_e v_2 } \and
 \inferrule [loc - left ]
-{ e \to e' }
-{ \textsf{left } e \to \textsf{left } e' } \and
+{ e \to_e e' }
+{ \textsf{left } e \to_e \textsf{left } e' } \and
 \inferrule [ ]
-{ e \to v }
-{ \textsf{left } e \to \textsf{left } v } \and
+{ e \to_e v }
+{ \textsf{left } e \to_e \textsf{left } v } \and
 \inferrule [ loc - right]
-{ e \to e' }
-{ \textsf{right } e \to \textsf{right } e' } \and
+{ e \to_e e' }
+{ \textsf{right } e \to_e \textsf{right } e' } \and
 \inferrule [ ]
-{ e \to v }
-{ \textsf{right } e \to \textsf{right } v } \and
+{ e \to_e v }
+{ \textsf{right } e \to_e \textsf{right } v } \and
 \inferrule [ Loc - match ]
-{ e \to e' }
-{ \textsf{(match e with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} \to \textsf{(match e' with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} } \and
+{ e \to_e e' }
+{ \textsf{(match e with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} \to_e \textsf{(match e' with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} } \and
 \inferrule [ ]
-{ e \to \textsf{left } v }
-{ \textsf{(match e with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} \to e_1\ [x \mapsto v] } \and
+{ e \to_e \textsf{left } v }
+{ \textsf{(match e with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} \to_e e_1\ [x \mapsto v] } \and
 \inferrule [ ]
-{ e \to \textsf{right } v }
-{ \textsf{(match e with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} \to e_2\ [y \mapsto v] }
+{ e \to_e \textsf{right } v }
+{ \textsf{(match e with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} \to_e e_2\ [y \mapsto v] }
 
 \end{mathpar}
 
@@ -523,72 +523,72 @@ Using IH we can say, $\Gamma; \Delta \vdash$ match $C'$ with left $X \Rightarrow
 
 \begin{mathpar}
 \inferrule [assoc ]
-{ e \to e' }
-{ \ell.e \to \ell.e' } \and
+{ e \to_e e' }
+{ \ell.e \to_c \ell.e' } \and
 \inferrule [ ]
-{ e \to v }
-{ \ell.e \to \ell.v} \and
+{ e \to_e v }
+{ \ell.e \to_c \ell.v} \and
 \inferrule [send ]
-{ C \to C'}
-{ C \leadsto \ell \to C' \leadsto \ell} \and
+{ C \to_c C'}
+{ C \leadsto \ell \to_c C' \leadsto \ell} \and
 \inferrule [ ]
-{ C \to V \quad C = \ell.v }
-{ C \leadsto \ell' \to \ell'.v} \and
+{ C \to_c V \quad C = \ell.v }
+{ C \leadsto \ell' \to_c \ell'.v} \and
 \inferrule [sync ]
-{ C \to C'}
-{ \ell_1[d] \leadsto \ell_2 ; C\to \ell_1[d] \leadsto \ell_2 ; C'} \and
+{ C \to_c C'}
+{ \ell_1[d] \leadsto \ell_2 ; C\to_c \ell_1[d] \leadsto \ell_2 ; C'} \and
 
 
 \inferrule [App ]
-{ C_1 \to C'_1 }
-{ C_1 C_2 \to C'_1 C_2  } \and
+{ C_1 \to_c C'_1 }
+{ C_1 C_2 \to_c C'_1 C_2  } \and
 \inferrule [ ]
-{ C_2 \to C'_2    }
-{ C_1 C_2 \to C_1 C'_2  } \and
+{ C_2 \to_c C'_2    }
+{ C_1 C_2 \to_c C_1 C'_2  } \and
 
 \inferrule [pair]
-{ C_1 \to C'_1 }
-{ (C_1, C_2) \to (C'_1, C_2)  } \and
+{ C_1 \to_c C'_1 }
+{ (C_1, C_2) \to_c (C'_1, C_2)  } \and
 \inferrule [ ]
-{ C_2 \to C'_2    }
-{ (C_1, C_2) \to (C_1, C'_2)  } \and
+{ C_2 \to_c C'_2    }
+{ (C_1, C_2) \to_c (C_1, C'_2)  } \and
 \inferrule [ ]
-{ C_1 \to V_1 \quad C_2 \to V_2    }
-{ (C_1, C_2) \to (V_1, V_2) } \and
+{ C_1 \to_c V_1 \quad C_2 \to_c V_2    }
+{ (C_1, C_2) \to_c (V_1, V_2) } \and
 
 \inferrule [fst ]
-{ C \to C' }
-{ \textsf{fst } C \to \textsf{fst } C' } \and
+{ C \to_c C' }
+{ \textsf{fst } C \to_c \textsf{fst } C' } \and
 \inferrule [ ]
-{ C \to V \quad V = (V_1, V_2) }
-{ \textsf{fst } C \to V_1 } \and
+{ C \to_c V \quad V = (V_1, V_2) }
+{ \textsf{fst } C \to_c V_1 } \and
 \inferrule [snd ]
-{ C \to C' }
-{ \textsf{snd } C \to \textsf{snd } C' } \and
+{ C \to_c C' }
+{ \textsf{snd } C \to_c \textsf{snd } C' } \and
 \inferrule [ ]
-{ C \to V \quad V = (V_1, V_2) }
-{ \textsf{snd } C \to V_2 } \and
+{ C \to_c V \quad V = (V_1, V_2) }
+{ \textsf{snd } C \to_c V_2 } \and
 \inferrule [left ]
-{ C \to C' }
-{ \textsf{left } C \to \textsf{left } C' } \and
+{ C \to_c C' }
+{ \textsf{left } C \to_c \textsf{left } C' } \and
 \inferrule [ ]
-{ C \to V }
-{ \textsf{left } C \to \textsf{left } V } \and
+{ C \to_c V }
+{ \textsf{left } C \to_c \textsf{left } V } \and
 \inferrule [right ]
-{ C \to C' }
-{ \textsf{right } C \to \textsf{right } C' } \and
+{ C \to_c C' }
+{ \textsf{right } C \to_c \textsf{right } C' } \and
 \inferrule [ ]
-{ C \to V }
-{ \textsf{right } C \to \textsf{right } V } \and
+{ C \to_c V }
+{ \textsf{right } C \to_c \textsf{right } V } \and
 \inferrule [match ]
-{ C \to C' }
-{ \textsf{(match C with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to \textsf{(match C' with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} } \and
+{ C \to_c C' }
+{ \textsf{(match C with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to_c \textsf{(match C' with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} } \and
 \inferrule [ ]
-{ C \to \textsf{left } V }
-{ \textsf{(match C with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to C_1\ [X \mapsto V] } \and
+{ C \to_c \textsf{left } V }
+{ \textsf{(match C with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to_c C_1\ [X \mapsto V] } \and
 \inferrule [ ]
-{ C \to \textsf{right } V }
-{ \textsf{(match C with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to C_2\ [Y \mapsto V] }
+{ C \to_c \textsf{right } V }
+{ \textsf{(match C with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to_c C_2\ [Y \mapsto V] }
 
 \end{mathpar}
 
@@ -789,3 +789,4 @@ $$
 
 
 \end{document}
+
