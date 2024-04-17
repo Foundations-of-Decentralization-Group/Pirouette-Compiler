@@ -11,8 +11,8 @@ type expr =
   | Ret of Local.expr
   | If of expr * expr * expr
   | Let of stmt list * expr
-  | SendTo of expr * Local.loc_id
-  | RecvFrom of Local.loc_id
+  | Send of expr * Local.loc_id
+  | Recv of Local.loc_id
   | ChooseFor of Local.sync_label * Local.loc_id * expr
   | AllowChoice of Local.loc_id * (Local.sync_label * expr) list
   | FunDef of Local.pattern * expr

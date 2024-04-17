@@ -1,5 +1,3 @@
-open Ast
-
 module LocSet = Set.Make (String)
 
 let rec extract_stmt_block (stmts : Choreo.stmt_block) =
