@@ -11,7 +11,7 @@
 
 \title{Pirouette - Theory}
 \author{\textbf{Shruti Gupta} \and \textbf{Prashant Godhwani}}
-\date{September 2023}
+\date{February 2024}
 
 
 \begin{document}
@@ -26,6 +26,20 @@
     \alternative{L}
     \alternative{R}
 
+     \category[Binary Operations]{\odot}
+    \alternative{+}
+    \alternative{-}
+    \alternative{*}
+    \alternative{/}
+    \alternative{=}
+    \alternative{<=}
+    \alternative{>=}
+    \alternative{!=}
+    \alternative{>}
+    \alternative{<}
+    \alternative{\&\&}
+    \alternative{\parallel}
+
     \category[Choreography]{C}
     % Each alternative is introduced on its own line.
     \alternative{\mathbf{()}}
@@ -35,7 +49,7 @@
     \alternative{\textbf{if } C \textbf{ then } C_1 \textbf{ else } C_2}
     \\
     \alternative{\ell_1 [d] \leadsto \ell_2  ; \ C }  
-    \alternative{ \textbf{let } \ell . x \Coloneqq C_1 \textbf{ in } C_2}
+    \alternative{ \textbf{let } \ell . x := C_1 \textbf{ in } C_2}
     \alternative{\textbf{fun } X \Rightarrow C}
     \alternative{C_1 \  C_2}
     \\
@@ -60,7 +74,7 @@
     \alternative{num}
     \alternative{x}
     \alternative{e_1 \ binop \ e_2}
-    \alternative{\textbf{let} \ x = e_1 \ in \ e_2}
+    \alternative{\textbf{let} \ x := e_1 \ in \ e_2}
     \alternative{(e_1, e_2)} 
     \alternative{\textbf{fst } e} \\
     \alternative{\textbf{snd } e}
@@ -75,7 +89,7 @@
     \alternative{E_1 \ E_2 }
     \alternative{\textsf{ret}(e)}
     \\
-    \alternative{\textsf{let ret}(x) = E_1 \ \textsf{in} \ E_2}
+    \alternative{\textsf{let ret}(x) := E_1 \ \textsf{in} \ E_2}
     \alternative{\textsf{send } e \textsf{ to } \ell ; \  E}
     \alternative{\textsf{receive } x \textsf{ from } \ell ; \  E}
     \\
@@ -225,7 +239,7 @@
 { \Gamma;\Delta \vdash C : \tau}
 { \Gamma;\Delta \vdash \ell_1[d] \leadsto \ell_2 ; C : \tau} \and
 \inferrule [ if ]
-{ \Gamma;\Delta \vdash C_1 : \tau_1 \quad \Gamma;\Delta\vdash C_2 : \tau_2 \quad \Gamma;\Delta \vdash C_3 : \tau_2 }
+{ \Gamma;\Delta \vdash C_1 : \ell.t \quad \Gamma;\Delta\vdash C_2 : \tau_2 \quad \Gamma;\Delta \vdash C_3 : \tau_2 }
 { \Gamma;\Delta \vdash \textsf{if } C_1 \textsf{ then } C_2 \textsf{ else } C_3: T_2  } \and
 \inferrule [ def ]
 { \Gamma;\Delta \vdash C_1 : \ell.t \quad \Gamma, \ell.x : t ;\Delta \vdash C_2 : \tau_2 }
@@ -447,59 +461,59 @@ Using IH we can say, $\Gamma; \Delta \vdash$ match $C'$ with left $X \Rightarrow
 \end{syntax}
 
 \begin{mathpar}
-\inferrule [loc - binop ]
-{ e_1 \to_e e'_1 }
-{ e_1 \textsf{ binop } e_2 \to_e  e'_1 \textsf{ binop } e_2  } \and
-\inferrule [ ]
-{ e_2 \to_e e'_2    }
-{ e_1 \textsf{ binop } e_2 \to_e e_1 \textsf{ binop } e'_2  } \and
-\inferrule [ ]
-{ e_1 \to_e v_1 \quad e_2 \to_e v_2    }
-{ e_1 \textsf{ binop } e_2 \to_e v_1 \textsf{ binop } v_2 \textsf{ (binop $\neq$ division) }} \and
+\inferrule  [binop 1 ]
+{ e_1 \to_l e'_1 }
+{ e_1 \odot  e_2 \to_l  e'_1  \Tilde{\odot} e_2  } \and
+\inferrule [ binop 2]
+{ e_2 \to_l e'_2 }
+{ v \odot e_2 \to_l v \Tilde{\odot} e'_2  } \and
+\inferrule [binop 3 ]
+{    }
+{ v_1 \odot v_2 \to_l v_1 \Tilde{\odot} v_2 \  (/ \notin \odot) } \and
 
-\inferrule [loc - pair ]
-{ e_1 \to_e e'_1 }
-{ (e_1, e_2) \to_e (e'_1, e_2)  } \and
-\inferrule [ ]
-{ e_1 \to_e v \quad e_2 \to_e e'_2    }
-{ (e_1, e_2) \to_e (v, e'_2)  } \and
-\inferrule [ ]
-{ e_1 \to_e v_1 \quad e_2 \to_e v_2    }
-{ (e_1, e_2) \to_e (v_1, v_2) } \and
+\inferrule[Loc - let 1]
+{e_1 \to_l e'_1}
+{\textsf{let $x := e_1$ in $e_2$} \to_l \textsf{let $x := e'_1$ in $e_2$} } \and
+
+\inferrule[Loc - let 2]
+{ }
+{\textsf{let $ x := v$ in $e$} \to_l e[x \mapsto v] } \and
+
+\inferrule [loc - pair 1]
+{ e_1 \to_l e'_1 }
+{ (e_1, e_2) \to_l (e'_1, e_2)  } \and
+\inferrule [loc - pair 2 ]
+{  e_2 \to_l e'_2    }
+{ (v, e_2) \to_l (v, e'_2)  } \and
 
 \inferrule [loc - fst ]
-{ e \to_e e' }
-{ \textsf{fst } e \to_e \textsf{fst } e' } \and
-\inferrule [ ]
-{ e \to_e v \quad v = (v_1, v_2) }
-{ \textsf{fst } e \to_e v_1 } \and
+{ e \to_l e' }
+{ \textsf{fst } e \to_l \textsf{fst } e' } \and
+\inferrule [loc - pair elim 1 ]
+{ }
+{ \textsf{fst } (v_1, v_2) \to_l v_1 }\and
+
 \inferrule [loc - snd ]
-{ e \to_e e' }
-{ \textsf{snd } e \to_e \textsf{snd } e' } \and
-\inferrule [ ]
-{ e \to_e v \quad v = (v_1, v_2) }
-{ \textsf{snd } e \to_e v_2 } \and
+{ e \to_l e' }
+{ \textsf{snd } e \to_l \textsf{snd } e' } \and
+\inferrule [loc - pair elim 2 ]
+{  }
+{ \textsf{snd } (v_1, v_2) \to_l v_2 } \and
 \inferrule [loc - left ]
-{ e \to_e e' }
-{ \textsf{left } e \to_e \textsf{left } e' } \and
-\inferrule [ ]
-{ e \to_e v }
-{ \textsf{left } e \to_e \textsf{left } v } \and
+{ e \to_l e' }
+{ \textsf{left } e \to_l \textsf{left } e' } \and
 \inferrule [ loc - right]
-{ e \to_e e' }
-{ \textsf{right } e \to_e \textsf{right } e' } \and
-\inferrule [ ]
-{ e \to_e v }
-{ \textsf{right } e \to_e \textsf{right } v } \and
+{ e \to_l e' }
+{ \textsf{right } e \to_l \textsf{right } e' } \and
 \inferrule [ Loc - match ]
-{ e \to_e e' }
-{ \textsf{(match e with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} \to_e \textsf{(match e' with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} } \and
-\inferrule [ ]
-{ e \to_e \textsf{left } v }
-{ \textsf{(match e with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} \to_e e_1\ [x \mapsto v] } \and
-\inferrule [ ]
-{ e \to_e \textsf{right } v }
-{ \textsf{(match e with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} \to_e e_2\ [y \mapsto v] }
+{ e \to_l e' }
+{ \textsf{(match e with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} \to_l \textsf{(match e' with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} } \and
+\inferrule [loc - Sum elim 1 ]
+{ }
+{ \textsf{(match left v with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} \to_l e_1\ [x \mapsto v] } \and
+\inferrule [loc - sum elim 2 ]
+{ }
+{ \textsf{(match right v with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} \to_l e_2\ [y \mapsto v] }
 
 \end{mathpar}
 
@@ -519,76 +533,83 @@ Using IH we can say, $\Gamma; \Delta \vdash$ match $C'$ with left $X \Rightarrow
     \alternative{(V_1, V_2)} 
     \alternative{\textbf{left } V}
     \alternative{\textbf{right } V}
+    \alternative{\textbf{fun } X \Rightarrow C}
 \end{syntax}
 
 \begin{mathpar}
 \inferrule [assoc ]
-{ e \to_e e' }
-{ \ell.e \to_c \ell.e' } \and
-\inferrule [ ]
-{ e \to_e v }
-{ \ell.e \to_c \ell.v} \and
-\inferrule [send ]
-{ C \to_c C'}
-{ C \leadsto \ell \to_c C' \leadsto \ell} \and
-\inferrule [ ]
-{ C \to_c V \quad C = \ell.v }
-{ C \leadsto \ell' \to_c \ell'.v} \and
+{ e \to_l e' }
+{ \ell.e \to_g \ell.e' } \and
+
+\inferrule [send 1 ]
+{ C \to_g C'}
+{ C \leadsto \ell \to_g C' \leadsto \ell} \and
+\inferrule [send 2]
+{ }
+{ \ell.v \leadsto \ell' \to_g \ell'.v} \and
 \inferrule [sync ]
-{ C \to_c C'}
-{ \ell_1[d] \leadsto \ell_2 ; C\to_c \ell_1[d] \leadsto \ell_2 ; C'} \and
+{ }
+{ \ell_1[d] \leadsto \ell_2 ; C\to_g C} \and
+\inferrule[let 1]
+{C_1 \to_g C'_1}
+{\textsf{let $X := C_1$ in $C_2$} \to_g \textsf{let $X := C'_1$ in $C_2$} } \and
+\inferrule[If 1]
+{C \to_g C'}
+{\textsf{if } C \textsf{ then } C_1 \textsf{ else } C_2 \to_g \textsf{if } C' \textsf{ then } C_1 \textsf{ else } C_2} \and
+\inferrule[If 2]
+{ }
+{\textsf{if } \ell.true \textsf{ then } C_1 \textsf{ else } C_2 \to_g C_1} \and
+\inferrule[If 3]
+{ }
+{\textsf{if } \ell.false \textsf{ then } C_1 \textsf{ else } C_2 \to_g C_2} \and
 
 
-\inferrule [App ]
-{ C_1 \to_c C'_1 }
-{ C_1 C_2 \to_c C'_1 C_2  } \and
-\inferrule [ ]
-{ C_2 \to_c C'_2    }
-{ C_1 C_2 \to_c C_1 C'_2  } \and
-
-\inferrule [pair]
-{ C_1 \to_c C'_1 }
-{ (C_1, C_2) \to_c (C'_1, C_2)  } \and
-\inferrule [ ]
-{ C_2 \to_c C'_2    }
-{ (C_1, C_2) \to_c (C_1, C'_2)  } \and
-\inferrule [ ]
-{ C_1 \to_c V_1 \quad C_2 \to_c V_2    }
-{ (C_1, C_2) \to_c (V_1, V_2) } \and
+\inferrule[let 2]
+{ }
+{\textsf{let $ X := V$ in $C$} \to_g C[X \mapsto V] } \and
+\inferrule [App 1]
+{ C_1 \to_g C'_1 }
+{ C_1 C_2 \to_g C'_1 C_2  } \and
+\inferrule [app 2 ]
+{ C_2 \to_g C'_2 }
+{ C_1 C_2 \to_g C_1 C'_2  } \and
+\inferrule [app 3 ]
+{  }
+{\textsf{(fun $ X \Rightarrow$ C) }  V \to_g C[X \mapsto V]  } \and
+\inferrule [pair 1]
+{ C_1 \to_g C'_1 }
+{ (C_1, C_2) \to_g (C'_1, C_2)  } \and
+\inferrule [pair 2 ]
+{ C_2 \to_g C'_2    }
+{ (C_1, C_2) \to_g (C_1, C'_2)  } \and
 
 \inferrule [fst ]
-{ C \to_c C' }
-{ \textsf{fst } C \to_c \textsf{fst } C' } \and
-\inferrule [ ]
-{ C \to_c V \quad V = (V_1, V_2) }
-{ \textsf{fst } C \to_c V_1 } \and
+{ C \to_g C' }
+{ \textsf{fst } C \to_g \textsf{fst } C' } \and
+\inferrule [pair elim 1 ]
+{ }
+{ \textsf{fst } (V_1, V_2) \to_g V_1 } \and
 \inferrule [snd ]
-{ C \to_c C' }
-{ \textsf{snd } C \to_c \textsf{snd } C' } \and
-\inferrule [ ]
-{ C \to_c V \quad V = (V_1, V_2) }
-{ \textsf{snd } C \to_c V_2 } \and
+{ C \to_g C' }
+{ \textsf{snd } C \to_g \textsf{snd } C' } \and
+\inferrule [ pair elim 2]
+{  }
+{ \textsf{snd } (V_1, V_2) \to_g V_2 } \and
 \inferrule [left ]
-{ C \to_c C' }
-{ \textsf{left } C \to_c \textsf{left } C' } \and
-\inferrule [ ]
-{ C \to_c V }
-{ \textsf{left } C \to_c \textsf{left } V } \and
+{ C \to_g C' }
+{ \textsf{left } C \to_g \textsf{left } C' } \and
 \inferrule [right ]
-{ C \to_c C' }
-{ \textsf{right } C \to_c \textsf{right } C' } \and
-\inferrule [ ]
-{ C \to_c V }
-{ \textsf{right } C \to_c \textsf{right } V } \and
+{ C \to_g C' }
+{ \textsf{right } C \to_g \textsf{right } C' } \and
 \inferrule [match ]
-{ C \to_c C' }
-{ \textsf{(match C with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to_c \textsf{(match C' with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} } \and
-\inferrule [ ]
-{ C \to_c \textsf{left } V }
-{ \textsf{(match C with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to_c C_1\ [X \mapsto V] } \and
-\inferrule [ ]
-{ C \to_c \textsf{right } V }
-{ \textsf{(match C with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to_c C_2\ [Y \mapsto V] }
+{ C \to_g C' }
+{ \textsf{(match C with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to_g \textsf{(match C' with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} } \and
+\inferrule [sum elim 1 ]
+{ }
+{ \textsf{(match (left V) with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to_g C_1\ [X \mapsto V] } \and
+\inferrule [sum elim 2 ]
+{ }
+{ \textsf{(match (right V) with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to_g C_2\ [Y \mapsto V] }
 
 \end{mathpar}
 
@@ -789,4 +810,3 @@ $$
 
 
 \end{document}
-
