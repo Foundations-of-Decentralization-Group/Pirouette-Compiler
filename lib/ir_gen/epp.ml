@@ -19,11 +19,11 @@ and epp_expr (c : Choreo.expr) (loc : string) : Net.expr =
   | Right c -> Right (epp_expr c loc)
   | Let (stmts, c) ->
     Let (List.map (fun stmt -> epp_stmt stmt loc) stmts, epp_expr c loc)
-  | Send (c, LocId loc1) -> (
-      match c with (* fix needed *)
-      | LocExpr (LocId loc2, _) when loc1 = loc && loc2 != loc -> Recv (LocId loc2)
-      | _ when loc1 != loc -> Send (epp_expr c loc, LocId loc1)
-      | _ -> Unit)
+  | Send (c, LocId loc1, LocId loc2) -> (
+      if loc1 = loc2 then epp_expr c loc
+      else if loc1 = loc then Send (epp_expr c loc, LocId loc2)
+      else if loc2 = loc then Recv (LocId loc1)
+      else epp_expr c loc)
   | Sync (LocId id1, l, LocId id2, c) ->
       if id1 = loc && id2 != loc then ChooseFor (l, LocId id2, epp_expr c loc)
       else if id2 = loc && id1 != loc then AllowChoice (LocId id1, [ (l, epp_expr c loc) ])
@@ -136,7 +136,7 @@ and merge_expr (e1 : Net.expr) (e2 : Net.expr) : Net.expr option =
              let h = Hashtbl.create 2 in
              List.iter (merge_choice_into h) choices1;
              List.iter (merge_choice_into h) choices2;
-             Hashtbl.fold (fun l e acc -> (l, e) :: acc) h [] ))
+             Hashtbl.fold (fun l e acc -> (l, e) :: acc) h [] )) (* use list *)
   | _ -> None
 
 and merge_choice_into tbl (label, expr) =

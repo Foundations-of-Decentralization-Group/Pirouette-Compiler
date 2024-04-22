@@ -68,21 +68,21 @@ stmt:
 
 /* Associativity increases from expr to expr3, with each precedence level falling through to the next. */
 choreo_expr:
-  | IF choreo_expr THEN choreo_expr ELSE choreo_expr                             { If ($2, $4, $6) }
-  | LET stmt_block IN choreo_expr                                                { Let ($2, $4) }
-  | FUN choreo_pattern ARROW choreo_expr                                         { FunDef ($2, $4) }
-  | FST choreo_expr                                                              { Fst $2 }
-  | SND choreo_expr                                                              { Snd $2 }
-  | LEFT choreo_expr                                                             { Left $2 }
-  | RIGHT choreo_expr                                                            { Right $2 }
-  | LPAREN choreo_expr COMMA choreo_expr RPAREN                                  { Pair ($2, $4) }
-  | MATCH choreo_expr WITH nonempty_list(choreo_case)                            { Match ($2, $4) }
-  | loc_id LBRACKET sync_label RBRACKET TILDE_ARROW loc_id SEMICOLON choreo_expr { Sync ($1, $3, $6, $8) }
-  | choreo_expr1 TILDE_ARROW loc_id DOT local_pattern SEMICOLON choreo_expr      { Let ([Assign (LocPatt ($3, $5), Send ($1, $3))], $7) }
-  | choreo_expr1                                                                 { $1 }
+  | IF choreo_expr THEN choreo_expr ELSE choreo_expr                                                 { If ($2, $4, $6) }
+  | LET stmt_block IN choreo_expr                                                                    { Let ($2, $4) }
+  | FUN choreo_pattern ARROW choreo_expr                                                             { FunDef ($2, $4) }
+  | FST choreo_expr                                                                                  { Fst $2 }
+  | SND choreo_expr                                                                                  { Snd $2 }
+  | LEFT choreo_expr                                                                                 { Left $2 }
+  | RIGHT choreo_expr                                                                                { Right $2 }
+  | LPAREN choreo_expr COMMA choreo_expr RPAREN                                                      { Pair ($2, $4) }
+  | MATCH choreo_expr WITH nonempty_list(choreo_case)                                                { Match ($2, $4) }
+  | loc_id LBRACKET sync_label RBRACKET TILDE_ARROW loc_id SEMICOLON choreo_expr                     { Sync ($1, $3, $6, $8) }
+  | choreo_expr1 LBRACKET loc_id RBRACKET TILDE_ARROW loc_id DOT local_pattern SEMICOLON choreo_expr { Let ([Assign (LocPatt ($6, $8), Send ($1, $3, $6))], $10) }
+  | choreo_expr1                                                                                     { $1 }
 
 choreo_expr1:
-  | choreo_expr1 TILDE_ARROW loc_id                                              { Send ($1, $3) }
+  | choreo_expr1 LBRACKET loc_id RBRACKET TILDE_ARROW loc_id                     { Send ($1, $3, $6) }
   | choreo_expr2                                                                 { $1 }
 
 choreo_expr2:

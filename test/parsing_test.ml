@@ -87,13 +87,13 @@ let test_second_pair _ =
        ])
 
 let test_decl_send _ =
-  peq "y : P2.int;\n        y := P1.5 ~> P2;"
+  peq "y : P2.int;\n        y := P1.5 [P1] ~> P2;"
     (Prog
        [
          Decl (Var (VarId "y"), TLoc (LocId "P2", TInt));
          Assign
            ( Var (VarId "y"),
-             Send (LocExpr (LocId "P1", Val (`Int 5)), LocId "P2") );
+             Send (LocExpr (LocId "P1", Val (`Int 5)), LocId "P1", LocId "P2") );
        ])
 
 let suite =
