@@ -25,9 +25,9 @@ and epp_expr (c : Choreo.expr) (loc : string) : Net.expr =
       else if loc2 = loc then Recv (LocId loc1)
       else epp_expr c loc)
   | Sync (LocId id1, l, LocId id2, c) ->
-      if id1 = loc && id2 != loc then ChooseFor (l, LocId id2, epp_expr c loc)
-      else if id2 = loc && id1 != loc then AllowChoice (LocId id1, [ (l, epp_expr c loc) ])
-      else if id1 != id2 then epp_expr c loc
+      if id1 = loc && id2 <> loc then ChooseFor (l, LocId id2, epp_expr c loc)
+      else if id2 = loc && id1 <> loc then AllowChoice (LocId id1, [ (l, epp_expr c loc) ])
+      else if id1 <> id2 then epp_expr c loc
       else Unit
   | If (c1, c2, c3) -> (
       match merge_expr (epp_expr c2 loc) (epp_expr c3 loc) with
@@ -111,6 +111,29 @@ and merge_expr (e1 : Net.expr) (e2 : Net.expr) : Net.expr option =
       match merge_expr e2 e2', merge_expr e3 e3' with
       | Some e2, Some e3 -> Some (If (e1, e2, e3))
       | _ -> None)
+  | Let (stmts1, e1), Let (stmts2, e2) -> (
+      if List.length stmts1 <> List.length stmts2 then None
+      else
+        let merged_stmts =
+          let exception Not_matched in
+          try
+            List.fold_left2
+              (fun acc s1 s2 ->
+                match acc with
+                | Some acc -> (
+                    match merge_stmt s1 s2 with
+                    | Some s -> Some (s :: acc)
+                    | None -> raise Not_matched)
+                | None -> raise Not_matched)
+              (Some []) stmts1 stmts2
+          with Not_matched -> None
+        in
+        match merged_stmts with
+        | Some stmts -> (
+            match merge_expr e1 e2 with
+            | Some e -> Some (Let (List.rev stmts, e))
+            | None -> None)
+        | None -> None)
   | Match (e, cases1), Match (e', cases2) when e = e' -> (
     let cases1_tbl = Hashtbl.create (List.length cases1) in
     List.iter (fun (p, e) -> Hashtbl.add cases1_tbl p e) cases1;
@@ -137,6 +160,16 @@ and merge_expr (e1 : Net.expr) (e2 : Net.expr) : Net.expr option =
              List.iter (merge_choice_into h) choices1;
              List.iter (merge_choice_into h) choices2;
              Hashtbl.fold (fun l e acc -> (l, e) :: acc) h [] )) (* use list *)
+  | _ -> None
+
+and merge_stmt (s1 : Net.stmt) (s2 : Net.stmt) : Net.stmt option =
+  match (s1, s2) with
+  | Decl (p, t), Decl (p', t') when p = p' && t = t' -> Some (Decl (p, t))
+  | TypeDecl (id, t), TypeDecl (id', t') when id = id' && t = t' -> Some (TypeDecl (id, t))
+  | Assign (p, e1), Assign (p', e2) when p = p' -> (
+      match merge_expr e1 e2 with
+      | Some e -> Some (Assign (p, e))
+      | None -> None)
   | _ -> None
 
 and merge_choice_into tbl (label, expr) =
