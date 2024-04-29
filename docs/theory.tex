@@ -6,12 +6,12 @@
 \usepackage{pl-syntax/pl-syntax}
 \usepackage{mathpartir}
 \usepackage{stmaryrd}
-
+ 
 
 
 \title{Pirouette - Theory}
 \author{\textbf{Shruti Gupta} \and \textbf{Prashant Godhwani}}
-\date{September 2023}
+\date{February 2024}
 
 
 \begin{document}
@@ -26,6 +26,20 @@
     \alternative{L}
     \alternative{R}
 
+     \category[Binary Operations]{\odot}
+    \alternative{+}
+    \alternative{-}
+    \alternative{*}
+    \alternative{/}
+    \alternative{=}
+    \alternative{<=}
+    \alternative{>=}
+    \alternative{!=}
+    \alternative{>}
+    \alternative{<}
+    \alternative{\&\&}
+    \alternative{\parallel}
+
     \category[Choreography]{C}
     % Each alternative is introduced on its own line.
     \alternative{\mathbf{()}}
@@ -35,7 +49,7 @@
     \alternative{\textbf{if } C \textbf{ then } C_1 \textbf{ else } C_2}
     \\
     \alternative{\ell_1 [d] \leadsto \ell_2  ; \ C }  
-    \alternative{ \textbf{let } \ell . x \Coloneqq C_1 \textbf{ in } C_2}
+    \alternative{ \textbf{let } X := C_1 \textbf{ in } C_2}
     \alternative{\textbf{fun } X \Rightarrow C}
     \alternative{C_1 \  C_2}
     \\
@@ -60,7 +74,7 @@
     \alternative{num}
     \alternative{x}
     \alternative{e_1 \ binop \ e_2}
-    \alternative{\textbf{let} \ x = e_1 \ in \ e_2}
+    \alternative{\textbf{let} \ x := e_1 \ in \ e_2}
     \alternative{(e_1, e_2)} 
     \alternative{\textbf{fst } e} \\
     \alternative{\textbf{snd } e}
@@ -75,7 +89,7 @@
     \alternative{E_1 \ E_2 }
     \alternative{\textsf{ret}(e)}
     \\
-    \alternative{\textsf{let ret}(x) = E_1 \ \textsf{in} \ E_2}
+    \alternative{\textsf{let ret}(x) := E_1 \ \textsf{in} \ E_2}
     \alternative{\textsf{send } e \textsf{ to } \ell ; \  E}
     \alternative{\textsf{receive } x \textsf{ from } \ell ; \  E}
     \\
@@ -167,7 +181,7 @@
 { \Gamma ;\Delta \vdash \textsf{$E_1 : T_1 \to T_2$} \quad \Gamma ;\Delta \vdash \textsf{$E_2 : T_1$} }
 { \Gamma ;\Delta \vdash \textsf{$E_1 E_2 : T_2$}  } \and
 \inferrule [ Network - if ]
-{ \Gamma ;\Delta \vdash \textsf{$E_1 : T_1$} \quad \Gamma ;\Delta \vdash \textsf{$E_2 : T_2$} \quad \Gamma ;\Delta \vdash \textsf{$E_3 : T_2$} }
+{ \Gamma ;\Delta \vdash \textsf{$E_1 : \boxed{bool}$} \quad \Gamma ;\Delta \vdash \textsf{$E_2 : T_2$} \quad \Gamma ;\Delta \vdash \textsf{$E_3 : T_2$} }
 { \Gamma ;\Delta \vdash \textsf{if $ E_1$ then  $E_2$ else $E_3: T_2$}  } \and
 \inferrule [ Network - def ]
 { \Gamma ;\Delta \vdash \textsf{$E_1 : \boxed{t}$} \quad \Gamma, \textsf{$x : t$} ;\Delta \vdash \textsf{$E_2 : T_2$} }
@@ -225,11 +239,11 @@
 { \Gamma;\Delta \vdash C : \tau}
 { \Gamma;\Delta \vdash \ell_1[d] \leadsto \ell_2 ; C : \tau} \and
 \inferrule [ if ]
-{ \Gamma;\Delta \vdash C_1 : \tau_1 \quad \Gamma;\Delta\vdash C_2 : \tau_2 \quad \Gamma;\Delta \vdash C_3 : \tau_2 }
+{ \Gamma;\Delta \vdash C_1 : \ell.t \quad \Gamma;\Delta\vdash C_2 : \tau_2 \quad \Gamma;\Delta \vdash C_3 : \tau_2 }
 { \Gamma;\Delta \vdash \textsf{if } C_1 \textsf{ then } C_2 \textsf{ else } C_3: T_2  } \and
 \inferrule [ def ]
-{ \Gamma;\Delta \vdash C_1 : \ell.t \quad \Gamma, \ell.x : t ;\Delta \vdash C_2 : \tau_2 }
-{ \Gamma;\Delta \vdash \textsf{let } \ell.x = C_1 \textsf{ in } C_2 : \tau_2 } \and
+{ \Gamma;\Delta \vdash C_1 : \ell.t \quad \Gamma;\Delta, X : \ell.t \vdash C_2 : \tau_2 }
+{ \Gamma;\Delta \vdash \textsf{let } X = C_1 \textsf{ in } C_2 : \tau_2 } \and
 \inferrule [ fun ]
 { \Gamma ;\Delta , X : \tau_1 \vdash C : \tau_2 }
 { \Gamma ;\Delta \vdash \textsf{fun}\; X \Rightarrow C : \tau_1 \to \tau_2  } \and
@@ -258,46 +272,221 @@
 
 \end{mathpar}
 
+
+\section{Operational Semantics}
+\subsection{Local Language}
+\begin{syntax}
+     \category[Local values]{v}
+     \alternative{()}
+    \alternative{num}
+    \alternative{v_1 \odot v_2}
+    \alternative{(v_1, v_2)} 
+    \alternative{\textbf{left } v}
+    \alternative{\textbf{right } v}
+\end{syntax}
+
+\begin{mathpar}
+\inferrule  [binop 1 ]
+{ e_1 \to_l e'_1 }
+{ e_1 \odot  e_2 \to_l  e'_1  \Tilde{\odot} e_2  } \and
+\inferrule [ binop 2]
+{ e_2 \to_l e'_2 }
+{ v \odot e_2 \to_l v \Tilde{\odot} e'_2  } \and
+\inferrule [binop 3 ]
+{    }
+{ v_1 \odot v_2 \to_l v_1 \Tilde{\odot} v_2 \  (/ \notin \odot) } \and
+
+\inferrule[Loc - let 1]
+{e_1 \to_l e'_1}
+{\textsf{let $x := e_1$ in $e_2$} \to_l \textsf{let $x := e'_1$ in $e_2$} } \and
+
+\inferrule[Loc - let 2]
+{ }
+{\textsf{let $ x := v$ in $e$} \to_l e[x \mapsto v] } \and
+
+\inferrule [loc - pair 1]
+{ e_1 \to_l e'_1 }
+{ (e_1, e_2) \to_l (e'_1, e_2)  } \and
+\inferrule [loc - pair 2 ]
+{  e_2 \to_l e'_2    }
+{ (v, e_2) \to_l (v, e'_2)  } \and
+
+\inferrule [loc - fst ]
+{ e \to_l e' }
+{ \textsf{fst } e \to_l \textsf{fst } e' } \and
+\inferrule [loc - pair elim 1 ]
+{ }
+{ \textsf{fst } (v_1, v_2) \to_l v_1 }\and
+
+\inferrule [loc - snd ]
+{ e \to_l e' }
+{ \textsf{snd } e \to_l \textsf{snd } e' } \and
+\inferrule [loc - pair elim 2 ]
+{  }
+{ \textsf{snd } (v_1, v_2) \to_l v_2 } \and
+\inferrule [loc - left ]
+{ e \to_l e' }
+{ \textsf{left } e \to_l \textsf{left } e' } \and
+\inferrule [ loc - right]
+{ e \to_l e' }
+{ \textsf{right } e \to_l \textsf{right } e' } \and
+\inferrule [ Loc - match ]
+{ e \to_l e' }
+{ \textsf{(match e with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} \to_l \textsf{(match e' with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} } \and
+\inferrule [loc - Sum elim 1 ]
+{ }
+{ \textsf{(match (left v) with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} \to_l e_1\ [x \mapsto v] } \and
+\inferrule [loc - sum elim 2 ]
+{ }
+{ \textsf{(match (right v) with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$)} \to_l e_2\ [y \mapsto v] }
+
+\end{mathpar}
+
+\subsection{NetIR}
+\begin{mathpar}
+\textsf{fst} (E_1, E_2)  \to E_1 \and
+ \textsf{snd} (E_1, E_2)  \to E_2 \and
+\textsf{(match \ inl \ E \ with \ inl X} \Rightarrow E_1 \textsf{; inr Y} \Rightarrow E_2) \to E_1\ [X \mapsto E] \and
+\textsf{(match \ inr \ E \ with \ inl X} \Rightarrow E_1 \textsf{; inr Y} \Rightarrow E_2) \to E_2\ [Y \mapsto E]
+\end{mathpar}
+\\
+\subsection{Choreography}
+\begin{syntax}
+     \category[Choreographic Values]{V}
+     \alternative{()}
+    \alternative{\ell.v}
+    \alternative{(V_1, V_2)} 
+    \alternative{\textbf{left } V}
+    \alternative{\textbf{right } V}
+    \alternative{\textbf{fun } X \Rightarrow C}
+\end{syntax}
+
+\begin{mathpar}
+\inferrule [assoc ]
+{ e \to_l e' }
+{ \ell.e \to_g \ell.e' } \and
+
+\inferrule [send 1 ]
+{ C \to_g C'}
+{ C \leadsto \ell \to_g C' \leadsto \ell} \and
+\inferrule [send 2]
+{ }
+{ \ell.v \leadsto \ell' \to_g \ell'.v} \and
+\inferrule [sync ]
+{ }
+{ \ell_1[d] \leadsto \ell_2 ; C\to_g C} \and
+\inferrule[let 1]
+{C_1 \to_g C'_1}
+{\textsf{let $X := C_1$ in $C_2$} \to_g \textsf{let $X := C'_1$ in $C_2$} } \and
+\inferrule[let 2]
+{ }
+{\textsf{let $ X := V$ in $C$} \to_g C[X \mapsto V] } \and
+\inferrule[If 1]
+{C \to_g C'}
+{\textsf{if } C \textsf{ then } C_1 \textsf{ else } C_2 \to_g \textsf{if } C' \textsf{ then } C_1 \textsf{ else } C_2} \and
+\inferrule[If 2]
+{ }
+{\textsf{if } \ell.true \textsf{ then } C_1 \textsf{ else } C_2 \to_g C_1} \and
+\inferrule[If 3]
+{ }
+{\textsf{if } \ell.false \textsf{ then } C_1 \textsf{ else } C_2 \to_g C_2} \and
+\inferrule [App 1]
+{ C_1 \to_g C'_1 }
+{ C_1 C_2 \to_g C'_1 C_2  } \and
+\inferrule [app 2 ]
+{ C_2 \to_g C'_2 }
+{ \textsf{(fun $ X \Rightarrow$ C) } C_2 \to_g \textsf{(fun $ X \Rightarrow$ C) } C'_2  } \and
+\inferrule [app 3 ]
+{  }
+{\textsf{(fun $ X \Rightarrow$ C) }  V \to_g C[X \mapsto V]  } \and
+\inferrule [pair 1]
+{ C_1 \to_g C'_1 }
+{ (C_1, C_2) \to_g (C'_1, C_2)  } \and
+\inferrule [pair 2 ]
+{ C_2 \to_g C'_2    }
+{ (V, C_2) \to_g (V, C'_2)  } \and
+
+\inferrule [fst ]
+{ C \to_g C' }
+{ \textsf{fst } C \to_g \textsf{fst } C' } \and
+\inferrule [pair elim 1 ]
+{ }
+{ \textsf{fst } (V_1, V_2) \to_g V_1 } \and
+\inferrule [snd ]
+{ C \to_g C' }
+{ \textsf{snd } C \to_g \textsf{snd } C' } \and
+\inferrule [ pair elim 2]
+{  }
+{ \textsf{snd } (V_1, V_2) \to_g V_2 } \and
+\inferrule [left ]
+{ C \to_g C' }
+{ \textsf{left } C \to_g \textsf{left } C' } \and
+\inferrule [right ]
+{ C \to_g C' }
+{ \textsf{right } C \to_g \textsf{right } C' } \and
+\inferrule [match ]
+{ C \to_g C' }
+{ \textsf{(match C with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to_g \textsf{(match C' with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} } \and
+\inferrule [sum elim 1 ]
+{ }
+{ \textsf{(match (left V) with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to_g C_1\ [X \mapsto V] } \and
+\inferrule [sum elim 2 ]
+{ }
+{ \textsf{(match (right V) with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to_g C_2\ [Y \mapsto V] }
+
+\end{mathpar}
+
+
 \section{Theorems}
-\textbf{Theorem 1.} (\textit{Local Progress}): For every expression $\cdot \vdash e : t$ either $  \exists \ e'.\ e \to e'$  or $e$ is a value
+\textbf{Theorem 1.} (\textit{Local Progress}): For every expression $\cdot \vdash e : t$ either $  \exists \ e'.\ e \to_l e'$  or $e$ is a value
   \\
 \textit{Proof.} We will start with induction on e \\\\
 \textbf{Case e = ()} \\
 () is a value and we are done \\ \\
 \textbf{Case e = num} \\
 num is a value and we are done \\ \\
-\textbf{Case e = $e_1$ binop $e_2$} \\
-IH1 $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
-if $e_1 \to e'_1$ then $e_1$ binop $e_2 \to e'_1$ binop $e_2$ \\
-if $e_1$ is a value, IH2 $e_2$ is either a value or $  \exists \ e'_2.\ e_2 \to e'_2 $ \\
-if $e_2$ is a value, then $e_1$ binop $e_2 \to$ a value given $e_1$ and $e_2$ are numbers \\
-if $e_2 \to e'_2$ then $e_1$ binop $e_2 \to e_1$ binop $e'_2$ \\ \\
+\textbf{Case e = $e_1 \odot e_2$} \\
+IH1 $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
+if $e_1 \to_l e'_1$ then $e_1 \odot e_2 \to_l e'_1 \Tilde{\odot} \ e_2$ using binop 1 rule\\
+if $e_1$ is a value $v_1$, IH2 $e_2$ is either a value or $  \exists \ e'_2.\ e_2 \to_l e'_2 $ \\
+if $e_2$ is a value $v_2$, then $v_1 \odot v_2 \to_l v_1 \Tilde{\odot} \ v_2$, which is a value using the binop 3 rule  \\
+if $e_2 \to_l e'_2$ then $v_1 \odot e_2 \to_l v_1 \Tilde{\odot} \ e'_2$ using binop 2 rule 
+\\ \\
+\textbf{Case e = let $x := e_1$ in $e_2$} \\
+IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
+if $e_1 \to_l e'_1$ then let $x := e_1$ in $e_2 \to_l $ let $x := e'_1$ in $e_2$ using loc - let 1 rule\\
+if $e_1$ is a value $v$, then let $x := v$ in $e_2 \to_l e_2[x \mapsto v]$ using loc - let 2 rule
+\\ \\
 \textbf{Case e = $(e_1,e_2)$} \\
-IH1 $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
-if $e_1 \to e'_1$ then $(e_1,e_2) \to (e'_1, e_2)$\\
-if $e_1$ is a value, IH2 $e_2$ is either a value or $  \exists \ e'_2.\ e_2 \to e'_2 $ \\
-if $e_2$ is a value, then $(e_1,e_2)$ is a value \\
-if $e_2 \to e'_2$ then $(e_1,e_2) \to (e_1,e'_2)$ \\ \\
+IH1 $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
+if $e_1 \to_l e'_1$ then $(e_1,e_2) \to_l (e'_1, e_2)$ using loc - pair 1 rule\\
+if $e_1$ is a value $v_1$, IH2 $e_2$ is either a value or $  \exists \ e'_2.\ e_2 \to_l e'_2 $ \\
+if $e_2$ is a value $v_2$, then $(v_1,v_2)$ is a value \\
+if $e_2 \to_l e'_2$ then $(v_1,e_2) \to_l (v_1,e'_2)$ using loc - pair 2 rule \\ \\
 \textbf{Case e = fst $e_1$} \\
-IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
-if $e_1 \to e'_1$ then fst $e_1 \to$ fst $e'_1$\\
-if $e_1$ is a value, this means $e_1$ is a pair of values as $e_1: t_1 x t_2$
- so if $e_1 = (v_1, v_2)$ then fst $e_1 \to$ $v_1$\\ \\
+IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
+if $e_1 \to_l e'_1$ then fst $e_1 \to_l $ fst $e'_1$ using loc - fst rule\\
+if $e_1$ is a value $v$, this means $v = (v_1, v_2)$ then fst $(v_1, v_2) \to_l v_1$ using loc - pair elim 1 rule\\ \\
 \textbf{Case e = snd $e_1$} \\
-IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
-if $e_1 \to e'_1$ then snd $e_1 \to$ snd $e'_1$\\
-if $e_1$ is a value, this means $e_1$ is a pair of values as $e_1: t_1 x t_2$
- so if $e_1 = (v_1, v_2)$ then snd $e_1 \to$ $v_2$\\ \\
+IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
+if $e_1 \to_l e'_1$ then snd $e_1 \to_l $ snd $e'_1$ using loc - snd rule\\
+if $e_1$ is a value $v$, this means $v = (v_1, v_2)$ then snd $(v_1, v_2) \to_l v_2$ using loc - pair elim 2 rule\\ \\
 \textbf{Case e = left $e_1$} \\
-IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
-if $e_1 \to e'_1$ then left $e_1 \to$ left $e'_1$\\
-if $e_1$ is a value,then left $e_1$ is a value\\ \\
+IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
+if $e_1 \to_l e'_1$ then left $e_1 \to_l$ left $e'_1$ using loc - left rule\\
+if $e_1$ is a value $v$, then left $v$ is a value\\ \\
 \textbf{Case e = right $e_1$} \\
-IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to e'_1 $ \\
-if $e_1 \to e'_1$ then right $e_1 \to$ right $e'_1$\\
-if $e_1$ is a value,then right $e_1$ is a value\\ \\
-
-
+IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
+if $e_1 \to_l e'_1$ then right $e_1 \to_l$ right $e'_1$ using loc - right rule\\
+if $e_1$ is a value $v$, then right $v$ is a value\\ \\
+\textbf{Case e = match $e_1$ with left x $\Rightarrow e_2$; right y $\Rightarrow e_3$}\\
+IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
+if $e_1 \to_l e'_1$ then match $e_1$ with left x $\Rightarrow e_2$; right y $\Rightarrow e_3 \to_l$ match $e'_1$ with left x $\Rightarrow e_2$; right y $\Rightarrow e_3$ using loc - match rule\\
+if $e_1$ is a value, then $e_1$ is either left $v$ or right $v$\\
+if $e_1 = $ left $v$ then match (left $v$) with left x $\Rightarrow e_2$; right y $\Rightarrow e_3 \to_l$ $e_2[x \mapsto v]$ using loc - sum elim 1 rule\\
+if $e_1 = $ right $v$ then match (right $v$) with left x $\Rightarrow e_2$; right y $\Rightarrow e_3 \to_l$ $e_3[y \mapsto v]$ using loc - sum elim 2 rule\\
+\\\\ 
+\\
 \textbf{Theorem 2.} (\textit{Local Preservation}): If $\Gamma \vdash e : t$ and  $e \to e'$ then $\Gamma \vdash e' : t$
   \\
 \textit{Proof.} We will start with induction on $\Gamma \vdash e : t$ \\\\
@@ -339,47 +528,76 @@ match $e'$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3$ and $\Gamm
 Using IH we can say $\Gamma \vdash$ match $e'$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 : t_3$ 
 \\\\
 \\
-\textbf{Theorem 3.} (\textit{Progress}): For every choreography $\cdot \vdash C : \tau$ either $  \exists \ C'.\ C \to C'$  or $C$ is a value
+\textbf{Theorem 3.} (\textit{Progress}): For every choreography $\cdot \vdash C : \tau$ either $  \exists \ C'.\ C \to_g C'$  or $C$ is a value
   \\
 \textit{Proof.} We will start with induction on C \\\\
 \textbf{Case C = ()} \\
 () is a value and we are done \\ \\
 \textbf{Case C = $\ell.e$} \\
-we know from local progress, e is either a value or $ \exists \ e'.\ e \to e'$  \\
-So, if e is a value, $\ell.e$ is a value and we are done \\
-If $ \exists \ e'.\ e \to e'$ then, $ \ell. e \to \ell.e'$
+we know from local progress that e is either a value or $ \exists \ e'.\ e \to_l e'$  \\
+So, if e is a value $v$, $\ell.v$ is a value and we are done \\
+If $ \exists \ e'.\ e \to_l e'$ then, $ \ell. e \to_g \ell.e'$ using assoc rule
 \\ \\
 \textbf{Case C = $C_1 \leadsto \ell$} \\
-IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to C'_1 $ \\
-if $C_1 \to C'_1$ then $C_1 \leadsto \ell \to C'_1 \leadsto \ell$ \\
-if $C_1$ is a value,  \textbf{//doubt} 
+IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
+if $C_1 \to_g C'_1$ then $C_1 \leadsto \ell \to_g C'_1 \leadsto \ell$ using the send 1 rule \\
+if $C_1$ is a value, $C_1 = \ell'.v$ and $\ell'.v \leadsto \ell \to_g \ell.v$ using send 2 rule 
+\\
+\\
+\textbf{Case C = $\ell_1[d] \leadsto \ell_2; C_1$} \\ 
+ we know that, $\ell_1[d] \leadsto \ell_2; C_1 \to_g C_1$ using sync rule \\
 \\
 \textbf{Case C = if $C_1$ then $C_2$ else $C_3$} \\
+IH1 $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
+if $C_1 \to C'_1$ then if $C_1$ then $C_2$ else $C_3 \to_g $ if $C'_1$ then $C_2$ else $C_3$ using if 1 rule\\
+if $C_1$ is a value, then $C_1$ is either $\ell.true$ or $\ell.false$ \\
+if $C_1 = \ell.true$ then if $C_1$ then $C_2$ else $C_3 \to_g C_2$ using if 2 rule\\
+if $C_1 = \ell.false$ then if $C_1$ then $C_2$ else $C_3 \to_g C_3$ using if 3 rule\\
 \\
+\textbf{Case C = let $X := C_1$ in $C_2$} \\
+IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
+if $C_1 \to_g C'_1$ then let $X := C_1$ in $C_2 \to_g $ let $X := C'_1$ in $C_2$ using let 1 rule\\
+if $C_1$ is a value $V$, then let $X := V$ in $C_2 \to_g C_2[X \mapsto V]$ using let 2 rule
+\\ \\
+\textbf{Case C = fun $X \Rightarrow C_1$ } \\
+fun $X \Rightarrow C_1$ is a value and we are done 
+\\ \\
+\textbf{Case C = $C_1 C_2$} \\
+IH1 $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
+if $C_1 \to_g C'_1$ then $C_1 C_2 \to_g C'_1 C_2$ using app 1 rule\\
+if $C_1$ is a value, fun $X \Rightarrow C'$, IH2 $C_2$ is either a value or $  \exists \ C'_2.\ C_2 \to_g C'_2 $ \\
+if $C_2$ is a value $V$, then (fun $X \Rightarrow C') V \to_g C'[X \mapsto V]$ using app 3 rule \\
+if $C_2 \to_g C'_2$ then (fun $X \Rightarrow C') C_2 \to_g$ (fun $X \Rightarrow C') C'_2$ using app 2 rule 
+\\ \\
 \textbf{Case C = $(C_1,C_2)$} \\
-IH1 $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to C'_1 $ \\
-if $C_1 \to C'_1$ then $(C_1,C_2) \to (C'_1, C_2)$\\
-if $C_1$ is a value, IH2 $C_2$ is either a value or $  \exists \ C'_2.\ C_2 \to C'_2 $ \\
-if $C_2$ is a value, then $(C_1,C_2)$ is a value \\
-if $C_2 \to C'_2$ then $(C_1,C_2) \to (C_1,C'_2)$ \\ \\
+IH1 $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
+if $C_1 \to_g C'_1$ then $(C_1,C_2) \to_g (C'_1, C_2)$ using pair 1 rule\\
+if $C_1$ is a value $V_1$, IH2 $C_2$ is either a value or $  \exists \ C'_2.\ C_2 \to_g C'_2 $ \\
+if $C_2$ is a value $V_2$, then $(V_1,V_2)$ is a value \\
+if $C_2 \to_g C'_2$ then $(V_1,C_2) \to (V_1,C'_2)$ using pair 2 rule \\ \\
 \textbf{Case C = fst $C_1$} \\
-IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to C'_1 $ \\
-if $C_1 \to C'_1$ then fst $C_1 \to$ fst $C'_1$\\
-if $C_1$ is a value, this means $C_1$ is a pair of values as $C_1: \tau_1$ x $\tau_2$
- so if $C_1 = (v_1, v_2)$ then fst $C_1 \to$ $v_1$\\ \\
+IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
+if $C_1 \to_g C'_1$ then fst $C_1 \to_g$ fst $C'_1$ using fst rule\\
+if $C_1$ is a value $V$, this means $V = (V_1, V_2)$ then fst $(V_1, V_2) \to_g V_1$ using pair elim 1 rule\\ \\
 \textbf{Case C = snd $C_1$} \\
-IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to C'_1 $ \\
-if $C_1 \to C'_1$ then snd $C_1 \to$ snd $C'_1$\\
-if $C_1$ is a value, this means $C_1$ is a pair of values as $C_1: \tau_1$ x $\tau_2$
- so if $C_1 = (v_1, v_2)$ then snd $C_1 \to$ $v_2$\\ \\
+IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
+if $C_1 \to_g C'_1$ then snd $C_1 \to_g$ snd $C'_1$ using snd rule\\
+if $C_1$ is a value $V$, this means $V = (V_1, V_2)$ then snd $(V_1, V_2) \to_g V_2$ using pair elim 2 rule\\ \\
 \textbf{Case C = left $C_1$} \\
-IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to C'_1 $ \\
-if $C_1 \to C'_1$ then left $C_1 \to$ left $C'_1$\\
-if $C_1$ is a value,then left $C_1$ is a value\\ \\
+IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
+if $C_1 \to_g C'_1$ then left $C_1 \to_g$ left $C'_1$ using left rule\\
+if $C_1$ is a value $V$,then left $V$ is a value\\ \\
 \textbf{Case C = right $C_1$} \\
-IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to C'_1 $ \\
-if $C_1 \to C'_1$ then right $C_1 \to$ right $C'_1$\\
-if $C_1$ is a value,then right $C_1$ is a value\\ \\
+IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
+if $C_1 \to_g C'_1$ then right $C_1 \to_g$ right $C'_1$ using right rule\\
+if $C_1$ is a value $V$,then right $V$ is a value\\ \\
+\textbf{Case C = match $C_1$ with left X $\Rightarrow C_2$; right Y $\Rightarrow C_3$}\\
+IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
+if $C_1 \to_g C'_1$ then match $C_1$ with left X $\Rightarrow C_2$; right Y $\Rightarrow C_3 \to_g$ match $C'_1$ with left X $\Rightarrow C_2$; right Y $\Rightarrow C_3$ using match rule\\
+if $C_1$ is a value, then $C_1$ is either left $V$ or right $V$\\
+if $C_1 = $ left $V$ then match (left $V$) with left X $\Rightarrow C_2$; right Y $\Rightarrow C_3 \to_g$ $C_2[X \mapsto V]$ using sum elim 1 rule\\
+if $C_1 = $ right $V$ then match (right $V$) with left X $\Rightarrow C_2$; right Y $\Rightarrow C_3 \to_g$ $C_3[Y \mapsto V]$ using sum elim 2 rule\\
+\\
 \\
 \textbf{Theorem 4.} (\textit{Preservation}): If $\Gamma;\Delta \vdash C : \tau$ and  $C \to C'$ then $\Gamma;\Delta \vdash C' : \tau$
   \\
@@ -427,22 +645,6 @@ match $C'$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3$ and $\Gamm
 Using IH we can say, $\Gamma; \Delta \vdash$ match $C'$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3 : \tau_3$ \\\\
 
 
-\section{Operational Semantics}
-\subsection{Network Language}
-\begin{mathpar}
-\textsf{fst} (E_1, E_2)  \to E_1 \and
- \textsf{snd} (E_1, E_2)  \to E_2 \and
-\textsf{(match \ inl \ E \ with \ inl X} \Rightarrow E_1 \textsf{; inr Y} \Rightarrow E_2) \to E_1\ [X \mapsto E] \and
-\textsf{(match \ inr \ E \ with \ inl X} \Rightarrow E_1 \textsf{; inr Y} \Rightarrow E_2) \to E_2\ [Y \mapsto E]
-\end{mathpar}
-\\
-\subsection{Choreography}
-\begin{mathpar}
-\textsf{fst} (C_1, C_2)  \to C_1 \and
- \textsf{snd} (C_1, C_2)  \to C_2 \and
-\textsf{(match \ inl \ C \ with \ inl X} \Rightarrow C_1 \textsf{; inr Y} \Rightarrow C_2) \to C_1\ [X \mapsto C] \and
-\textsf{(match \ inr \ C \ with \ inl X} \Rightarrow C_1 \textsf{; inr Y} \Rightarrow C_2) \to C_2\ [Y \mapsto C]
-\end{mathpar}
 
 \section{Glossary}
 $$

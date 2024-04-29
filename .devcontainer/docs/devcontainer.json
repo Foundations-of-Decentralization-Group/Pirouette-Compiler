@@ -8,6 +8,7 @@
         "valentjn.vscode-ltex"
       ],
       "settings": {
+        "latex-workshop.latex.autoBuild.run": "onSave",
         "latex-workshop.latex.autoClean.run": "onBuilt"
       }
     }
