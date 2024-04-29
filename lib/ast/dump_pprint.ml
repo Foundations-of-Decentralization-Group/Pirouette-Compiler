@@ -22,7 +22,7 @@ let rec pprint_local_expr ppf (e : Local.expr) =
   | Unit -> fprintf ppf "@[<h>()@]"
   | Val v ->
     fprintf ppf "@[<h>%a@]"
-      (fun ppf -> function `Int i -> fprintf ppf "%d" i | `String s -> fprintf ppf "%s" s | `Bool b -> fprintf ppf "%b" b) v
+      (fun ppf -> function `Int i -> fprintf ppf "%d" i | `String s -> fprintf ppf "\"%s\"" s | `Bool b -> fprintf ppf "%b" b) v
   | Var (VarId id) ->
       fprintf ppf "@[<h>%s@]" id
   | BinOp (e1, op, e2) ->
@@ -135,9 +135,9 @@ and pprint_choreo_stmt ppf = function
       fprintf ppf "@[<h>(%a) : %a@];"
         pprint_choreo_pattern p
         pprint_choreo_type t
-  | Assign (p, e) ->
+  | Assign (ps, e) ->
       fprintf ppf "@[<hv2>(%a) :=@ (%a)@];"
-        pprint_choreo_pattern p
+        (pp_print_list ~pp_sep:pp_print_space pprint_choreo_pattern) ps
         pprint_choreo_expr e
   | TypeDecl (TypId id, t) ->
       fprintf ppf "@[<h>%s : %a@]"
@@ -205,7 +205,7 @@ and pprint_choreo_expr ppf = function
         pprint_choreo_expr e1
         pprint_choreo_expr e2
   | Match (e, cases) ->
-      fprintf ppf "@[<hv>match (%a)@ with@[<v2>@ | %a@]@]"
+      fprintf ppf "@[<v>match (%a)@ with@ | %a@]"
         pprint_choreo_expr e
         (pp_print_list ~pp_sep:(fun ppf () -> fprintf ppf "@ | ") pprint_choreo_case) cases
 
@@ -275,9 +275,9 @@ and pprint_net_stmt ppf = function
       fprintf ppf "@[<h>(%a) : %a@];"
         pprint_local_pattern p
         pprint_net_type t
-  | Assign (p, e) ->
+  | Assign (ps, e) ->
       fprintf ppf "@[<hv2>(%a) :=@ (%a)@];"
-        pprint_local_pattern p
+        (pp_print_list ~pp_sep:pp_print_space pprint_local_pattern) ps
         pprint_net_expr e
   | TypeDecl (TypId id, t) ->
       fprintf ppf "@[<h>%s : %a@]"
@@ -301,7 +301,7 @@ and pprint_net_expr ppf = function
   | Send (e, LocId loc) ->
       fprintf ppf "@[<hv2>(%a) ~>@ %s@]" pprint_net_expr e loc
   | Recv (LocId loc) ->
-    fprintf ppf "@Recv@[<h>(%s)]"  loc
+    fprintf ppf "@[Recv@[<h>(%s)@]"  loc
   | If (e1, e2, e3) ->
       fprintf ppf "@[<hv>if@;<1 2>(%a)@ then@;<1 2>(%a)@ else@;<1 2>(%a)@]"
         pprint_net_expr e1
@@ -328,12 +328,12 @@ and pprint_net_expr ppf = function
         pprint_net_expr e
         (pp_print_list ~pp_sep:(fun ppf () -> fprintf ppf "@ | ") pprint_net_case) cases
   | ChooseFor (LabelId id, LocId locid, e) -> 
-      fprintf ppf "@[<hv2>choose %s for %s@ %a]"
+      fprintf ppf "@[<hv2>choose %s for %s;@ %a@]"
         id
         locid
         pprint_net_expr e
   | AllowChoice (LocId loc, choices) -> 
-      fprintf ppf "@[<hv>allow %s@ choice@[<v2>@,| %a@]@]"
+      fprintf ppf "@[<v>allow %s choice@ | %a@]"
         loc
         (pp_print_list ~pp_sep:(fun ppf () -> fprintf ppf "@ | ") pprint_net_choice) choices
 

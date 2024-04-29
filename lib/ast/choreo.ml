@@ -33,7 +33,7 @@ type expr =
 
 and stmt =
   | Decl of pattern * typ
-  | Assign of pattern * expr
+  | Assign of pattern list * expr
   | TypeDecl of Local.typ_id * typ
 
 and stmt_block = stmt list

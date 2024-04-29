@@ -9,11 +9,11 @@ and jsonify_stmt = function
             `Assoc [ ("choreo_pattern", jsonify_choreo_pattern p); ("choreo_type", jsonify_choreo_type t) ]
           );
         ]
-  | Assign (p, e) ->
+  | Assign (ps, e) ->
       `Assoc
         [
           ( "Assign",
-            `Assoc [ ("choreo_pattern", jsonify_choreo_pattern p); ("choreo_expr", jsonify_choreo_expr e) ]
+            `Assoc [ ("choreo_pattern", `List (List.map jsonify_choreo_pattern ps)); ("choreo_expr", jsonify_choreo_expr e) ]
           );
         ]
   | TypeDecl (TypId id, t) ->

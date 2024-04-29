@@ -62,9 +62,9 @@ stmt_block:
 
 /* TODO: Removing the need for semicolons */
 stmt:
-  | choreo_pattern COLON choreo_type SEMICOLON        { Decl ($1, $3)}
-  | choreo_pattern COLONEQ choreo_expr SEMICOLON      { Assign ($1, $3) }
-  | TYPE typ_id COLONEQ choreo_type SEMICOLON?        { TypeDecl ($2, $4) }
+  | choreo_pattern COLON choreo_type SEMICOLON                   { Decl ($1, $3)}
+  | nonempty_list(choreo_pattern) COLONEQ choreo_expr SEMICOLON  { Assign ($1, $3) }
+  | TYPE typ_id COLONEQ choreo_type SEMICOLON?                   { TypeDecl ($2, $4) }
 
 /* Associativity increases from expr to expr3, with each precedence level falling through to the next. */
 choreo_expr:
@@ -75,18 +75,18 @@ choreo_expr:
   | SND choreo_expr                                                                                  { Snd $2 }
   | LEFT choreo_expr                                                                                 { Left $2 }
   | RIGHT choreo_expr                                                                                { Right $2 }
-  | LPAREN choreo_expr COMMA choreo_expr RPAREN                                                      { Pair ($2, $4) }
   | MATCH choreo_expr WITH nonempty_list(choreo_case)                                                { Match ($2, $4) }
   | loc_id LBRACKET sync_label RBRACKET TILDE_ARROW loc_id SEMICOLON choreo_expr                     { Sync ($1, $3, $6, $8) }
   | LBRACKET loc_id RBRACKET choreo_expr TILDE_ARROW loc_id                                          { Send ($2, $4, $6) }
-  | LBRACKET loc_id RBRACKET choreo_expr TILDE_ARROW loc_id DOT local_pattern SEMICOLON choreo_expr  { Let ([Assign (LocPatt ($6, $8), Send ($2, $4, $6))], $10) }
-  | choreo_expr_app                                                                                  { $1 }
+  | LBRACKET loc_id RBRACKET choreo_expr TILDE_ARROW loc_id DOT local_pattern SEMICOLON choreo_expr  { Let ([Assign ([LocPatt ($6, $8)], Send ($2, $4, $6))], $10) }
+  | choreo_expr1                                                                                     { $1 }
 
-choreo_expr_app:
-  | choreo_expr_app choreo_expr_basic                                                                { FunApp ($1, $2) }
-  | choreo_expr_basic                                                                                { $1 }
+choreo_expr1:
+  | choreo_expr1 choreo_expr2                                                                        { FunApp ($1, $2) }
+  | choreo_expr2 COMMA choreo_expr2                                                                  { Pair ($1, $3) }
+  | choreo_expr2                                                                                     { $1 }
 
-choreo_expr_basic:
+choreo_expr2:
   | LPAREN RPAREN                                                                                    { Unit }
   | var_id                                                                                           { Var $1 }
   | loc_id DOT local_expr                                                                            { LocExpr ($1, $3) }

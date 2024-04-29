@@ -7,7 +7,7 @@ let rec extract_stmt_block (stmts : Choreo.stmt_block) =
 
 and extract_stmt = function
   | Decl (p, t) -> LocSet.union (extract_pattern p) (extract_type t)
-  | Assign (p, e) -> LocSet.union (extract_pattern p) (extract_expr e)
+  | Assign (ps, e) -> LocSet.union (List.fold_left (fun acc p -> LocSet.union acc (extract_pattern p)) LocSet.empty ps) (extract_expr e)
   | TypeDecl (_, t) -> extract_type t
 
 and extract_expr = function

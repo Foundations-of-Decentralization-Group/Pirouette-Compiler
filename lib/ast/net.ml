@@ -26,7 +26,7 @@ type expr =
 
 and stmt =
   | Decl of Local.pattern * typ
-  | Assign of Local.pattern * expr
+  | Assign of Local.pattern list * expr
   | TypeDecl of Local.typ_id * typ
 
 and stmt_block = stmt list

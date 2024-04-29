@@ -3,7 +3,7 @@ open Ast
 let rec epp_stmt (stmt : Choreo.stmt) (loc : string) : Net.stmt =
   match stmt with
   | Decl (p, t) -> Decl (epp_pattern p loc, epp_type t loc)
-  | Assign (p, e) -> Assign (epp_pattern p loc, epp_expr e loc)
+  | Assign (ps, e) -> Assign (List.map (fun p -> epp_pattern p loc) ps, epp_expr e loc)
   | TypeDecl (id, t) -> TypeDecl (id, epp_type t loc)
 
   (* change e to c*)
@@ -179,3 +179,6 @@ and merge_choice_into tbl (label, expr) =
       | Some e -> Hashtbl.replace tbl label e
       | None -> Hashtbl.add tbl label expr)
   | None -> Hashtbl.add tbl label expr
+
+let epp (Choreo.Prog prog) loc =
+  Net.Prog (List.map (fun stmt -> epp_stmt stmt loc) prog)
