@@ -1,0 +1,25 @@
+name: Publish PDF Docs on Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  compile-and-release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Git repository
+      uses: actions/checkout@v4
+    - name: Compile LaTeX docs
+      uses: xu-cheng/latex-action@v3
+      with:
+        root_file: |
+          concrete_syntax.tex
+          theory.tex
+        working_directory: ./docs/
+    - name: Upload PDFs to Release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        file: ./docs/*.pdf
+        file_glob: true
+        overwrite: true
