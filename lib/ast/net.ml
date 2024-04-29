@@ -15,7 +15,7 @@ type expr =
   | Recv of Local.loc_id
   | ChooseFor of Local.sync_label * Local.loc_id * expr
   | AllowChoice of Local.loc_id * (Local.sync_label * expr) list
-  | FunDef of Local.pattern * expr
+  | FunDef of Local.pattern list * expr
   | FunApp of expr * expr
   | Pair of expr * expr
   | Fst of expr

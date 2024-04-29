@@ -198,9 +198,9 @@ and pprint_choreo_expr ppf = function
       fprintf ppf "@[<hv>let@;<1 2>%a@ in (%a)@]"
         pprint_choreo_stmt_block stmt_block
         pprint_choreo_expr e
-  | FunDef (p, e) -> 
+  | FunDef (ps, e) -> 
       fprintf ppf "@[<hv2>fun@ (%a) ->@ (%a)@]"
-        pprint_choreo_pattern p
+        (pp_print_list ~pp_sep:pp_print_space pprint_choreo_pattern) ps
         pprint_choreo_expr e
   | FunApp (e1, e2) ->
       fprintf ppf "@[<hv>(%a)@ (%a)@]"
@@ -319,9 +319,9 @@ and pprint_net_expr ppf = function
       fprintf ppf "@[<hv>let@;<1 2>%a@ in (%a)@]"
         pprint_net_stmt_block stmt_block
         pprint_net_expr e
-  | FunDef (p, e) -> 
+  | FunDef (ps, e) -> 
       fprintf ppf "@[<hv2>fun@ (%a) ->@ (%a)@]"
-        pprint_local_pattern p
+        (pp_print_list ~pp_sep:pp_print_space pprint_local_pattern) ps
         pprint_net_expr e
   | FunApp (e1, e2) ->
       fprintf ppf "@[<hv>(%a)@ (%a)@]"

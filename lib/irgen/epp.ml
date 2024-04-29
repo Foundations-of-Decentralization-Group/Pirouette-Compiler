@@ -9,7 +9,7 @@ let rec epp_stmt (stmt : Choreo.stmt) (loc : string) : Net.stmt =
 and epp_expr (c : Choreo.expr) (loc : string) : Net.expr =
   match c with
   | LocExpr (LocId loc1, e) when loc1 = loc -> Ret e
-  | FunDef (p, c) -> FunDef (epp_pattern p loc, epp_expr c loc)
+  | FunDef (ps, c) -> FunDef (List.map (fun p -> epp_pattern p loc) ps, epp_expr c loc)
   | FunApp (c1, c2) -> FunApp (epp_expr c1 loc, epp_expr c2 loc)
   | Pair (c1, c2) -> Pair (epp_expr c1 loc, epp_expr c2 loc)
   | Fst c -> Fst (epp_expr c loc)

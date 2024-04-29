@@ -22,7 +22,7 @@ type expr =
   | Sync of Local.loc_id * Local.sync_label * Local.loc_id * expr
   | If of expr * expr * expr
   | Let of stmt_block * expr
-  | FunDef of pattern * expr
+  | FunDef of pattern list * expr
   | FunApp of expr * expr
   | Pair of expr * expr
   | Fst of expr

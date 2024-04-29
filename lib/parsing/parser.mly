@@ -72,7 +72,7 @@ stmt:
 choreo_expr:
   | IF choreo_expr THEN choreo_expr ELSE choreo_expr                                                 { If ($2, $4, $6) }
   | LET stmt_block IN choreo_expr                                                                    { Let ($2, $4) }
-  | FUN choreo_pattern ARROW choreo_expr                                                             { FunDef ($2, $4) }
+  | FUN nonempty_list(choreo_pattern) ARROW choreo_expr                                              { FunDef ($2, $4) }
   | FST choreo_expr                                                                                  { Fst $2 }
   | SND choreo_expr                                                                                  { Snd $2 }
   | LEFT choreo_expr                                                                                 { Left $2 }
