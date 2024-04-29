@@ -1,10 +1,10 @@
-y: P2.int
-y := if P1. (3>5)
+y: P2.int;
+y := if P1.(3>5)
    then P1[L] ~> P2;
           P2.5
      else P1[R] ~> P2;
           P2.9
-
+;
 {-
   NetIR:
   P1:
