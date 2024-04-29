@@ -25,6 +25,12 @@ let rec pprint_local_expr ppf (e : Local.expr) =
       (fun ppf -> function `Int i -> fprintf ppf "%d" i | `String s -> fprintf ppf "\"%s\"" s | `Bool b -> fprintf ppf "%b" b) v
   | Var (VarId id) ->
       fprintf ppf "@[<h>%s@]" id
+  | UnOp (op, e) ->
+      fprintf ppf "@[<h>%s(%a)@]"
+      (match op with
+        | Not -> "not "
+        | Neg -> "-")
+      pprint_local_expr e
   | BinOp (e1, op, e2) ->
       fprintf ppf "@[<hv2>(%a) %s@ (%a)@]"
       pprint_local_expr e1

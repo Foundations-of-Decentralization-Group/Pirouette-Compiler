@@ -10,6 +10,7 @@
 %token UNIT_T INT_T STRING_T BOOL_T
 %token FUN TYPE
 %token PLUS MINUS TIMES DIV
+%token NOT
 %token AND OR
 %token EQ NEQ LT LEQ GT GEQ
 %token LPAREN RPAREN LBRACKET RBRACKET
@@ -47,6 +48,7 @@
 %right ARROW
 %left PLUS MINUS
 %left TIMES DIV
+%nonassoc UNARY
 %left DOT
 
 
@@ -96,6 +98,7 @@ local_expr:
   | LPAREN RPAREN                                    { Unit }
   | value                                            { Val $1 }                                                                    
   | var_id                                           { Var $1 }
+  | un_op local_expr %prec UNARY                     { UnOp ($1, $2) }
   | local_expr bin_op local_expr                     { BinOp ($1, $2, $3) }
   | LET var_id COLONEQ local_expr IN local_expr      { Let ($2, $4, $6) }
   | LPAREN local_expr COMMA local_expr RPAREN        { Pair ($2, $4) }
@@ -164,6 +167,10 @@ value:
 
 %inline local_case:
   | VERTICAL local_pattern ARROW local_expr    { ($2, $4) }
+
+%inline un_op:
+  | MINUS { Neg }
+  | NOT   { Not }
 
 %inline bin_op:
   | PLUS  { Plus }

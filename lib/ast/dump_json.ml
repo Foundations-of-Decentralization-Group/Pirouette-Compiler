@@ -17,6 +17,8 @@ let rec jsonify_local_expr (e: Local.expr) =
       `Assoc [ ("Right", jsonify_local_expr e) ]
   | Pair (e1, e2) ->
       `Assoc [ ("Pair", `List [ jsonify_local_expr e1; jsonify_local_expr e2 ]) ]
+  | UnOp (op, e) ->
+      `Assoc [ ("UnOp", `Assoc [ ("op", jsonify_un_op op); ("choreo_e", jsonify_local_expr e) ]) ]
   | BinOp (e1, op, e2) ->
       `Assoc
         [
@@ -77,6 +79,10 @@ and jsonify_local_type (t: Local.typ) =
       `Assoc [ ("TProd", `List [ jsonify_local_type t1; jsonify_local_type t2 ]) ]
   | TSum (t1, t2) ->
       `Assoc [ ("TSum", `List [ jsonify_local_type t1; jsonify_local_type t2 ]) ]
+
+and jsonify_un_op = function
+  | Not -> `String "Not"
+  | Neg -> `String "Neg"
 
 and jsonify_bin_op = function
   | Plus  -> `String "Plus"

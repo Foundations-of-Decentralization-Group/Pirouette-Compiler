@@ -8,6 +8,10 @@ type var_id = VarId of string
 type typ_id = TypId of string
 type sync_label = LabelId of string
 
+type un_op =
+  | Not
+  | Neg
+
 type bin_op =
   | Plus
   | Minus
@@ -42,6 +46,7 @@ type expr =
   | Unit
   | Val of value
   | Var of var_id
+  | UnOp of un_op * expr
   | BinOp of expr * bin_op * expr
   | Let of var_id * expr * expr
   | Pair of expr * expr
