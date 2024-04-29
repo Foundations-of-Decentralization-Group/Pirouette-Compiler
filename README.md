@@ -1,16 +1,16 @@
-## Build `pirc`:
+## Build `pirc`
 
 ```sh
 dune build
 ```
 
-## Run tests:
+## Run tests
 
 ```sh
 dune runtest
 ```
 
-## Build and execute:
+## Build and execute
 
 ```sh
 cd examples
