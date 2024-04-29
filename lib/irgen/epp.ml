@@ -6,10 +6,9 @@ let rec epp_stmt (stmt : Choreo.stmt) (loc : string) : Net.stmt =
   | Assign (ps, e) -> Assign (List.map (fun p -> epp_pattern p loc) ps, epp_expr e loc)
   | TypeDecl (id, t) -> TypeDecl (id, epp_type t loc)
 
-  (* change e to c*)
 and epp_expr (c : Choreo.expr) (loc : string) : Net.expr =
   match c with
-  | LocExpr (LocId loc1, e) when loc1 == loc -> Ret e
+  | LocExpr (LocId loc1, e) when loc1 = loc -> Ret e
   | FunDef (p, c) -> FunDef (epp_pattern p loc, epp_expr c loc)
   | FunApp (c1, c2) -> FunApp (epp_expr c1 loc, epp_expr c2 loc)
   | Pair (c1, c2) -> Pair (epp_expr c1 loc, epp_expr c2 loc)
@@ -71,7 +70,7 @@ and epp_type (t : Choreo.typ) (loc : string) : Net.typ =
   | TSum (t1, t2) -> TSum (epp_type t1 loc, epp_type t2 loc)
   | _ -> TUnit
 
-(* add more exprs *)
+(* TODO: change Hashtbl to List *)
 and merge_expr (e1 : Net.expr) (e2 : Net.expr) : Net.expr option =
   match (e1, e2) with
   | Unit, Unit -> Some Unit

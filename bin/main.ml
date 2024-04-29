@@ -31,14 +31,8 @@ let () =
   let program = parse_program lexbuf in
 
   (match !ast_dump_format with
-  | "json" ->
-      jsonify_choreo_ast
-        (Format.formatter_of_out_channel (open_out (!basename ^ ".json")))
-        program
-  | "pprint" ->
-      pprint_choreo_ast
-        (Format.formatter_of_out_channel (open_out (!basename ^ ".ast")))
-        program
+  | "json" -> jsonify_choreo_ast (open_out (!basename ^ ".json")) program
+  | "pprint" -> pprint_choreo_ast (open_out (!basename ^ ".ast")) program
   | _ -> invalid_arg "Invalid ast-dump format");
 
   let locs = extract_locs program in
@@ -47,14 +41,8 @@ let () =
       let ir = epp program loc in
       match !ast_dump_format with
       | "json" ->
-          jsonify_net_ast
-            (Format.formatter_of_out_channel
-               (open_out (!basename ^ "." ^ loc ^ ".json")))
-            ir
+          jsonify_net_ast (open_out (!basename ^ "." ^ loc ^ ".json")) ir
       | "pprint" ->
-          pprint_net_ast
-            (Format.formatter_of_out_channel
-               (open_out (!basename ^ "." ^ loc ^ ".ast")))
-            ir
+          pprint_net_ast (open_out (!basename ^ "." ^ loc ^ ".ast")) ir
       | _ -> invalid_arg "Invalid ast-dump format")
     locs

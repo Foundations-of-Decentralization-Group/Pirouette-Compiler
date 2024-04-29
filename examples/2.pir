@@ -1,4 +1,4 @@
-_ := if R.(3+5)
+_ := if R.(3+5 < 2-1)
 then R[L] ~> S;
   	 R."Sent"
 else R[R] ~> S;
