@@ -1,10 +1,16 @@
 open Ast.Dump
+open Ast.Extract
 open Parsing.Interface
+open Irgen.Epp
 
 let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json>]"
 let ast_dump_format = ref "pprint"
 let file_ic = ref None
-let anon_fun filename = file_ic := Some (open_in filename)
+let basename = ref "choreo"
+
+let anon_fun filename =
+  basename := Filename.remove_extension filename;
+  file_ic := Some (open_in filename)
 
 let speclist =
   [
@@ -23,7 +29,32 @@ let () =
 
   let lexbuf = Lexing.from_channel (Option.get !file_ic) in
   let program = parse_program lexbuf in
-  match !ast_dump_format with
-  | "json" -> jsonify_choreo_ast Format.std_formatter program
-  | "pprint" -> pprint_choreo_ast Format.std_formatter program
-  | _ -> failwith "Invalid ast-dump format"
+
+  (match !ast_dump_format with
+  | "json" ->
+      jsonify_choreo_ast
+        (Format.formatter_of_out_channel (open_out (!basename ^ ".json")))
+        program
+  | "pprint" ->
+      pprint_choreo_ast
+        (Format.formatter_of_out_channel (open_out (!basename ^ ".ast")))
+        program
+  | _ -> invalid_arg "Invalid ast-dump format");
+
+  let locs = extract_locs program in
+  List.iter
+    (fun loc ->
+      let ir = epp program loc in
+      match !ast_dump_format with
+      | "json" ->
+          jsonify_net_ast
+            (Format.formatter_of_out_channel
+               (open_out (!basename ^ "." ^ loc ^ ".json")))
+            ir
+      | "pprint" ->
+          pprint_net_ast
+            (Format.formatter_of_out_channel
+               (open_out (!basename ^ "." ^ loc ^ ".ast")))
+            ir
+      | _ -> invalid_arg "Invalid ast-dump format")
+    locs

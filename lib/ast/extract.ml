@@ -39,5 +39,6 @@ and extract_type = function
   | TUnit -> LocSet.empty
   | TLoc (LocId id, _) -> LocSet.singleton id
   | TMap (t1, t2) | TProd (t1, t2) | TSum (t1, t2) -> LocSet.union (extract_type t1) (extract_type t2)
+  | TAlias (_, t) -> extract_type t
 
 let extract_locs (Choreo.Prog stmts) = extract_stmt_block stmts |> LocSet.elements

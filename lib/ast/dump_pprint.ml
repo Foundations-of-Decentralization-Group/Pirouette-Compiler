@@ -263,8 +263,10 @@ and pprint_choreo_type ppf = function
       fprintf ppf "@[<h>(%a) + (%a)@]"
         pprint_choreo_type t1
         pprint_choreo_type t2
+  | TAlias (TypId id, t) ->
+      fprintf ppf "@[<h>type %s := %a;@]" id pprint_choreo_type t
 
-(* ============================== NetIR ============================== *)
+(* ============================== Net ============================== *)
 
 let rec pprint_net_stmt_block ppf (stmts : Net.stmt_block) =
     fprintf ppf "@[<v>(@[<v1>@,%a@]@,)@]"

@@ -21,7 +21,7 @@ let new_decl _ =
 
 let int_assign _ =
   peq "x := P1.5;"
-    (Prog [ Assign (Var (VarId "x"), LocExpr (LocId "P1", Val (`Int 5))) ])
+    (Prog [ Assign ([Var (VarId "x")], LocExpr (LocId "P1", Val (`Int 5))) ])
 
 let decl_expr _ =
   peq "(P1.5, P2.true) : P1.int * P2.bool;"
@@ -39,7 +39,7 @@ let pair_assign _ =
     (Prog
        [
          Assign
-           ( Var (VarId "pair1"),
+           ( [Var (VarId "pair1")],
              Pair
                ( LocExpr (LocId "P1", Val (`Int 5)),
                  LocExpr (LocId "P2", Val (`Bool true)) ) );
@@ -50,7 +50,7 @@ let binary_operation _ =
     (Prog
        [
          Assign
-           ( Var (VarId "y"),
+           ( [Var (VarId "y")],
              If
                ( LocExpr
                    ( LocId "P1",
@@ -67,7 +67,7 @@ let test_first_pair _ =
     (Prog
        [
          Assign
-           ( Var (VarId "y"),
+           ( [Var (VarId "y")],
              Fst
                (Pair
                   ( LocExpr (LocId "P1", Val (`String "Hello")),
@@ -79,7 +79,7 @@ let test_second_pair _ =
     (Prog
        [
          Assign
-           ( Var (VarId "y"),
+           ( [Var (VarId "y")],
              Snd
                (Pair
                   ( LocExpr (LocId "P1", Val (`String "Hello")),
@@ -92,7 +92,7 @@ let test_decl_send _ =
        [
          Decl (Var (VarId "y"), TLoc (LocId "P2", TInt));
          Assign
-           ( Var (VarId "y"),
+           ( [Var (VarId "y")],
              Send (LocId "P1", LocExpr (LocId "P1", Val (`Int 5)), LocId "P2") );
        ])
 
