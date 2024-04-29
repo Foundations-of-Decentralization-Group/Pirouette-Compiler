@@ -18,7 +18,7 @@ type expr =
   | Unit
   | Var of Local.var_id
   | LocExpr of Local.loc_id * Local.expr
-  | Send of expr * Local.loc_id * Local.loc_id
+  | Send of Local.loc_id * expr * Local.loc_id
   | Sync of Local.loc_id * Local.sync_label * Local.loc_id * expr
   | If of expr * expr * expr
   | Let of stmt_block * expr

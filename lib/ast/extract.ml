@@ -13,7 +13,7 @@ and extract_stmt = function
 and extract_expr = function
   | Unit | Var _ -> LocSet.empty
   | LocExpr (LocId id, _) -> LocSet.singleton id
-  | Send (e, LocId id1, LocId id2) -> LocSet.add id2 (LocSet.add id1 (extract_expr e))
+  | Send (LocId id1, e, LocId id2) -> LocSet.add id2 (LocSet.add id1 (extract_expr e))
   | Sync (LocId id1, _, LocId id2, e) ->
       LocSet.add id2 (LocSet.add id1 (extract_expr e))
   | If (e1, e2, e3) ->

@@ -177,8 +177,8 @@ and pprint_choreo_expr ppf = function
       fprintf ppf "@[<hv2>right@ (%a)@]" pprint_choreo_expr e
   | LocExpr (LocId loc, e) ->
       fprintf ppf "@[<h>%s.(%a)@]" loc pprint_local_expr e
-  | Send (e, LocId loc) ->
-      fprintf ppf "@[<hv2>(%a) ~>@ %s@]" pprint_choreo_expr e loc
+  | Send (LocId loc1, e, LocId loc2) ->
+      fprintf ppf "@[<hv2>(%a) [%s] ~>@ %s@]" pprint_choreo_expr e loc1 loc2
   | Sync (LocId loc1, LabelId label, LocId loc2, e) ->
       fprintf ppf "@[<hv2>%s[%s] ~>@ %s;@ (%a)@]"
         loc1 label loc2

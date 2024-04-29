@@ -19,7 +19,7 @@ and epp_expr (c : Choreo.expr) (loc : string) : Net.expr =
   | Right c -> Right (epp_expr c loc)
   | Let (stmts, c) ->
     Let (List.map (fun stmt -> epp_stmt stmt loc) stmts, epp_expr c loc)
-  | Send (c, LocId loc1, LocId loc2) -> (
+  | Send (LocId loc1, c, LocId loc2) -> (
       if loc1 = loc2 then epp_expr c loc
       else if loc1 = loc then Send (epp_expr c loc, LocId loc2)
       else if loc2 = loc then Recv (LocId loc1)

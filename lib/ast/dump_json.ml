@@ -44,12 +44,12 @@ and jsonify_choreo_expr = function
               [ ("loc", `String loc); ("local_expr", jsonify_local_expr e) ]
           );
         ]
-  | Send (e, LocId loc) ->
+  | Send (LocId loc1, e, LocId loc2) ->
       `Assoc
         [
           ( "Send",
             `Assoc
-              [ ("choreo_expr", jsonify_choreo_expr e); ("loc", `String loc) ]
+              [ ("choreo_expr", jsonify_choreo_expr e); ("from", `String loc1); ("to", `String loc2) ]
           );
         ]
   | Sync (LocId loc1, LabelId label, LocId loc2, e) ->

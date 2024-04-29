@@ -93,7 +93,7 @@ let test_decl_send _ =
          Decl (Var (VarId "y"), TLoc (LocId "P2", TInt));
          Assign
            ( Var (VarId "y"),
-             Send (LocExpr (LocId "P1", Val (`Int 5)), LocId "P1", LocId "P2") );
+             Send (LocId "P1", LocExpr (LocId "P1", Val (`Int 5)), LocId "P2") );
        ])
 
 let suite =
