@@ -71,22 +71,16 @@ let rec stmt_blocks (stmts : Net.stmt_block) =
 and netir_stmt = function
   | Decl (_, _) -> " "
   | Assign (ps, e) ->
-      "let"
+      "let "
       ^ List.fold_left (fun acc p -> acc ^ local_pattern p) "" ps
       ^ " = " ^ netir_expr e
   | TypeDecl (TypId id, t) -> "type " ^ id ^ netir_type t
 
-and netir_type = function
-  | TUnit -> "unit"
-  | TLoc t -> local_type t
-  | TMap (t1, t2) -> netir_type t1 ^ " -> " ^ netir_type t2
-  | TProd (t1, t2) -> netir_type t1 ^ " * " ^ netir_type t2
-  | TSum (t1, t2) -> netir_type t1 ^ " + " ^ netir_type t2
-
-and netir_expr _ = "()"
-(*function
+and netir_expr = function
   | Unit -> "()"
-  | Var (VarId id) ->
+  | Ret (e) -> local_expr e
+  | _ -> "()"
+  (*| Var (VarId id) ->
       Printf.sprintf "%d" id
   | Fst e ->
       "fst" ^ local_expr e
@@ -113,8 +107,6 @@ and netir_expr _ = "()"
 
   | Pair (e1, e2) ->
       "("^ netir_expr e1 ^", "^ netir_expr e2 ^")"
-  | Ret (e) ->
-      local_expr e
   | AllowChoice (Locid loc, choices) -> " "
   | Recv (LocId loc) -> " "
   | ChooseFor (LabelId id, LocId locid, e) -> " "
@@ -122,6 +114,13 @@ and netir_expr _ = "()"
       "match" ^ netir_expr e ^ " with "
       let match_cases cases =
         List.iter (fun (p, e') -> "| " ^ (netir_pattern p) ^ " -> " ^ (netir_expr e')) *)
+
+and netir_type = function
+| TUnit -> "unit"
+| TLoc t -> local_type t
+| TMap (t1, t2) -> netir_type t1 ^ " -> " ^ netir_type t2
+| TProd (t1, t2) -> netir_type t1 ^ " * " ^ netir_type t2
+| TSum (t1, t2) -> netir_type t1 ^ " + " ^ netir_type t2
 
 let ocamlcode_netir channel (Net.Prog prog) =
   Printf.fprintf channel "%s" (stmt_blocks prog)
