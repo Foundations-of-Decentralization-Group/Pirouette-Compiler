@@ -1,14 +1,29 @@
 open Ast.Dump
 open Parsing.Interface
 
+let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json>]"
+let ast_dump_format = ref "pprint"
+let file_ic = ref None
+let anon_fun filename = file_ic := Some (open_in filename)
+
+let speclist =
+  [
+    ("-", Arg.Unit (fun () -> file_ic := Some stdin), "Read source from stdin");
+    ( "-ast-dump",
+      Arg.Symbol ([ "pprint"; "json" ], fun s -> ast_dump_format := s),
+      "Dump the AST in the specified format (pprint, json)" );
+  ]
+
 let () =
-  if Array.length Sys.argv < 2 then (
-    print_endline "USAGE: pirc <file>";
-    exit 1)
-  else
-    let filename = Sys.argv.(1) in
-    let file_ic = open_in filename in
-    let lexbuf = Lexing.from_channel file_ic in
-    let program = parse_program lexbuf in
-    print_endline (dump_choreo_ast program);
-    close_in file_ic
+  Arg.parse speclist anon_fun usage_msg;
+
+  if !file_ic = None then (
+    prerr_endline (Sys.argv.(0) ^ ": No input file");
+    exit 1);
+
+  let lexbuf = Lexing.from_channel (Option.get !file_ic) in
+  let program = parse_program lexbuf in
+  match !ast_dump_format with
+  | "json" -> jsonify_choreo_ast Format.std_formatter program
+  | "pprint" -> pprint_choreo_ast Format.std_formatter program
+  | _ -> failwith "Invalid ast-dump format"
