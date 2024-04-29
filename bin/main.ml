@@ -2,6 +2,7 @@ open Ast.Dump
 open Ast.Extract
 open Parsing.Interface
 open Irgen.Epp
+open Codegen.Ocamlcode
 
 let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json>]"
 let ast_dump_format = ref "pprint"
@@ -39,10 +40,11 @@ let () =
   List.iter
     (fun loc ->
       let ir = epp program loc in
-      match !ast_dump_format with
+      (match !ast_dump_format with
       | "json" ->
           jsonify_net_ast (open_out (!basename ^ "." ^ loc ^ ".json")) ir
       | "pprint" ->
           pprint_net_ast (open_out (!basename ^ "." ^ loc ^ ".ast")) ir
-      | _ -> invalid_arg "Invalid ast-dump format")
+      | _ -> invalid_arg "Invalid ast-dump format");
+      ocamlcode_netir (open_out (!basename ^ "." ^ loc ^ ".ml")) ir)
     locs
