@@ -56,11 +56,12 @@ and epp_expr (c : Choreo.expr) (loc : string) : Net.expr =
 
 and epp_pattern (p : Choreo.pattern) (loc : string) : Local.pattern =
   match p with
+  | Default -> Default
+  | Var id -> Var id
   | Pair (p1, p2) -> Pair (epp_pattern p1 loc, epp_pattern p2 loc)
   | LocPatt (LocId id, p) -> if id = loc then p else Default
   | Left p -> Left (epp_pattern p loc)
   | Right p -> Right (epp_pattern p loc)
-  | _ -> Default
 
 and epp_type (t : Choreo.typ) (loc : string) : Net.typ =
   match t with

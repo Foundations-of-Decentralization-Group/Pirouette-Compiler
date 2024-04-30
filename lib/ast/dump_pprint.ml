@@ -138,11 +138,11 @@ let rec pprint_choreo_stmt_block ppf (stmts : Choreo.stmt_block) =
 *)
 and pprint_choreo_stmt ppf = function
   | Decl (p, t) ->
-      fprintf ppf "@[<h>(%a) : %a@];"
+      fprintf ppf "@[<h>(%a) : %a;@]"
         pprint_choreo_pattern p
         pprint_choreo_type t
   | Assign (ps, e) ->
-      fprintf ppf "@[<hv2>(%a) :=@ (%a)@];"
+      fprintf ppf "@[<hv2>(%a) :=@ (%a);@]"
         (pp_print_list ~pp_sep:pp_print_space pprint_choreo_pattern) ps
         pprint_choreo_expr e
   | TypeDecl (TypId id, t) ->
@@ -184,9 +184,9 @@ and pprint_choreo_expr ppf = function
   | LocExpr (LocId loc, e) ->
       fprintf ppf "@[<h>%s.(%a)@]" loc pprint_local_expr e
   | Send (LocId loc1, e, LocId loc2) ->
-      fprintf ppf "@[<hv2>(%a) [%s] ~>@ %s@]" pprint_choreo_expr e loc1 loc2
+      fprintf ppf "@[<hv2>[%s] (%a)@ ~> %s@]" loc1 pprint_choreo_expr e loc2
   | Sync (LocId loc1, LabelId label, LocId loc2, e) ->
-      fprintf ppf "@[<hv2>%s[%s] ~>@ %s;@ (%a)@]"
+      fprintf ppf "@[<hv>%s[%s] ~> %s;@ (%a)@]"
         loc1 label loc2
         pprint_choreo_expr e
   | If (e1, e2, e3) ->
@@ -195,7 +195,7 @@ and pprint_choreo_expr ppf = function
         pprint_choreo_expr e2
         pprint_choreo_expr e3
   | Let (stmt_block, e) ->
-      fprintf ppf "@[<hv>let@;<1 2>%a@ in (%a)@]"
+      fprintf ppf "@[<hv2>let@ %a@;<1 -2>in@ (%a)@]"
         pprint_choreo_stmt_block stmt_block
         pprint_choreo_expr e
   | FunDef (ps, e) -> 
@@ -280,11 +280,11 @@ let rec pprint_net_stmt_block ppf (stmts : Net.stmt_block) =
     
 and pprint_net_stmt ppf = function
   | Decl (p, t) ->
-      fprintf ppf "@[<h>(%a) : %a@];"
+      fprintf ppf "@[<h>(%a) : %a@]"
         pprint_local_pattern p
         pprint_net_type t
   | Assign (ps, e) ->
-      fprintf ppf "@[<hv2>(%a) :=@ (%a)@];"
+      fprintf ppf "@[<hv2>(%a) :=@ (%a)@]"
         (pp_print_list ~pp_sep:pp_print_space pprint_local_pattern) ps
         pprint_net_expr e
   | TypeDecl (TypId id, t) ->
@@ -307,16 +307,16 @@ and pprint_net_expr ppf = function
   | Right e ->
       fprintf ppf "@[<hv2>right@ (%a)@]" pprint_net_expr e
   | Send (e, LocId loc) ->
-      fprintf ppf "@[<hv2>(%a) ~>@ %s@]" pprint_net_expr e loc
+      fprintf ppf "@[<hv2>(%a) ~> %s@]" pprint_net_expr e loc
   | Recv (LocId loc) ->
-    fprintf ppf "@[Recv@[<h>(%s)@]"  loc
+    fprintf ppf "@[<~ %s@]"  loc
   | If (e1, e2, e3) ->
       fprintf ppf "@[<hv>if@;<1 2>(%a)@ then@;<1 2>(%a)@ else@;<1 2>(%a)@]"
         pprint_net_expr e1
         pprint_net_expr e2
         pprint_net_expr e3
   | Let (stmt_block, e) ->
-      fprintf ppf "@[<hv>let@;<1 2>%a@ in (%a)@]"
+      fprintf ppf "@[<hv2>let@ %a@;<1 -2>in@ (%a)@]"
         pprint_net_stmt_block stmt_block
         pprint_net_expr e
   | FunDef (ps, e) -> 
@@ -336,7 +336,7 @@ and pprint_net_expr ppf = function
         pprint_net_expr e
         (pp_print_list ~pp_sep:(fun ppf () -> fprintf ppf "@ | ") pprint_net_case) cases
   | ChooseFor (LabelId id, LocId locid, e) -> 
-      fprintf ppf "@[<hv2>choose %s for %s;@ %a@]"
+      fprintf ppf "@[<hv>choose %s for %s;@ %a@]"
         id
         locid
         pprint_net_expr e
