@@ -6,7 +6,7 @@ y := if P1.(3>5)
           P2.9
 ;
 {-
-  NetIR:
+NetIR:
   P1:
   y : unit
   y = if 3>5 

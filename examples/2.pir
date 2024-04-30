@@ -1,12 +1,13 @@
-_ := if R.(3+5 < 2-1)
+_ :=
+if R.(3+5 > 2-1)
 then R[L] ~> S;
-  	 R."Sent"
+  	 let R.res := [S] S.(1,true) ~> R; in R."Sent"
 else R[R] ~> S;
-  	 R."why"
+  	 let R.res := [S] S.(0,false) ~> R; in R."why"
 ;
 
 {-
-  NetIR:
+NetIR:
   S: 
   Allow R choice
   | L => send (1,true) to R

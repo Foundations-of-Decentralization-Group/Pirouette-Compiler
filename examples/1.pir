@@ -6,7 +6,8 @@ _ := let R.x := [S] S.3 ~> R; in
        S."Bye";
 
 
-{-NetIR:
+{-
+NetIR:
   S:
   2+3
   send 3 to R
