@@ -50,7 +50,7 @@
     \\
     \alternative{\ell_1 [d] \leadsto \ell_2  ; \ C }  
     \alternative{ \textbf{let } X := C_1 \textbf{ in } C_2}
-    \alternative{\textbf{fun } X \Rightarrow C}
+    \alternative{\textbf{fun }F \ X \Rightarrow C}
     \alternative{C_1 \  C_2}
     \\
     \alternative{(C_1, C_2)}
@@ -85,7 +85,7 @@
     \category[Network Expressions]{E}
     \alternative{X}
     \alternative{\mathbf{()}}
-    \alternative{\textbf{fun } X \Rightarrow E}
+    \alternative{\textbf{fun}\ F\ X \Rightarrow E}
     \alternative{E_1 \ E_2 }
     \alternative{\textsf{ret}(e)}
     \\
@@ -97,7 +97,6 @@
     \alternative{\textsf{choose } d \textsf{ for } \ell ; \  E}
     \\
     \alternative{\textsf{allow } \ell \textsf{ choice L} \Rightarrow E_1 \ ; \ \textsf{R} \Rightarrow E_2}
-     % \alternative{\textsf{allow } \ell \textsf{ choice } [ \ | \ d \to E\ ]^*}
     \alternative{(E_1, E_2)}
     \\
     \alternative{\textbf{fst } E}
@@ -139,26 +138,32 @@
 { \; }
 { \Gamma \vdash \textsf{( ) : unit} } \and
 \inferrule [ Loc - var ]
-{ \textsf{$x : t$} \in \Gamma }
-{ \Gamma \vdash \textsf{$x : t$}  } \and
+{ x : t \in \Gamma }
+{ \Gamma \vdash x : t  } \and
+\inferrule [ Loc - binop ] 
+{ \Gamma \vdash e_1 : t_1 \quad \Gamma \vdash e_2 : t_2 \quad \textbf{DOUBT} } 
+{ \Gamma \vdash e_1  } \and
+\inferrule [ Loc - def ]
+{ \Gamma \vdash e_1 : t \quad \Gamma, x : t \vdash e_2 : t_2 }
+{ \Gamma ;\Delta \vdash \textsf{let}\ x := e_1 \ \textsf{in}\ e_2 : t_2  } \and
 \inferrule [ Loc - pair ]
-{ \Gamma \vdash \textsf{$e_1 : t_1$} \quad \Gamma \vdash \textsf{$e_2 : t_2$} }
-{ \Gamma \vdash \textsf{$(e_1, e_2) : t_1 \times t_2$}  } \and
+{ \Gamma \vdash e_1 : t_1 \quad \Gamma \vdash e_2 : t_2}
+{ \Gamma \vdash (e_1, e_2) : t_1 \times t_2 } \\
 \inferrule [ Loc - fst ]
-{ \Gamma \vdash \textsf{$e : t_1 \times t_2$} }
-{ \Gamma \vdash \textsf{fst $ e : t_1 $} } \and
+{ \Gamma \vdash e : t_1 \times t_2 }
+{ \Gamma \vdash \textsf{fst} \  e : t_1 } \and
 \inferrule [ Loc - snd ]
-{ \Gamma \vdash \textsf{$e : t_1 \times t_2$} }
-{ \Gamma \vdash \textsf{snd $ e : t_2 $} } \and
+{ \Gamma \vdash e : t_1 \times t_2 }
+{ \Gamma \vdash \textsf{snd} \ e : t_2 } \\
 \inferrule [ Loc - left ]
-{ \Gamma \vdash \textsf{$ e_1 : t_1$} }
-{ \Gamma \vdash \textsf{left $ e_1 : t_1 + t_2 $} } \and
+{ \Gamma \vdash e_1 : t_1 }
+{ \Gamma \vdash \textsf{left} \ e_1 : t_1 + t_2 } \and
 \inferrule [ Loc - right ]
-{ \Gamma \vdash \textsf{$ e_2 : t_2$} }
-{ \Gamma \vdash \textsf{right $ e_2 : t_1 + t_2 $} } \and
+{ \Gamma \vdash e_2 : t_2 }
+{ \Gamma \vdash \textsf{right} \ e_2 : t_1 + t_2 } \and
 \inferrule [ Loc - match ]
-{ \Gamma \vdash \textsf{$ e : t_1+t_2$} \quad \Gamma \textsf{, x : $t_1$} \vdash \textsf{$ e_1 : t_3$} \quad \Gamma \textsf{, y : $t_2$} \vdash \textsf{$ e_2 : t_3$}  }
-{ \Gamma \vdash \textsf{(match e with left x $\Rightarrow e_1$ ; right y $\Rightarrow e_2$) : $ t_3 $} } 
+{ \Gamma \vdash e : t_1+t_2 \quad \Gamma , \ x : t_1 \vdash e_1 : t_3 \quad \Gamma , \ y : t_2 \vdash e_2 : t_3  }
+{ \Gamma \vdash (\textsf{match e with left} \ x \Rightarrow e_1 ; \textsf{right} \ y \Rightarrow e_2) :t_3  } 
 
 \end{mathpar}
 
@@ -169,54 +174,54 @@
 { \; }
 { \Gamma ;\Delta \vdash \textsf{( ) : unit} } \and
 \inferrule [ Network - var ]
-{ \textsf{$X : T$} \in \Delta }
-{ \Gamma ;\Delta \vdash \textsf{$X : T$}  } \and
+{ X : T \in \Delta }
+{ \Gamma ;\Delta \vdash X : T } \and
 \inferrule [ ret ]
-{ \Gamma ;\Delta\vdash \textsf{$e : t$} }
-{ \Gamma ;\Delta\vdash \textsf{ret $ (e) : \boxed{t}$}  } \and
+{ \Gamma ;\Delta\vdash e : t }
+{ \Gamma ;\Delta\vdash \textsf{ret} \ (e) : \boxed{t} } \and
 \inferrule [ Network - fun ]
-{ \Gamma ;\Delta \textsf{, $X : T_1$} \vdash \textsf{$E : T_2$} }
-{ \Gamma ;\Delta \vdash \textsf{fun $X \Rightarrow E : T_1 \to T_2$}  } \and
+{ \Gamma ;\Delta , X : T_1, F: T_1 \to T_2 \vdash E : T_2 }
+{ \Gamma ;\Delta \vdash \textsf{fun} \ F \ X \Rightarrow E : T_1 \to T_2  } \and
 \inferrule [ Network - app ]
-{ \Gamma ;\Delta \vdash \textsf{$E_1 : T_1 \to T_2$} \quad \Gamma ;\Delta \vdash \textsf{$E_2 : T_1$} }
-{ \Gamma ;\Delta \vdash \textsf{$E_1 E_2 : T_2$}  } \and
+{ \Gamma ;\Delta \vdash E_1 : T_1 \to T_2 \quad \Gamma ;\Delta \vdash E_2 : T_1 }
+{ \Gamma ;\Delta \vdash E_1 E_2 : T_2  } \and
 \inferrule [ Network - if ]
-{ \Gamma ;\Delta \vdash \textsf{$E_1 : \boxed{bool}$} \quad \Gamma ;\Delta \vdash \textsf{$E_2 : T_2$} \quad \Gamma ;\Delta \vdash \textsf{$E_3 : T_2$} }
-{ \Gamma ;\Delta \vdash \textsf{if $ E_1$ then  $E_2$ else $E_3: T_2$}  } \and
+{ \Gamma ;\Delta \vdash E_1 : \boxed{bool} \quad \Gamma ;\Delta \vdash E_2 : T_2 \quad \Gamma ;\Delta \vdash E_3 : T_2 }
+{ \Gamma ;\Delta \vdash \textsf{if} \ E_1 \ \textsf{then}\ E_2 \ \textsf{else}\ E_3: T_2  } \and
 \inferrule [ Network - def ]
-{ \Gamma ;\Delta \vdash \textsf{$E_1 : \boxed{t}$} \quad \Gamma, \textsf{$x : t$} ;\Delta \vdash \textsf{$E_2 : T_2$} }
-{ \Gamma ;\Delta \vdash \textsf{let ret $ (x) = E_1$ in $E_2 : T_2$}  } \and
+{ \Gamma ;\Delta \vdash E_1 : \boxed{t} \quad \Gamma, x : t ;\Delta \vdash E_2 : T_2 }
+{ \Gamma ;\Delta \vdash \textsf{let ret}\ (x) = E_1\ \textsf{in}\ E_2 : T_2  } \\
 \inferrule [ Network - send ]
-{ \Gamma ;\Delta \vdash \textsf{$e : t$} \quad \Gamma ;\Delta \vdash \textsf{$E : T$} }
-{ \Gamma ;\Delta \vdash \textsf{send $e$ to $\ell; E : T$}  } \and
+{ \Gamma ;\Delta \vdash e : t \quad \Gamma ;\Delta \vdash E : T }
+{ \Gamma ;\Delta \vdash \textsf{send $e$ to}\ \ell; E : T  } \and
 \inferrule [ Network - rcv ]
-{ \Gamma , x : t ;\Delta \vdash \textsf{$E : T$} }
-{ \Gamma ;\Delta \vdash \textsf{receive $x$ from $\ell; E : T$}  } \and
+{ \Gamma , x : t ;\Delta \vdash E : T }
+{ \Gamma ;\Delta \vdash \textsf{receive $x$ from}\ \ell; E : T  } \and
 \inferrule [ Network - choose ]
-{\Gamma ;\Delta \vdash \textsf{$E : T$} }
-{ \Gamma ;\Delta \vdash \textsf{choose $d$ for $\ell; E : T$}  } \and
+{\Gamma ;\Delta \vdash E : T }
+{ \Gamma ;\Delta \vdash \textsf{choose $d$ for}\ \ell; E : T  } \and
 \inferrule [ Network - allow ]
-{ \Gamma ;\Delta \vdash \textsf{$E_1 : T$} \quad \Gamma ;\Delta \vdash \textsf{$E_2 : T$} }
-{ \Gamma ;\Delta \vdash \textsf{(allow $\ell $ choice   L $\Rightarrow E_1 \; ;$  R $\Rightarrow E_2$) : $ T $} } \and
+{ \Gamma ;\Delta \vdash E_1 : T \quad \Gamma ;\Delta \vdash E_2 : T }
+{ \Gamma ;\Delta \vdash (\textsf{allow $\ell $ choice L} \Rightarrow E_1 \; ; \textsf{R} \Rightarrow E_2) : T  } \and
 \inferrule [ Network - pair ]
-{ \Gamma ;\Delta \vdash \textsf{$E_1 : T_1$} \quad \Gamma ;\Delta \vdash \textsf{$E_2 : T_2$} }
-{ \Gamma ;\Delta \vdash \textsf{$(E_1, E_2) : T_1 \times T_2$}  } \and
+{ \Gamma ;\Delta \vdash E_1 : T_1 \quad \Gamma ;\Delta \vdash E_2 : T_2 }
+{ \Gamma ;\Delta \vdash (E_1, E_2) : T_1 \times T_2 } \and
 \inferrule [ Network - fst ]
-{ \Gamma ;\Delta \vdash \textsf{$E : T_1 \times T_2$} }
-{ \Gamma ;\Delta \vdash \textsf{fst $E : T_1 $} } \and
+{ \Gamma ;\Delta \vdash E : T_1 \times T_2 }
+{ \Gamma ;\Delta \vdash \textsf{fst}\ E : T_1 } \and
 \inferrule [ Network - snd ]
-{ \Gamma ;\Delta \vdash \textsf{$E : T_1 \times T_2$} }
-{ \Gamma ;\Delta \vdash \textsf{snd $E : T_2 $} } \and
+{ \Gamma ;\Delta \vdash E : T_1 \times T_2 }
+{ \Gamma ;\Delta \vdash \textsf{snd}\ E : T_2 } \and
 \inferrule [ Network - left ]
-{ \Gamma ;\Delta \vdash \textsf{$ E_1 : T_1$} }
-{ \Gamma ;\Delta \vdash \textsf{left $E_1 : T_1 + T_2 $} } \and
+{ \Gamma ;\Delta \vdash E_1 : T_1 }
+{ \Gamma ;\Delta \vdash \textsf{left}\ E_1 : T_1 + T_2 } \and
 \inferrule [ Network - right ]
-{ \Gamma ;\Delta \vdash \textsf{$ E_2 : T_2$} }
-{ \Gamma ;\Delta \vdash \textsf{right $E_2 : T_1 + T_2 $} } \and
+{ \Gamma ;\Delta \vdash  E_2 : T_2 }
+{ \Gamma ;\Delta \vdash \textsf{right}\ E_2 : T_1 + T_2 } \and
 
 \inferrule [ Network - match ]
-{ \Gamma \vdash \textsf{$ E : T_1+T_2$} \quad \Gamma;\Delta, X : T_1 \vdash  E_1 : T_3 \quad \Gamma;\Delta , Y : T_2 \vdash E_2 : T_3  }
-{ \Gamma \vdash \textsf{(match E with left X $\Rightarrow E_1$ ; right Y $\Rightarrow E_2$) : $ T_3 $} } 
+{ \Gamma \vdash E : T_1+T_2 \quad \Gamma;\Delta, X : T_1 \vdash  E_1 : T_3 \quad \Gamma;\Delta , Y : T_2 \vdash E_2 : T_3  }
+{ \Gamma \vdash (\textsf{match}\ E\ \textsf{with left}\; X \Rightarrow E_1 ; \textsf{right}\; Y \Rightarrow E_2) : T_3 } 
 
 \end{mathpar}
 
@@ -227,11 +232,11 @@
 { \; }
 { \Gamma ; \Delta \vdash \textsf{( ) : unit} } \and
 \inferrule [ var ]
-{ \textsf{$X : \tau$} \in \Delta }
-{ \Gamma ;\Delta \vdash \textsf{$X : \tau$}  } \and
+{ X : \tau \in \Delta }
+{ \Gamma ;\Delta \vdash X : \tau } \and
 \inferrule [ done ]
-{ \Gamma_{|\ell} \vdash \textsf{$e : t$} }
-{ \Gamma ; \Delta \vdash \textsf{$\ell.e : \ell.t $} } \and
+{ \Gamma_{|\ell} \vdash e : t }
+{ \Gamma ; \Delta \vdash \ell.e : \ell.t } \and
 \inferrule [ send ]
 { \Gamma ; \Delta \vdash C : \ell.t}
 { \Gamma;\Delta \vdash C \leadsto \ell_2 : \ell_2.t} \and
@@ -239,36 +244,36 @@
 { \Gamma;\Delta \vdash C : \tau}
 { \Gamma;\Delta \vdash \ell_1[d] \leadsto \ell_2 ; C : \tau} \and
 \inferrule [ if ]
-{ \Gamma;\Delta \vdash C_1 : \ell.t \quad \Gamma;\Delta\vdash C_2 : \tau_2 \quad \Gamma;\Delta \vdash C_3 : \tau_2 }
+{ \Gamma;\Delta \vdash C_1 : \ell.bool \quad \Gamma;\Delta\vdash C_2 : \tau_2 \quad \Gamma;\Delta \vdash C_3 : \tau_2 }
 { \Gamma;\Delta \vdash \textsf{if } C_1 \textsf{ then } C_2 \textsf{ else } C_3: T_2  } \and
 \inferrule [ def ]
 { \Gamma;\Delta \vdash C_1 : \ell.t \quad \Gamma;\Delta, X : \ell.t \vdash C_2 : \tau_2 }
 { \Gamma;\Delta \vdash \textsf{let } X = C_1 \textsf{ in } C_2 : \tau_2 } \and
 \inferrule [ fun ]
-{ \Gamma ;\Delta , X : \tau_1 \vdash C : \tau_2 }
-{ \Gamma ;\Delta \vdash \textsf{fun}\; X \Rightarrow C : \tau_1 \to \tau_2  } \and
+{ \Gamma ;\Delta , X : \tau_1, F : \tau_1 \to \tau_2\vdash C : \tau_2 }
+{ \Gamma ;\Delta \vdash \textsf{fun}\ F \ X \Rightarrow C : \tau_1 \to \tau_2  } \and
 \inferrule [ app ]
 { \Gamma;\Delta \vdash C_1 : \tau_1 \to \tau_2 \quad \Gamma;\Delta \vdash C_2 : \tau_1 }
 { \Gamma;\Delta \vdash C_1 C_2 : \tau_2  } \and
 \inferrule [ pair ]
-{ \Gamma ; \Delta \vdash \textsf{$C_1 : \tau_1$} \quad \Gamma ; \Delta \vdash \textsf{$C_2 : \tau_2$} }
-{ \Gamma ; \Delta \vdash \textsf{$(C_1, C_2) : \tau_1 \times \tau_2$}  } \and
+{ \Gamma ; \Delta \vdash C_1 : \tau_1 \quad \Gamma ; \Delta \vdash C_2 : \tau_2 }
+{ \Gamma ; \Delta \vdash (C_1, C_2) : \tau_1 \times \tau_2  } \and
 \inferrule [ fst ]
 { \Gamma ; \Delta \vdash C : \tau_1 \times \tau_2 }
-{ \Gamma ; \Delta \vdash \textsf{fst $C : \tau_1 $} } \and
+{ \Gamma ; \Delta \vdash \textsf{fst}\ C : \tau_1 } \and
 \inferrule [ snd ]
-{ \Gamma ; \Delta \vdash \textsf{$C : \tau_1 \times \tau_2$} }
-{ \Gamma ; \Delta \vdash \textsf{snd $C : \tau_2 $} } \\
+{ \Gamma ; \Delta \vdash C : \tau_1 \times \tau_2 }
+{ \Gamma ; \Delta \vdash \textsf{snd}\ C : \tau_2 } \\
 \inferrule [ left ]
-{ \Gamma ; \Delta \vdash \textsf{$ C : \tau_1$} }
-{ \Gamma ; \Delta \vdash \textsf{left $C : \tau_1 + \tau_2 $} } \and
+{ \Gamma ; \Delta \vdash C : \tau_1 }
+{ \Gamma ; \Delta \vdash \textsf{left}\ C : \tau_1 + \tau_2 } \and
 \inferrule [ right ]
-{ \Gamma ; \Delta \vdash \textsf{$ C : \tau_2$} }
-{ \Gamma ; \Delta \vdash \textsf{right $C : \tau_1 + \tau_2 $} } \and
+{ \Gamma ; \Delta \vdash C : \tau_2 }
+{ \Gamma ; \Delta \vdash \textsf{right}\ C : \tau_1 + \tau_2 } \and
 
 \inferrule [ match ]
-{ \Gamma ; \Delta \vdash \textsf{$ C : \tau_1+\tau_2$} \quad \Gamma ; \Delta \textsf{, X : $\tau_1$} \vdash \textsf{$ C_1 : \tau_3$} \quad \Gamma ; \Delta \textsf{, Y : $\tau_2$} \vdash \textsf{$ C_2 : \tau_3$}  }
-{ \Gamma ; \Delta \vdash \textsf{(match C with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$) : $ \tau_3 $} } 
+{ \Gamma ; \Delta \vdash C : \tau_1+\tau_2 \quad \Gamma ; \Delta , X : \tau_1 \vdash C_1 : \tau_3 \quad \Gamma ; \Delta , Y : \tau_2 \vdash C_2 : \tau_3  }
+{ \Gamma ; \Delta \vdash (\textsf{match}\ C \ \textsf{with left}\ X \Rightarrow C_1 ; \textsf{right}\ Y \Rightarrow C_2) : \tau_3 } 
 
 \end{mathpar}
 
@@ -294,7 +299,7 @@
 { v \odot e_2 \to_l v \Tilde{\odot} e'_2  } \and
 \inferrule [binop 3 ]
 {    }
-{ v_1 \odot v_2 \to_l v_1 \Tilde{\odot} v_2 \  (/ \notin \odot) } \and
+{ v_1 \odot v_2 \to_l v_1 \Tilde{\odot} v_2 } \and
 
 \inferrule[Loc - let 1]
 {e_1 \to_l e'_1}
@@ -309,21 +314,19 @@
 { (e_1, e_2) \to_l (e'_1, e_2)  } \and
 \inferrule [loc - pair 2 ]
 {  e_2 \to_l e'_2    }
-{ (v, e_2) \to_l (v, e'_2)  } \and
-
+{ (v, e_2) \to_l (v, e'_2)  } \\
 \inferrule [loc - fst ]
 { e \to_l e' }
 { \textsf{fst } e \to_l \textsf{fst } e' } \and
 \inferrule [loc - pair elim 1 ]
 { }
 { \textsf{fst } (v_1, v_2) \to_l v_1 }\and
-
 \inferrule [loc - snd ]
 { e \to_l e' }
 { \textsf{snd } e \to_l \textsf{snd } e' } \and
 \inferrule [loc - pair elim 2 ]
 {  }
-{ \textsf{snd } (v_1, v_2) \to_l v_2 } \and
+{ \textsf{snd } (v_1, v_2) \to_l v_2 } \\
 \inferrule [loc - left ]
 { e \to_l e' }
 { \textsf{left } e \to_l \textsf{left } e' } \and
@@ -358,10 +361,10 @@
     \alternative{(V_1, V_2)} 
     \alternative{\textbf{left } V}
     \alternative{\textbf{right } V}
-    \alternative{\textbf{fun } X \Rightarrow C}
+    \alternative{\textbf{fun}\  F \ X \Rightarrow C}
 \end{syntax}
 
-\begin{mathpar}
+\begin{mathparpagebreakable}
 \inferrule [assoc ]
 { e \to_l e' }
 { \ell.e \to_g \ell.e' } \and
@@ -395,10 +398,10 @@
 { C_1 C_2 \to_g C'_1 C_2  } \and
 \inferrule [app 2 ]
 { C_2 \to_g C'_2 }
-{ \textsf{(fun $ X \Rightarrow$ C) } C_2 \to_g \textsf{(fun $ X \Rightarrow$ C) } C'_2  } \and
+{ \textsf{(fun $F \ X \Rightarrow$ C) } C_2 \to_g \textsf{(fun $F \  X \Rightarrow$ C) } C'_2  } \and
 \inferrule [app 3 ]
 {  }
-{\textsf{(fun $ X \Rightarrow$ C) }  V \to_g C[X \mapsto V]  } \and
+{\textsf{(fun$\ F \ X \Rightarrow$ C) }  V \to_g C[X \mapsto V, F \mapsto \textsf{(fun$\ F \ X \Rightarrow$ C) }]  } \and
 \inferrule [pair 1]
 { C_1 \to_g C'_1 }
 { (C_1, C_2) \to_g (C'_1, C_2)  } \and
@@ -434,7 +437,7 @@
 { }
 { \textsf{(match (right V) with left X $\Rightarrow C_1$ ; right Y $\Rightarrow C_2$)} \to_g C_2\ [Y \mapsto V] }
 
-\end{mathpar}
+\end{mathparpagebreakable}
 
 
 \section{Theorems}
@@ -446,45 +449,53 @@
 \textbf{Case e = num} \\
 num is a value and we are done \\ \\
 \textbf{Case e = $e_1 \odot e_2$} \\
+$e_1\ $ and $e_2\ $ are well-typed \\
 IH1 $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
-if $e_1 \to_l e'_1$ then $e_1 \odot e_2 \to_l e'_1 \Tilde{\odot} \ e_2$ using binop 1 rule\\
+if $e_1 \to_l e'_1$ then $e_1 \odot e_2 \to_l e'_1 \Tilde{\odot} \ e_2$ using \textsc{binop 1} rule\\
 if $e_1$ is a value $v_1$, IH2 $e_2$ is either a value or $  \exists \ e'_2.\ e_2 \to_l e'_2 $ \\
-if $e_2$ is a value $v_2$, then $v_1 \odot v_2 \to_l v_1 \Tilde{\odot} \ v_2$, which is a value using the binop 3 rule  \\
-if $e_2 \to_l e'_2$ then $v_1 \odot e_2 \to_l v_1 \Tilde{\odot} \ e'_2$ using binop 2 rule 
+if $e_2$ is a value $v_2$, then $v_1 \odot v_2 \to_l v_1 \Tilde{\odot} \ v_2$, which is a value using the \textsc{binop 3} rule  \\
+if $e_2 \to_l e'_2$ then $v_1 \odot e_2 \to_l v_1 \Tilde{\odot} \ e'_2$ using \textsc{binop 2} rule 
 \\ \\
 \textbf{Case e = let $x := e_1$ in $e_2$} \\
+$\cdot \vdash e_1 : t$ \\
 IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
-if $e_1 \to_l e'_1$ then let $x := e_1$ in $e_2 \to_l $ let $x := e'_1$ in $e_2$ using loc - let 1 rule\\
-if $e_1$ is a value $v$, then let $x := v$ in $e_2 \to_l e_2[x \mapsto v]$ using loc - let 2 rule
+if $e_1 \to_l e'_1$ then let $x := e_1$ in $e_2 \to_l $ let $x := e'_1$ in $e_2$ using \textsc{loc - let 1} rule\\
+if $e_1$ is a value $v$, then let $x := v$ in $e_2 \to_l e_2[x \mapsto v]$ using \textsc{loc - let 2} rule
 \\ \\
 \textbf{Case e = $(e_1,e_2)$} \\
+$\cdot \vdash e_1 : t \quad \cdot \vdash e_2 : t_2$\\
 IH1 $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
-if $e_1 \to_l e'_1$ then $(e_1,e_2) \to_l (e'_1, e_2)$ using loc - pair 1 rule\\
+if $e_1 \to_l e'_1$ then $(e_1,e_2) \to_l (e'_1, e_2)$ using \textsc{loc - pair 1} rule\\
 if $e_1$ is a value $v_1$, IH2 $e_2$ is either a value or $  \exists \ e'_2.\ e_2 \to_l e'_2 $ \\
 if $e_2$ is a value $v_2$, then $(v_1,v_2)$ is a value \\
-if $e_2 \to_l e'_2$ then $(v_1,e_2) \to_l (v_1,e'_2)$ using loc - pair 2 rule \\ \\
+if $e_2 \to_l e'_2$ then $(v_1,e_2) \to_l (v_1,e'_2)$ using \textsc{loc - pair 2} rule \\ \\
 \textbf{Case e = fst $e_1$} \\
+$\cdot \vdash e_1: t_1 \times t_2$\\
 IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
-if $e_1 \to_l e'_1$ then fst $e_1 \to_l $ fst $e'_1$ using loc - fst rule\\
-if $e_1$ is a value $v$, this means $v = (v_1, v_2)$ then fst $(v_1, v_2) \to_l v_1$ using loc - pair elim 1 rule\\ \\
+if $e_1 \to_l e'_1$ then fst $e_1 \to_l $ fst $e'_1$ using \textsc{loc - fst} rule\\
+if $e_1$ is a value $v$, and $\cdot \vdash e_1: t_1 \times t_2$, this means $v = (v_1, v_2)$ then fst $(v_1, v_2) \to_l v_1$ using \textsc{loc - pair elim 1} rule\\ \\
 \textbf{Case e = snd $e_1$} \\
+$\cdot \vdash e_1: t_1 \times t_2$\\
 IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
-if $e_1 \to_l e'_1$ then snd $e_1 \to_l $ snd $e'_1$ using loc - snd rule\\
-if $e_1$ is a value $v$, this means $v = (v_1, v_2)$ then snd $(v_1, v_2) \to_l v_2$ using loc - pair elim 2 rule\\ \\
+if $e_1 \to_l e'_1$ then snd $e_1 \to_l $ snd $e'_1$ using \textsc{loc - snd} rule\\
+if $e_1$ is a value $v$, and $\cdot \vdash e_1: t_1 \times t_2$, this means $v = (v_1, v_2)$ then snd $(v_1, v_2) \to_l v_2$ using \textsc{loc - pair elim 2} rule\\ \\
 \textbf{Case e = left $e_1$} \\
+$\cdot \vdash e_1: t_1$\\
 IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
-if $e_1 \to_l e'_1$ then left $e_1 \to_l$ left $e'_1$ using loc - left rule\\
+if $e_1 \to_l e'_1$ then left $e_1 \to_l$ left $e'_1$ using \textsc{loc - left} rule\\
 if $e_1$ is a value $v$, then left $v$ is a value\\ \\
 \textbf{Case e = right $e_1$} \\
+$\cdot \vdash e_1: t_2$\\
 IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
-if $e_1 \to_l e'_1$ then right $e_1 \to_l$ right $e'_1$ using loc - right rule\\
+if $e_1 \to_l e'_1$ then right $e_1 \to_l$ right $e'_1$ using \textsc{loc - right} rule\\
 if $e_1$ is a value $v$, then right $v$ is a value\\ \\
 \textbf{Case e = match $e_1$ with left x $\Rightarrow e_2$; right y $\Rightarrow e_3$}\\
+$\cdot \vdash e_1: t_1 + t_2$\\
 IH $e_1$ is either a value or $  \exists \ e'_1.\ e_1 \to_l e'_1 $ \\
-if $e_1 \to_l e'_1$ then match $e_1$ with left x $\Rightarrow e_2$; right y $\Rightarrow e_3 \to_l$ match $e'_1$ with left x $\Rightarrow e_2$; right y $\Rightarrow e_3$ using loc - match rule\\
-if $e_1$ is a value, then $e_1$ is either left $v$ or right $v$\\
-if $e_1 = $ left $v$ then match (left $v$) with left x $\Rightarrow e_2$; right y $\Rightarrow e_3 \to_l$ $e_2[x \mapsto v]$ using loc - sum elim 1 rule\\
-if $e_1 = $ right $v$ then match (right $v$) with left x $\Rightarrow e_2$; right y $\Rightarrow e_3 \to_l$ $e_3[y \mapsto v]$ using loc - sum elim 2 rule\\
+if $e_1 \to_l e'_1$ then match $e_1$ with left x $\Rightarrow e_2$; right y $\Rightarrow e_3 \to_l$ match $e'_1$ with left x $\Rightarrow e_2$; right y $\Rightarrow e_3$ using \textsc{loc - match} rule\\
+if $e_1$ is a value, and $\cdot \vdash e_1: t_1 + t_2$ this means $e_1$ is either left $v$ or right $v$\\
+if $e_1 = $ left $v$ then match (left $v$) with left x $\Rightarrow e_2$; right y $\Rightarrow e_3 \to_l$ $e_2[x \mapsto v]$ using \textsc{loc - sum elim 1} rule\\
+if $e_1 = $ right $v$ then match (right $v$) with left x $\Rightarrow e_2$; right y $\Rightarrow e_3 \to_l$ $e_3[y \mapsto v]$ using \textsc{loc - sum elim 2} rule\\
 \\\\ 
 \\
 \textbf{Theorem 2.} (\textit{Local Preservation}): If $\Gamma \vdash e : t$ and  $e \to e'$ then $\Gamma \vdash e' : t$
@@ -494,11 +505,11 @@ if $e_1 = $ right $v$ then match (right $v$) with left x $\Rightarrow e_2$; righ
  $\Gamma \vdash $ ( ) : unit. () doesn't take a step and we are done \\ \\
 \textbf{Case x : t}      \\ 
 $\Gamma \vdash $ x : t. x doesn't take a step and we are done \\ \\
-\textbf{Case $\Gamma \vdash e : t_1 X t_2$ } \\
+\textbf{Case $\Gamma \vdash e : t_1 \times t_2$ } \\
 This means e = $(e_1, e_2)$ \\
 IH If $\Gamma \vdash e_1 : t_1$ and  $e_1 \to e'_1$ then $\Gamma \vdash e'_1 : t_1$ \\
-Now we know, $(e_1,e_2) \to (e'_1, e_2)$ and $\Gamma \vdash (e_1, e_2) : t_1 X t_2$ \\
-Using IH we can say $\Gamma \vdash (e'_1, e_2) : t_1 X t_2$ \\\\
+Now we know, $(e_1,e_2) \to (e'_1, e_2)$ and $\Gamma \vdash (e_1, e_2) : t_1 \times t_2$ \\
+Using IH we can say $\Gamma \vdash (e'_1, e_2) : t_1 \times t_2$ \\\\
 \textbf{Case $\Gamma \vdash$ fst $e : t_1$ } \\
 This means $e : t_1Xt_2$ \\
 IH If $\Gamma \vdash e : t_1Xt_2$ and  $e \to e'$ then $\Gamma \vdash e' : t_1Xt_2$ \\
@@ -534,69 +545,83 @@ Using IH we can say $\Gamma \vdash$ match $e'$ with left $x \Rightarrow e_2 $; r
 \textbf{Case C = ()} \\
 () is a value and we are done \\ \\
 \textbf{Case C = $\ell.e$} \\
+$\cdot \vdash e: t$\\
 we know from local progress that e is either a value or $ \exists \ e'.\ e \to_l e'$  \\
-So, if e is a value $v$, $\ell.v$ is a value and we are done \\
-If $ \exists \ e'.\ e \to_l e'$ then, $ \ell. e \to_g \ell.e'$ using assoc rule
+So, if e is a value $v$ then $C = \ell.v$ which is a value and we are done \\
+If $ \exists \ e'.\ e \to_l e'$ then, $ \ell. e \to_g \ell.e'$ using \textsc{assoc} rule
 \\ \\
 \textbf{Case C = $C_1 \leadsto \ell$} \\
+$\cdot \vdash C_1: \ell'.t$\\
 IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
-if $C_1 \to_g C'_1$ then $C_1 \leadsto \ell \to_g C'_1 \leadsto \ell$ using the send 1 rule \\
-if $C_1$ is a value, $C_1 = \ell'.v$ and $\ell'.v \leadsto \ell \to_g \ell.v$ using send 2 rule 
+if $C_1 \to_g C'_1$ then $C_1 \leadsto \ell \to_g C'_1 \leadsto \ell$ using the \textsc{send 1} rule \\
+if $C_1$ is a value and $\cdot \vdash C_1: \ell'.t \ $then, $C_1 = \ell'.v$ and $\ell'.v \leadsto \ell \to_g \ell.v$ using \textsc{send 2} rule 
 \\
 \\
 \textbf{Case C = $\ell_1[d] \leadsto \ell_2; C_1$} \\ 
- we know that, $\ell_1[d] \leadsto \ell_2; C_1 \to_g C_1$ using sync rule \\
+ we know that, $\ell_1[d] \leadsto \ell_2; C_1 \to_g C_1$ using \textsc{sync} rule \\
 \\
 \textbf{Case C = if $C_1$ then $C_2$ else $C_3$} \\
+$\cdot \vdash C_1: \ell.bool$\\
 IH1 $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
-if $C_1 \to C'_1$ then if $C_1$ then $C_2$ else $C_3 \to_g $ if $C'_1$ then $C_2$ else $C_3$ using if 1 rule\\
-if $C_1$ is a value, then $C_1$ is either $\ell.true$ or $\ell.false$ \\
-if $C_1 = \ell.true$ then if $C_1$ then $C_2$ else $C_3 \to_g C_2$ using if 2 rule\\
-if $C_1 = \ell.false$ then if $C_1$ then $C_2$ else $C_3 \to_g C_3$ using if 3 rule\\
+if $C_1 \to C'_1$ then if $C_1$ then $C_2$ else $C_3 \to_g $ if $C'_1$ then $C_2$ else $C_3$ using \textsc{if 1} rule\\
+if $C_1$ is a value and $\cdot \vdash C_1: \ell.bool$, then $C_1$ is either $\ell.true$ or $\ell.false$ \\
+if $C_1 = \ell.true$ then if $C_1$ then $C_2$ else $C_3 \to_g C_2$ using \textsc{if 2} rule\\
+if $C_1 = \ell.false$ then if $C_1$ then $C_2$ else $C_3 \to_g C_3$ using \textsc{if 3} rule\\
 \\
 \textbf{Case C = let $X := C_1$ in $C_2$} \\
+$\cdot \vdash C_1: \tau_1$\\
 IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
-if $C_1 \to_g C'_1$ then let $X := C_1$ in $C_2 \to_g $ let $X := C'_1$ in $C_2$ using let 1 rule\\
-if $C_1$ is a value $V$, then let $X := V$ in $C_2 \to_g C_2[X \mapsto V]$ using let 2 rule
+if $C_1 \to_g C'_1$ then let $X := C_1$ in $C_2 \to_g $ let $X := C'_1$ in $C_2$ using \textsc{let 1} rule\\
+if $C_1$ is a value $V$, then let $X := V$ in $C_2 \to_g C_2[X \mapsto V]$ using \textsc{let 2} rule
 \\ \\
-\textbf{Case C = fun $X \Rightarrow C_1$ } \\
-fun $X \Rightarrow C_1$ is a value and we are done 
-\\ \\
+\textbf{Case C = fun$\ F\ X \Rightarrow C_1$ } \\
+fun$\ F\ X \Rightarrow C_1$ is a value and we are done 
+\\\\
 \textbf{Case C = $C_1 C_2$} \\
+$\cdot \vdash C_1: \tau_1 \to \tau_2\ $and$\cdot \vdash C_2: \tau_1$\\
 IH1 $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
-if $C_1 \to_g C'_1$ then $C_1 C_2 \to_g C'_1 C_2$ using app 1 rule\\
-if $C_1$ is a value, fun $X \Rightarrow C'$, IH2 $C_2$ is either a value or $  \exists \ C'_2.\ C_2 \to_g C'_2 $ \\
-if $C_2$ is a value $V$, then (fun $X \Rightarrow C') V \to_g C'[X \mapsto V]$ using app 3 rule \\
-if $C_2 \to_g C'_2$ then (fun $X \Rightarrow C') C_2 \to_g$ (fun $X \Rightarrow C') C'_2$ using app 2 rule 
+if $C_1 \to_g C'_1$ then $C_1 C_2 \to_g C'_1 C_2$ using \textsc{app 1} rule\\
+if $C_1$ is a value and $\cdot \vdash C_1: \tau_1 \to \tau_2\ $then$\ C_1 =\ $fun$\ F\ X \Rightarrow C'$,\\
+IH2 $C_2$ is either a value or $  \exists \ C'_2.\ C_2 \to_g C'_2 $ \\
+if $C_2$ is a value $V$, then (fun$\ F\ X \Rightarrow C') V \to_g C'[X \mapsto V]$ using \textsc{app 3} rule \\
+if $C_2 \to_g C'_2$ then (fun$\ F\ X \Rightarrow C') C_2 \to_g$ (fun$\ F\ X \Rightarrow C') C'_2$ using \textsc{app 2} rule 
 \\ \\
 \textbf{Case C = $(C_1,C_2)$} \\
+$\cdot \vdash C_1: \tau_1\ $and$\ \cdot \vdash C_2: \tau_2\ $\\
 IH1 $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
-if $C_1 \to_g C'_1$ then $(C_1,C_2) \to_g (C'_1, C_2)$ using pair 1 rule\\
+if $C_1 \to_g C'_1$ then $(C_1,C_2) \to_g (C'_1, C_2)$ using \textsc{pair 1} rule\\
 if $C_1$ is a value $V_1$, IH2 $C_2$ is either a value or $  \exists \ C'_2.\ C_2 \to_g C'_2 $ \\
 if $C_2$ is a value $V_2$, then $(V_1,V_2)$ is a value \\
-if $C_2 \to_g C'_2$ then $(V_1,C_2) \to (V_1,C'_2)$ using pair 2 rule \\ \\
+if $C_2 \to_g C'_2$ then $(V_1,C_2) \to (V_1,C'_2)$ using \textsc{pair 2} rule \\ \\ \\
 \textbf{Case C = fst $C_1$} \\
+$\cdot \vdash C_1: \tau_1 \times \tau_2\ $\\
 IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
-if $C_1 \to_g C'_1$ then fst $C_1 \to_g$ fst $C'_1$ using fst rule\\
-if $C_1$ is a value $V$, this means $V = (V_1, V_2)$ then fst $(V_1, V_2) \to_g V_1$ using pair elim 1 rule\\ \\
+if $C_1 \to_g C'_1$ then, fst $C_1 \to_g$ fst $C'_1$ using \textsc{fst} rule\\
+if $C_1$ is a value $V$ and $\cdot \vdash C_1: \tau_1 \times \tau_2\ $ this means $V = (V_1, V_2)$ \\ 
+then, fst $(V_1, V_2) \to_g V_1$ using \textsc{pair elim 1} rule\\ \\
 \textbf{Case C = snd $C_1$} \\
+$\cdot \vdash C_1: \tau_1 \times \tau_2\ $\\
 IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
-if $C_1 \to_g C'_1$ then snd $C_1 \to_g$ snd $C'_1$ using snd rule\\
-if $C_1$ is a value $V$, this means $V = (V_1, V_2)$ then snd $(V_1, V_2) \to_g V_2$ using pair elim 2 rule\\ \\
+if $C_1 \to_g C'_1$ then, snd $C_1 \to_g$ snd $C'_1$ using \textsc{snd} rule\\
+if $C_1$ is a value $V$ and $\cdot \vdash C_1: \tau_1 \times \tau_2\ $ this means $V = (V_1, V_2)$ \\ 
+then, snd $(V_1, V_2) \to_g V_2$ using \textsc{pair elim 2} rule\\ \\
 \textbf{Case C = left $C_1$} \\
+$\cdot \vdash C_1: \tau_1$\\
 IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
-if $C_1 \to_g C'_1$ then left $C_1 \to_g$ left $C'_1$ using left rule\\
-if $C_1$ is a value $V$,then left $V$ is a value\\ \\
+if $C_1 \to_g C'_1$ then left $C_1 \to_g$ left $C'_1$ using \textsc{left} rule\\
+if $C_1$ is a value $V$, then left $V$ is a value\\ \\
 \textbf{Case C = right $C_1$} \\
+$\cdot \vdash C_1: \tau_2$ \\
 IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
-if $C_1 \to_g C'_1$ then right $C_1 \to_g$ right $C'_1$ using right rule\\
-if $C_1$ is a value $V$,then right $V$ is a value\\ \\
+if $C_1 \to_g C'_1$ then right $C_1 \to_g$ right $C'_1$ using \textsc{right} rule\\
+if $C_1$ is a value $V$, then right $V$ is a value\\ \\
 \textbf{Case C = match $C_1$ with left X $\Rightarrow C_2$; right Y $\Rightarrow C_3$}\\
+$\cdot \vdash C_1: \tau_1 + \tau_2$\\
 IH $C_1$ is either a value or $  \exists \ C'_1.\ C_1 \to_g C'_1 $ \\
-if $C_1 \to_g C'_1$ then match $C_1$ with left X $\Rightarrow C_2$; right Y $\Rightarrow C_3 \to_g$ match $C'_1$ with left X $\Rightarrow C_2$; right Y $\Rightarrow C_3$ using match rule\\
-if $C_1$ is a value, then $C_1$ is either left $V$ or right $V$\\
-if $C_1 = $ left $V$ then match (left $V$) with left X $\Rightarrow C_2$; right Y $\Rightarrow C_3 \to_g$ $C_2[X \mapsto V]$ using sum elim 1 rule\\
-if $C_1 = $ right $V$ then match (right $V$) with left X $\Rightarrow C_2$; right Y $\Rightarrow C_3 \to_g$ $C_3[Y \mapsto V]$ using sum elim 2 rule\\
+if $C_1 \to_g C'_1$ then match $C_1$ with left X $\Rightarrow C_2$; right Y $\Rightarrow C_3 \to_g$ match $C'_1$ with left X $\Rightarrow C_2$; right Y $\Rightarrow C_3$ using \textsc{match} rule\\
+if $C_1$ is a value and $\cdot \vdash C_1: \tau_1 + \tau_2\ $then $C_1$ is either left $V$ or right $V$\\
+if $C_1 = $ left $V$ then match (left $V$) with left X $\Rightarrow C_2$; right Y $\Rightarrow C_3 \to_g$ $C_2[X \mapsto V]$ using \textsc{sum elim 1} rule\\
+if $C_1 = $ right $V$ then match (right $V$) with left X $\Rightarrow C_2$; right Y $\Rightarrow C_3 \to_g$ $C_3[Y \mapsto V]$ using \textsc{sum elim 2} rule\\
 \\
 \\
 \textbf{Theorem 4.} (\textit{Preservation}): If $\Gamma;\Delta \vdash C : \tau$ and  $C \to C'$ then $\Gamma;\Delta \vdash C' : \tau$
@@ -612,19 +637,19 @@ Using local preservation we can say that, if $\Gamma \vdash e : t$ and  $e \to e
 Now we know, $\ell.e \to \ell.e'$ and $\Gamma; \Delta; \Delta \vdash C : \ell.t$  \\
 Using local preservation, $\Gamma;\Delta \vdash C' : \ell.t$ where $C' = \ell.e'$
 \\ \\
-\textbf{Case $\Gamma;\Delta \vdash C : \tau_1 $ x $ \tau_2$ } \\
+\textbf{Case $\Gamma;\Delta \vdash C : \tau_1  \times  \tau_2$ } \\
 This means C = $(C_1, C_2)$ \\
 IH If $\Gamma; \Delta \vdash C_1 : \tau_1$ and  $C_1 \to C'_1$ then $\Gamma;\Delta \vdash C'_1 : \tau_1$ \\
-Now we know, $(C_1,C_2) \to (C'_1, C_2)$ and $\Gamma; \Delta \vdash (C_1, C_2) : \tau_1$ x $\tau_2$ \\
-Using IH we can say $\Gamma;\Delta \vdash (C'_1, C_2) : \tau_1$ x $ \tau_2$ \\\\
+Now we know, $(C_1,C_2) \to (C'_1, C_2)$ and $\Gamma; \Delta \vdash (C_1, C_2) : \tau_1 \times \tau_2$ \\
+Using IH we can say $\Gamma;\Delta \vdash (C'_1, C_2) : \tau_1 \times  \tau_2$ \\\\
 \textbf{Case $\Gamma; \Delta\vdash$ fst $C : \tau_1$ } \\
-This means $C : \tau_1$ x $\tau_2$ \\
-IH If $\Gamma; \Delta \vdash C : \tau_1$ x $\tau_2$ and  $C \to c'$ then $\Gamma; \Delta \vdash C' : \tau_1$ x $\tau_2$ \\
+This means $C : \tau_1 \times \tau_2$ \\
+IH If $\Gamma; \Delta \vdash C : \tau_1 \times \tau_2$ and  $C \to c'$ then $\Gamma; \Delta \vdash C' : \tau_1 \times \tau_2$ \\
 Now we know, fst $C \to$ fst $C'$ and $\Gamma;\Delta \vdash$ fst $C : \tau_1$ \\
 Using IH we can say $\Gamma; \Delta \vdash$ fst $ C' : \tau_1$ \\\\
 \textbf{Case $\Gamma; \Delta \vdash$ snd $C : \tau_2$ } \\
-This means $C : \tau_1$ x $\tau_2$ \\
-IH If $\Gamma; \Delta \vdash C : \tau_1$ x $\tau_2$ and  $C \to C'$ then $\Gamma; \Delta \vdash C' : \tau_1$ x $\tau_2$ \\
+This means $C : \tau_1 \times \tau_2$ \\
+IH If $\Gamma; \Delta \vdash C : \tau_1 \times \tau_2$ and  $C \to C'$ then $\Gamma; \Delta \vdash C' : \tau_1 \times \tau_2$ \\
 Now we know, snd $C \to$ snd $C'$ and $\Gamma; \Delta \vdash$ snd $C : \tau_2$ \\
 Using IH we can say $\Gamma; \Delta \vdash$ snd $ C' : \tau_2$ \\\\
 \textbf{Case $\Gamma; \Delta \vdash$ left $C : \tau_1+\tau_2$ } \\
