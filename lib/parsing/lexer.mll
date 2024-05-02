@@ -14,7 +14,7 @@ let alpha = ['a'-'z' 'A'-'Z']
 let white = [' ' '\t']+
 let newline = '\r' | '\n' | "\r\n"
 
-let integer = '-'? digit+
+let integer = digit+
 let identifier = (alpha | '_' ) (alpha | digit | '_')*
 
 rule read = parse
@@ -50,6 +50,7 @@ rule read = parse
   | "int"              { INT_T }
   | "string"           { STRING_T }
   | "bool"             { BOOL_T }
+  | "not"              { NOT }
   | "fun"              { FUN }
   | "type"             { TYPE }
   | "true"             { TRUE }

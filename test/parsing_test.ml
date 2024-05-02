@@ -15,15 +15,15 @@ let test_declarations_basic _ =
   (* peq "var : loc.bool" (Prog [ VarDecl (VarId "var", TLoc (LocId "loc", TBool)) ]);
      peq "fun fn : loc.int -> loc.int" (Prog [FunDecl (FunId "fn", TLoc (LocId "loc", TInt), TLoc (LocId "loc", TInt)) ]);
      peq "loc.var : loc.string" (Prog [ LocVarDecl (LocId "loc", VarId "var", LocId "loc", TString) ]); *)
-  peq "type new := unit" (Prog [ TypeDecl (VarId "new", TUnit) ])
+  peq "type new := unit" (Prog [ TypeDecl (TypId "new", TUnit) ])
 
 let new_decl _ =
   peq "type x := P1.int"
-    (Prog [ TypeDecl (VarId "x", TLoc (LocId "P1", TInt)) ])
+    (Prog [ TypeDecl (TypId "x", TLoc (LocId "P1", TInt)) ])
 
 let int_assign _ =
   peq "x := P1.5;"
-    (Prog [ Assign (Var (VarId "x"), LocExpr (LocId "P1", Val (`Int 5))) ])
+    (Prog [ Assign ([Var (VarId "x")], LocExpr (LocId "P1", Val (`Int 5))) ])
 
 let decl_expr _ =
   peq "(P1.5, P2.true) : P1.int * P2.bool;"
@@ -41,7 +41,7 @@ let pair_assign _ =
     (Prog
        [
          Assign
-           ( Var (VarId "pair1"),
+           ( [Var (VarId "pair1")],
              Pair
                ( LocExpr (LocId "P1", Val (`Int 5)),
                  LocExpr (LocId "P2", Val (`Bool true)) ) );
@@ -52,7 +52,7 @@ let binary_operation _ =
     (Prog
        [
          Assign
-           ( Var (VarId "y"),
+           ( [Var (VarId "y")],
              If
                ( LocExpr
                    ( LocId "P1",
@@ -69,7 +69,7 @@ let test_first_pair _ =
     (Prog
        [
          Assign
-           ( Var (VarId "y"),
+           ( [Var (VarId "y")],
              Fst
                (Pair
                   ( LocExpr (LocId "P1", Val (`String "Hello")),
@@ -81,7 +81,7 @@ let test_second_pair _ =
     (Prog
        [
          Assign
-           ( Var (VarId "y"),
+           ( [Var (VarId "y")],
              Snd
                (Pair
                   ( LocExpr (LocId "P1", Val (`String "Hello")),
@@ -89,13 +89,13 @@ let test_second_pair _ =
        ])
 
 let test_decl_send _ =
-  peq "y : P2.int;\n        y := P1.5 ~> P2;"
+  peq "y : P2.int;\n        y := P1.5 [P1] ~> P2;"
     (Prog
        [
          Decl (Var (VarId "y"), TLoc (LocId "P2", TInt));
          Assign
-           ( Var (VarId "y"),
-             Send (LocExpr (LocId "P1", Val (`Int 5)), LocId "P2") );
+           ( [Var (VarId "y")],
+             Send (LocId "P1", LocExpr (LocId "P1", Val (`Int 5)), LocId "P2") );
        ])
 
 let suite =

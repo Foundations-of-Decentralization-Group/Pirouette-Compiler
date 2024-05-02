@@ -5,7 +5,12 @@ type value =
 
 type loc_id = LocId of string
 type var_id = VarId of string
+type typ_id = TypId of string
 type sync_label = LabelId of string
+
+type un_op =
+  | Not
+  | Neg
 
 type bin_op =
   | Plus
@@ -21,31 +26,32 @@ type bin_op =
   | Gt
   | Geq
 
-type local_type =
+type typ =
   | TUnit
   | TInt
   | TString
   | TBool
-  | TProd of local_type * local_type
-  | TSum of local_type * local_type
+  | TProd of typ * typ
+  | TSum of typ * typ
 
-type local_pattern =
+type pattern =
   | Default
   | Val of value
   | Var of var_id
-  | Pair of local_pattern * local_pattern
-  | Left of local_pattern
-  | Right of local_pattern
+  | Pair of pattern * pattern
+  | Left of pattern
+  | Right of pattern
 
-type local_expr =
+type expr =
   | Unit
   | Val of value
   | Var of var_id
-  | BinOp of local_expr * bin_op * local_expr
-  | Let of var_id * local_expr * local_expr
-  | Pair of local_expr * local_expr
-  | Fst of local_expr
-  | Snd of local_expr
-  | Left of local_expr
-  | Right of local_expr
-  | Match of local_expr * (local_pattern * local_expr) list
+  | UnOp of un_op * expr
+  | BinOp of expr * bin_op * expr
+  | Let of var_id * expr * expr
+  | Pair of expr * expr
+  | Fst of expr
+  | Snd of expr
+  | Left of expr
+  | Right of expr
+  | Match of expr * (pattern * expr) list
