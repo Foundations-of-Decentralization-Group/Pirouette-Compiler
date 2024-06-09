@@ -140,9 +140,15 @@
 \inferrule [ Loc - var ]
 { x : t \in \Gamma }
 { \Gamma \vdash x : t  } \and
-\inferrule [ Loc - binop ] 
-{ \Gamma \vdash e_1 : t_1 \quad \Gamma \vdash e_2 : t_2 \quad \textbf{DOUBT} } 
-{ \Gamma \vdash e_1  } \and
+\inferrule [ Loc - binop mat ] 
+{ \Gamma \vdash e_1 : int \quad \Gamma \vdash e_2 : int \quad \odot \in \{+,-,\times, /\}} 
+{ \Gamma \vdash e_1 \odot e_2 : int} \and
+\inferrule [ Loc - binop comp ] 
+{ \Gamma \vdash e_1 : int \quad \Gamma \vdash e_2 : int \quad \odot \in \{=, !=, <, >, <=, >=\}} 
+{ \Gamma \vdash e_1 \odot e_2 : bool} \and
+\inferrule [ Loc - binop bool ] 
+{ \Gamma \vdash e_1 : bool \quad \Gamma \vdash e_2 : bool \quad \odot \in \{\& \&, \parallel\}} 
+{ \Gamma \vdash e_1 \odot e_2 : bool} \and
 \inferrule [ Loc - def ]
 { \Gamma \vdash e_1 : t \quad \Gamma, x : t \vdash e_2 : t_2 }
 { \Gamma ;\Delta \vdash \textsf{let}\ x := e_1 \ \textsf{in}\ e_2 : t_2  } \and
@@ -501,42 +507,80 @@ if $e_1 = $ right $v$ then match (right $v$) with left x $\Rightarrow e_2$; righ
 \textbf{Theorem 2.} (\textit{Local Preservation}): If $\Gamma \vdash e : t$ and  $e \to e'$ then $\Gamma \vdash e' : t$
   \\
 \textit{Proof.} We will start with induction on $\Gamma \vdash e : t$ \\\\
-\textbf{Case $\Gamma \vdash e : unit$} \\
- $\Gamma \vdash $ ( ) : unit. () doesn't take a step and we are done \\ \\
-\textbf{Case x : t}      \\ 
-$\Gamma \vdash $ x : t. x doesn't take a step and we are done \\ \\
-\textbf{Case $\Gamma \vdash e : t_1 \times t_2$ } \\
-This means e = $(e_1, e_2)$ \\
-IH If $\Gamma \vdash e_1 : t_1$ and  $e_1 \to e'_1$ then $\Gamma \vdash e'_1 : t_1$ \\
-Now we know, $(e_1,e_2) \to (e'_1, e_2)$ and $\Gamma \vdash (e_1, e_2) : t_1 \times t_2$ \\
-Using IH we can say $\Gamma \vdash (e'_1, e_2) : t_1 \times t_2$ \\\\
-\textbf{Case $\Gamma \vdash$ fst $e : t_1$ } \\
-This means $e : t_1Xt_2$ \\
-IH If $\Gamma \vdash e : t_1Xt_2$ and  $e \to e'$ then $\Gamma \vdash e' : t_1Xt_2$ \\
-Now we know, fst $e \to$ fst $e'$ and $\Gamma \vdash$ fst $e : t_1$ \\
-Using IH we can say $\Gamma \vdash$ fst $ e' : t_1$ \\\\
-\textbf{Case $\Gamma \vdash$ snd $e : t_2$ } \\
-This means $e : t_1Xt_2$ \\
-IH If $\Gamma \vdash e : t_1Xt_2$ and  $e \to e'$ then $\Gamma \vdash e' : t_1Xt_2$ \\
-Now we know, snd $e \to$ snd $e'$ and $\Gamma \vdash$ snd $e : t_2$ \\
-Using IH we can say $\Gamma \vdash$ snd $ e' : t_2$ \\\\
-\textbf{Case $\Gamma \vdash$ left $e : t_1+t_2$ } \\
-This means $e : t_1$ \\
+\textbf{Case $\inferrule []
+{ \; }
+{ \Gamma \vdash \textsf{( ) : unit} } \and$} \\
+() doesn't take a step and we are done \\ \\
+\textbf{Case $\inferrule []
+{ x : t \in \Gamma }
+{ \Gamma \vdash x : t  } $}      \\ 
+$x$ doesn't take a step and we are done \\ \\
+\textbf{Case $\inferrule []
+{ \Gamma \vdash e_1 : t_1 \quad \Gamma, x : t \vdash e_2 : t_2 }
+{ \Gamma ;\Delta \vdash \textsf{let}\ x := e_1 \ \textsf{in}\ e_2 : t_2  }$}      \\ 
+if $e_1 \to e'_1$ then let $ x := e_1$ in $ e_2 \to $ let $ x := e'_1$ in $ e_2$ using the \textsc{Loc - Let 1} rule\\
+and $\Gamma \vdash$ let $ x := e_1$ in $ e_2 : t_2$ \\ 
+IH if $\Gamma \vdash e_1 : t_1$ and  $e_1 \to e'_1$ then $\Gamma \vdash e'_1 : t_1$ \\
+Using IH we can say, let $ x := e'_1$ in $ e_2 : t_2$\\
+if $e_1 = v$ then let $ x := e_1$ in $ e_2 \to e_2[x \mapsto v]$ using the \textsc{Loc - Let 2} rule\\
+and we know $e_2 : t_2$
+\\\\
+\textbf{Case $\inferrule []
+{ \Gamma \vdash e_1 : t_1 \quad \Gamma \vdash e_2 : t_2}
+{ \Gamma \vdash (e_1, e_2) : t_1 \times t_2 }$ } \\
+IH1 If $\Gamma \vdash e_1 : t_1$ and  $e_1 \to e'_1$ then $\Gamma \vdash e'_1 : t_1$ \\
+if $e_1 \to e'_1$ then $(e_1,e_2) \to (e'_1, e_2)$ using the \textsc{Loc - Pair 1} rule\\
+and $\Gamma \vdash (e_1, e_2) : t_1 \times t_2$ \\
+Using IH1 we can say $\Gamma \vdash (e'_1, e_2) : t_1 \times t_2$ \\
+IH2 If $\Gamma \vdash e_2 : t_2$ and  $e_2 \to e'_2$ then $\Gamma \vdash e'_2 : t_2$ \\
+if $e_1 = v$ then $(v,e_2) \to (v, e'_2)$ using the \textsc{Loc - Pair 2} rule\\
+and $\Gamma \vdash (v, e_2) : t_1 \times t_2$ \\
+Using IH2 we can say $\Gamma \vdash (v, e'_2) : t_1 \times t_2$
+\\\\
+\textbf{Case $\inferrule []
+{ \Gamma \vdash e : t_1 \times t_2 }
+{ \Gamma \vdash \textsf{fst} \  e : t_1 }$ } \\
+if $e \to e'$
+IH If $\Gamma \vdash e : t_1 \times t_2$ and  $e \to e'$ then $\Gamma \vdash e' : t_1 \times t_2$ \\
+using \textsc{Loc - fst} rule, fst $e \to$ fst $e'$ and we know $\Gamma \vdash$ fst $e : t_1$ \\
+Using IH we can say $\Gamma \vdash$ fst $ e' : t_1$ \\
+if $e = v$ This means that $e = (v_1, v_2)$ where $v_1 : t_1$
+then using \textsc{Loc - pair elim 1}, fst $(v_1, v_2) \to v_1$ and we know $\Gamma \vdash$ fst $(v_1, v_2) : t_1$ \\
+and $v_1: t_1$\\\\
+\textbf{Case $\inferrule []
+{ \Gamma \vdash e : t_1 \times t_2 }
+{ \Gamma \vdash \textsf{snd} \  e : t_2 }$ } \\
+if $e \to e'$
+IH If $\Gamma \vdash e : t_1 \times t_2$ and  $e \to e'$ then $\Gamma \vdash e' : t_1 \times t_2$ \\
+using \textsc{Loc - snd} rule, snd $e \to$ snd $e'$ and we know $\Gamma \vdash$ snd $e : t_2$ \\
+Using IH we can say $\Gamma \vdash$ snd $ e' : t_2$ \\
+if $e = v$ This means that $e = (v_1, v_2)$ where $v_2 : t_2$
+then using \textsc{Loc - pair elim 2}, snd $(v_1, v_2) \to v_2$ and we know $\Gamma \vdash$ snd $(v_1, v_2) : t_2$ \\
+and $v_2: t_2$\\\\
+\textbf{Case $\inferrule []
+{ \Gamma \vdash e : t_1 }
+{ \Gamma \vdash \textsf{left} \ e : t_1 + t_2 }$ } \\
 IH If $\Gamma \vdash e : t_1$ and  $e \to e'$ then $\Gamma \vdash e' : t_1$ \\
-Now we know, left $e \to$ left $e'$ and $\Gamma \vdash$ left $e : t_1+t_2$ \\
-Using IH we can say $\Gamma \vdash$ left $ e' : t_1+t_2$ \\\\
-\textbf{Case $\Gamma \vdash$ right $e : t_1+t_2$ } \\
-This means $e : t_2$ \\
+using \textsc{Loc - Left} rule we know, left $e \to$ left $e'$ and $\Gamma \vdash$ left $e : t_1+t_2$ \\
+Using IH we can say $\Gamma \vdash$ left $ e' : t_1 + t_2$ \\\\
+\textbf{Case $\inferrule []
+{ \Gamma \vdash e : t_2 }
+{ \Gamma \vdash \textsf{right} \ e : t_1 + t_2 }$ } \\
 IH If $\Gamma \vdash e : t_2$ and  $e \to e'$ then $\Gamma \vdash e' : t_2$ \\
-Now we know, right $e \to$ right $e'$ and $\Gamma \vdash$ right $e : t_1+t_2$ \\
-Using IH we can say $\Gamma \vdash$ right $ e' : t_1+t_2$ \\
-\\
-\textbf{Case $\Gamma; x: t_1, y: t_2 \vdash$ match $e$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 : t_3$ } \\
-This means $e : t_1 + t_2$ \\
+using \textsc{Loc - Right} rule we know, right $e \to$ right $e'$ and $\Gamma \vdash$ right $e : t_1+t_2$ \\
+Using IH we can say $\Gamma \vdash$ right $ e' : t_1 + t_2$ \\\\
+\textbf{Case $\inferrule []
+{ \Gamma \vdash e : t_1+t_2 \quad \Gamma , \ x : t_1 \vdash e_1 : t_3 \quad \Gamma , \ y : t_2 \vdash e_2 : t_3  }
+{ \Gamma \vdash (\textsf{match e with left} \ x \Rightarrow e_1 ; \textsf{right} \ y \Rightarrow e_2) :t_3  } $ } \\
+if $e \to e'$
 IH If $\Gamma \vdash e : t_1+t_2$ and  $e \to e'$ then $\Gamma \vdash e' : t_1+t_2$ \\
-Now we know, match $e$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 \to$
-match $e'$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3$ and $\Gamma \vdash$ match $e$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 : t_3$ \\
-Using IH we can say $\Gamma \vdash$ match $e'$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 : t_3$ 
+Using \textsc{Loc - match} rule we know, \\ 
+match $e$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 \to$
+match $e'$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3$ \\ and $\Gamma \vdash$ match $e$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 : t_3$ \\
+Using IH we can say $\Gamma \vdash$ match $e'$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 : t_3$ \\
+if $e$ is a value then $e =$ left $v$ or right $v$ then using \textsc{Loc - sum elim 1} and \textsc{Loc - sum elim 2} rule respectively, \\
+match $e$ with left $x \Rightarrow e_2 $; right $ y \Rightarrow e_3 \to  e_1\ [x \mapsto v] $ or $  e_2\ [y \mapsto v]$ where e = left v or right v\\
+and $e_1, e_2 : t_3$
 \\\\
 \\
 \textbf{Theorem 3.} (\textit{Progress}): For every choreography $\cdot \vdash C : \tau$ either $  \exists \ C'.\ C \to_g C'$  or $C$ is a value
@@ -627,47 +671,133 @@ if $C_1 = $ right $V$ then match (right $V$) with left X $\Rightarrow C_2$; righ
 \textbf{Theorem 4.} (\textit{Preservation}): If $\Gamma;\Delta \vdash C : \tau$ and  $C \to C'$ then $\Gamma;\Delta \vdash C' : \tau$
   \\
 \textit{Proof.} We will start with induction on $\Gamma;\Delta \vdash C : \tau$ \\ \\
-\textbf{Case $\Gamma; \Delta \vdash C : unit$} \\
- $\Gamma; \Delta \vdash $ ( ) : unit. () doesn't take a step and we are done \\ \\
-\textbf{Case $\Gamma; \Delta \vdash X : \tau$}       \\ 
-$\Gamma; \Delta \vdash X : \tau$. X doesn't take a step and we are done \\ \\
-\textbf{Case $\Gamma; \Delta \vdash C : \ell.t$}       \\ 
-This means C = $\ell.e$ \\
+\textbf{Case $\inferrule []
+{ \; }
+{ \Gamma ; \Delta \vdash \textsf{( ) : unit} }$} \\
+() doesn't take a step and we are done \\ \\
+\textbf{Case $\inferrule []
+{ X : \tau \in \Delta }
+{ \Gamma ;\Delta \vdash X : \tau }$}       \\ 
+X doesn't take a step and we are done \\ \\
+\textbf{Case $\inferrule []
+{ \Gamma_{|\ell} \vdash e : t }
+{ \Gamma ; \Delta \vdash \ell.e : \ell.t }$}       \\ 
 Using local preservation we can say that, if $\Gamma \vdash e : t$ and  $e \to e'$ then $\Gamma \vdash e' : t$
-Now we know, $\ell.e \to \ell.e'$ and $\Gamma; \Delta; \Delta \vdash C : \ell.t$  \\
-Using local preservation, $\Gamma;\Delta \vdash C' : \ell.t$ where $C' = \ell.e'$
+Now using \textsc{Assoc} rule we know, if $e \to e'$ then $\ell.e \to \ell.e'$ and $\Gamma; \Delta \vdash \ell.e : \ell.t$  \\
+Using local preservation, $\Gamma;\Delta \vdash \ell.e' : \ell.t$
 \\ \\
-\textbf{Case $\Gamma;\Delta \vdash C : \tau_1  \times  \tau_2$ } \\
-This means C = $(C_1, C_2)$ \\
-IH If $\Gamma; \Delta \vdash C_1 : \tau_1$ and  $C_1 \to C'_1$ then $\Gamma;\Delta \vdash C'_1 : \tau_1$ \\
-Now we know, $(C_1,C_2) \to (C'_1, C_2)$ and $\Gamma; \Delta \vdash (C_1, C_2) : \tau_1 \times \tau_2$ \\
-Using IH we can say $\Gamma;\Delta \vdash (C'_1, C_2) : \tau_1 \times  \tau_2$ \\\\
-\textbf{Case $\Gamma; \Delta\vdash$ fst $C : \tau_1$ } \\
-This means $C : \tau_1 \times \tau_2$ \\
-IH If $\Gamma; \Delta \vdash C : \tau_1 \times \tau_2$ and  $C \to c'$ then $\Gamma; \Delta \vdash C' : \tau_1 \times \tau_2$ \\
-Now we know, fst $C \to$ fst $C'$ and $\Gamma;\Delta \vdash$ fst $C : \tau_1$ \\
-Using IH we can say $\Gamma; \Delta \vdash$ fst $ C' : \tau_1$ \\\\
-\textbf{Case $\Gamma; \Delta \vdash$ snd $C : \tau_2$ } \\
-This means $C : \tau_1 \times \tau_2$ \\
-IH If $\Gamma; \Delta \vdash C : \tau_1 \times \tau_2$ and  $C \to C'$ then $\Gamma; \Delta \vdash C' : \tau_1 \times \tau_2$ \\
-Now we know, snd $C \to$ snd $C'$ and $\Gamma; \Delta \vdash$ snd $C : \tau_2$ \\
-Using IH we can say $\Gamma; \Delta \vdash$ snd $ C' : \tau_2$ \\\\
-\textbf{Case $\Gamma; \Delta \vdash$ left $C : \tau_1+\tau_2$ } \\
-This means $C : \tau_1$ \\
-IH If $\Gamma; \Delta \vdash C : \tau_1$ and  $C \to C'$ then $\Gamma;\Delta \vdash C' : \tau_1$ \\
-Now we know, left $C \to$ left $C'$ and $\Gamma; \Delta \vdash$ left $C : \tau_1+\tau_2$ \\
-Using IH we can say $\Gamma; \Delta \vdash$ left $ C' : \tau_1+\tau_2$ \\\\
-\textbf{Case $\Gamma; \Delta \vdash$ right $C : \tau_1+\tau_2$ } \\
-This means $C : \tau_2$ \\
-IH If $\Gamma; \Delta \vdash C : \tau_2$ and  $C \to C'$ then $\Gamma; \Delta \vdash C' : \tau_2$ \\
-Now we know, right $C \to$ right $C'$ and $\Gamma; \Delta \vdash$ right $C : \tau_1+\tau_2$ \\
-Using IH we can say $\Gamma;\Delta \vdash$ right $ C' : \tau_1+\tau_2$ \\\\
-\textbf{Case $\Gamma;\Delta \vdash$ match $C$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3 : \tau_3$ } \\
-This means $C : \tau_1 + \tau_2$ \\
-IH If $\Gamma;\Delta \vdash C : \tau_1+\tau_2$ and  $C \to C'$ then $\Gamma; \Delta \vdash C' : \tau_1+\tau_2$ \\
-Now we know, match $C$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3 \to$
-match $C'$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3$ and $\Gamma; \Delta \vdash$ match $C$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3 : \tau_3$ \\
-Using IH we can say, $\Gamma; \Delta \vdash$ match $C'$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3 : \tau_3$ \\\\
+\textbf{Case $\inferrule []
+{ \Gamma ; \Delta \vdash C : \ell.t}
+{ \Gamma;\Delta \vdash C \leadsto \ell_2 : \ell_2.t}$ } \\
+if $C \to C'$ \\
+IH if $\Gamma;\Delta \vdash C : \tau$ and  $C \to C'$ then $\Gamma; \Delta \vdash C' : \tau$ \\
+Using \textsc{Send 1} rule we can say, $ C \leadsto \ell_2 \to  C' \leadsto \ell_2 $\\
+using the IH and the \textsc{Send} typing rule, $C' \leadsto \ell_2 : \ell_2.t$\\
+if C is a value, then $C = \ell.v$ and using the \textsc{Send 2} rule we can say, \\
+$\ell.v \leadsto \ell_2 \to \ell_2.v $ there $\ell.v : \ell.t$ \\
+and so, $\ell_2.v : \ell.t$
+\\\\
+\textbf{Case $\inferrule []
+{ \Gamma;\Delta \vdash C : \tau}
+{ \Gamma;\Delta \vdash \ell_1[d] \leadsto \ell_2 ; C : \tau}$ } \\
+$\ell_1[d] \leadsto \ell_2 ; C : \tau$ and using the \textsc{Sync} rule we know, \\
+$\ell_1[d] \leadsto \ell_2 ; C \to C$ and as we know $C : \tau$
+\\\\
+\textbf{Case $\inferrule []
+{ \Gamma;\Delta \vdash C : \ell.bool \quad \Gamma;\Delta\vdash C_2 : \tau_2 \quad \Gamma;\Delta \vdash C_3 : \tau_2 }
+{ \Gamma;\Delta \vdash \textsf{if } C \textsf{ then } C_2 \textsf{ else } C_3: \tau_2  }$ } \\
+if $C \to C'$ \\
+IH if $\Gamma;\Delta \vdash C : \tau$ and  $C \to C'$ then $\Gamma; \Delta \vdash C' : \tau$ \\
+Using \textsc{If 1} rule we can say that if $C$ then $C_2$ else $C_3 \to$ if $C'$ then $C_2$ else $C_3$ \\
+Using the IH and the \textsc{if} typing rule, if $C'$ then $C_2$ else $C_3 : \tau_2$ \\
+If C is a value then $C = \ell.true$ or $ \ell.false$ as $C : \ell.bool$\\
+Using the \textsc{if 2} and \textsc{if 3},  if $C$ then $C_2$ else $C_3 \to C_2$ or $C_3$ respectively \\
+and we know, $C_2, C_3 : \tau_2$
+\\\\
+\textbf{Case $\inferrule []
+{ \Gamma;\Delta \vdash C_1 : \ell.t \quad \Gamma;\Delta, X : \ell.t \vdash C_2 : \tau_2 }
+{ \Gamma;\Delta \vdash \textsf{let } X = C_1 \textsf{ in } C_2 : \tau_2 }$ } \\
+if $C_1 \to C'_1$ \\
+let $ X := C_1$ in $ C_2 \to $ let $ X := C'_1$ in $ C_2$ using the \textsc{Let 1} rule\\
+and $\Gamma; \Delta \vdash$ let $ X := C_1$ in $ C_2 : \tau_2$ \\ 
+IH if $\Gamma;\Delta \vdash C_1 : \tau_1$ and  $C_1 \to C'_1$ then $\Gamma; \Delta \vdash C'_1 : \tau_1$ \\
+Using IH we can say, let $ X := C'_1$ in $ C_2 : \tau_2$\\
+if $C_1 = V$ then let $ X := C_1$ in $ C_2 \to C_2[X \mapsto V]$ using the \textsc{Let 2} rule\\
+and we know $C_2 : \tau_2$
+\\\\
+\textbf{Case $\inferrule []
+{ \Gamma;\Delta \vdash C_1 : \tau_1 \to \tau_2 \quad \Gamma;\Delta \vdash C_2 : \tau_1 }
+{ \Gamma;\Delta \vdash C_1 C_2 : \tau_2  }$ } \\
+if $C_1 \to C'_1$ \\
+IH1 if $\Gamma;\Delta \vdash C_1 : \tau_1 \to \tau_2$ and  $C_1 \to C'_1$ then $\Gamma; \Delta \vdash C' : \tau_1 \to \tau_2$ \\
+Using the \textsc{App 1} rule, $C_1 C_2 \to C'_1 C_2$ \\
+Using the IH1 and \textsc{app} typing rule, $C'_1 C_2 : \tau_2$ \\
+If $C_1$ is a value then, $ C_1 =$ fun $F \ X \Rightarrow C$ as $C_1 : \tau_1 \to \tau_2$ \\
+Now if $C_2 \to C'_2$ \\
+IH2 If $\Gamma;\Delta \vdash C_2 : \tau_1$ and  $C_2 \to C'_2$ then $\Gamma \vdash C'_2 : \tau_1$ \\
+Using \textsc{App 2} rule we know, (fun $F \ X \Rightarrow C) C_2 \to ($fun $F \ X \Rightarrow C) C'_2$ \\
+And Using IH2 and \textsc{app} typing rule, (fun $F \ X \Rightarrow C) C_2 : \tau_2$ \\
+If $C_2$ is a value then $C_2 = V$ \\
+Using \textsc{App 3} rule we know,\\
+(fun $F \ X \Rightarrow C) V \to C[X \mapsto V, F \mapsto$ (fun $F \ X \Rightarrow C)]$ \\
+Using \textsc{Fun} typing rule we can say, $C[X \mapsto V, F \mapsto$ (fun $F \ X \Rightarrow C)] : \tau_2$
+\\\\
+\textbf{Case $\inferrule []
+{ \Gamma ; \Delta \vdash C_1 : \tau_1 \quad \Gamma ; \Delta \vdash C_2 : \tau_2 }
+{ \Gamma ; \Delta \vdash (C_1, C_2) : \tau_1 \times \tau_2  }$ } \\
+IH1 If $\Gamma;\Delta \vdash C_1 : \tau_1$ and  $C_1 \to C'_1$ then $\Gamma \vdash C'_1 : \tau_1$ \\
+if $C_1 \to C'_1$ then $(C_1,C_2) \to (C'_1, C_2)$ using the \textsc{Pair 1} rule\\
+and $\Gamma;\Delta \vdash (C_1, C_2) : \tau_1 \times \tau_2$ \\
+Using IH1 we can say $\Gamma;\Delta \vdash (C'_1, C_2) : \tau_1 \times \tau_2$ \\
+IH2 If $\Gamma;\Delta \vdash C_2 : \tau_2$ and  $C_2 \to C'_2$ then $\Gamma;\Delta \vdash C'_2 : \tau_2$ \\
+if $C_1 = V$ then $(V,C_2) \to (V, C'_2)$ using the \textsc{Pair 2} rule\\
+and $\Gamma;\Delta \vdash (V, C_2) : \tau_1 \times \tau_2$ \\
+Using IH2 we can say $\Gamma;\Delta \vdash (V, C'_2) : \tau_1 \times \tau_2$
+\\\\
+\textbf{Case $\inferrule []
+{ \Gamma ; \Delta \vdash C : \tau_1 \times \tau_2 }
+{ \Gamma ; \Delta \vdash \textsf{fst}\ C : \tau_1 }$ } \\
+if $C \to C'$
+IH If $\Gamma;\Delta \vdash C : \tau_1 \times \tau_2$ and  $C \to C'$ then $\Gamma;\Delta \vdash C' : \tau_1 \times \tau_2$ \\
+using \textsc{fst} rule, fst $C \to$ fst $C'$ and we know $\Gamma;\Delta \vdash$ fst $C : \tau_1$ \\
+Using IH we can say $\Gamma;\Delta \vdash$ fst $ C' : \tau_1$ \\
+if $C = V$ This means that $C = (V_1, V_2)$ where $V_1 : \tau_1$
+then using \textsc{pair elim 1}, fst $(V_1, V_2) \to V_1$ and we know $\Gamma;\Delta \vdash$ fst $(V_1, V_2) : \tau_1$ \\
+and $V_1: \tau_1$\\\\
+\textbf{Case $\inferrule []
+{ \Gamma ; \Delta \vdash C : \tau_1 \times \tau_2 }
+{ \Gamma ; \Delta \vdash \textsf{snd}\ C : \tau_2 }$ } \\
+if $C \to C'$
+IH If $\Gamma;\Delta \vdash C : \tau_1 \times \tau_2$ and  $C \to C'$ then $\Gamma;\Delta \vdash C' : \tau_1 \times \tau_2$ \\
+using \textsc{snd} rule, snd $C \to$ snd $C'$ and we know $\Gamma;\Delta \vdash$ snd $C : \tau_2$ \\
+Using IH we can say $\Gamma;\Delta \vdash$ snd $ C' : \tau_2$ \\
+if $C = V$ This means that $C = (V_1, V_2)$ where $V_2 : \tau_2$
+then using \textsc{pair elim 2}, snd $(V_1, V_2) \to V_2$ and we know $\Gamma;\Delta \vdash$ snd $(V_1, V_2) : \tau_2$ \\
+and $V_2: \tau_2$\\\\
+\textbf{Case $\inferrule []
+{ \Gamma ; \Delta \vdash C : \tau_1 }
+{ \Gamma ; \Delta \vdash \textsf{left}\ C : \tau_1 + \tau_2 }$ } \\
+IH If $\Gamma;\Delta \vdash C : \tau_1$ and  $C \to C'$ then $\Gamma;\Delta \vdash C' : \tau_1$ \\
+using \textsc{Left} rule we know, left $C \to$ left $C'$ and $\Gamma;\Delta \vdash$ left $e : \tau_1+\tau_2$ \\
+Using IH we can say $\Gamma;\Delta \vdash$ left $ C' : \tau_1 + \tau_2$ \\\\
+\textbf{Case $\inferrule []
+{ \Gamma ; \Delta \vdash C : \tau_2 }
+{ \Gamma ; \Delta \vdash \textsf{right}\ C : \tau_1 + \tau_2 }$ } \\
+IH If $\Gamma;\Delta \vdash C : \tau_2$ and  $C \to C'$ then $\Gamma;\Delta \vdash C' : \tau_2$ \\
+using \textsc{Right} rule we know, right $C \to$ right $C'$ and $\Gamma;\Delta \vdash$ right $C : \tau_1+\tau_2$ \\
+Using IH we can say $\Gamma;\Delta \vdash$ right $ C' : \tau_1 + \tau_2$ \\\\
+\textbf{Case $\inferrule []
+{ \Gamma ; \Delta \vdash C : \tau_1+\tau_2 \quad \Gamma ; \Delta , X : \tau_1 \vdash C_1 : \tau_3 \quad \Gamma ; \Delta , Y : \tau_2 \vdash C_2 : \tau_3  }
+{ \Gamma ; \Delta \vdash (\textsf{match}\ C \ \textsf{with left}\ X \Rightarrow C_1 ; \textsf{right}\ Y \Rightarrow C_2) : \tau_3 } $ } \\
+if $C \to C'$
+IH If $\Gamma;\Delta \vdash C : \tau_1+\tau_2$ and  $C \to C'$ then $\Gamma;\Delta \vdash C' : \tau_1+\tau_2$ \\
+Using \textsc{match} rule we know, \\ 
+match $C$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3 \to$
+match $C'$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3$ \\ and $\Gamma;\Delta \vdash$ match $C$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3 : \tau_3$ \\
+Using IH we can say $\Gamma;\Delta \vdash$ match $C'$ with left $X \Rightarrow C_2 $; right $ Y \Rightarrow C_3 : \tau_3$ \\
+if $C$ is a value then $C =$ left $V$ or right $V$ then using \textsc{sum elim 1} and \textsc{sum elim 2} rule respectively, \\
+match $C$ with left $V \ X \Rightarrow C_2 $; right $ Y \Rightarrow C_3 \to  C_2\ [X \mapsto V] $ or $  C_3\ [Y \mapsto V]$ where C = left V or right V\\
+and $C_2, C_3 : \tau_3$ \\\\
 
 
 
