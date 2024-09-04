@@ -32,6 +32,8 @@ jobs:
 
       - name: Set-up OCaml
         uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 5
 
       - name: Lint and format
         uses: ocaml/setup-ocaml/lint-fmt@v3
@@ -52,6 +54,8 @@ jobs:
 
       - name: Set-up OCaml
         uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 5
 
       - name: Install dependencies
         run: opam install . --deps-only --with-test
