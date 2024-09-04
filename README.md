@@ -41,3 +41,9 @@ cat examples/1.pir | dune exec pirc -- -
     - You can format your code using `dune fmt`
 
     - [Avoid using `open`](https://ocaml.org/docs/guidelines#opening-modules)
+ 
+- You can enable repo-wide githooks to make sure your code is formatted and can build
+
+    ```sh
+    git config core.hooksPath .githooks
+    ```
