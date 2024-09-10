@@ -74,15 +74,20 @@ type choreo_context = (string * Ast.Choreo.typ) list
 let add_binding ctx var_name var_type = (var_name, var_type) :: ctx
 
 (*lookup varname in context list to get its binding*)
-(*return option type*)
-let context_lookup ctx var_name = List.assoc_opt var_name ctx
+(*return Result type*)
+let context_lookup ctx var_name =
+  try Ok (List.assoc var_name ctx) with
+  | Not_found -> Error "Variable not found"
+;;
+
+(*type checking of choreo expression*)
 
 let typeof_bop bop e1 e2 =
   match bop with
   | Ast.Local.Plus | Ast.Local.Minus | Ast.Local.Times | Ast.Local.Div ->
     (match e1, e2 with
-     | Ast.Local.TInt, Ast.Local.TInt -> Some Ast.Local.TInt
-     | _ -> None)
+     | Ast.Local.TInt, Ast.Local.TInt -> Ok Ast.Local.TInt
+     | _ -> Error "Expected: TInt -> TInt -> TInt")
   | Ast.Local.Eq
   | Ast.Local.Neq
   | Ast.Local.Lt
@@ -90,91 +95,100 @@ let typeof_bop bop e1 e2 =
   | Ast.Local.Geq
   | Ast.Local.Leq ->
     (match e1, e2 with
-     | Ast.Local.TInt, Ast.Local.TInt -> Some Ast.Local.TBool
-     | _ -> None)
+     | Ast.Local.TInt, Ast.Local.TInt -> Ok Ast.Local.TBool
+     | _ -> Error "Expected: TInt -> TInt -> TBool")
   | Ast.Local.And | Ast.Local.Or ->
     (match e1, e2 with
-     | Ast.Local.TBool, Ast.Local.TBool -> Some Ast.Local.TBool
-     | _ -> None)
+     | Ast.Local.TBool, Ast.Local.TBool -> Ok Ast.Local.TBool
+     | _ -> Error "Expected: TBool -> TBool -> TBool")
 ;;
 
 let typeof_unop unop e =
   match unop with
   | Ast.Local.Neg ->
     (match e with
-     | Ast.Local.TInt -> Some Ast.Local.TInt
-     | _ -> None)
+     | Ast.Local.TInt -> Ok Ast.Local.TInt
+     | _ -> Error "Expected: TInt -> TInt")
   | Ast.Local.Not ->
     (match e with
-     | Ast.Local.TBool -> Some Ast.Local.TBool
-     | _ -> None)
+     | Ast.Local.TBool -> Ok Ast.Local.TBool
+     | _ -> Error "Expected: TBool -> TBool")
 ;;
 
 let rec check_local_pattn ctx p =
   match p with
-  | Ast.Local.Default -> Some Ast.Local.TUnit
+  | Ast.Local.Default -> Ok Ast.Local.TUnit
   | Ast.Local.Val v ->
     (match v with
-     | `Int _ -> Some Ast.Local.TInt
-     | `String _ -> Some Ast.Local.TString
-     | `Bool _ -> Some Ast.Local.TBool)
+     | `Int _ -> Ok Ast.Local.TInt
+     | `String _ -> Ok Ast.Local.TString
+     | `Bool _ -> Ok Ast.Local.TBool)
   | Ast.Local.Var (Ast.Local.VarId var_name) -> context_lookup ctx var_name
   | Ast.Local.Pair (p1, p2) ->
     (match check_local_pattn ctx p1, check_local_pattn ctx p2 with
-     | Some t1, Some t2 -> Some (Ast.Local.TProd (t1, t2))
-     | _ -> None)
+     | Ok t1, Ok t2 -> Ok (Ast.Local.TProd (t1, t2))
+     | Error errmsg, Ok _ | Ok _, Error errmsg -> Error errmsg
+     | Error errmsg1, Error errmsg2 -> Error (errmsg1 ^ "\n" ^ errmsg2))
   | Ast.Local.Left p | Ast.Local.Right p -> check_local_pattn ctx p
 
 (*type checking of local expression*)
 and check_local_exp ctx e =
   match e with
-  | Ast.Local.Unit -> Some Ast.Local.TUnit
+  | Ast.Local.Unit -> Ok Ast.Local.TUnit
   | Ast.Local.Val v ->
     (match v with
-     | `Int _ -> Some Ast.Local.TInt
-     | `String _ -> Some Ast.Local.TString
-     | `Bool _ -> Some Ast.Local.TBool)
+     | `Int _ -> Ok Ast.Local.TInt
+     | `String _ -> Ok Ast.Local.TString
+     | `Bool _ -> Ok Ast.Local.TBool)
   | Ast.Local.Var (Ast.Local.VarId var_name) -> context_lookup ctx var_name
   | Ast.Local.UnOp (unop, e) ->
     (match check_local_exp ctx e with
-     | Some t -> typeof_unop unop t
-     | _ -> None)
+     | Ok t -> typeof_unop unop t
+     | Error errmsg -> Error errmsg)
   | Ast.Local.BinOp (e1, bop, e2) ->
     (match check_local_exp ctx e1, check_local_exp ctx e2 with
-     | Some e1_typ, Some e2_typ -> typeof_bop bop e1_typ e2_typ
-     | _ -> None)
+     | Ok e1_typ, Ok e2_typ -> typeof_bop bop e1_typ e2_typ
+     | Error errmsg, Ok _ | Ok _, Error errmsg -> Error errmsg
+     | Error errmsg1, Error errmsg2 -> Error (errmsg1 ^ "\n" ^ errmsg2))
   | Ast.Local.Let (Ast.Local.VarId var_name, e1, e2) ->
     (match check_local_exp ctx e1 with
-     | Some e1_typ -> check_local_exp (add_binding ctx var_name e1_typ) e2
-     | _ -> None)
+     | Ok e1_typ -> check_local_exp (add_binding ctx var_name e1_typ) e2
+     | Error errmsg -> Error errmsg)
   | Ast.Local.Pair (e1, e2) ->
     (match check_local_exp ctx e1, check_local_exp ctx e2 with
-     | Some e1_typ, Some e2_typ -> Some (Ast.Local.TProd (e1_typ, e2_typ))
-     | _ -> None)
+     | Ok e1_typ, Ok e2_typ -> Ok (Ast.Local.TProd (e1_typ, e2_typ))
+     | Error errmsg, Ok _ | Ok _, Error errmsg -> Error errmsg
+     | Error errmsg1, Error errmsg2 -> Error (errmsg1 ^ "\n" ^ errmsg2))
   | Ast.Local.Fst e ->
     (match check_local_exp ctx e with
-     | Some (Ast.Local.TProd (t1, _)) -> Some t1
-     | _ -> None)
+     | Ok (Ast.Local.TProd (t1, _)) -> Ok t1
+     | Ok _ -> Error "Expected: TProd (t1, _) -> T1"
+     | Error msg -> Error msg)
   | Ast.Local.Snd e ->
     (match check_local_exp ctx e with
-     | Some (Ast.Local.TProd (_, t2)) -> Some t2
-     | _ -> None)
+     | Ok (Ast.Local.TProd (_, t2)) -> Ok t2
+     | Ok _ -> Error "Expected: TProd (_, t2) -> T2"
+     | Error msg -> Error msg)
   | Ast.Local.Left e ->
     (match check_local_exp ctx e with
-     | Some t -> Some (Ast.Local.TSum (t, Ast.Local.TUnit))
-     | _ -> None)
+     | Ok (Ast.Local.TSum (t1, _)) -> Ok t1
+     | Ok _ -> Error "Expected: TSum (t1, _) -> T1"
+     | Error msg -> Error msg)
   | Ast.Local.Right e ->
     (match check_local_exp ctx e with
-     | Some t -> Some (Ast.Local.TSum (Ast.Local.TUnit, t))
-     | _ -> None)
+     | Ok (Ast.Local.TSum (_, t2)) -> Ok t2
+     | Ok _ -> Error "Expected: TSum (_, t2) -> T2"
+     | Error msg -> Error msg)
   | Ast.Local.Match (e, cases) ->
     let match_exp_typ = check_local_exp ctx e in
     let pattn_typs, exp_typs =
       List.split
         (List.map (fun (p, e) -> check_local_pattn ctx p, check_local_exp ctx e) cases)
     in
-    if List.for_all (fun x -> x = match_exp_typ) pattn_typs
-       && List.for_all (fun x -> x = List.hd exp_typs) exp_typs
-    then List.hd exp_typs
-    else None
+    (match List.for_all (fun x -> x = match_exp_typ) pattn_typs with
+     | false -> Error "Pattern types do not match"
+     | true ->
+       (match List.for_all (fun x -> x = List.hd exp_typs) exp_typs with
+        | false -> Error "Expression types do not match"
+        | true -> List.hd exp_typs))
 ;;
