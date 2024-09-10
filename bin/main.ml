@@ -66,117 +66,115 @@ let () =
 
 (*************************************************)
 
-(*err msg of type checking*)
-type typ_err =
-  | UnboundVariable
-  | BopErr
-  | LocalPattnMismatch
-  | LocalExpErr
-
 (*context: list of pair of variable name and its binding*)
 type local_context = (string * Ast.Local.typ) list
 type choreo_context = (string * Ast.Choreo.typ) list
-
-(*construct and raise exception with error message*)
-let handle_err typ_err arg =
-  let err_msg =
-    match typ_err with
-    | UnboundVariable -> "Unbound variable: " ^ arg
-    | BopErr -> "operator and operands mismatch, expected: " ^ arg
-    | LocalPattnMismatch -> "Pattern and expression mismatchL: " ^ arg
-    | LocalExpErr -> "Error in local expression, detail: " ^ arg
-  in
-  failwith err_msg
 
 (*add varname:vartype pair to context list*)
 let add_binding ctx var_name var_type = (var_name, var_type) :: ctx
 
 (*lookup varname in context list to get its binding*)
-(*raise exception if pair is not found*)
-let context_lookup ctx var_name =
-  match List.assoc_opt var_name ctx with
-  | Some t -> t
-  | None -> handle_err UnboundVariable var_name
+(*return option type*)
+let context_lookup ctx var_name = List.assoc_opt var_name ctx
 
 let typeof_bop bop e1 e2 =
   match bop with
-  | Ast.Local.Plus | Ast.Local.Minus | Ast.Local.Times | Ast.Local.Div -> (
-      match (e1, e2) with
-      | Ast.Local.TInt, Ast.Local.TInt -> Ast.Local.TInt
-      | _ -> handle_err BopErr "Local.TInt -> Local.TInt -> Local.TInt")
-  | Ast.Local.Eq | Ast.Local.Neq | Ast.Local.Lt | Ast.Local.Gt | Ast.Local.Geq
-  | Ast.Local.Leq -> (
-      match (e1, e2) with
-      | Ast.Local.TInt, Ast.Local.TInt -> Ast.Local.TBool
-      | _ -> handle_err BopErr "Local.TInt -> Local.TInt -> Local.TBool")
-  | Ast.Local.And | Ast.Local.Or -> (
-      match (e1, e2) with
-      | Ast.Local.TBool, Ast.Local.TBool -> Ast.Local.TBool
-      | _ -> handle_err BopErr "Local.TBool -> Local.TBool -> Local.TBool")
+  | Ast.Local.Plus | Ast.Local.Minus | Ast.Local.Times | Ast.Local.Div ->
+    (match e1, e2 with
+     | Ast.Local.TInt, Ast.Local.TInt -> Some Ast.Local.TInt
+     | _ -> None)
+  | Ast.Local.Eq
+  | Ast.Local.Neq
+  | Ast.Local.Lt
+  | Ast.Local.Gt
+  | Ast.Local.Geq
+  | Ast.Local.Leq ->
+    (match e1, e2 with
+     | Ast.Local.TInt, Ast.Local.TInt -> Some Ast.Local.TBool
+     | _ -> None)
+  | Ast.Local.And | Ast.Local.Or ->
+    (match e1, e2 with
+     | Ast.Local.TBool, Ast.Local.TBool -> Some Ast.Local.TBool
+     | _ -> None)
+;;
+
+let typeof_unop unop e =
+  match unop with
+  | Ast.Local.Neg ->
+    (match e with
+     | Ast.Local.TInt -> Some Ast.Local.TInt
+     | _ -> None)
+  | Ast.Local.Not ->
+    (match e with
+     | Ast.Local.TBool -> Some Ast.Local.TBool
+     | _ -> None)
+;;
 
 let rec check_local_pattn ctx p =
   match p with
-  | Ast.Local.Default -> Ast.Local.TUnit
-  | Ast.Local.Val v -> (
-      match v with
-      | `Int _ -> Ast.Local.TInt
-      | `String _ -> Ast.Local.TString
-      | `Bool _ -> Ast.Local.TBool)
+  | Ast.Local.Default -> Some Ast.Local.TUnit
+  | Ast.Local.Val v ->
+    (match v with
+     | `Int _ -> Some Ast.Local.TInt
+     | `String _ -> Some Ast.Local.TString
+     | `Bool _ -> Some Ast.Local.TBool)
   | Ast.Local.Var (Ast.Local.VarId var_name) -> context_lookup ctx var_name
   | Ast.Local.Pair (p1, p2) ->
-      Ast.Local.TProd (check_local_pattn ctx p1, check_local_pattn ctx p2)
-  (*TODO: not sure left and right*)
-  | Ast.Local.Left p -> (
-      match check_local_pattn ctx p with _ -> Ast.Local.TUnit)
-  | Ast.Local.Right p -> (
-      match check_local_pattn ctx p with _ -> Ast.Local.TUnit)
-
-and check_local_case ctx match_typ p e =
-  let p_typ = check_local_pattn ctx p in
-  if p_typ = match_typ then check_local_exp ctx e
-  else handle_err LocalPattnMismatch "Pattern and expression mismatch"
+    (match check_local_pattn ctx p1, check_local_pattn ctx p2 with
+     | Some t1, Some t2 -> Some (Ast.Local.TProd (t1, t2))
+     | _ -> None)
+  | Ast.Local.Left p | Ast.Local.Right p -> check_local_pattn ctx p
 
 (*type checking of local expression*)
 and check_local_exp ctx e =
   match e with
-  | Ast.Local.Unit -> Ast.Local.TUnit
-  | Ast.Local.Val v -> (
-      match v with
-      | `Int _ -> Ast.Local.TInt
-      | `String _ -> Ast.Local.TString
-      | `Bool _ -> Ast.Local.TBool)
+  | Ast.Local.Unit -> Some Ast.Local.TUnit
+  | Ast.Local.Val v ->
+    (match v with
+     | `Int _ -> Some Ast.Local.TInt
+     | `String _ -> Some Ast.Local.TString
+     | `Bool _ -> Some Ast.Local.TBool)
   | Ast.Local.Var (Ast.Local.VarId var_name) -> context_lookup ctx var_name
-  | Ast.Local.UnOp (unop, e) -> (
-      match unop with
-      | Ast.Local.Neg -> (
-          match check_local_exp ctx e with
-          | Ast.Local.TInt -> Ast.Local.TInt
-          | _ -> handle_err LocalExpErr "Expect Local.TInt")
-      | Ast.Local.Not -> (
-          match check_local_exp ctx e with
-          | Ast.Local.TBool -> Ast.Local.TBool
-          | _ -> handle_err LocalExpErr "Expect Local.TBool"))
+  | Ast.Local.UnOp (unop, e) ->
+    (match check_local_exp ctx e with
+     | Some t -> typeof_unop unop t
+     | _ -> None)
   | Ast.Local.BinOp (e1, bop, e2) ->
-      let e1_typ, e2_typ = (check_local_exp ctx e1, check_local_exp ctx e2) in
-      typeof_bop bop e1_typ e2_typ
+    (match check_local_exp ctx e1, check_local_exp ctx e2 with
+     | Some e1_typ, Some e2_typ -> typeof_bop bop e1_typ e2_typ
+     | _ -> None)
   | Ast.Local.Let (Ast.Local.VarId var_name, e1, e2) ->
-      let e1_typ = check_local_exp ctx e1 in
-      check_local_exp (add_binding ctx var_name e1_typ) e2
+    (match check_local_exp ctx e1 with
+     | Some e1_typ -> check_local_exp (add_binding ctx var_name e1_typ) e2
+     | _ -> None)
   | Ast.Local.Pair (e1, e2) ->
-      let e1_typ, e2_typ = (check_local_exp ctx e1, check_local_exp ctx e2) in
-      Ast.Local.TProd (e1_typ, e2_typ)
-  | Ast.Local.Fst e -> (
-      match check_local_exp ctx e with
-      | Ast.Local.TProd (t1, _) -> t1
-      | _ -> handle_err LocalExpErr "Expect Local Pair")
-  | Ast.Local.Snd e -> (
-      match check_local_exp ctx e with
-      | Ast.Local.TProd (_, t2) -> t2
-      | _ -> handle_err LocalExpErr "Expect Local Pair")
-  | Ast.Local.Left e -> Ast.Local.TSum (check_local_exp ctx e, Ast.Local.TUnit)
-  | Ast.Local.Right e -> Ast.Local.TSum (Ast.Local.TUnit, check_local_exp ctx e)
+    (match check_local_exp ctx e1, check_local_exp ctx e2 with
+     | Some e1_typ, Some e2_typ -> Some (Ast.Local.TProd (e1_typ, e2_typ))
+     | _ -> None)
+  | Ast.Local.Fst e ->
+    (match check_local_exp ctx e with
+     | Some (Ast.Local.TProd (t1, _)) -> Some t1
+     | _ -> None)
+  | Ast.Local.Snd e ->
+    (match check_local_exp ctx e with
+     | Some (Ast.Local.TProd (_, t2)) -> Some t2
+     | _ -> None)
+  | Ast.Local.Left e ->
+    (match check_local_exp ctx e with
+     | Some t -> Some (Ast.Local.TSum (t, Ast.Local.TUnit))
+     | _ -> None)
+  | Ast.Local.Right e ->
+    (match check_local_exp ctx e with
+     | Some t -> Some (Ast.Local.TSum (Ast.Local.TUnit, t))
+     | _ -> None)
   | Ast.Local.Match (e, cases) ->
-      let e_typ = check_local_exp ctx e in
-      let _ = List.map (fun (p, e) -> check_local_case ctx e_typ p e) cases in
-      e_typ
-
+    let match_exp_typ = check_local_exp ctx e in
+    let pattn_typs, exp_typs =
+      List.split
+        (List.map (fun (p, e) -> check_local_pattn ctx p, check_local_exp ctx e) cases)
+    in
+    if List.for_all (fun x -> x = match_exp_typ) pattn_typs
+       && List.for_all (fun x -> x = List.hd exp_typs) exp_typs
+    then List.hd exp_typs
+    else None
+;;
