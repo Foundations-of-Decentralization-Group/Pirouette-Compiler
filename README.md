@@ -1,4 +1,4 @@
-## Install Dependencies
+## Install dependencies
 
 ```sh
 opam install . --deps-only --with-test
