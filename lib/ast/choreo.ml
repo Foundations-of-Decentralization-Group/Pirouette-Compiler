@@ -33,7 +33,7 @@ type expr =
 
 and stmt =
   | Decl of pattern * typ
-  | Assign of pattern list * expr
+  | Assign of pattern list * expr (* list is only for F P1 P2 ... Pn := C *)
   | TypeDecl of Local.typ_id * typ
 
 and stmt_block = stmt list

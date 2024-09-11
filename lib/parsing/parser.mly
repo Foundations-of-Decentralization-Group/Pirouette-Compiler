@@ -157,10 +157,10 @@ sync_label:
   | ID { LabelId $1 }
 
 value:
-  | INT    { `Int $1 }
-  | STRING { `String $1 }
-  | TRUE   { `Bool true }
-  | FALSE  { `Bool false }
+  | INT    { Int $1 }
+  | STRING { String $1 }
+  | TRUE   { Bool true }
+  | FALSE  { Bool false }
 
 %inline choreo_case:
   | VERTICAL choreo_pattern ARROW choreo_expr { ($2, $4) }

@@ -25,9 +25,9 @@ let rec pprint_local_expr ppf (e : Ast.Local.expr) =
       ppf
       "@[<h>%a@]"
       (fun ppf -> function
-        | `Int i -> fprintf ppf "%d" i
-        | `String s -> fprintf ppf "\"%s\"" s
-        | `Bool b -> fprintf ppf "%b" b)
+        | Ast.Local.Int i -> fprintf ppf "%d" i
+        | String s -> fprintf ppf "\"%s\"" s
+        | Bool b -> fprintf ppf "%b" b)
       v
   | Var (VarId id) -> fprintf ppf "@[<h>%s@]" id
   | UnOp (op, e) ->
@@ -104,9 +104,9 @@ and pprint_local_pattern ppf = function
       ppf
       "@[<h>%a@]"
       (fun ppf -> function
-        | `Int i -> fprintf ppf "%d" i
-        | `String s -> fprintf ppf "%s" s
-        | `Bool b -> fprintf ppf "%b" b)
+        | Ast.Local.Int i -> fprintf ppf "%d" i
+        | String s -> fprintf ppf "%s" s
+        | Bool b -> fprintf ppf "%b" b)
       v
   | Var (VarId id) -> fprintf ppf "@[<h>%s@]" id
   | Pair (p1, p2) ->
