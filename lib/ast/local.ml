@@ -1,8 +1,7 @@
 type value =
-  [ `Int of int
-  | `String of string
-  | `Bool of bool
-  ]
+  | Int of int
+  | String of string
+  | Bool of bool
 
 type loc_id = LocId of string
 type var_id = VarId of string

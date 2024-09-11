@@ -26,7 +26,7 @@ let new_decl _ =
 let int_assign _ =
   peq
     "x := P1.5;"
-    (Prog [ Assign ([ Var (VarId "x") ], LocExpr (LocId "P1", Val (`Int 5))) ])
+    (Prog [ Assign ([ Var (VarId "x") ], LocExpr (LocId "P1", Val (Int 5))) ])
 ;;
 
 let decl_expr _ =
@@ -35,7 +35,7 @@ let decl_expr _ =
     (Prog
        [ Decl
            ( Pair
-               (LocPatt (LocId "P1", Val (`Int 5)), LocPatt (LocId "P2", Val (`Bool true)))
+               (LocPatt (LocId "P1", Val (Int 5)), LocPatt (LocId "P2", Val (Bool true)))
            , TProd (TLoc (LocId "P1", TInt), TLoc (LocId "P2", TBool)) )
        ])
 ;;
@@ -47,7 +47,7 @@ let pair_assign _ =
        [ Assign
            ( [ Var (VarId "pair1") ]
            , Pair
-               (LocExpr (LocId "P1", Val (`Int 5)), LocExpr (LocId "P2", Val (`Bool true)))
+               (LocExpr (LocId "P1", Val (Int 5)), LocExpr (LocId "P2", Val (Bool true)))
            )
        ])
 ;;
@@ -62,11 +62,11 @@ let binary_operation _ =
                ( LocExpr
                    ( LocId "P1"
                    , BinOp
-                       ( BinOp (Val (`Int 3), Gt, Val (`Int 5))
+                       ( BinOp (Val (Int 3), Gt, Val (Int 5))
                        , And
-                       , BinOp (Val (`Int 4), Lt, Val (`Int 0)) ) )
-               , LocExpr (LocId "P1", Val (`Int 3))
-               , LocExpr (LocId "P1", Val (`Int 6)) ) )
+                       , BinOp (Val (Int 4), Lt, Val (Int 0)) ) )
+               , LocExpr (LocId "P1", Val (Int 3))
+               , LocExpr (LocId "P1", Val (Int 6)) ) )
        ])
 ;;
 
@@ -78,8 +78,8 @@ let test_first_pair _ =
            ( [ Var (VarId "y") ]
            , Fst
                (Pair
-                  ( LocExpr (LocId "P1", Val (`String "Hello"))
-                  , LocExpr (LocId "P1", Val (`String "World")) )) )
+                  ( LocExpr (LocId "P1", Val (String "Hello"))
+                  , LocExpr (LocId "P1", Val (String "World")) )) )
        ])
 ;;
 
@@ -91,8 +91,8 @@ let test_second_pair _ =
            ( [ Var (VarId "y") ]
            , Snd
                (Pair
-                  ( LocExpr (LocId "P1", Val (`String "Hello"))
-                  , LocExpr (LocId "P1", Val (`String "World")) )) )
+                  ( LocExpr (LocId "P1", Val (String "Hello"))
+                  , LocExpr (LocId "P1", Val (String "World")) )) )
        ])
 ;;
 
@@ -103,7 +103,7 @@ let test_decl_send _ =
        [ Decl (Var (VarId "y"), TLoc (LocId "P2", TInt))
        ; Assign
            ( [ Var (VarId "y") ]
-           , Send (LocId "P1", LocExpr (LocId "P1", Val (`Int 5)), LocId "P2") )
+           , Send (LocId "P1", LocExpr (LocId "P1", Val (Int 5)), LocId "P2") )
        ])
 ;;
 

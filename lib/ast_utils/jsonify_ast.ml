@@ -3,7 +3,14 @@
 let rec jsonify_local_expr (e : Ast.Local.expr) =
   match e with
   | Unit -> `String "Unit"
-  | Val ((`Int _ | `String _ | `Bool _) as v) -> `Assoc [ "Val", v ]
+  | Val v ->
+    `Assoc
+      [ ( "Val"
+        , match v with
+          | Int i -> `Int i
+          | String s -> `String s
+          | Bool b -> `Bool b )
+      ]
   | Var (VarId id) -> `Assoc [ "Var", `String id ]
   | Fst e -> `Assoc [ "Fst", jsonify_local_expr e ]
   | Snd e -> `Assoc [ "Snd", jsonify_local_expr e ]
@@ -45,7 +52,14 @@ and jsonify_local_case (p, e) =
 
 and jsonify_local_pattern = function
   | Default -> `String "Default"
-  | Val ((`Int _ | `String _ | `Bool _) as v) -> `Assoc [ "Val", v ]
+  | Val v ->
+    `Assoc
+      [ ( "Val"
+        , match v with
+          | Int i -> `Int i
+          | String s -> `String s
+          | Bool b -> `Bool b )
+      ]
   | Var (VarId id) -> `Assoc [ "Var", `String id ]
   | Left p -> `Assoc [ "Left", jsonify_local_pattern p ]
   | Right p -> `Assoc [ "Right", jsonify_local_pattern p ]
