@@ -256,7 +256,7 @@ and pprint_choreo_pattern ppf = function
     - For variants [TSend], [TProd], [TMap] and [TSum], it calls helper function
       [pprint_choreo_type] to pretty print the choreo type *)
 and pprint_choreo_type ppf = function
-  | TUnit _ -> fprintf ppf "@[<h>unit@]"
+  | TUnit _ -> fprintf ppf "@[<h>()@]"
   | TLoc (LocId (loc, _), t, _) -> fprintf ppf "@[<h>%s.(%a)@]" loc pprint_local_type t
   | TMap (t1, t2, _) ->
     fprintf ppf "@[<h>%a ->@ %a@]" pprint_choreo_type t1 pprint_choreo_type t2
