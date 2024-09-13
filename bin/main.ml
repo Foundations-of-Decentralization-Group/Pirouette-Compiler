@@ -75,48 +75,13 @@ let add_binding ctx var_name var_type = (var_name, var_type) :: ctx
 
 (*lookup varname in context list to get its binding*)
 (*return Result type*)
-let context_lookup ctx var_name =
+and context_lookup ctx var_name =
   try Ok (List.assoc var_name ctx) with
   | Not_found -> Error "Variable not found"
 ;;
 
-(*type checking of choreo expression*)
-
-let typeof_bop bop e1 e2 =
-  match bop with
-  | Ast.Local.Plus | Ast.Local.Minus | Ast.Local.Times | Ast.Local.Div ->
-    (match e1, e2 with
-     | Ast.Local.TInt, Ast.Local.TInt -> Ok Ast.Local.TInt
-     | _ -> Error "Expected: TInt -> TInt -> TInt")
-  | Ast.Local.Eq
-  | Ast.Local.Neq
-  | Ast.Local.Lt
-  | Ast.Local.Gt
-  | Ast.Local.Geq
-  | Ast.Local.Leq ->
-    (match e1, e2 with
-     | Ast.Local.TInt, Ast.Local.TInt -> Ok Ast.Local.TBool
-     | _ -> Error "Expected: TInt -> TInt -> TBool")
-  | Ast.Local.And | Ast.Local.Or ->
-    (match e1, e2 with
-     | Ast.Local.TBool, Ast.Local.TBool -> Ok Ast.Local.TBool
-     | _ -> Error "Expected: TBool -> TBool -> TBool")
-;;
-
-let typeof_unop unop e =
-  match unop with
-  | Ast.Local.Neg ->
-    (match e with
-     | Ast.Local.TInt -> Ok Ast.Local.TInt
-     | _ -> Error "Expected: TInt -> TInt")
-  | Ast.Local.Not ->
-    (match e with
-     | Ast.Local.TBool -> Ok Ast.Local.TBool
-     | _ -> Error "Expected: TBool -> TBool")
-;;
-
-let rec check_local_pattn ctx p =
-  match p with
+(* ============================== Local ============================== *)
+let rec check_local_pattn ctx = function
   | Ast.Local.Default -> Ok Ast.Local.TUnit
   | Ast.Local.Val v ->
     (match v with
@@ -131,9 +96,7 @@ let rec check_local_pattn ctx p =
      | Error errmsg1, Error errmsg2 -> Error (errmsg1 ^ "\n" ^ errmsg2))
   | Ast.Local.Left p | Ast.Local.Right p -> check_local_pattn ctx p
 
-(*type checking of local expression*)
-and check_local_exp ctx e =
-  match e with
+and check_local_exp ctx = function
   | Ast.Local.Unit -> Ok Ast.Local.TUnit
   | Ast.Local.Val v ->
     (match v with
@@ -143,11 +106,11 @@ and check_local_exp ctx e =
   | Ast.Local.Var (Ast.Local.VarId var_name) -> context_lookup ctx var_name
   | Ast.Local.UnOp (unop, e) ->
     (match check_local_exp ctx e with
-     | Ok t -> typeof_unop unop t
+     | Ok t -> typeof_unop t unop
      | Error errmsg -> Error errmsg)
   | Ast.Local.BinOp (e1, bop, e2) ->
     (match check_local_exp ctx e1, check_local_exp ctx e2 with
-     | Ok e1_typ, Ok e2_typ -> typeof_bop bop e1_typ e2_typ
+     | Ok e1_typ, Ok e2_typ -> typeof_bop e1_typ e2_typ bop
      | Error errmsg, Ok _ | Ok _, Error errmsg -> Error errmsg
      | Error errmsg1, Error errmsg2 -> Error (errmsg1 ^ "\n" ^ errmsg2))
   | Ast.Local.Let (Ast.Local.VarId var_name, e1, e2) ->
@@ -191,4 +154,33 @@ and check_local_exp ctx e =
        (match List.for_all (fun x -> x = List.hd exp_typs) exp_typs with
         | false -> Error "Expression types do not match"
         | true -> List.hd exp_typs))
+
+and typeof_bop e1 e2 = function
+  | Ast.Local.Plus | Ast.Local.Minus | Ast.Local.Times | Ast.Local.Div ->
+    (match e1, e2 with
+     | Ast.Local.TInt, Ast.Local.TInt -> Ok Ast.Local.TInt
+     | _ -> Error "Expected: TInt -> TInt -> TInt")
+  | Ast.Local.Eq
+  | Ast.Local.Neq
+  | Ast.Local.Lt
+  | Ast.Local.Gt
+  | Ast.Local.Geq
+  | Ast.Local.Leq ->
+    (match e1, e2 with
+     | Ast.Local.TInt, Ast.Local.TInt -> Ok Ast.Local.TBool
+     | _ -> Error "Expected: TInt -> TInt -> TBool")
+  | Ast.Local.And | Ast.Local.Or ->
+    (match e1, e2 with
+     | Ast.Local.TBool, Ast.Local.TBool -> Ok Ast.Local.TBool
+     | _ -> Error "Expected: TBool -> TBool -> TBool")
+
+and typeof_unop e = function
+  | Ast.Local.Neg ->
+    (match e with
+     | Ast.Local.TInt -> Ok Ast.Local.TInt
+     | _ -> Error "Expected: TInt -> TInt")
+  | Ast.Local.Not ->
+    (match e with
+     | Ast.Local.TBool -> Ok Ast.Local.TBool
+     | _ -> Error "Expected: TBool -> TBool")
 ;;
