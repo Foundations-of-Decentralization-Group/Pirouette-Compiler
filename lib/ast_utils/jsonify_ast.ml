@@ -216,8 +216,6 @@ and jsonify_choreo_type = function
     `Assoc [ "TProd", `List [ jsonify_choreo_type t1; jsonify_choreo_type t2 ] ]
   | TSum (t1, t2) ->
     `Assoc [ "TSum", `List [ jsonify_choreo_type t1; jsonify_choreo_type t2 ] ]
-  | TAlias (TypId id, t) ->
-    `Assoc [ "TAlias", `Assoc [ "id", `String id; "choreo_type", jsonify_choreo_type t ] ]
 ;;
 
 (* ============================== Net ============================== *)

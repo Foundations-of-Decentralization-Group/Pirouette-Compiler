@@ -269,7 +269,6 @@ and pprint_choreo_type ppf = function
     fprintf ppf "@[<h>(%a) * (%a)@]" pprint_choreo_type t1 pprint_choreo_type t2
   | TSum (t1, t2) ->
     fprintf ppf "@[<h>(%a) + (%a)@]" pprint_choreo_type t1 pprint_choreo_type t2
-  | TAlias (TypId id, t) -> fprintf ppf "@[<h>type %s := %a;@]" id pprint_choreo_type t
 ;;
 
 (* ============================== Net ============================== *)
