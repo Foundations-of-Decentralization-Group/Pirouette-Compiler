@@ -4,7 +4,6 @@ type typ =
   | TMap of typ * typ
   | TProd of typ * typ
   | TSum of typ * typ
-  | TAlias of Local.typ_id * typ
 
 type pattern =
   | Default
