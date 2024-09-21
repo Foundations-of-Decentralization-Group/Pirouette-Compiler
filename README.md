@@ -22,20 +22,6 @@ dune test
 dune exec pirc -- [options] <file>
 ```
 
-if it has been installed by `dune install` you can run it directly:
-
-```sh
-pirc [options] <file>
-``` 
-
-E.g.:
-
-```sh
-cd examples
-dune exec pirc -- -ast-dump json 1.pir
-pirc -ast-dump json 2.pir
-```
-
 Then `pirc` will parse the file and dump the ASTs to the current terminal (in pretty-printed format by default).
 
 ## Options
