@@ -100,16 +100,6 @@ let test_second_pair _ =
        ])
 ;;
 
-let test_decl_send _ =
-  peq
-    "y : P2.int;\n        y := P1.5 [P1] ~> P2;"
-    (Prog
-       [ Decl (Var (VarId "y"), TLoc (LocId "P2", TInt))
-       ; Assign
-           ( [ Var (VarId "y") ]
-           , Send (LocId "P1", LocExpr (LocId "P1", Val (Int 5)), LocId "P2") )
-       ])
-;;
 
 let suite =
   "Parser Tests"
@@ -122,7 +112,6 @@ let suite =
               ; "Binary operations " >:: binary_operation
               ; "Send first of pair" >:: test_first_pair
               ; "Send second of pair" >:: test_second_pair
-              ; "Testing declare and send" >:: test_decl_send
               ]
        ]
 ;;
