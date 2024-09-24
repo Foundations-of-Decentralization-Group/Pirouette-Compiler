@@ -7,6 +7,8 @@ open Parsing
 
 (* comment *)
 
+let m = "test", 1
+
 let peq (s : string) (v : 'a) =
   let lexbuf = Lexing.from_string s in
   assert_equal v (parse_program lexbuf)
@@ -16,11 +18,13 @@ let test_declarations_basic _ =
   (* peq "var : loc.bool" (Prog [ VarDecl (VarId "var", TLoc (LocId "loc", TBool)) ]);
      peq "fun fn : loc.int -> loc.int" (Prog [FunDecl (FunId "fn", TLoc (LocId "loc", TInt), TLoc (LocId "loc", TInt)) ]);
      peq "loc.var : loc.string" (Prog [ LocVarDecl (LocId "loc", VarId "var", LocId "loc", TString) ]); *)
-  peq "type new := unit" (Prog [ TypeDecl (TypId "new", TUnit) ])
+  peq "type new := unit" (Prog ([ TypeDecl (TypId ("new", m), TUnit m, m) ], m))
 ;;
 
 let new_decl _ =
-  peq "type x := P1.int" (Prog [ TypeDecl (TypId "x", TLoc (LocId "P1", TInt)) ])
+  peq
+    "type x := P1.int"
+    (Prog ([ TypeDecl (TypId ("x", m), TLoc (LocId ("P1", m), TInt m, m), m) ], m))
 ;;
 
 let int_assign _ =
