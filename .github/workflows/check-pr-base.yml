@@ -1,0 +1,27 @@
+name: Check PR Base
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - 'dev'
+
+jobs:
+  check-pr-base:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check if PR is based on latest main
+        run: |
+          git fetch origin main:main
+          if git merge-base --is-ancestor origin/main ${{ github.event.pull_request.head.sha }}; then
+            echo "The PR is based on the latest main."
+          else
+            echo "The PR is not based on the latest main."
+            echo "You need rebase/merge."
+            exit 1
+          fi
