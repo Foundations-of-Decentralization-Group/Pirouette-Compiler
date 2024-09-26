@@ -20,7 +20,7 @@
  (name pirc)
  (synopsis "Pirouette Compiler")
  (description "Higher-order typed functional choreographies")
- (depends ocaml dune menhir ounit2 yojson)
+ (depends ocaml dune cohttp-lwt-unix logs lwt menhir ounit2 yojson)
  (allow_empty))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
