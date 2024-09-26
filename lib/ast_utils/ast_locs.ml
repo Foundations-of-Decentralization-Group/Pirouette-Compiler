@@ -14,8 +14,10 @@ and extract_stmt = function
 and extract_expr = function
   | Unit _ | Var _ -> LocSet.empty
   | LocExpr (LocId (id, _), _, _) -> LocSet.singleton id
-  | Send (LocId (id1, _), e, LocId (id2, _), _) -> LocSet.add id2 (LocSet.add id1 (extract_expr e))
-  | Sync (LocId (id1, _), _, LocId (id2, _), e, _) -> LocSet.add id2 (LocSet.add id1 (extract_expr e))
+  | Send (LocId (id1, _), e, LocId (id2, _), _) ->
+    LocSet.add id2 (LocSet.add id1 (extract_expr e))
+  | Sync (LocId (id1, _), _, LocId (id2, _), e, _) ->
+    LocSet.add id2 (LocSet.add id1 (extract_expr e))
   | If (e1, e2, e3, _) ->
     LocSet.union (extract_expr e1) (LocSet.union (extract_expr e2) (extract_expr e3))
   | Let (stmts, e, _) -> LocSet.union (extract_stmt_block stmts) (extract_expr e)
@@ -23,7 +25,8 @@ and extract_expr = function
     LocSet.union
       (List.fold_left (fun acc p -> LocSet.union acc (extract_pattern p)) LocSet.empty ps)
       (extract_expr e)
-  | FunApp (e1, e2, _) | Pair (e1, e2, _) -> LocSet.union (extract_expr e1) (extract_expr e2)
+  | FunApp (e1, e2, _) | Pair (e1, e2, _) ->
+    LocSet.union (extract_expr e1) (extract_expr e2)
   | Fst (e, _) | Snd (e, _) | Left (e, _) | Right (e, _) -> extract_expr e
   | Match (e, cases, _) ->
     List.fold_left

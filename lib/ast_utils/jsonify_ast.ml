@@ -2,21 +2,21 @@
 
 let rec jsonify_local_expr (e : Ast.Local.expr) =
   match e with
-  | Unit -> `String "Unit"
-  | Val v ->
+  | Unit _ -> `String "Unit"
+  | Val (v, _) ->
     `Assoc
       [ ( "Val"
         , match v with
-          | Int i -> `Int i
-          | String s -> `String s
-          | Bool b -> `Bool b )
+          | Int (i, _) -> `Int i
+          | String (s, _) -> `String s
+          | Bool (b, _) -> `Bool b )
       ]
-  | Var (VarId id) -> `Assoc [ "Var", `String id ]
-  | Fst e -> `Assoc [ "Fst", jsonify_local_expr e ]
-  | Snd e -> `Assoc [ "Snd", jsonify_local_expr e ]
-  | Left e -> `Assoc [ "Left", jsonify_local_expr e ]
-  | Right e -> `Assoc [ "Right", jsonify_local_expr e ]
-  | Pair (e1, e2) ->
+  | Var (VarId (id, _), _) -> `Assoc [ "Var", `String id ]
+  | Fst (e, _) -> `Assoc [ "Fst", jsonify_local_expr e ]
+  | Snd (e, _) -> `Assoc [ "Snd", jsonify_local_expr e ]
+  | Left (e, _) -> `Assoc [ "Left", jsonify_local_expr e ]
+  | Right (e, _) -> `Assoc [ "Right", jsonify_local_expr e ]
+  | Pair (e1, e2, _) ->
     `Assoc [ "Pair", `List [ jsonify_local_expr e1; jsonify_local_expr e2 ] ]
   | UnOp (op, e, _) ->
     `Assoc [ "UnOp", `Assoc [ "op", jsonify_un_op op; "choreo_e", jsonify_local_expr e ] ]
@@ -51,19 +51,19 @@ and jsonify_local_case (p, e) =
   `Assoc [ "local_patt", jsonify_local_pattern p; "local_expr", jsonify_local_expr e ]
 
 and jsonify_local_pattern = function
-  | Default -> `String "Default"
-  | Val v ->
+  | Default _ -> `String "Default"
+  | Val (v, _) ->
     `Assoc
       [ ( "Val"
         , match v with
-          | Int i -> `Int i
-          | String s -> `String s
-          | Bool b -> `Bool b )
+          | Int (i, _) -> `Int i
+          | String (s, _) -> `String s
+          | Bool (b, _) -> `Bool b )
       ]
-  | Var (VarId id) -> `Assoc [ "Var", `String id ]
-  | Left p -> `Assoc [ "Left", jsonify_local_pattern p ]
-  | Right p -> `Assoc [ "Right", jsonify_local_pattern p ]
-  | Pair (p1, p2) ->
+  | Var (VarId (id, _), _) -> `Assoc [ "Var", `String id ]
+  | Left (p, _) -> `Assoc [ "Left", jsonify_local_pattern p ]
+  | Right (p, _) -> `Assoc [ "Right", jsonify_local_pattern p ]
+  | Pair (p1, p2, _) ->
     `Assoc [ "Pair", `List [ jsonify_local_pattern p1; jsonify_local_pattern p2 ] ]
 
 and jsonify_local_type (t : Ast.Local.typ) =

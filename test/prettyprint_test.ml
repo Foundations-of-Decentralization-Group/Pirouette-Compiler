@@ -18,7 +18,8 @@ let peq (s : string) =
     print_newline ()
   in
   let program' = Parsing.parse_program (Lexing.from_string pprint_s) in
-  assert_raises (OUnitTest.OUnit_failure("not equal")) (fun _ -> assert_equal program program')
+  assert_raises (OUnitTest.OUnit_failure "not equal") (fun _ ->
+    assert_equal program program')
 ;;
 
 let suite =

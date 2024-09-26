@@ -1,5 +1,5 @@
-(* 
-let read_config filename =
+(*
+   let read_config filename =
   let ic = open_in filename in
   let rec read_lines () =
     try

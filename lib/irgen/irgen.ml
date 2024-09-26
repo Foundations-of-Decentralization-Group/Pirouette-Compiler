@@ -14,7 +14,8 @@ and epp_expr (c : Ast.Choreo.expr) (loc : string) : Ast.Net.expr =
   | Snd (c, _) -> Snd (epp_expr c loc)
   | Left (c, _) -> Left (epp_expr c loc)
   | Right (c, _) -> Right (epp_expr c loc)
-  | Let (stmts, c, _) -> Let (List.map (fun stmt -> epp_stmt stmt loc) stmts, epp_expr c loc)
+  | Let (stmts, c, _) ->
+    Let (List.map (fun stmt -> epp_stmt stmt loc) stmts, epp_expr c loc)
   | Send (LocId (loc1, loc1m), c, LocId (loc2, loc2m), _) ->
     if loc1 = loc2
     then epp_expr c loc
@@ -102,7 +103,8 @@ and merge_expr (e1 : Ast.Net.expr) (e2 : Ast.Net.expr) : Ast.Net.expr option =
     (match merge_expr e1 e2 with
      | Some e -> Some (Send (e, LocId (loc, locm)))
      | None -> None)
-  | Recv (LocId (loc, locm)), Recv (LocId (loc', _)) when loc = loc' -> Some (Recv (LocId (loc, locm)))
+  | Recv (LocId (loc, locm)), Recv (LocId (loc', _)) when loc = loc' ->
+    Some (Recv (LocId (loc, locm)))
   | FunDef (p, e), FunDef (p', e') when p = p' && e = e' -> Some (FunDef (p, e))
   | FunApp (e1, e2), FunApp (e1', e2') ->
     (match merge_expr e1 e1', merge_expr e2 e2' with
@@ -156,13 +158,13 @@ and merge_expr (e1 : Ast.Net.expr) (e2 : Ast.Net.expr) : Ast.Net.expr option =
        Some (Match (e, Hashtbl.fold (fun p e acc -> (p, e) :: acc) cases1_tbl []))
      with
      | Not_matched -> None)
-  | ChooseFor (l, LocId (loc, locm), e1), ChooseFor (l', LocId (loc', _), e2) when l = l' && loc = loc'
-    ->
+  | ChooseFor (l, LocId (loc, locm), e1), ChooseFor (l', LocId (loc', _), e2)
+    when l = l' && loc = loc' ->
     (match merge_expr e1 e2 with
      | Some e -> Some (ChooseFor (l, LocId (loc, locm), e))
      | None -> None)
-  | AllowChoice (LocId (loc, locm), choices1), AllowChoice (LocId (loc', _), choices2) when loc = loc'
-    ->
+  | AllowChoice (LocId (loc, locm), choices1), AllowChoice (LocId (loc', _), choices2)
+    when loc = loc' ->
     Some
       (AllowChoice
          ( LocId (loc, locm)

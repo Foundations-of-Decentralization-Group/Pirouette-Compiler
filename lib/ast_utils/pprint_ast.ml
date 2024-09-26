@@ -30,10 +30,11 @@ let rec pprint_local_expr ppf (e : Ast.Local.expr) =
     fprintf
       ppf
       "@[<h>%a@]"
-      (fun ppf -> function
-        | Ast.Local.Int i -> fprintf ppf "%d" i
-        | String s -> fprintf ppf "\"%s\"" s
-        | Bool b -> fprintf ppf "%b" b)
+      (fun ppf (v : Ast.Local.value) ->
+        match v with
+        | Int (i, _) -> fprintf ppf "%d" i
+        | String (s, _) -> fprintf ppf "\"%s\"" s
+        | Bool (b, _) -> fprintf ppf "%b" b)
       v
   | Var (VarId (id, _), _) -> fprintf ppf "@[<h>%s@]" id
   | UnOp (op, e, _) ->
@@ -107,10 +108,11 @@ and pprint_local_pattern ppf = function
     fprintf
       ppf
       "@[<h>%a@]"
-      (fun ppf -> function
-        | Ast.Local.Int i -> fprintf ppf "%d" i
-        | String s -> fprintf ppf "%s" s
-        | Bool b -> fprintf ppf "%b" b)
+      (fun ppf (v : Ast.Local.value) ->
+        match v with
+        | Int (i, _) -> fprintf ppf "%d" i
+        | String (s, _) -> fprintf ppf "%s" s
+        | Bool (b, _) -> fprintf ppf "%b" b)
       v
   | Var (VarId (id, _), _) -> fprintf ppf "@[<h>%s@]" id
   | Pair (p1, p2, _) ->
@@ -163,7 +165,8 @@ and pprint_choreo_stmt ppf = function
       ps
       pprint_choreo_expr
       e
-  | TypeDecl (TypId (id, _), t, _) -> fprintf ppf "@[<h>type %s := %a;@]" id pprint_choreo_type t
+  | TypeDecl (TypId (id, _), t, _) ->
+    fprintf ppf "@[<h>type %s := %a;@]" id pprint_choreo_type t
 
 (** [pp_choreo_expr] takes a formatter [ppf] and a choreo expression
     and prints the formatted code of the choreo expression
@@ -238,7 +241,8 @@ and pprint_choreo_case ppf (p, e) =
 and pprint_choreo_pattern ppf = function
   | Default _ -> fprintf ppf "@[<h>_@]"
   | Var (VarId (id, _), _) -> fprintf ppf "@[<h>%s@]" id
-  | LocPatt (LocId (loc, _), p, _) -> fprintf ppf "@[<h>%s.%a@]" loc pprint_local_pattern p
+  | LocPatt (LocId (loc, _), p, _) ->
+    fprintf ppf "@[<h>%s.%a@]" loc pprint_local_pattern p
   | Pair (p1, p2, _) ->
     fprintf ppf "@[<hv>(%a, %a)@]" pprint_choreo_pattern p1 pprint_choreo_pattern p2
   | Left (p, _) -> fprintf ppf "@[<hv2>left@ %a@]" pprint_choreo_pattern p

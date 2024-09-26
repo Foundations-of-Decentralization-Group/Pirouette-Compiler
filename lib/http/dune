@@ -3,8 +3,7 @@
  (modules Send_receive)
  (libraries cohttp cohttp-lwt-unix lwt))
 
- (executable
+(executable
  (name mock_server)
  (modules mock_server)
  (libraries cohttp cohttp-lwt-unix lwt))
-

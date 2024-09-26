@@ -1,7 +1,7 @@
 type value =
-  | Int of int
-  | String of string
-  | Bool of bool
+  | Int of int * Metainfo.metainfo
+  | String of string * Metainfo.metainfo
+  | Bool of bool * Metainfo.metainfo
 
 type loc_id = LocId of string * Metainfo.metainfo
 type var_id = VarId of string * Metainfo.metainfo
@@ -9,18 +9,18 @@ type typ_id = TypId of string * Metainfo.metainfo
 type sync_label = LabelId of string * Metainfo.metainfo
 
 (*
-  Type: bin_op
-  Description: Represents binary operations in the AST with associated metadata(see above).
+   Type: bin_op
+   Description: Represents binary operations in the AST with associated metadata(see above).
 
-  Variants:
-  - Eq: Represents equality (==)
-  - Neq: Represents inequality (!=)
-  - Lt: Represents less than (<)
-  - Leq: Represents less than or equal (<=)
-  - Gt: Represents greater than (>)
-  - Geq: Represents greater than or equal (>=)
+   Variants:
+   - Eq: Represents equality (==)
+   - Neq: Represents inequality (!=)
+   - Lt: Represents less than (<)
+   - Leq: Represents less than or equal (<=)
+   - Gt: Represents greater than (>)
+   - Geq: Represents greater than or equal (>=)
 
-  Each variant is tagged with a `Metainfo.metainfo` (see above).
+   Each variant is tagged with a `Metainfo.metainfo` (see above).
 *)
 type un_op =
   | Not of Metainfo.metainfo
@@ -71,9 +71,10 @@ type expr =
   | Match of expr * (pattern * expr) list * Metainfo.metainfo
 
 let metainfo_of_Val = function
-  | `Int (_, m) -> m
-  | `String (_, m) -> m
-  | `Bool (_, m) -> m
+  | Int (_, m) -> m
+  | String (_, m) -> m
+  | Bool (_, m) -> m
+;;
 
 let metainfo_of_LocId (LocId (_, m)) = m
 let metainfo_of_VarId (VarId (_, m)) = m
@@ -83,7 +84,8 @@ let metainfo_of_LabelId (LabelId (_, m)) = m
 let metainfo_of_UnOp = function
   | Not m -> m
   | Neg m -> m
-  
+;;
+
 let metainfo_of_LocTyp = function
   | TUnit m -> m
   | TInt m -> m
@@ -91,6 +93,7 @@ let metainfo_of_LocTyp = function
   | TBool m -> m
   | TProd (_, _, m) -> m
   | TSum (_, _, m) -> m
+;;
 
 let metainfo_of_LocPatt = function
   | Default m -> m
@@ -99,6 +102,7 @@ let metainfo_of_LocPatt = function
   | Pair (_, _, m) -> m
   | Left (_, m) -> m
   | Right (_, m) -> m
+;;
 
 let metainfo_of_LocExpr = function
   | Unit m -> m
@@ -113,3 +117,4 @@ let metainfo_of_LocExpr = function
   | Left (_, m) -> m
   | Right (_, m) -> m
   | Match (_, _, m) -> m
+;;
