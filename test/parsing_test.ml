@@ -100,7 +100,6 @@ let test_second_pair _ =
        ])
 ;;
 
-
 let suite =
   "Parser Tests"
   >::: [ "Declarations"

@@ -47,21 +47,3 @@ let dot_choreo_ast channel (Ast.Choreo.Prog (prog, metainfo)) =
   output_string channel dot_code;
   flush channel
 ;;
-
-let stringify_pprint_choreo_ast (Ast.Choreo.Prog (prog, _)) =
-  let _ = Pprint_ast.pprint_choreo_stmt_block Format.str_formatter prog in
-  Format.flush_str_formatter ()
-;;
-
-let stringify_pprint_net_ast (Ast.Net.Prog prog) =
-  let _ = Pprint_ast.pprint_net_stmt_block Format.str_formatter prog in
-  Format.flush_str_formatter ()
-;;
-
-let stringify_jsonify_choreo_ast (Ast.Choreo.Prog (prog, _)) =
-  Jsonify_ast.jsonify_choreo_stmt_block prog |> Yojson.Basic.pretty_to_string
-;;
-
-let stringify_jsonify_net_ast (Ast.Net.Prog prog) =
-  Jsonify_ast.jsonify_net_stmt_block prog |> Yojson.Basic.pretty_to_string
-;;

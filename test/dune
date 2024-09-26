@@ -26,4 +26,3 @@
  (name marshal_receiver)
  (modules marshal_receiver)
  (libraries ounit2 http cohttp-lwt-unix logs types_test))
-
