@@ -13,13 +13,11 @@ open OUnit2
 let peq (s : string) =
   let program = Parsing.parse_program (Lexing.from_string s) in
   let pprint_s = Ast_utils.stringify_pprint_choreo_ast program in
-  let _ =
-    print_endline pprint_s;
-    print_newline ()
-  in
+  let _ = print_string ("\n" ^ pprint_s ^ "\n") in
   let program' = Parsing.parse_program (Lexing.from_string pprint_s) in
-  assert_raises (OUnitTest.OUnit_failure "not equal") (fun _ ->
-    assert_equal program program')
+  let json_ast = Ast_utils.stringify_jsonify_choreo_ast program in
+  let json_ast' = Ast_utils.stringify_jsonify_choreo_ast program' in
+  assert_equal json_ast json_ast'
 ;;
 
 let suite =

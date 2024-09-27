@@ -111,7 +111,7 @@ and pprint_local_pattern ppf = function
       (fun ppf (v : Ast.Local.value) ->
         match v with
         | Int (i, _) -> fprintf ppf "%d" i
-        | String (s, _) -> fprintf ppf "%s" s
+        | String (s, _) -> fprintf ppf "\"%s\"" s
         | Bool (b, _) -> fprintf ppf "%b" b)
       v
   | Var (VarId (id, _), _) -> fprintf ppf "@[<h>%s@]" id
