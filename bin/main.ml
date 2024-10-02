@@ -89,243 +89,44 @@ and extract_local_ctx global_ctx loc_id =
 ;;
 
 (* ============================== Local ============================== *)
-let rec typeof_local_pattn ctx = function
-  | Ast.Local.Default -> Ok Ast.Local.TUnit
-  | Ast.Local.Val v ->
-    (match v with
-     | `Int _ -> Ok Ast.Local.TInt
-     | `String _ -> Ok Ast.Local.TString
-     | `Bool _ -> Ok Ast.Local.TBool)
-  | Ast.Local.Var (Ast.Local.VarId var_name) -> ctx_lookup ctx var_name
-  | Ast.Local.Pair (p1, p2) ->
-    (match typeof_local_pattn ctx p1, typeof_local_pattn ctx p2 with
-     | Ok t1, Ok t2 -> Ok (Ast.Local.TProd (t1, t2))
-     | Error errmsg1, Error errmsg2 -> Error (errmsg1 ^ "\n" ^ errmsg2)
-     | Error errmsg, _ | _, Error errmsg -> Error errmsg)
-  | Ast.Local.Left p | Ast.Local.Right p -> typeof_local_pattn ctx p
-
-and typeof_local_expr ctx = function
-  | Ast.Local.Unit -> Ok Ast.Local.TUnit
-  | Ast.Local.Val v ->
-    (match v with
-     | `Int _ -> Ok Ast.Local.TInt
-     | `String _ -> Ok Ast.Local.TString
-     | `Bool _ -> Ok Ast.Local.TBool)
-  | Ast.Local.Var (Ast.Local.VarId var_name) -> ctx_lookup ctx var_name
-  | Ast.Local.UnOp (unop, e) ->
-    (match typeof_local_expr ctx e with
-     | Ok t -> typeof_unop t unop
-     | err -> err)
-  | Ast.Local.BinOp (e1, bop, e2) ->
-    (match typeof_local_expr ctx e1, typeof_local_expr ctx e2 with
-     | Ok e1_typ, Ok e2_typ -> typeof_bop e1_typ e2_typ bop
-     | Error errmsg1, Error errmsg2 -> Error (errmsg1 ^ "\n" ^ errmsg2)
-     | Error errmsg, _ | _, Error errmsg -> Error errmsg)
+let rec check_local_expr ctx expected_typ = function
+  | Ast.Local.Unit -> expected_typ = Ast.Local.TUnit
+  | Ast.Local.Val v -> expected_typ = typeof_Val v
+  | Ast.Local.Var v ->
+    (match ctx_lookup ctx v with
+     | Ok t -> expected_typ = t
+     | _ -> false)
+  | Ast.Local.UnOp (op, e) ->
+    (match op with
+     | Ast.Local.Neg ->
+       check_local_expr ctx Ast.Local.TInt e && expected_typ = Ast.Local.TInt
+     | Ast.Local.Not ->
+       check_local_expr ctx Ast.Local.TBool e && expected_typ = Ast.Local.TBool)
+  | Ast.Local.BinOp (e1, op, e2) ->
+    (match op with
+     | Ast.Local.Plus | Ast.Local.Minus | Ast.Local.Times | Ast.Local.Div ->
+       check_local_expr ctx Ast.Local.TInt e1
+       && check_local_expr ctx Ast.Local.TInt e2
+       && expected_typ = Ast.Local.TInt
+     | Ast.Local.Eq
+     | Ast.Local.Neq
+     | Ast.Local.Lt
+     | Ast.Local.Leq
+     | Ast.Local.Gt
+     | Ast.Local.Geq ->
+       check_local_expr ctx TInt e1
+       && check_local_expr ctx TInt e2
+       && expected_typ = Ast.Local.TBool
+     | Ast.Local.And | Ast.Local.Or ->
+       check_local_expr ctx Ast.Local.TBool e1
+       && check_local_expr ctx Ast.Local.TBool e2
+       && expected_typ = Ast.Local.TBool)
   | Ast.Local.Let (Ast.Local.VarId var_name, e1, e2) ->
-    (match typeof_local_expr ctx e1 with
-     | Ok e1_typ -> typeof_local_expr (add_binding ctx var_name e1_typ) e2
-     | err -> err)
-  | Ast.Local.Pair (e1, e2) ->
-    (match typeof_local_expr ctx e1, typeof_local_expr ctx e2 with
-     | Ok e1_typ, Ok e2_typ -> Ok (Ast.Local.TProd (e1_typ, e2_typ))
-     | Error errmsg1, Error errmsg2 -> Error (errmsg1 ^ "\n" ^ errmsg2)
-     | Error errmsg, _ | _, Error errmsg -> Error errmsg)
-  | Ast.Local.Fst e ->
-    (match typeof_local_expr ctx e with
-     | Ok (Ast.Local.TProd (t1, _)) -> Ok t1
-     | Ok _ -> Error "Expected: TProd (t1, _) -> T1"
-     | err -> err)
-  | Ast.Local.Snd e ->
-    (match typeof_local_expr ctx e with
-     | Ok (Ast.Local.TProd (_, t2)) -> Ok t2
-     | Ok _ -> Error "Expected: TProd (_, t2) -> T2"
-     | err -> err)
-  | Ast.Local.Left e ->
-    (match typeof_local_expr ctx e with
-     | Ok (Ast.Local.TSum (t1, _)) -> Ok t1
-     | Ok _ -> Error "Expected: TSum (t1, _) -> T1"
-     | err -> err)
-  | Ast.Local.Right e ->
-    (match typeof_local_expr ctx e with
-     | Ok (Ast.Local.TSum (_, t2)) -> Ok t2
-     | Ok _ -> Error "Expected: TSum (_, t2) -> T2"
-     | err -> err)
-  | Ast.Local.Match (e, cases) ->
-    let match_exp_typ = typeof_local_expr ctx e in
-    (match cases with
-     | [] -> Error "Empty cases"
-     | (fst_p, fst_e) :: rest_cases ->
-       let fst_pattn_typ = typeof_local_pattn ctx fst_p in
-       let fst_exp_typ = typeof_local_expr ctx fst_e in
-       if fst_pattn_typ <> match_exp_typ
-       then Error "Pattern types do not match"
-       else
-         List.fold_left
-           (fun acc (p, e) ->
-             match acc with
-             | Error _ as err -> err
-             | _ ->
-               let pattn_typ = typeof_local_pattn ctx p in
-               let exp_typ = typeof_local_expr ctx e in
-               if pattn_typ <> match_exp_typ
-               then Error "Pattern types do not match"
-               else if exp_typ <> fst_exp_typ
-               then Error "Expression types do not match"
-               else fst_exp_typ)
-           fst_exp_typ
-           rest_cases)
-
-and typeof_bop e1 e2 = function
-  | Ast.Local.Plus | Ast.Local.Minus | Ast.Local.Times | Ast.Local.Div ->
-    (match e1, e2 with
-     | Ast.Local.TInt, Ast.Local.TInt -> Ok Ast.Local.TInt
-     | _ -> Error "Expected: TInt -> TInt -> TInt")
-  | Ast.Local.Eq
-  | Ast.Local.Neq
-  | Ast.Local.Lt
-  | Ast.Local.Gt
-  | Ast.Local.Geq
-  | Ast.Local.Leq ->
-    (match e1, e2 with
-     | Ast.Local.TInt, Ast.Local.TInt -> Ok Ast.Local.TBool
-     | _ -> Error "Expected: TInt -> TInt -> TBool")
-  | Ast.Local.And | Ast.Local.Or ->
-    (match e1, e2 with
-     | Ast.Local.TBool, Ast.Local.TBool -> Ok Ast.Local.TBool
-     | _ -> Error "Expected: TBool -> TBool -> TBool")
-
-and typeof_unop e = function
-  | Ast.Local.Neg ->
-    (match e with
-     | Ast.Local.TInt -> Ok Ast.Local.TInt
-     | _ -> Error "Expected: TInt -> TInt")
-  | Ast.Local.Not ->
-    (match e with
-     | Ast.Local.TBool -> Ok Ast.Local.TBool
-     | _ -> Error "Expected: TBool -> TBool")
-
-and check_local typeof_f ctx e expected_typ =
-  match typeof_f ctx e with
-  | Ok typ when typ = expected_typ -> true
+    check_local_expr (add_binding ctx var_name (typeof_Val e1)) expected_typ e2
   | _ -> false
-;;
 
-(* ============================== Choreo ============================== *)
-
-let rec check_choreo_pattn choreo_ctx global_ctx = function
-  | Ast.Choreo.Default -> Ok Ast.Choreo.TUnit
-  | Ast.Choreo.Var (Ast.Local.VarId var_name) -> ctx_lookup choreo_ctx var_name
-  | Ast.Choreo.Pair (p1, p2) ->
-    (match
-       ( check_choreo_pattn choreo_ctx global_ctx p1
-       , check_choreo_pattn choreo_ctx global_ctx p2 )
-     with
-     | Ok t1, Ok t2 -> Ok (Ast.Choreo.TProd (t1, t2))
-     | Error errmsg1, Error errmsg2 -> Error (errmsg1 ^ "\n" ^ errmsg2)
-     | Error errmsg, _ | _, Error errmsg -> Error errmsg)
-  | Ast.Choreo.LocPatt (Ast.Local.LocId loc_name, p1) ->
-    let loc_ctx = extract_local_ctx global_ctx loc_name in
-    (match typeof_local_pattn loc_ctx p1 with
-     | Ok _ -> ctx_lookup choreo_ctx loc_name
-     | Error errmsg -> Error errmsg)
-  | Ast.Choreo.Left p | Ast.Choreo.Right p -> check_choreo_pattn choreo_ctx global_ctx p
-
-and check_choreo_exp choreo_ctx global_ctx = function
-  | Ast.Choreo.Unit -> Ok Ast.Choreo.TUnit
-  | Ast.Choreo.Var (Ast.Local.VarId var_name) -> ctx_lookup choreo_ctx var_name
-  | Ast.Choreo.LocExpr (Ast.Local.LocId loc_name, e1) ->
-    let loc_ctx = extract_local_ctx global_ctx loc_name in
-    (match typeof_local_expr loc_ctx e1 with
-     | Ok local_etyp -> Ok (Ast.Choreo.TLoc (Ast.Local.LocId loc_name, local_etyp))
-     | Error errmsg -> Error errmsg)
-  | Ast.Choreo.Send (Ast.Local.LocId loc_name1, e1, Ast.Local.LocId loc_name2) ->
-    let choreo_ctx1 = extract_local_ctx global_ctx loc_name1 in
-    let choreo_ctx2 = extract_local_ctx global_ctx loc_name2 in
-    (match check_choreo_exp choreo_ctx1 global_ctx e1 with
-     | Ok typ1 ->
-       (match check_choreo_exp choreo_ctx2 global_ctx e1 with
-        | Ok typ2 when typ1 = typ2 -> Ok Ast.Choreo.TUnit
-        | Ok _ -> Error "Expression type do not match the with the two local IDs"
-        | err -> err)
-     | err -> err)
-  | Ast.Choreo.Sync (Ast.Local.LocId loc_name1, _, Ast.Local.LocId loc_name2, e1) ->
-    let choreo_ctx1 = extract_local_ctx global_ctx loc_name1 in
-    let choreo_ctx2 = extract_local_ctx global_ctx loc_name2 in
-    (match check_choreo_exp choreo_ctx1 global_ctx e1 with
-     | Ok typ1 ->
-       (match check_choreo_exp choreo_ctx2 global_ctx e1 with
-        | Ok typ2 when typ1 = typ2 -> Ok Ast.Choreo.TUnit
-        | Ok _ -> Error "Expression type do not match the with the two local IDs"
-        | err -> err)
-     | err -> err)
-  | Ast.Choreo.If (e1, e2, e3) ->
-    (match e1 with
-     | Ast.Choreo.LocExpr (Ast.Local.LocId loc_name, e1) ->
-       let loc_ctx = extract_local_ctx global_ctx loc_name in
-       if check_local typeof_local_expr loc_ctx e1 Ast.Local.TBool
-       then (
-         match
-           ( check_choreo_exp choreo_ctx global_ctx e2
-           , check_choreo_exp choreo_ctx global_ctx e3 )
-         with
-         | Ok t2, Ok t3 when t2 = t3 -> Ok t2
-         | Ok _, Ok _ -> Error "Expression types do not match"
-         | _, _ -> Error "Type Error")
-       else Error "The condition of an if expression must be a boolean"
-     | _ -> Error "The condition of an if expression must be a boolean")
-    (* (match check_choreo_exp choreo_ctx local_ctx global_ctx e1 with
-       | Ok Ast.Choreo.TLoc (lname, Ast.Local.TBool)
-       (match check_choreo_exp choreo_ctx local_ctx global_ctx e2, check_choreo_exp choreo_ctx local_ctx global_ctx e3 with
-       | Ok t2, Ok t3 when t2 = t3 -> Ok t2
-       | Ok _, Ok _ -> Error "Expression types do not match"
-       | _, _ -> Error "Type Error")
-       | Ok _ -> Error "The condition of an if expression must be a boolean"
-       | Error errmsg -> Error errmsg) *)
-  | Ast.Choreo.Let (stmt_block, e1) -> Ok Ast.Choreo.TUnit
-  | Ast.Choreo.FunDef (pattn_list, e1) -> Ok Ast.Choreo.TUnit
-  | Ast.Choreo.FunApp (e1, e2) -> Ok Ast.Choreo.TUnit
-  | Ast.Choreo.Pair (e1, e2) ->
-    (match
-       ( check_choreo_exp choreo_ctx global_ctx e1
-       , check_choreo_exp choreo_ctx global_ctx e2 )
-     with
-     | Ok e1_typ, Ok e2_typ -> Ok (Ast.Choreo.TProd (e1_typ, e2_typ))
-     | Error errmsg1, Error errmsg2 -> Error (errmsg1 ^ "\n" ^ errmsg2)
-     | Error errmsg, _ | _, Error errmsg -> Error errmsg)
-  | Ast.Choreo.Fst e ->
-    (match check_choreo_exp choreo_ctx global_ctx e with
-     | Ok (Ast.Choreo.TProd (t1, _)) -> Ok t1
-     | Ok _ -> Error "Expected: TProd (t1, _) -> T1"
-     | err -> err)
-  | Ast.Choreo.Snd e ->
-    (match check_choreo_exp choreo_ctx global_ctx e with
-     | Ok (Ast.Choreo.TProd (_, t2)) -> Ok t2
-     | Ok _ -> Error "Expected: TProd (_, t2) -> T2"
-     | err -> err)
-  | Ast.Choreo.Left e ->
-    (match check_choreo_exp choreo_ctx global_ctx e with
-     | Ok (Ast.Choreo.TSum (t1, _)) -> Ok t1
-     | Ok _ -> Error "Expected: TSum (t1, _) -> T1"
-     | err -> err)
-  | Ast.Choreo.Right e ->
-    (match check_choreo_exp choreo_ctx global_ctx e with
-     | Ok (Ast.Choreo.TSum (_, t2)) -> Ok t2
-     | Ok _ -> Error "Expected: TSum (_, t2) -> T2"
-     | err -> err)
-  | Ast.Choreo.Match (e, cases) ->
-    let match_exp_typ = check_choreo_exp choreo_ctx global_ctx e in
-    let pattn_typs, exp_typs =
-      List.split
-        (List.map
-           (fun (p, e) ->
-             ( check_choreo_pattn choreo_ctx global_ctx p
-             , check_choreo_exp choreo_ctx global_ctx e ))
-           cases)
-    in
-    (match List.for_all (fun x -> x = match_exp_typ) pattn_typs with
-     | false -> Error "Pattern types do not match"
-     | true ->
-       (match List.for_all (fun x -> x = List.hd exp_typs) exp_typs with
-        | false -> Error "Expression types do not match"
-        | true -> List.hd exp_typs))
+and typeof_Val = function
+  | `Int _ -> Ast.Local.TInt
+  | `Bool _ -> Ast.Local.TBool
+  | `String _ -> Ast.Local.TString
 ;;
