@@ -66,6 +66,9 @@ let () =
 
 (*************************************************)
 
+(*dummy metainfo to let compiler happy*)
+let m : Ast.Metainfo.metainfo = "", 0
+
 (*context: list of pair of variable name and its binding*)
 type local_context = (string * Ast.Local.typ) list
 type choreo_context = (string * Ast.Choreo.typ) list
@@ -90,43 +93,43 @@ and extract_local_ctx global_ctx loc_id =
 
 (* ============================== Local ============================== *)
 let rec check_local_expr ctx expected_typ = function
-  | Ast.Local.Unit -> expected_typ = Ast.Local.TUnit
-  | Ast.Local.Val v -> expected_typ = typeof_Val v
-  | Ast.Local.Var v ->
+  | Ast.Local.Unit _ -> expected_typ = Ast.Local.TUnit m
+  | Ast.Local.Val (v, _) -> expected_typ = typeof_Val v
+  | Ast.Local.Var (v, _) ->
     (match ctx_lookup ctx v with
      | Ok t -> expected_typ = t
      | _ -> false)
-  | Ast.Local.UnOp (op, e) ->
+  | Ast.Local.UnOp (op, e, _) ->
     (match op with
-     | Ast.Local.Neg ->
-       check_local_expr ctx Ast.Local.TInt e && expected_typ = Ast.Local.TInt
-     | Ast.Local.Not ->
-       check_local_expr ctx Ast.Local.TBool e && expected_typ = Ast.Local.TBool)
-  | Ast.Local.BinOp (e1, op, e2) ->
+     | Ast.Local.Neg _ ->
+       check_local_expr ctx (TInt m) e && expected_typ = Ast.Local.TInt m
+     | Ast.Local.Not _ ->
+       check_local_expr ctx (Ast.Local.TBool m) e && expected_typ = Ast.Local.TBool m)
+  | Ast.Local.BinOp (e1, op, e2, _) ->
     (match op with
-     | Ast.Local.Plus | Ast.Local.Minus | Ast.Local.Times | Ast.Local.Div ->
-       check_local_expr ctx Ast.Local.TInt e1
-       && check_local_expr ctx Ast.Local.TInt e2
-       && expected_typ = Ast.Local.TInt
-     | Ast.Local.Eq
-     | Ast.Local.Neq
-     | Ast.Local.Lt
-     | Ast.Local.Leq
-     | Ast.Local.Gt
-     | Ast.Local.Geq ->
-       check_local_expr ctx TInt e1
-       && check_local_expr ctx TInt e2
-       && expected_typ = Ast.Local.TBool
-     | Ast.Local.And | Ast.Local.Or ->
-       check_local_expr ctx Ast.Local.TBool e1
-       && check_local_expr ctx Ast.Local.TBool e2
-       && expected_typ = Ast.Local.TBool)
-  | Ast.Local.Let (Ast.Local.VarId var_name, e1, e2) ->
-    check_local_expr (add_binding ctx var_name (typeof_Val e1)) expected_typ e2
+     | Ast.Local.Plus _ | Ast.Local.Minus _ | Ast.Local.Times _ | Ast.Local.Div _ ->
+       check_local_expr ctx (Ast.Local.TInt m) e1
+       && check_local_expr ctx (Ast.Local.TInt m) e2
+       && expected_typ = Ast.Local.TInt m
+     | Ast.Local.Eq _
+     | Ast.Local.Neq _
+     | Ast.Local.Lt _
+     | Ast.Local.Leq _
+     | Ast.Local.Gt _
+     | Ast.Local.Geq _ ->
+       check_local_expr ctx (Ast.Local.TInt m) e1
+       && check_local_expr ctx (Ast.Local.TInt m) e2
+       && expected_typ = Ast.Local.TBool m
+     | Ast.Local.And _ | Ast.Local.Or _ ->
+       check_local_expr ctx (Ast.Local.TBool m) e1
+       && check_local_expr ctx (Ast.Local.TBool m) e2
+       && expected_typ = Ast.Local.TBool m)
+  | Ast.Local.Let (Ast.Local.VarId (var_name, _), e1, e2, _) ->
+    check_local_expr (add_binding ctx var_name (typeof_Val e1 m)) expected_typ e2
   | _ -> false
 
 and typeof_Val = function
-  | `Int _ -> Ast.Local.TInt
-  | `Bool _ -> Ast.Local.TBool
-  | `String _ -> Ast.Local.TString
+  | Int _ -> Ast.Local.TInt m
+  | Bool _ -> Ast.Local.TBool m
+  | String _ -> Ast.Local.TString m
 ;;
