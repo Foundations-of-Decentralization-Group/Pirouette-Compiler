@@ -84,7 +84,7 @@ and ctx_lookup ctx var_name =
   | Not_found -> Error "Variable not found"
 
 (*extract loc_id's local context from glocal context*)
-and extract_local_ctx global_ctx loc_id =
+and extract_local_ctx (global_ctx : (string * string * Ast.Local.typ) list) loc_id =
   List.fold_right
     (fun (loc, var_name, typ) acc -> if loc = loc_id then (var_name, typ) :: acc else acc)
     global_ctx
@@ -204,4 +204,32 @@ and check_local_pattern ctx expected_typ = function
     (match expected_typ with
      | Ast.Local.TSum (_, t2, _) -> check_local_pattern ctx t2 p
      | _ -> false)
+;;
+
+(* ============================== Choreo ============================== *)
+let rec check_choreo_expr choreo_ctx global_ctx expected_typ = function
+  | Ast.Choreo.Unit _ -> expected_typ = Ast.Choreo.TUnit m
+  | Ast.Choreo.Var (VarId (var_name, _), _) ->
+    (match ctx_lookup choreo_ctx var_name with
+     | Ok t -> expected_typ = t
+     | _ -> false)
+  | Ast.Choreo.LocExpr (Ast.Local.LocId (loc_id, _), e, _) ->
+    (match expected_typ with
+     | Ast.Choreo.TLoc (Ast.Local.LocId (loc_id', _), local_typ, _) ->
+       loc_id = loc_id'
+       && check_local_expr (extract_local_ctx global_ctx loc_id) local_typ e
+     | _ -> false)
+  | Ast.Choreo.Send (Ast.Local.LocId (loc_id1, _), e, Ast.Local.LocId (loc_id2, _), _) ->
+    (match expected_typ with
+     | Ast.Choreo.TLoc (Ast.Local.LocId (loc_id2', _), local_typ, _) ->
+       check_choreo_expr
+         choreo_ctx
+         global_ctx
+         (Ast.Choreo.TLoc (Ast.Local.LocId (loc_id1, m), local_typ, m))
+         e
+       && loc_id2 = loc_id2'
+     | _ -> false)
+  | Ast.Choreo.Sync (_, _, _, e, _) ->
+    check_choreo_expr choreo_ctx global_ctx expected_typ e
+  | _ -> false
 ;;
