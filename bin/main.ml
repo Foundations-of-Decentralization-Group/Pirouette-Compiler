@@ -84,7 +84,7 @@ and ctx_lookup ctx var_name =
   | Not_found -> Error "Variable not found"
 
 (*extract loc_id's local context from glocal context*)
-and extract_local_ctx (global_ctx : (string * string * Ast.Local.typ) list) loc_id =
+and extract_local_ctx global_ctx loc_id =
   List.fold_right
     (fun (loc, var_name, typ) acc -> if loc = loc_id then (var_name, typ) :: acc else acc)
     global_ctx
@@ -231,5 +231,56 @@ let rec check_choreo_expr choreo_ctx global_ctx expected_typ = function
      | _ -> false)
   | Ast.Choreo.Sync (_, _, _, e, _) ->
     check_choreo_expr choreo_ctx global_ctx expected_typ e
+  | Ast.Choreo.If (cond, c1, c2, _) ->
+    (match cond with
+     | Ast.Choreo.LocExpr (loc_id, _, _) ->
+       check_choreo_expr choreo_ctx global_ctx expected_typ c1
+       && check_choreo_expr choreo_ctx global_ctx expected_typ c2
+       && check_choreo_expr
+            choreo_ctx
+            global_ctx
+            (Ast.Choreo.TLoc (loc_id, Ast.Local.TBool m, m))
+            cond
+     | _ -> false)
+  | Ast.Choreo.Pair (e1, e2, _) ->
+    (match expected_typ with
+     | Ast.Choreo.TProd (t1, t2, _) ->
+       check_choreo_expr choreo_ctx global_ctx t1 e1
+       && check_choreo_expr choreo_ctx global_ctx t2 e2
+     | _ -> false)
+  | Ast.Choreo.Fst (e, _) ->
+    (match expected_typ with
+     | Ast.Choreo.TProd (t1, _, _) -> check_choreo_expr choreo_ctx global_ctx t1 e
+     | _ -> false)
+  | Ast.Choreo.Snd (e, _) ->
+    (match expected_typ with
+     | Ast.Choreo.TProd (_, t2, _) -> check_choreo_expr choreo_ctx global_ctx t2 e
+     | _ -> false)
+  | Ast.Choreo.Left (e, _) ->
+    (match expected_typ with
+     | Ast.Choreo.TSum (t1, _, _) -> check_choreo_expr choreo_ctx global_ctx t1 e
+     | _ -> false)
+  | Ast.Choreo.Right (e, _) ->
+    (match expected_typ with
+     | Ast.Choreo.TSum (_, t2, _) -> check_choreo_expr choreo_ctx global_ctx t2 e
+     | _ -> false)
+  | Ast.Choreo.Match (e, ls, _) ->
+    (match ls with
+     | [ (Ast.Choreo.Left (left_pattn, _), c1); (Ast.Choreo.Right (right_pattn, _), c2) ]
+       ->
+       let left_pattn_typ = typof_choreo_pattn choreo_ctx global_ctx left_pattn in
+       let right_pattn_typ = typof_choreo_pattn choreo_ctx global_ctx right_pattn in
+       check_choreo_expr
+         choreo_ctx
+         global_ctx
+         (Ast.Choreo.TSum (left_pattn_typ, right_pattn_typ, m))
+         e
+       && check_choreo_expr choreo_ctx global_ctx expected_typ c1
+       && check_choreo_expr choreo_ctx global_ctx expected_typ c2
+     | _ -> false)
+  | Ast.Choreo.Let (_, _, _) -> Ast.Choreo.TUnit m = expected_typ
   | _ -> false
+
+and typof_choreo_pattn _choreo_ctx _global_ctx = function
+  | _ -> Ast.Choreo.TUnit m
 ;;
