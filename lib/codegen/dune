@@ -1,3 +1,5 @@
 (library
  (name codegen)
- (libraries ast ppxlib))
+ (libraries ast ppxlib)
+ (preprocess
+  (pps ppxlib.metaquot)))
