@@ -10,13 +10,13 @@ let rec emit_local_expr (e : Local.expr) =
   | Val (Int i) -> Ast_builder.Default.eint ~loc i
   | Val (String s) -> Ast_builder.Default.estring ~loc s
   | Val (Bool b) -> Ast_builder.Default.ebool ~loc b
-  | Var (Local.VarId v) -> Ast_builder.Default.evar ~loc v
-  | UnOp (Local.Not, e) ->
+  | Var (VarId v) -> Ast_builder.Default.evar ~loc v
+  | UnOp (Not, e) ->
     Ast_builder.Default.eapply
       ~loc
       (Ast_builder.Default.evar ~loc "not")
       [ emit_local_expr e ]
-  | UnOp (Local.Neg, e) ->
+  | UnOp (Neg, e) ->
     Ast_builder.Default.eapply
       ~loc
       (Ast_builder.Default.evar ~loc "~-")
@@ -91,7 +91,7 @@ and emit_local_pattern (p : Local.pattern) =
   | Local.Val (Int i) -> Ast_builder.Default.pint ~loc i
   | Local.Val (String s) -> Ast_builder.Default.pstring ~loc s
   | Local.Val (Bool b) -> Ast_builder.Default.pbool ~loc b
-  | Local.Var (Local.VarId v) -> Ast_builder.Default.pvar ~loc v
+  | Local.Var (VarId v) -> Ast_builder.Default.pvar ~loc v
   | Local.Pair (p1, p2) ->
     Ast_builder.Default.ppat_tuple ~loc [ emit_local_pattern p1; emit_local_pattern p2 ]
   | Local.Left p ->
@@ -136,7 +136,11 @@ and emit_net_stmt (msg : (module Msg_intf.M)) (s : Net.stmt) =
          ~loc
          ~pat:(emit_local_pattern f)
          ~expr:(build_fun_body msg ps e))
-  | _ -> failwith "not supported"
+  | _ ->
+    Ast_builder.Default.value_binding
+      ~loc
+      ~pat:(Ast_builder.Default.punit ~loc)
+      ~expr:(Ast_builder.Default.eunit ~loc)
 
 and emit_net_expr (msg : (module Msg_intf.M)) (e : Net.expr) =
   match e with

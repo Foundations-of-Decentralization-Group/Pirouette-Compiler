@@ -22,10 +22,10 @@ let emit_domain_stri (loc_id : string) (net_stmts : Net.stmt_block) =
   let rec emit_net_stmtblock = function
     | [] -> Ast_builder.Default.eunit ~loc
     | stmt :: stmts ->
-      (match stmt with
-       | Net.Assign (ps, e) ->
-         let binding =
-           match ps with
+      let binding =
+        match stmt with
+        | Net.Assign (ps, e) ->
+          (match ps with
            | [] -> failwith "empty pattern in assignment"
            | [ var ] ->
              Ast_builder.Default.value_binding
@@ -36,14 +36,18 @@ let emit_domain_stri (loc_id : string) (net_stmts : Net.stmt_block) =
              Ast_builder.Default.value_binding
                ~loc
                ~pat:(Emit_ocaml.emit_local_pattern f)
-               ~expr:(Emit_ocaml.build_fun_body (module Msg) ps e)
-         in
-         Ast_builder.Default.pexp_let
-           ~loc
-           Nonrecursive
-           [ binding ]
-           (emit_net_stmtblock stmts)
-       | _ -> failwith "not supported")
+               ~expr:(Emit_ocaml.build_fun_body (module Msg) ps e))
+        | _ ->
+          Ast_builder.Default.value_binding
+            ~loc
+            ~pat:(Ast_builder.Default.punit ~loc)
+            ~expr:(Ast_builder.Default.eunit ~loc)
+      in
+      Ast_builder.Default.pexp_let
+        ~loc
+        Nonrecursive
+        [ binding ]
+        (emit_net_stmtblock stmts)
   in
   [%stri
     let [%p Ast_builder.Default.pvar ~loc (loc_id ^ "_domain")] =
