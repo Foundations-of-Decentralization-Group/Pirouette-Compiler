@@ -278,8 +278,9 @@ let rec check_choreo_expr choreo_ctx global_ctx expected_typ = function
        && check_choreo_expr choreo_ctx global_ctx expected_typ c1
        && check_choreo_expr choreo_ctx global_ctx expected_typ c2
      | _ -> false)
-  | Ast.Choreo.Let (_, _, _) -> Ast.Choreo.TUnit m = expected_typ
-  | _ -> false
+  | Ast.Choreo.Let (_stmt_block, _e, _) -> false
+  | Ast.Choreo.FunDef (_pattern_ls, _e, _) -> false
+  | Ast.Choreo.FunApp (_e1, _e2, _) -> false
 
 and typof_choreo_pattn _choreo_ctx _global_ctx = function
   | _ -> Ast.Choreo.TUnit m
