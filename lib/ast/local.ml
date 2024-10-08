@@ -62,7 +62,7 @@ type expr =
   | Var of var_id * Metainfo.metainfo
   | UnOp of un_op * expr * Metainfo.metainfo
   | BinOp of expr * bin_op * expr * Metainfo.metainfo
-  | Let of var_id * expr * expr * Metainfo.metainfo
+  | Let of var_id * typ * expr * expr * Metainfo.metainfo
   | Pair of expr * expr * Metainfo.metainfo
   | Fst of expr * Metainfo.metainfo
   | Snd of expr * Metainfo.metainfo
@@ -110,7 +110,7 @@ let metainfo_of_LocExpr = function
   | Var (_, m) -> m
   | UnOp (_, _, m) -> m
   | BinOp (_, _, _, m) -> m
-  | Let (_, _, _, m) -> m
+  | Let (_, _, _, _, m) -> m
   | Pair (_, _, m) -> m
   | Fst (_, m) -> m
   | Snd (_, m) -> m

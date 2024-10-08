@@ -29,7 +29,8 @@ let rec jsonify_local_expr (e : Ast.Local.expr) =
             ; "choreo_e2", jsonify_local_expr e2
             ] )
       ]
-  | Let (VarId (id, _), e1, e2, _) ->
+    (*the Let is changed to take in the additional type!!!!!!!!!!!!!!!!!!!!!!!!!*)
+  | Let (VarId (id, _), _, e1, e2, _) ->
     `Assoc
       [ ( "Let"
         , `Assoc

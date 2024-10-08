@@ -95,8 +95,8 @@ and extract_local_ctx global_ctx loc_id =
 let rec check_local_expr ctx expected_typ = function
   | Ast.Local.Unit _ -> expected_typ = Ast.Local.TUnit m
   | Ast.Local.Val (v, _) -> expected_typ = typeof_Val v
-  | Ast.Local.Var (v, _) ->
-    (match ctx_lookup ctx v with
+  | Ast.Local.Var (VarId (var_name, _), _) ->
+    (match ctx_lookup ctx var_name with
      | Ok t -> expected_typ = t
      | _ -> false)
   | Ast.Local.UnOp (op, e, _) ->
@@ -124,12 +124,75 @@ let rec check_local_expr ctx expected_typ = function
        check_local_expr ctx (Ast.Local.TBool m) e1
        && check_local_expr ctx (Ast.Local.TBool m) e2
        && expected_typ = Ast.Local.TBool m)
-  | Ast.Local.Let (Ast.Local.VarId (var_name, _), e1, e2, _) ->
-    check_local_expr (add_binding ctx var_name (typeof_Val e1 m)) expected_typ e2
-  | _ -> false
+  | Ast.Local.Let (Ast.Local.VarId (var_name, _), local_type, e1, e2, _) ->
+    (match check_local_expr ctx local_type e1 with
+     | true ->
+       let ctx' = add_binding ctx var_name local_type in
+       check_local_expr ctx' expected_typ e2
+     | _ -> false)
+  | Ast.Local.Pair (e1, e2, _) ->
+    (match expected_typ with
+     | Ast.Local.TProd (t1, t2, _) ->
+       check_local_expr ctx t1 e1 && check_local_expr ctx t2 e2
+     | _ -> false)
+  | Ast.Local.Fst (e, _) ->
+    (match expected_typ with
+     | Ast.Local.TProd (t1, _, _) -> check_local_expr ctx t1 e
+     | _ -> false)
+  | Ast.Local.Snd (e, _) ->
+    (match expected_typ with
+     | Ast.Local.TProd (_, t2, _) -> check_local_expr ctx t2 e
+     | _ -> false)
+  | Ast.Local.Left (e, _) ->
+    (match expected_typ with
+     | Ast.Local.TSum (t1, _, _) -> check_local_expr ctx t1 e
+     | _ -> false)
+  | Ast.Local.Right (e, _) ->
+    (match expected_typ with
+     | Ast.Local.TSum (_, t2, _) -> check_local_expr ctx t2 e
+     | _ -> false)
+  | Ast.Local.Match (e, cases, _) ->
+    (match cases with
+     | [] -> failwith "Empty cases"
+     | (fst_pattern, fst_expr) :: rest_cases ->
+       if not (check_local_expr ctx expected_typ e)
+       then false
+       else (
+         let fst_pattern_valid = check_local_pattern ctx expected_typ fst_pattern in
+         let fst_expr_valid = check_local_expr ctx expected_typ fst_expr in
+         if (not fst_pattern_valid) || not fst_expr_valid
+         then false
+         else
+           List.for_all
+             (fun (pattern, expr) ->
+               let pattern_valid = check_local_pattern ctx expected_typ pattern in
+               let expr_valid = check_local_expr ctx expected_typ expr in
+               pattern_valid && expr_valid)
+             rest_cases))
 
 and typeof_Val = function
   | Int _ -> Ast.Local.TInt m
   | Bool _ -> Ast.Local.TBool m
   | String _ -> Ast.Local.TString m
+
+and check_local_pattern ctx expected_typ = function
+  | Ast.Local.Default _ -> true
+  | Ast.Local.Val (v, _) -> expected_typ = typeof_Val v
+  | Ast.Local.Var (VarId (var_name, _), _) ->
+    (match ctx_lookup ctx var_name with
+     | Ok t -> expected_typ = t
+     | _ -> false)
+  | Ast.Local.Pair (p1, p2, _) ->
+    (match expected_typ with
+     | Ast.Local.TProd (t1, t2, _) ->
+       check_local_pattern ctx t1 p1 && check_local_pattern ctx t2 p2
+     | _ -> false)
+  | Ast.Local.Left (p, _) ->
+    (match expected_typ with
+     | Ast.Local.TSum (t1, _, _) -> check_local_pattern ctx t1 p
+     | _ -> false)
+  | Ast.Local.Right (p, _) ->
+    (match expected_typ with
+     | Ast.Local.TSum (_, t2, _) -> check_local_pattern ctx t2 p
+     | _ -> false)
 ;;
