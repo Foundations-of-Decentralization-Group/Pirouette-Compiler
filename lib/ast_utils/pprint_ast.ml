@@ -2,6 +2,53 @@ open Format
 
 (* ============================== Local ============================== *)
 
+(* unit
+   int
+   string
+   bool
+   type * type
+   type + type
+*)
+let rec pprint_local_type ppf (typ : Ast.Local.typ) =
+  match typ with
+  | TUnit -> fprintf ppf "@[<h>unit@]"
+  | TInt -> fprintf ppf "@[<h>int@]"
+  | TString -> fprintf ppf "@[<h>string@]"
+  | TBool -> fprintf ppf "@[<h>bool@]"
+  | TProd (t1, t2) ->
+    fprintf ppf "@[<h>(%a) * (%a)@]" pprint_local_type t1 pprint_local_type t2
+  | TSum (t1, t2) ->
+    fprintf ppf "@[<h>(%a) + (%a)@]" pprint_local_type t1 pprint_local_type t2
+;;
+
+(* _
+   value
+   id
+   loc.(local_expr)
+   (pattern1), (pattern2)
+   loc.(local_pattern)
+   left (pattern)
+   right (pattern)
+*)
+let rec pprint_local_pattern ppf (pat : Ast.Local.pattern) =
+  match pat with
+  | Default -> fprintf ppf "@[<h>_@]"
+  | Val v ->
+    fprintf
+      ppf
+      "@[<h>%a@]"
+      (fun ppf -> function
+        | Ast.Local.Int i -> fprintf ppf "%d" i
+        | String s -> fprintf ppf "%s" s
+        | Bool b -> fprintf ppf "%b" b)
+      v
+  | Var (VarId id) -> fprintf ppf "@[<h>%s@]" id
+  | Pair (p1, p2) ->
+    fprintf ppf "@[<hv>(%a),@ (%a)@]" pprint_local_pattern p1 pprint_local_pattern p2
+  | Left p -> fprintf ppf "@[<hv2>left@ (%a)@]" pprint_local_pattern p
+  | Right p -> fprintf ppf "@[<hv2>right@ (%a)@]" pprint_local_pattern p
+;;
+
 (* ()
    value
    id
@@ -17,8 +64,8 @@ open Format
    | case2
    | ...
 *)
-let rec pprint_local_expr ppf (e : Ast.Local.expr) =
-  match e with
+let rec pprint_local_expr ppf (expr : Ast.Local.expr) =
+  match expr with
   | Unit -> fprintf ppf "@[<h>()@]"
   | Val v ->
     fprintf
@@ -76,6 +123,10 @@ let rec pprint_local_expr ppf (e : Ast.Local.expr) =
   | Left e -> fprintf ppf "@[<hv2>left (%a)@]" pprint_local_expr e
   | Right e -> fprintf ppf "@[<hv2>right (%a)@]" pprint_local_expr e
   | Match (e, cases) ->
+    let[@inline] pprint_local_case ppf (p, e) =
+      (* pattern -> expr *)
+      fprintf ppf "@[<hv2>%a ->@ %a@]" pprint_local_pattern p pprint_local_expr e
+    in
     fprintf
       ppf
       "@[<hv>match (%a)@ with@[<v2>@ | %a@]@]"
@@ -83,13 +134,30 @@ let rec pprint_local_expr ppf (e : Ast.Local.expr) =
       e
       (pp_print_list ~pp_sep:(fun ppf () -> fprintf ppf "@ | ") pprint_local_case)
       cases
+;;
 
-(* pattern -> expr *)
-and pprint_local_case ppf (p, e) =
-  fprintf ppf "@[<hv2>%a ->@ %a@]" pprint_local_pattern p pprint_local_expr e
+(* ============================== Choreo ============================== *)
+
+(*
+   unit
+   loc.(local_type)
+   type -> type
+   type * type
+   type + type
+*)
+let rec pprint_choreo_type ppf (typ : Ast.Choreo.typ) =
+  match typ with
+  | TUnit -> fprintf ppf "@[<h>unit@]"
+  | TLoc (LocId loc, t) -> fprintf ppf "@[<h>%s.(%a)@]" loc pprint_local_type t
+  | TMap (t1, t2) ->
+    fprintf ppf "@[<h>(%a) -> (%a)@]" pprint_choreo_type t1 pprint_choreo_type t2
+  | TProd (t1, t2) ->
+    fprintf ppf "@[<h>(%a) * (%a)@]" pprint_choreo_type t1 pprint_choreo_type t2
+  | TSum (t1, t2) ->
+    fprintf ppf "@[<h>(%a) + (%a)@]" pprint_choreo_type t1 pprint_choreo_type t2
+;;
 
 (* _
-   value
    id
    loc.(local_expr)
    (pattern1), (pattern2)
@@ -97,43 +165,16 @@ and pprint_local_case ppf (p, e) =
    left (pattern)
    right (pattern)
 *)
-and pprint_local_pattern ppf = function
+let rec pprint_choreo_pattern ppf (pat : Ast.Choreo.pattern) =
+  match pat with
   | Default -> fprintf ppf "@[<h>_@]"
-  | Val v ->
-    fprintf
-      ppf
-      "@[<h>%a@]"
-      (fun ppf -> function
-        | Ast.Local.Int i -> fprintf ppf "%d" i
-        | String s -> fprintf ppf "%s" s
-        | Bool b -> fprintf ppf "%b" b)
-      v
   | Var (VarId id) -> fprintf ppf "@[<h>%s@]" id
+  | LocPatt (LocId loc, p) -> fprintf ppf "@[<h>%s.(%a)@]" loc pprint_local_pattern p
   | Pair (p1, p2) ->
-    fprintf ppf "@[<hv>(%a),@ (%a)@]" pprint_local_pattern p1 pprint_local_pattern p2
-  | Left p -> fprintf ppf "@[<hv2>left@ (%a)@]" pprint_local_pattern p
-  | Right p -> fprintf ppf "@[<hv2>right@ (%a)@]" pprint_local_pattern p
-
-(* unit
-   int
-   string
-   bool
-   type * type
-   type + type
-*)
-and pprint_local_type ppf (t : Ast.Local.typ) =
-  match t with
-  | TUnit -> fprintf ppf "@[<h>unit@]"
-  | TInt -> fprintf ppf "@[<h>int@]"
-  | TString -> fprintf ppf "@[<h>string@]"
-  | TBool -> fprintf ppf "@[<h>bool@]"
-  | TProd (t1, t2) ->
-    fprintf ppf "@[<h>(%a) * (%a)@]" pprint_local_type t1 pprint_local_type t2
-  | TSum (t1, t2) ->
-    fprintf ppf "@[<h>(%a) + (%a)@]" pprint_local_type t1 pprint_local_type t2
+    fprintf ppf "@[<hv>(%a),@ (%a)@]" pprint_choreo_pattern p1 pprint_choreo_pattern p2
+  | Left p -> fprintf ppf "@[<hv2>left@ (%a)@]" pprint_choreo_pattern p
+  | Right p -> fprintf ppf "@[<hv2>right@ (%a)@]" pprint_choreo_pattern p
 ;;
-
-(* ============================== Choreo ============================== *)
 
 (* {
       stmt1
@@ -142,7 +183,7 @@ and pprint_local_type ppf (t : Ast.Local.typ) =
       ...
     }
 *)
-let rec pprint_choreo_stmt_block ppf (stmts : Ast.Choreo.stmt_block) =
+let[@specialise] rec pprint_choreo_stmt_block ppf (stmts : Ast.Choreo.stmt_block) =
   fprintf ppf "@[<v>(@[<v1>@,%a@]@,)@]" (pp_print_list pprint_choreo_stmt) stmts
 
 (* (choreo_pattern) : choreo_type
@@ -224,6 +265,10 @@ and pprint_choreo_expr ppf = function
   | Pair (e1, e2) ->
     fprintf ppf "@[<hv>(%a),@ (%a)@]" pprint_choreo_expr e1 pprint_choreo_expr e2
   | Match (e, cases) ->
+    let[@inline] pprint_choreo_case ppf (p, e) =
+      (* pattern -> expr *)
+      fprintf ppf "@[<hv2>%a ->@ %a@]" pprint_choreo_pattern p pprint_choreo_expr e
+    in
     fprintf
       ppf
       "@[<v>match (%a)@ with@ | %a@]"
@@ -231,28 +276,9 @@ and pprint_choreo_expr ppf = function
       e
       (pp_print_list ~pp_sep:(fun ppf () -> fprintf ppf "@ | ") pprint_choreo_case)
       cases
+;;
 
-(* pattern -> expr *)
-and pprint_choreo_case ppf (p, e) =
-  fprintf ppf "@[<hv2>%a ->@ %a@]" pprint_choreo_pattern p pprint_choreo_expr e
-
-(* _
-   id
-   loc.(local_expr)
-   (pattern1), (pattern2)
-   loc.(local_pattern)
-   left (pattern)
-   right (pattern)
-*)
-and pprint_choreo_pattern ppf = function
-  | Default -> fprintf ppf "@[<h>_@]"
-  | Var (VarId id) -> fprintf ppf "@[<h>%s@]" id
-  | LocPatt (LocId loc, p) -> fprintf ppf "@[<h>%s.(%a)@]" loc pprint_local_pattern p
-  | Pair (p1, p2) ->
-    fprintf ppf "@[<hv>(%a),@ (%a)@]" pprint_choreo_pattern p1 pprint_choreo_pattern p2
-  | Left p -> fprintf ppf "@[<hv2>left@ (%a)@]" pprint_choreo_pattern p
-  | Right p -> fprintf ppf "@[<hv2>right@ (%a)@]" pprint_choreo_pattern p
-
+(* ============================== Net ============================== *)
 (*
    unit
    loc.(local_type)
@@ -260,20 +286,19 @@ and pprint_choreo_pattern ppf = function
    type * type
    type + type
 *)
-and pprint_choreo_type ppf = function
+let rec pprint_net_type ppf (typ : Ast.Net.typ) =
+  match typ with
   | TUnit -> fprintf ppf "@[<h>unit@]"
-  | TLoc (LocId loc, t) -> fprintf ppf "@[<h>%s.(%a)@]" loc pprint_local_type t
+  | TLoc t -> fprintf ppf "@[<h>%a@]" pprint_local_type t
   | TMap (t1, t2) ->
-    fprintf ppf "@[<h>(%a) -> (%a)@]" pprint_choreo_type t1 pprint_choreo_type t2
+    fprintf ppf "@[<h>(%a) -> (%a)@]" pprint_net_type t1 pprint_net_type t2
   | TProd (t1, t2) ->
-    fprintf ppf "@[<h>(%a) * (%a)@]" pprint_choreo_type t1 pprint_choreo_type t2
+    fprintf ppf "@[<h>(%a) * (%a)@]" pprint_net_type t1 pprint_net_type t2
   | TSum (t1, t2) ->
-    fprintf ppf "@[<h>(%a) + (%a)@]" pprint_choreo_type t1 pprint_choreo_type t2
+    fprintf ppf "@[<h>(%a) + (%a)@]" pprint_net_type t1 pprint_net_type t2
 ;;
 
-(* ============================== Net ============================== *)
-
-let rec pprint_net_stmt_block ppf (stmts : Ast.Net.stmt_block) =
+let[@specialise] rec pprint_net_stmt_block ppf (stmts : Ast.Net.stmt_block) =
   fprintf ppf "@[<v>(@[<v1>@,%a@]@,)@]" (pp_print_list pprint_net_stmt) stmts
 
 and pprint_net_stmt ppf = function
@@ -329,6 +354,9 @@ and pprint_net_expr ppf = function
   | Pair (e1, e2) ->
     fprintf ppf "@[<hv>(%a),@ (%a)@]" pprint_net_expr e1 pprint_net_expr e2
   | Match (e, cases) ->
+    let[@inline] pprint_net_case ppf (p, e) =
+      fprintf ppf "@[<hv2>%a ->@ %a@]" pprint_local_pattern p pprint_net_expr e
+    in
     fprintf
       ppf
       "@[<hv>match (%a)@ with@[<v2>@ | %a@]@]"
@@ -339,26 +367,13 @@ and pprint_net_expr ppf = function
   | ChooseFor (LabelId id, LocId locid, e) ->
     fprintf ppf "@[<hv>choose %s for %s;@ %a@]" id locid pprint_net_expr e
   | AllowChoice (LocId loc, choices) ->
+    let[@inline] pprint_net_choice ppf (Ast.Local.LabelId id, e) =
+      fprintf ppf "@[<hv2>%s ->@ %a@]" id pprint_net_expr e
+    in
     fprintf
       ppf
       "@[<v>allow %s choice@ | %a@]"
       loc
       (pp_print_list ~pp_sep:(fun ppf () -> fprintf ppf "@ | ") pprint_net_choice)
       choices
-
-and pprint_net_case ppf (p, e) =
-  fprintf ppf "@[<hv2>%a ->@ %a@]" pprint_local_pattern p pprint_net_expr e
-
-and pprint_net_choice ppf (LabelId id, e) =
-  fprintf ppf "@[<hv2>%s ->@ %a@]" id pprint_net_expr e
-
-and pprint_net_type ppf = function
-  | TUnit -> fprintf ppf "@[<h>unit@]"
-  | TLoc t -> fprintf ppf "@[<h>%a@]" pprint_local_type t
-  | TMap (t1, t2) ->
-    fprintf ppf "@[<h>(%a) -> (%a)@]" pprint_net_type t1 pprint_net_type t2
-  | TProd (t1, t2) ->
-    fprintf ppf "@[<h>(%a) * (%a)@]" pprint_net_type t1 pprint_net_type t2
-  | TSum (t1, t2) ->
-    fprintf ppf "@[<h>(%a) + (%a)@]" pprint_net_type t1 pprint_net_type t2
 ;;

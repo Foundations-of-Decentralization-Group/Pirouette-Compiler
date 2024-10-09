@@ -1,7 +1,58 @@
 (* ============================== Local ============================== *)
 
-let rec jsonify_local_expr (e : Ast.Local.expr) =
-  match e with
+let jsonify_un_op (op : Ast.Local.un_op) =
+  match op with
+  | Not -> `String "Not"
+  | Neg -> `String "Neg"
+
+and jsonify_bin_op (op : Ast.Local.bin_op) =
+  match op with
+  | Plus -> `String "Plus"
+  | Minus -> `String "Minus"
+  | Times -> `String "Times"
+  | Div -> `String "Div"
+  | And -> `String "And"
+  | Or -> `String "Or"
+  | Eq -> `String "Eq"
+  | Neq -> `String "Neq"
+  | Lt -> `String "Lt"
+  | Leq -> `String "Leq"
+  | Gt -> `String "Gt"
+  | Geq -> `String "Geq"
+;;
+
+let rec jsonify_local_type (typ : Ast.Local.typ) =
+  match typ with
+  | TUnit -> `String "TUnit"
+  | TInt -> `String "TInt"
+  | TString -> `String "TString"
+  | TBool -> `String "TBool"
+  | TProd (t1, t2) ->
+    `Assoc [ "TProd", `List [ jsonify_local_type t1; jsonify_local_type t2 ] ]
+  | TSum (t1, t2) ->
+    `Assoc [ "TSum", `List [ jsonify_local_type t1; jsonify_local_type t2 ] ]
+;;
+
+let rec jsonify_local_pattern (pat : Ast.Local.pattern) =
+  match pat with
+  | Default -> `String "Default"
+  | Val v ->
+    `Assoc
+      [ ( "Val"
+        , match v with
+          | Int i -> `Int i
+          | String s -> `String s
+          | Bool b -> `Bool b )
+      ]
+  | Var (VarId id) -> `Assoc [ "Var", `String id ]
+  | Left p -> `Assoc [ "Left", jsonify_local_pattern p ]
+  | Right p -> `Assoc [ "Right", jsonify_local_pattern p ]
+  | Pair (p1, p2) ->
+    `Assoc [ "Pair", `List [ jsonify_local_pattern p1; jsonify_local_pattern p2 ] ]
+;;
+
+let rec jsonify_local_expr (expr : Ast.Local.expr) =
+  match expr with
   | Unit -> `String "Unit"
   | Val v ->
     `Assoc
@@ -43,65 +94,49 @@ let rec jsonify_local_expr (e : Ast.Local.expr) =
       [ ( "Match"
         , `Assoc
             [ "local_expr", jsonify_local_expr e
-            ; "cases", `List (List.map jsonify_local_case cases)
+            ; ( "cases"
+              , `List
+                  (List.map
+                     (fun (p, e) ->
+                       `Assoc
+                         [ "local_patt", jsonify_local_pattern p
+                         ; "local_expr", jsonify_local_expr e
+                         ])
+                     cases) )
             ] )
       ]
-
-and jsonify_local_case (p, e) =
-  `Assoc [ "local_patt", jsonify_local_pattern p; "local_expr", jsonify_local_expr e ]
-
-and jsonify_local_pattern = function
-  | Default -> `String "Default"
-  | Val v ->
-    `Assoc
-      [ ( "Val"
-        , match v with
-          | Int i -> `Int i
-          | String s -> `String s
-          | Bool b -> `Bool b )
-      ]
-  | Var (VarId id) -> `Assoc [ "Var", `String id ]
-  | Left p -> `Assoc [ "Left", jsonify_local_pattern p ]
-  | Right p -> `Assoc [ "Right", jsonify_local_pattern p ]
-  | Pair (p1, p2) ->
-    `Assoc [ "Pair", `List [ jsonify_local_pattern p1; jsonify_local_pattern p2 ] ]
-
-and jsonify_local_type (t : Ast.Local.typ) =
-  match t with
-  | TUnit -> `String "TUnit"
-  | TInt -> `String "TInt"
-  | TString -> `String "TString"
-  | TBool -> `String "TBool"
-  | TProd (t1, t2) ->
-    `Assoc [ "TProd", `List [ jsonify_local_type t1; jsonify_local_type t2 ] ]
-  | TSum (t1, t2) ->
-    `Assoc [ "TSum", `List [ jsonify_local_type t1; jsonify_local_type t2 ] ]
-
-and jsonify_un_op = function
-  | Not -> `String "Not"
-  | Neg -> `String "Neg"
-
-and jsonify_bin_op = function
-  | Plus -> `String "Plus"
-  | Minus -> `String "Minus"
-  | Times -> `String "Times"
-  | Div -> `String "Div"
-  | And -> `String "And"
-  | Or -> `String "Or"
-  | Eq -> `String "Eq"
-  | Neq -> `String "Neq"
-  | Lt -> `String "Lt"
-  | Leq -> `String "Leq"
-  | Gt -> `String "Gt"
-  | Geq -> `String "Geq"
 ;;
 
 (* ============================== Choreo ============================== *)
 
-let rec jsonify_choreo_stmt_block (stmts : Ast.Choreo.stmt_block) =
-  `List (List.map jsonify_choreo_stmt stmts)
+let rec jsonify_choreo_type (typ : Ast.Choreo.typ) =
+  match typ with
+  | TUnit -> `String "TUnit"
+  | TLoc (LocId loc, t) ->
+    `Assoc [ "TLoc", `Assoc [ "loc", `String loc; "local_type", jsonify_local_type t ] ]
+  | TMap (t1, t2) ->
+    `Assoc [ "TMap", `List [ jsonify_choreo_type t1; jsonify_choreo_type t2 ] ]
+  | TProd (t1, t2) ->
+    `Assoc [ "TProd", `List [ jsonify_choreo_type t1; jsonify_choreo_type t2 ] ]
+  | TSum (t1, t2) ->
+    `Assoc [ "TSum", `List [ jsonify_choreo_type t1; jsonify_choreo_type t2 ] ]
+;;
 
-and jsonify_choreo_stmt = function
+let rec jsonify_choreo_pattern (pat : Ast.Choreo.pattern) =
+  match pat with
+  | Default -> `String "Default"
+  | Var (VarId id) -> `Assoc [ "Var", `String id ]
+  | Left p -> `Assoc [ "Left", jsonify_choreo_pattern p ]
+  | Right p -> `Assoc [ "Right", jsonify_choreo_pattern p ]
+  | Pair (p1, p2) ->
+    `Assoc [ "Pair", `List [ jsonify_choreo_pattern p1; jsonify_choreo_pattern p2 ] ]
+  | LocPatt (LocId loc, p) ->
+    `Assoc
+      [ "LocPatt", `Assoc [ "loc", `String loc; "local_patt", jsonify_local_pattern p ] ]
+;;
+
+let rec jsonify_choreo_stmt (stmt : Ast.Choreo.stmt) =
+  match stmt with
   | Decl (p, t) ->
     `Assoc
       [ ( "Decl"
@@ -122,7 +157,8 @@ and jsonify_choreo_stmt = function
     `Assoc
       [ "TypeDecl", `Assoc [ "id", `String id; "choreo_type", jsonify_choreo_type t ] ]
 
-and jsonify_choreo_expr = function
+and jsonify_choreo_expr (expr : Ast.Choreo.expr) =
+  match expr with
   | Unit -> `String "Unit"
   | Var (VarId id) -> `Assoc [ "Var", `String id ]
   | Fst e -> `Assoc [ "Fst", jsonify_choreo_expr e ]
@@ -183,6 +219,12 @@ and jsonify_choreo_expr = function
   | Pair (e1, e2) ->
     `Assoc [ "Pair", `List [ jsonify_choreo_expr e1; jsonify_choreo_expr e2 ] ]
   | Match (e, cases) ->
+    let[@inline] jsonify_choreo_case (p, e) =
+      `Assoc
+        [ "choreo_pattern", jsonify_choreo_pattern p
+        ; "choreo_expr", jsonify_choreo_expr e
+        ]
+    in
     `Assoc
       [ ( "Match"
         , `Assoc
@@ -190,40 +232,26 @@ and jsonify_choreo_expr = function
             ; "cases", `List (List.map jsonify_choreo_case cases)
             ] )
       ]
+;;
 
-and jsonify_choreo_case (p, e) =
-  `Assoc
-    [ "choreo_pattern", jsonify_choreo_pattern p; "choreo_expr", jsonify_choreo_expr e ]
-
-and jsonify_choreo_pattern = function
-  | Default -> `String "Default"
-  | Var (VarId id) -> `Assoc [ "Var", `String id ]
-  | Left p -> `Assoc [ "Left", jsonify_choreo_pattern p ]
-  | Right p -> `Assoc [ "Right", jsonify_choreo_pattern p ]
-  | Pair (p1, p2) ->
-    `Assoc [ "Pair", `List [ jsonify_choreo_pattern p1; jsonify_choreo_pattern p2 ] ]
-  | LocPatt (LocId loc, p) ->
-    `Assoc
-      [ "LocPatt", `Assoc [ "loc", `String loc; "local_patt", jsonify_local_pattern p ] ]
-
-and jsonify_choreo_type = function
-  | TUnit -> `String "TUnit"
-  | TLoc (LocId loc, t) ->
-    `Assoc [ "TLoc", `Assoc [ "loc", `String loc; "local_type", jsonify_local_type t ] ]
-  | TMap (t1, t2) ->
-    `Assoc [ "TMap", `List [ jsonify_choreo_type t1; jsonify_choreo_type t2 ] ]
-  | TProd (t1, t2) ->
-    `Assoc [ "TProd", `List [ jsonify_choreo_type t1; jsonify_choreo_type t2 ] ]
-  | TSum (t1, t2) ->
-    `Assoc [ "TSum", `List [ jsonify_choreo_type t1; jsonify_choreo_type t2 ] ]
+let[@inline] jsonify_choreo_stmt_block (stmts : Ast.Choreo.stmt_block) =
+  `List (List.map jsonify_choreo_stmt stmts)
 ;;
 
 (* ============================== Net ============================== *)
 
-let rec jsonify_net_stmt_block (stmts : Ast.Net.stmt_block) =
-  `List (List.map jsonify_net_stmt stmts)
+let rec jsonify_net_type (typ : Ast.Net.typ) =
+  match typ with
+  | TUnit -> `String "TUnit"
+  | TLoc t -> `Assoc [ "TLoc", jsonify_local_type t ]
+  | TMap (t1, t2) -> `Assoc [ "TMap", `List [ jsonify_net_type t1; jsonify_net_type t2 ] ]
+  | TProd (t1, t2) ->
+    `Assoc [ "TProd", `List [ jsonify_net_type t1; jsonify_net_type t2 ] ]
+  | TSum (t1, t2) -> `Assoc [ "TSum", `List [ jsonify_net_type t1; jsonify_net_type t2 ] ]
+;;
 
-and jsonify_net_stmt = function
+let rec jsonify_net_stmt (stmt : Ast.Net.stmt) =
+  match stmt with
   | Decl (p, t) ->
     `Assoc
       [ ( "Decl"
@@ -241,10 +269,8 @@ and jsonify_net_stmt = function
   | TypeDecl (TypId id, t) ->
     `Assoc [ "TypeDecl", `Assoc [ "id", `String id; "net_type", jsonify_net_type t ] ]
 
-and jsonify_net_case (p, e) =
-  `Assoc [ "net_pattern", jsonify_local_pattern p; "net_expr", jsonify_net_expr e ]
-
-and jsonify_net_expr = function
+and jsonify_net_expr (expr : Ast.Net.expr) =
+  match expr with
   | Unit -> `String "Unit"
   | Var (VarId id) -> `Assoc [ "Var", `String id ]
   | Ret e -> `Assoc [ "Ret", jsonify_local_expr e ]
@@ -304,6 +330,9 @@ and jsonify_net_expr = function
   | Left e -> `Assoc [ "Left", jsonify_net_expr e ]
   | Right e -> `Assoc [ "Right", jsonify_net_expr e ]
   | Match (e, cases) ->
+    let jsonify_net_case (p, e) =
+      `Assoc [ "net_pattern", jsonify_local_pattern p; "net_expr", jsonify_net_expr e ]
+    in
     `Assoc
       [ ( "Match"
         , `Assoc
@@ -311,12 +340,8 @@ and jsonify_net_expr = function
             ; "cases", `List (List.map jsonify_net_case cases)
             ] )
       ]
+;;
 
-and jsonify_net_type = function
-  | TUnit -> `String "TUnit"
-  | TLoc t -> `Assoc [ "TLoc", jsonify_local_type t ]
-  | TMap (t1, t2) -> `Assoc [ "TMap", `List [ jsonify_net_type t1; jsonify_net_type t2 ] ]
-  | TProd (t1, t2) ->
-    `Assoc [ "TProd", `List [ jsonify_net_type t1; jsonify_net_type t2 ] ]
-  | TSum (t1, t2) -> `Assoc [ "TSum", `List [ jsonify_net_type t1; jsonify_net_type t2 ] ]
+let jsonify_net_stmt_block (stmts : Ast.Net.stmt_block) =
+  `List (List.map jsonify_net_stmt stmts)
 ;;
