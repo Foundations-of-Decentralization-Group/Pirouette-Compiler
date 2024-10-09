@@ -1,4 +1,5 @@
 (lang dune 3.14)
+
 (using menhir 3.0)
 
 (name pirc)
@@ -20,7 +21,14 @@
  (name pirc)
  (synopsis "Pirouette Compiler")
  (description "Higher-order typed functional choreographies")
- (depends ocaml dune menhir ounit2 yojson)
+ (depends
+  (ocaml
+   (>= 5.0.0))
+  dune
+  menhir
+  ounit2
+  ppxlib
+  yojson)
  (allow_empty))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
