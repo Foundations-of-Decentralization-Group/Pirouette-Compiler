@@ -29,12 +29,22 @@ let load_config filename =
     Lwt.return (parse_config yaml)
   )
 
+let contains_substring str sub =
+  let len = String.length str in
+  let sublen = String.length sub in
+  let rec aux i =
+    if i > len - sublen then false
+    else if String.sub str i sublen = sub then true
+    else aux (i + 1)
+  in
+  aux 0
+
 let check_locations config code =
   let defined_locations = List.filter (fun loc ->
-    String.contains code loc.location.[0]
+    contains_substring code loc.location
   ) config.locations in
   let undefined_locations = List.filter (fun loc ->
-    not (String.contains code loc.location.[0])
+    not (contains_substring code loc.location)
   ) config.locations in
   (defined_locations, undefined_locations)
 

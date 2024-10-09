@@ -1,5 +1,7 @@
 locations:
-  - location: R
-    http_address: http://localhost:8080/R
+  - location: BOB
+    http_address: http://localhost:8080/BOB
   - location: E
     http_address: http://localhost:8081/E
+  - location: S
+    http_address: http://localhost:8082/S
