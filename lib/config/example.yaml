@@ -1,0 +1,5 @@
+locations:
+  - location: R
+    http_address: http://localhost:8080/R
+  - location: E
+    http_address: http://localhost:8081/E
