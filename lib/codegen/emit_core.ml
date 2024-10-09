@@ -6,8 +6,8 @@ module type Msg_intf = Msg_intf.M
 
 let loc = { !Ast_helper.default_loc with loc_ghost = true }
 
-let rec emit_local_pexp (e : Local.expr) =
-  match e with
+let rec emit_local_pexp (expr : Local.expr) =
+  match expr with
   | Unit -> Ast_builder.Default.eunit ~loc
   | Val (Int i) -> Ast_builder.Default.eint ~loc i
   | Val (String s) -> Ast_builder.Default.estring ~loc s
@@ -62,8 +62,8 @@ let rec emit_local_pexp (e : Local.expr) =
     in
     Ast_builder.Default.pexp_match ~loc (emit_local_pexp e) cases
 
-and emit_local_ppat (p : Local.pattern) =
-  match p with
+and emit_local_ppat (pat : Local.pattern) =
+  match pat with
   | Default -> Ast_builder.Default.ppat_any ~loc
   | Val (Int i) -> Ast_builder.Default.pint ~loc i
   | Val (String s) -> Ast_builder.Default.pstring ~loc s
@@ -77,21 +77,21 @@ and emit_local_ppat (p : Local.pattern) =
 let rec emit_net_fun_body
   ~(self_id : string)
   (module Msg : Msg_intf)
-  (ps : Local.pattern list)
-  (e : Net.expr)
+  (pats : Local.pattern list)
+  (expr : Net.expr)
   =
-  match ps with
-  | [] -> emit_net_pexp ~self_id (module Msg : Msg_intf) e
+  match pats with
+  | [] -> emit_net_pexp ~self_id (module Msg : Msg_intf) expr
   | f :: ps ->
     Ast_builder.Default.pexp_fun
       ~loc
       Nolabel
       None
       (emit_local_ppat f)
-      (emit_net_fun_body ~self_id (module Msg) ps e)
+      (emit_net_fun_body ~self_id (module Msg) ps expr)
 
-and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (s : Net.stmt) =
-  match s with
+and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (stmt : Net.stmt) =
+  match stmt with
   | Net.Assign (ps, e) ->
     (match ps with
      | [] -> failwith "Error: Empty pattern in assignment"
@@ -111,8 +111,8 @@ and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (s : Net.stmt) 
       ~pat:(Ast_builder.Default.punit ~loc)
       ~expr:(Ast_builder.Default.eunit ~loc)
 
-and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (e : Net.expr) =
-  match e with
+and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (expr : Net.expr) =
+  match expr with
   | Net.Unit -> Ast_builder.Default.eunit ~loc
   | Net.Var (VarId v) -> Ast_builder.Default.evar ~loc v
   | Net.Ret e -> emit_local_pexp e
