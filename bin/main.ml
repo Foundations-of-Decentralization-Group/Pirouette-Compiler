@@ -151,24 +151,33 @@ let rec check_local_expr ctx expected_typ = function
     (match expected_typ with
      | Ast.Local.TSum (_, t2, _) -> check_local_expr ctx t2 e
      | _ -> false)
-  | Ast.Local.Match (e, cases, _) ->
-    (match cases with
+  (* | Ast.Local.Match (e, cases, _) ->
+     (match cases with
      | [] -> failwith "Empty cases"
      | (fst_pattern, fst_expr) :: rest_cases ->
-       if not (check_local_expr ctx expected_typ e)
-       then false
-       else (
-         let fst_pattern_valid = check_local_pattern ctx expected_typ fst_pattern in
-         let fst_expr_valid = check_local_expr ctx expected_typ fst_expr in
-         if (not fst_pattern_valid) || not fst_expr_valid
-         then false
-         else
-           List.for_all
-             (fun (pattern, expr) ->
-               let pattern_valid = check_local_pattern ctx expected_typ pattern in
-               let expr_valid = check_local_expr ctx expected_typ expr in
-               pattern_valid && expr_valid)
-             rest_cases))
+     if not (check_local_expr ctx expected_typ e)
+     then false
+     else (
+     let fst_pattern_valid = check_local_pattern ctx expected_typ fst_pattern in
+     let fst_expr_valid = check_local_expr ctx expected_typ fst_expr in
+     if (not fst_pattern_valid) || not fst_expr_valid
+     then false
+     else
+     List.for_all
+     (fun (pattern, expr) ->
+     let pattern_valid = check_local_pattern ctx expected_typ pattern in
+     let expr_valid = check_local_expr ctx expected_typ expr in
+     pattern_valid && expr_valid)
+     rest_cases)) *)
+  | Ast.Local.Match (e, cases, _) ->
+    (match cases with
+     | [ (Ast.Local.Left (left_pattn, _), c1); (Ast.Local.Right (right_pattn, _), c2) ] ->
+       let left_pattn_typ = check_local_pattern ctx left_pattn in
+       let right_pattn_typ = check_local_pattern ctx right_pattn in
+       check_local_expr ctx (Ast.Local.TSum (left_pattn_typ, right_pattn_typ, m)) e
+       && check_local_expr ctx expected_typ c1
+       && check_local_expr ctx expected_typ c2
+     | _ -> false)
 
 and typeof_Val = function
   | Int _ -> Ast.Local.TInt m
