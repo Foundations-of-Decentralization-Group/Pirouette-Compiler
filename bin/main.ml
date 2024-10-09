@@ -264,24 +264,8 @@ let rec check_choreo_expr choreo_ctx global_ctx expected_typ = function
     (match expected_typ with
      | Ast.Choreo.TSum (_, t2, _) -> check_choreo_expr choreo_ctx global_ctx t2 e
      | _ -> false)
-  | Ast.Choreo.Match (e, ls, _) ->
-    (match ls with
-     | [ (Ast.Choreo.Left (left_pattn, _), c1); (Ast.Choreo.Right (right_pattn, _), c2) ]
-       ->
-       let left_pattn_typ = typof_choreo_pattn choreo_ctx global_ctx left_pattn in
-       let right_pattn_typ = typof_choreo_pattn choreo_ctx global_ctx right_pattn in
-       check_choreo_expr
-         choreo_ctx
-         global_ctx
-         (Ast.Choreo.TSum (left_pattn_typ, right_pattn_typ, m))
-         e
-       && check_choreo_expr choreo_ctx global_ctx expected_typ c1
-       && check_choreo_expr choreo_ctx global_ctx expected_typ c2
-     | _ -> false)
-  | Ast.Choreo.Let (_stmt_block, _e, _) -> false
-  | Ast.Choreo.FunDef (_pattern_ls, _e, _) -> false
-  | Ast.Choreo.FunApp (_e1, _e2, _) -> false
-
-and typof_choreo_pattn _choreo_ctx _global_ctx = function
-  | _ -> Ast.Choreo.TUnit m
+  | Ast.Choreo.Match (_e, _ls, _) -> true
+  | Ast.Choreo.Let (_stmt_block, _e, _) -> true
+  | Ast.Choreo.FunDef (_pattern_ls, _e, _) -> true
+  | Ast.Choreo.FunApp (_e1, _e2, _) -> true
 ;;
