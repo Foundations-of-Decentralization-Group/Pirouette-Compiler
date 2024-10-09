@@ -31,7 +31,7 @@ let () =
   let locs = Ast_utils.extract_locs program in
   List.iter
     (fun loc ->
-      let ir = Irgen.epp program loc in
+      let ir = Irgen.epp_choreo_to_net program loc in
       match !ast_dump_format with
       | "json" ->
         Ast_utils.jsonify_net_ast (open_out (!basename ^ "." ^ loc ^ ".json")) ir

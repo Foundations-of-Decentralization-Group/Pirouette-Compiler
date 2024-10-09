@@ -193,6 +193,6 @@ and merge_choice_into tbl (label, expr) =
   | None -> Hashtbl.add tbl label expr
 ;;
 
-let epp (Ast.Choreo.Prog prog) loc =
+let epp_choreo_to_net (Ast.Choreo.Prog prog) loc =
   Ast.Net.Prog (List.map (fun stmt -> epp_stmt stmt loc) prog)
 ;;
