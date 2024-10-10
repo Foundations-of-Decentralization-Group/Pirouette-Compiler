@@ -1,4 +1,5 @@
 open Lwt.Infix
+open Ast_utils
 
 type location_config = {
   location: string;
@@ -29,41 +30,38 @@ let load_config filename =
     Lwt.return (parse_config yaml)
   )
 
-let contains_substring str sub =
-  let len = String.length str in
-  let sublen = String.length sub in
-  let rec aux i =
-    if i > len - sublen then false
-    else if String.sub str i sublen = sub then true
-    else aux (i + 1)
-  in
-  aux 0
-
-let check_locations config code =
-  let defined_locations = List.filter (fun loc ->
-    contains_substring code loc.location
-  ) config.locations in
-  let undefined_locations = List.filter (fun loc ->
-    not (contains_substring code loc.location)
-  ) config.locations in
-  (defined_locations, undefined_locations)
+let check_locations config choreo_ast =
+  let extracted_locs = extract_locs choreo_ast in
+  let config_locs = List.map (fun loc_config -> loc_config.location) config.locations in
+  let undefined_locs = List.filter (fun loc -> not (List.mem loc config_locs)) extracted_locs in
+  if List.length undefined_locs > 0 then
+    Error (Printf.sprintf "Undefined locations found: %s" (String.concat ", " undefined_locs))
+  else
+    Ok (List.filter (fun loc_config -> List.mem loc_config.location extracted_locs) config.locations)
 
 let load_pir_code filename =
   Lwt_io.with_file ~mode:Input filename Lwt_io.read
 
 let () =
   let config_filename = "lib/config/example.yaml" in
-  let pir_filename = "./examples/1.pir" in
+  let pir_filename = "./examples/4.pir" in
   Lwt_main.run (
     Lwt.both (load_config config_filename) (load_pir_code pir_filename) >>= function
     | (Some config, pir_code) ->
-      let defined, undefined = check_locations config pir_code in
-      Lwt_io.printf "Defined locations:\n%s\n"
-        (String.concat "\n" (List.map (fun loc -> 
-          Printf.sprintf "%s (%s)" loc.location loc.http_address) defined)) >>= fun () ->
-      Lwt_io.printf "Undefined locations:\n%s\n"
-        (String.concat "\n" (List.map (fun loc -> 
-          Printf.sprintf "%s (%s)" loc.location loc.http_address) undefined))
+      let choreo_ast = Parsing.parse_program (Lexing.from_string pir_code) in
+      (match check_locations config choreo_ast with
+       | Error msg -> Lwt_io.printf "Error: %s\n" msg
+       | Ok defined_locations ->
+         let net_ir_code = List.map (fun loc_config ->
+           (loc_config.location, loc_config.http_address, Irgen.epp choreo_ast loc_config.location)
+         ) defined_locations in
+         Lwt_io.printf "Defined locations:\n%s\n"
+           (String.concat "\n" (List.map (fun loc -> 
+             Printf.sprintf "%s (%s)" loc.location loc.http_address) defined_locations)) >>= fun () ->
+         Lwt_io.printf "Generated NetIR code:\n%s\n"
+           (String.concat "\n" (List.map (fun (loc, addr, net_ir) ->
+             Printf.sprintf "Location: %s\nAddress: %s\nNetIR:\n%s\n"
+               loc addr (stringify_pprint_net_ast net_ir)) net_ir_code)))
     | (None, _) ->
       Lwt_io.printf "Failed to parse config file\n"
   )
