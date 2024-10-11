@@ -76,9 +76,9 @@ let choreo_pat_match =
 ;;
 
 let lcl_pat_match =
-  "y := P.let y := 3 in\n\nmatch (x,z) with\n\n|(true,_)->(1,\"None\");\n"
+  "y := P.let y : int := 3 in\n\nmatch (x,z) with\n\n|(true,_)->(1,\"None\");\n"
 ;;
 
 let lcl_pat_match_2 =
-  "y := P.let y := 3 in\n\nmatch (x,z) with\n\n|(left 1,right \"None\")->();\n"
+  "y := P.let y : int := 3 in\n\nmatch (x,z) with\n\n|(left 1,right \"None\")->();\n"
 ;;

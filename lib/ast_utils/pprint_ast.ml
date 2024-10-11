@@ -67,12 +67,13 @@ let rec pprint_local_expr ppf (e : Ast.Local.expr) =
        | Geq _ -> ">=")
       pprint_local_expr
       e2
-    (*the Let is changed to take in the additional type!!!!!!!!!!!!!!!!!!!!!!!!!*)
-  | Let (VarId (id, _), _, e1, e2, _) ->
+  | Let (VarId (id, _), typ, e1, e2, _) ->
     fprintf
       ppf
-      "@[<v2>let@ %s := %a@;<1 -2>in@ %a@]"
+      "@[<v2>let@ %s : %a := %a@;<1 -2>in@ %a@]"
       id
+      pprint_local_type
+      typ
       pprint_local_expr
       e1
       pprint_local_expr

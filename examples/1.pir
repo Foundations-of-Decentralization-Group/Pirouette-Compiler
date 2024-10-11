@@ -1,9 +1,6 @@
-_ := let R.x := [S] S.3 ~> R; in 
-  if R.(x>5) 
-  then R[L] ~> S;
-       S."Hello"
-  else R[R] ~> S;
-       S."Bye";
+y := P.let y : int := 3 in
+match (x,z) with
+|(true,_)->(1,"None");
 
 
 {-
