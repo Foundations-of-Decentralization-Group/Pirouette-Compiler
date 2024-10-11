@@ -25,7 +25,7 @@ module Msg_chan_intf : M = struct
     List.map
       (fun (a, b) ->
         [%stri
-          let [%p Ast_builder.Default.pvar ~loc (spf "%s_%s_chan" a b)] =
+          let [%p Ast_builder.Default.pvar ~loc (spf "chan_%s_%s" a b)] =
             Domainslib.Chan.make_bounded 0
           ;;])
       loc_pairs
@@ -35,12 +35,12 @@ module Msg_chan_intf : M = struct
     ignore dst;
     [%expr
       Domainslib.Chan.send
-        [%e Ast_builder.Default.evar ~loc (spf "%s_%s_chan" src dst)]
+        [%e Ast_builder.Default.evar ~loc (spf "chan_%s_%s" src dst)]
         [%e pexp]]
   ;;
 
   let emit_net_recv ~src ~dst =
     [%expr
-      Domainslib.Chan.recv [%e Ast_builder.Default.evar ~loc (spf "%s_%s_chan" src dst)]]
+      Domainslib.Chan.recv [%e Ast_builder.Default.evar ~loc (spf "chan_%s_%s" src dst)]]
   ;;
 end

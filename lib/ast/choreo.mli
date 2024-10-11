@@ -36,5 +36,3 @@ and stmt =
   | TypeDecl of Local.typ_id * typ
 
 and stmt_block = stmt list
-
-type program = Prog of stmt_block

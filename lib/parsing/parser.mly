@@ -23,7 +23,7 @@
 %token MATCH WITH
 %token EOF
 
-%type <Ast.Choreo.program> program
+%type <Ast.Choreo.stmt_block> program
 %type <Ast.Choreo.stmt_block> stmt_block
 %type <Ast.Choreo.stmt> stmt
 %type <Ast.Choreo.expr> choreo_expr
@@ -57,7 +57,7 @@
 %%
 
 program:
-  | stmt_block EOF { Prog $1 }
+  | stmt_block EOF { $1 }
 
 stmt_block:
   | list(stmt) { $1 }

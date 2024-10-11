@@ -201,6 +201,6 @@ and epp_choreo_expr (c : Ast.Choreo.expr) (loc : string) : Ast.Net.expr =
   | _ -> Unit
 ;;
 
-let epp_choreo_to_net (Ast.Choreo.Prog prog) loc =
-  Ast.Net.Prog (List.map (fun stmt -> epp_choreo_stmt stmt loc) prog)
+let epp_choreo_to_net stmt_block loc =
+  List.map (fun stmt -> epp_choreo_stmt stmt loc) stmt_block
 ;;

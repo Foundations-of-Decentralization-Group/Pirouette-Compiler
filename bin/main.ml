@@ -29,9 +29,9 @@ let () =
    | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (!basename ^ ".ast")) program
    | _ -> invalid_arg "Invalid ast-dump format");
   let locs = Ast_utils.extract_locs program in
-  List.iter
-    (fun loc ->
-      let ir = Netgen.epp_choreo_to_net program loc in
+  let netir_l = List.map (fun loc -> Netgen.epp_choreo_to_net program loc) locs in
+  List.iter2
+    (fun loc ir ->
       match !ast_dump_format with
       | "json" ->
         Ast_utils.jsonify_net_ast (open_out (!basename ^ "." ^ loc ^ ".json")) ir
@@ -39,4 +39,10 @@ let () =
         Ast_utils.pprint_net_ast (open_out (!basename ^ "." ^ loc ^ ".ast")) ir
       | _ -> invalid_arg "Invalid ast-dump format")
     locs
+    netir_l;
+  Codegen.Toplevel_shm.emit_toplevel_shm
+    (open_out (!basename ^ ".ml"))
+    (module Codegen.Msg_intf.Msg_chan_intf)
+    locs
+    netir_l
 ;;

@@ -1,1 +1,1 @@
-val parse_program : Lexing.lexbuf -> Ast.Choreo.program
+val parse_program : Lexing.lexbuf -> Ast.Choreo.stmt_block

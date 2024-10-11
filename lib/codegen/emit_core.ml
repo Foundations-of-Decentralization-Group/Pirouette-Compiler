@@ -108,7 +108,7 @@ and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (stmt : Net.stm
   | _ ->
     Ast_builder.Default.value_binding
       ~loc
-      ~pat:(Ast_builder.Default.punit ~loc)
+      ~pat:[%pat? _unit]
       ~expr:(Ast_builder.Default.eunit ~loc)
 
 and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (expr : Net.expr) =
@@ -159,10 +159,10 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (expr : Net.expr) 
       [%expr Marshal.to_string [%e emit_net_pexp ~self_id (module Msg) e] []]
   | Net.Recv (LocId src) ->
     [%expr Marshal.from_string [%e Msg.emit_net_recv ~src ~dst:self_id] 0]
-  | Net.ChooseFor (LabelId label, LocId src, e) ->
+  | Net.ChooseFor (LabelId label, LocId dst, e) ->
     Ast_builder.Default.esequence
       ~loc
-      [ Msg.emit_net_send ~src ~dst:self_id (Ast_builder.Default.estring ~loc label)
+      [ Msg.emit_net_send ~src:self_id ~dst (Ast_builder.Default.estring ~loc label)
       ; emit_net_pexp ~self_id (module Msg) e
       ]
   | Net.AllowChoice (LocId src, cases) ->

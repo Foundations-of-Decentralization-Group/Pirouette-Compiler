@@ -1,2 +1,14 @@
 *.ast
 *.json
+*.ml
+
+*.cmo
+*.cma
+*.cmi
+*.a
+*.o
+*.cmx
+*.cmxs
+*.cmxa
+*.exe
+*.out
