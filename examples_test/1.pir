@@ -1,3 +1,7 @@
+{- The goddamn thing is an anonymous function -}
+{- And this is the syntax for a comment -}
+
+
 _ := let R.x := [S] S.3 ~> R; in 
   if R.(x>5) 
   then R[L] ~> S;
@@ -9,6 +13,7 @@ _ := let R.x := [S] S.3 ~> R; in
 {-
 NetIR:
   S:
+  2+3
   send 3 to R
   Allow R choice
   | L => "Hello"

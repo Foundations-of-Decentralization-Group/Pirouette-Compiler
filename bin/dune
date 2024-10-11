@@ -1,4 +1,4 @@
 (executable
- (name main)
+ (name main_exec)
  (public_name pirc)
  (libraries ast parsing irgen))

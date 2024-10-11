@@ -1,0 +1,8 @@
+Canonical message example - if, loop.
+Common Subexpression Elimination across functions for different locations
+Loop invariant code
+Latency Hiding/Prefetching
+Exploiting Locality
+Cluster reads and writes? / Blocking sends
+Concurrency to fetch data?
+Commutative sending

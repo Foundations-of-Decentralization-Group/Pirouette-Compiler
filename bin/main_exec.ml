@@ -4,7 +4,7 @@ open Parsing.Interface
 open Irgen.Epp
 
 let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json>]"
-let ast_dump_format = ref "pprint"
+let ast_dump_format = ref ""
 let file_ic = ref None
 let basename = ref "choreo"
 
@@ -12,17 +12,19 @@ let anon_fun filename =
   basename := Filename.remove_extension filename;
   file_ic := Some (open_in filename)
 
+let () = Printf.printf "The main_exec is being executed\n"
+
 let speclist =
   [
-    ("-", Arg.Unit (fun () -> file_ic := Some stdin), "Read source from stdin");
     ( "-ast-dump",
       Arg.Symbol ([ "pprint"; "json" ], fun s -> ast_dump_format := s),
       "Dump the AST in the specified format (pprint, json)" );
+    ("-", Arg.Unit (fun () -> file_ic := Some stdin), "Read source from stdin");
   ]
 
 let () =
   Arg.parse speclist anon_fun usage_msg;
-
+  Printf.printf "%s \n" !ast_dump_format;
   if !file_ic = None then (
     prerr_endline (Sys.argv.(0) ^ ": No input file");
     exit 1);
