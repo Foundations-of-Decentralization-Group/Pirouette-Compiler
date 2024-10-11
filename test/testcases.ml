@@ -33,6 +33,7 @@ let testcase_3 =
    P2.5\n\n\
    else P1[R] ~> P2;\n\n\
    ()\n\
+   P2.3\n\
    ;"
 ;;
 
