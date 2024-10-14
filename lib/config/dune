@@ -3,9 +3,11 @@
  (public_name config_parser)
  (modules config_parser)
  (libraries lwt lwt.unix yaml ast_utils parsing irgen)
- (preprocess (pps lwt_ppx)))
+ (preprocess
+  (pps lwt_ppx)))
 
 (rule
  (alias runtest)
  (deps config.yaml examples/1.pir)
- (action (run ./config_parser.exe)))
+ (action
+  (run ./config_parser.exe)))
