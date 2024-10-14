@@ -1,5 +1,5 @@
 (*dummy metainfo to let compiler happy*)
-let m : Ast.Metainfo.metainfo = "", 0
+let m : Ast.Metainfo.metainfo = "", 0, 0, 0
 
 (*context: list of pair of variable name and its binding*)
 type local_context = (string * Ast.Local.typ) list
