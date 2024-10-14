@@ -120,7 +120,8 @@ local_expr:
   | var_id                                           { Var ($1, metainfo_of_VarId $1) }
   | un_op local_expr %prec UNARY                     { UnOp ($1, $2, metainfo_of_UnOp $1) } // ???
   | local_expr bin_op local_expr                     { BinOp ($1, $2, $3, metainfo_of_LocExpr $1) }
-  | LET var_id COLONEQ local_expr IN local_expr      { Let ($2, $4, $6, $1) }
+  // | LET var_id COLONEQ local_expr IN local_expr      { Let ($2, $4, $6, $1) }
+  | LET var_id COLON local_type COLONEQ local_expr IN local_expr      { Let ($2, $4, $6, $8, $1) }
   | LPAREN local_expr COMMA local_expr RPAREN        { Pair ($2, $4, $1) }
   | FST local_expr                                   { Fst ($2, $1) }
   | SND local_expr                                   { Snd ($2, $1) }

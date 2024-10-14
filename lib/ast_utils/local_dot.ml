@@ -137,7 +137,8 @@ and dot_local_expr (loc_expr : Local.expr) : string * string =
     let edge2 = Printf.sprintf "%s -> %s;\n" node_name n2 in
     let edge3 = Printf.sprintf "%s -> %s;\n" node_name n3 in
     bin_op_node ^ edge1 ^ edge2 ^ edge3 ^ c1 ^ c2 ^ c3, node_name
-  | Let (VarId (id, _), e1, e2, (_, line)) ->
+  | Let (VarId (id, _), _, e1, e2, (_, line)) ->
+    (*the Let is changed to take in the additional type!!!!!!!!!!!!!!!!!!!!!!!!!*)
     let c1, n1 = dot_local_expr e1 in
     let c2, n2 = dot_local_expr e2 in
     let let_node =
