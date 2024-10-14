@@ -2,8 +2,8 @@ open Lwt.Infix
 open Ast_utils
 
 type location_config = {
-  location: string;
-  http_address: string;
+  location: string
+  ; http_address: string
 }
 
 type config = {
@@ -12,14 +12,14 @@ type config = {
 
 let parse_location_config yaml =
   match yaml with
-  | `O [("location", `String loc); ("http_address", `String addr)] ->
+  | `O [ ("location", `String loc); ("http_address", `String addr) ] ->
     Some { location = loc; http_address = addr }
   | _ -> None
 ;;
 
 let parse_config yaml =
   match yaml with
-  | `O [("locations", `A locs)] ->
+  | `O [ ("locations", `A locs) ] ->
     let parsed_locs = List.filter_map parse_location_config locs in
     Some { locations = parsed_locs }
   | _ -> None
