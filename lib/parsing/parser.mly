@@ -7,25 +7,25 @@
     - Defines the types and categories of tokens used by the parser.
     - Each token can carry specific data types, such as strings, integers.
 *)
-%token <string * (string * int)> ID
-%token <int * (string * int)>    INT
-%token <string * (string * int)> STRING
-%token <string * int> TRUE FALSE
-%token <string * int> UNIT_T INT_T STRING_T BOOL_T
-%token <string * int> FUN TYPE
-%token <string * int> PLUS MINUS TIMES DIV
-%token <string * int> NOT
-%token <string * int> AND OR
-%token <string * int> EQ NEQ LT LEQ GT GEQ
-%token <string * int> LPAREN RPAREN LBRACKET RBRACKET
-%token <string * int> COMMA DOT COLON SEMICOLON
-%token <string * int> VERTICAL UNDERSCORE
+%token <string * (string * int * int * int)> ID
+%token <int * (string * int * int * int)>    INT
+%token <string * (string * int * int * int)> STRING
+%token <string * int * int * int> TRUE FALSE
+%token <string * int * int * int> UNIT_T INT_T STRING_T BOOL_T
+%token <string * int * int * int> FUN TYPE
+%token <string * int * int * int> PLUS MINUS TIMES DIV
+%token <string * int * int * int> NOT
+%token <string * int * int * int> AND OR
+%token <string * int * int * int> EQ NEQ LT LEQ GT GEQ
+%token <string * int * int * int> LPAREN RPAREN LBRACKET RBRACKET
+%token <string * int * int * int> COMMA DOT COLON SEMICOLON
+%token <string * int * int * int> VERTICAL UNDERSCORE
 %token COLONEQ ARROW TILDE_ARROW
-%token <string * int> LET IN
-%token <string * int> IF THEN ELSE
-%token <string * int> FST SND LEFT RIGHT
-%token <string * int> MATCH WITH
-%token <string * int> EOF
+%token <string * int * int * int> LET IN
+%token <string * int * int * int> IF THEN ELSE
+%token <string * int * int * int> FST SND LEFT RIGHT
+%token <string * int * int * int> MATCH WITH
+%token <string * int * int * int> EOF
 
 (** Type Declarations:
     - Specifies the types of the non-terminal symbols used in the grammar.

@@ -10,7 +10,7 @@
 
 open OUnit2
 
-let m : Ast.Metainfo.metainfo = "", 0
+let m : Ast.Metainfo.metainfo = "", 0, 0, 0
 
 let typ_eq (s : string) (expected_typ : Ast.Choreo.typ) =
   let program = Parsing.parse_program (Lexing.from_string s) in
