@@ -19,6 +19,8 @@ depends: [
   "menhir"
   "ounit2"
   "yojson"
+  "yaml"
+  "lwt_ppx"
   "odoc" {with-doc}
 ]
 build: [

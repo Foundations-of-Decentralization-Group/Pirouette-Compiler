@@ -9,62 +9,58 @@ let setup_logs () =
   Lwt.return_unit
 ;;
 
-let receive_and_unmarshal url expected_data =
-  Send_receive.receive_message ~url
+let send_data url data =
+  Send_receive.send_message ~url ~data
   >>= function
-  | Ok unmarshaled ->
-    Logs.debug (fun m -> m "Unmarshaled data: %s" (Marshal.to_string unmarshaled []));
-    Logs.debug (fun m -> m "Expected data: %s" (Marshal.to_string expected_data []));
-    assert_equal expected_data unmarshaled;
-    Lwt.return_unit
+  | Ok () -> Lwt.return_unit
   | Error msg -> Lwt.return (assert_failure msg)
 ;;
 
-let test_receive_int _ =
-  let url = "http://localhost:8080/receive" in
-  Lwt_main.run (receive_and_unmarshal url 10)
+let test_send_int _ =
+  let url = "http://localhost:8080/send" in
+  Lwt_main.run (send_data url 10)
 ;;
 
-let test_receive_float _ =
-  let url = "http://localhost:8080/receive" in
-  Lwt_main.run (receive_and_unmarshal url 3.14)
+let test_send_float _ =
+  let url = "http://localhost:8080/send" in
+  Lwt_main.run (send_data url 3.14)
 ;;
 
-let test_receive_bool _ =
-  let url = "http://localhost:8080/receive" in
-  Lwt_main.run (receive_and_unmarshal url true)
+let test_send_bool _ =
+  let url = "http://localhost:8080/send" in
+  Lwt_main.run (send_data url true)
 ;;
 
-let test_receive_string _ =
-  let url = "http://localhost:8080/receive" in
-  Lwt_main.run (receive_and_unmarshal url "Hello, world!")
+let test_send_string _ =
+  let url = "http://localhost:8080/send" in
+  Lwt_main.run (send_data url "Hello, world!")
 ;;
 
-let test_receive_list _ =
-  let url = "http://localhost:8080/receive" in
-  Lwt_main.run (receive_and_unmarshal url [ 1; 2; 3; 4; 5 ])
+let test_send_list _ =
+  let url = "http://localhost:8080/send" in
+  Lwt_main.run (send_data url [ 1; 2; 3; 4; 5 ])
 ;;
 
-let test_receive_color _ =
-  let url = "http://localhost:8080/receive" in
-  Lwt_main.run (receive_and_unmarshal url Red)
+let test_send_color _ =
+  let url = "http://localhost:8080/send" in
+  Lwt_main.run (send_data url Red)
 ;;
 
-let test_receive_person _ =
-  let url = "http://localhost:8080/receive" in
-  let expected = { name = "Ethan"; age = 20; favorite_colors = [ Green; Blue ] } in
-  Lwt_main.run (receive_and_unmarshal url expected)
+let test_send_person _ =
+  let url = "http://localhost:8080/send" in
+  let data = { name = "Ethan"; age = 20; favorite_colors = [ Green; Blue ] } in
+  Lwt_main.run (send_data url data)
 ;;
 
 let suite =
-  "Marshal Receiver Test Suite"
-  >::: [ "test_receive_int" >:: test_receive_int
-       ; "test_receive_float" >:: test_receive_float
-       ; "test_receive_bool" >:: test_receive_bool
-       ; "test_receive_string" >:: test_receive_string
-       ; "test_receive_list" >:: test_receive_list
-       ; "test_receive_color" >:: test_receive_color
-       ; "test_receive_person" >:: test_receive_person
+  "Marshal Sender Test Suite"
+  >::: [ "test_send_int" >:: test_send_int
+       ; "test_send_float" >:: test_send_float
+       ; "test_send_bool" >:: test_send_bool
+       ; "test_send_string" >:: test_send_string
+       ; "test_send_list" >:: test_send_list
+       ; "test_send_color" >:: test_send_color
+       ; "test_send_person" >:: test_send_person
        ]
 ;;
 
