@@ -21,7 +21,8 @@ depends: [
   "yojson"
   "odoc" {with-doc}
   "yaml"
-
+  "ppxlib"
+  "lwt_ppx"
 ]
 build: [
   ["dune" "subst"] {dev}
