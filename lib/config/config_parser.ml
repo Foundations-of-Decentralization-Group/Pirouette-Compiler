@@ -1,10 +1,10 @@
 open Lwt.Infix
 open Ast_utils
 
-type location_config = {
-  location : string
+type location_config =
+  { location : string
   ; http_address : string
-}
+  }
 
 type config = { locations : location_config list }
 
