@@ -20,6 +20,8 @@ depends: [
   "ounit2"
   "yojson"
   "odoc" {with-doc}
+  "yaml"
+
 ]
 build: [
   ["dune" "subst"] {dev}
