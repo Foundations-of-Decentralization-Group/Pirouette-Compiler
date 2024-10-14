@@ -18,17 +18,17 @@ let testcase_1 =
 
 let testcase_2 =
   "right (_,_) := \n\n\
-   if R.(3+5 >= 2-1 || snd 3 != left 3)\n\n\
+   if R.(3+5 >= 2-1 || 3 != 3)\n\n\
    then R[L] ~> S;\n\n\
-   let R.res := [S] (x,y) ~> R; in R.\"Sent\"\n\n\
+   let R.res := [S] (right x,y) ~> R; in R.\"Sent\"\n\n\
    else R[R] ~> S;\n\n\
-   let R.res := [S] S.(0,false) ~> R; in R.\"why\";\n"
+   let R.res := [S] S.(left 0,snd false) ~> R; in R.\"why\";\n"
 ;;
 
 let testcase_3 =
   "type x := P2.int;\n\
    y : P2.int;\n\n\
-   y := if P1.(3*2 < 5/2 && right 3 = 3)\n\n\
+   y := if P1.(3*2 < 5/2 && 3 = 3)\n\n\
    then P1[L] ~> P2;\n\n\
    P2.5\n\n\
    else P1[R] ~> P2;\n\n\

@@ -40,7 +40,10 @@ let suite =
                  >:: fun _ ->
                  typ_eq
                    Testcases.testcase_4
-                   (Ast.Choreo.TLoc (Ast.Local.LocId ("R", m), Ast.Local.TInt m, m)))
+                   (Ast.Choreo.TProd
+                      ( Ast.Choreo.TLoc (Ast.Local.LocId ("P2", m), Ast.Local.TInt m, m)
+                      , Ast.Choreo.TLoc (Ast.Local.LocId ("P2", m), Ast.Local.TInt m, m)
+                      , m )))
               ]
        ]
 ;;
