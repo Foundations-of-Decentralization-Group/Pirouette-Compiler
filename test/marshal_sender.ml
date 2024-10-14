@@ -66,5 +66,4 @@ let suite =
 
 let () =
   Lwt_main.run (setup_logs ());
-  run_test_tt_main suite
-;;
+  run_test_tt_main suite;;

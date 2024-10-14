@@ -2,13 +2,11 @@ open Lwt.Infix
 open Ast_utils
 
 type location_config = {
-  location: string
-  ; http_address: string
+  location : string
+  ; http_address : string
 }
 
-type config = {
-  locations: location_config list;
-}
+type config = { locations : location_config list }
 
 let parse_location_config yaml =
   match yaml with
