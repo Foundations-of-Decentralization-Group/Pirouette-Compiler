@@ -25,35 +25,102 @@ let generate_node_name () =
 let rec dot_local_pattern (patn : Local.pattern) : string * string =
   let node_name = generate_node_name () in
   match patn with
-  | Default (_, line) ->
-    Printf.sprintf "%s [label=\"Default\\nLine: %d\"];\n" node_name line, node_name
+  | Default (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"Default\\nLine: %d\n\
+         Starting char index: %d\n\
+         Ending char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
   | Val (v, _) ->
     (match v with
-     | Int (i, (_, line)) ->
-       ( Printf.sprintf "%s [label=\"%s\\nLine: %d\"];\n" node_name (string_of_int i) line
+     | Int (i, (_, line, start_idx, end_idx)) ->
+       ( Printf.sprintf
+           "%s [label=\"%s\\nLine: %d\n\
+            Starting char index: %d\n\
+            Ending char index: %d\"];\n"
+           node_name
+           (string_of_int i)
+           line
+           start_idx
+           end_idx
        , node_name )
-     | String (s, (_, line)) ->
-       Printf.sprintf "%s [label=\"%s\\nLine: %d\"];\n" node_name s line, node_name
-     | Bool (b, (_, line)) ->
-       ( Printf.sprintf "%s [label=\"%s\\nLine: %d\"];\n" node_name (string_of_bool b) line
+     | String (s, (_, line, start_idx, end_idx)) ->
+       ( Printf.sprintf
+           "%s [label=\"%s\\nLine: %d\n\
+            Starting char index: %d\n\
+            Ending char index: %d\"];\n"
+           node_name
+           s
+           line
+           start_idx
+           end_idx
+       , node_name )
+     | Bool (b, (_, line, start_idx, end_idx)) ->
+       ( Printf.sprintf
+           "%s [label=\"%s\\nLine: %d\n\
+            Starting char index: %d\n\
+            Ending char index: %d\"];\n"
+           node_name
+           (string_of_bool b)
+           line
+           start_idx
+           end_idx
        , node_name ))
-  | Var (VarId (id, _), (_, line)) ->
-    Printf.sprintf "%s [label=\"%s\\nLine: %d\"];\n" node_name id line, node_name
-  | Pair (patn1, patn2, (_, line)) ->
+  | Var (VarId (id, _), (_, line, start_idx, end_idx)) ->
+    ( Printf.sprintf
+        "%s [label=\"%s\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        id
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | Pair (patn1, patn2, (_, line, start_idx, end_idx)) ->
     let c1, n1 = dot_local_pattern patn1 in
     let c2, n2 = dot_local_pattern patn2 in
-    let pair_node = Printf.sprintf "%s [label=\"Pair\\nLine: %d\"];\n" node_name line in
+    let pair_node =
+      Printf.sprintf
+        "%s [label=\"Pair\\nLine: %d\n\
+         Starting char index: %d\n\
+         Ending char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    in
     let edge1 = Printf.sprintf "%s -> %s;\n" node_name n1 in
     let edge2 = Printf.sprintf "%s -> %s;\n" node_name n2 in
     pair_node ^ edge1 ^ edge2 ^ c1 ^ c2, node_name
-  | Left (patn, (_, line)) ->
+  | Left (patn, (_, line, start_idx, end_idx)) ->
     let c, n = dot_local_pattern patn in
-    let left_node = Printf.sprintf "%s [label=\"Left\\nLine: %d\"];\n" node_name line in
+    let left_node =
+      Printf.sprintf
+        "%s [label=\"Left\\nLine: %d\n\
+         Starting char index: %d\n\
+         Ending char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    in
     let edge = Printf.sprintf "%s -> %s;\n" node_name n in
     left_node ^ edge ^ c, node_name
-  | Right (patn, (_, line)) ->
+  | Right (patn, (_, line, start_idx, end_idx)) ->
     let c, n = dot_local_pattern patn in
-    let right_node = Printf.sprintf "%s [label=\"Right\\nLine: %d\"];\n" node_name line in
+    let right_node =
+      Printf.sprintf
+        "%s [label=\"Right\\nLine: %d\n\
+         Starting char index: %d\n\
+         Ending char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    in
     let edge = Printf.sprintf "%s -> %s;\n" node_name n in
     right_node ^ edge ^ c, node_name
 
@@ -68,27 +135,69 @@ let rec dot_local_pattern (patn : Local.pattern) : string * string =
 and dot_local_type (typ : Local.typ) : string * string =
   let node_name = generate_node_name () in
   match typ with
-  | TUnit (_, line) ->
-    Printf.sprintf "%s [label=\"()\\nLine: %d\"];\n" node_name line, node_name
-  | TInt (_, line) ->
-    Printf.sprintf "%s [label=\"Int\\nLine: %d\"];\n" node_name line, node_name
-  | TString (_, line) ->
-    Printf.sprintf "%s [label=\"String\\nLine: %d\"];\n" node_name line, node_name
-  | TBool (_, line) ->
-    Printf.sprintf "%s [label=\"Bool\\nLine: %d\"];\n" node_name line, node_name
-  | TProd (typ1, typ2, (_, line)) ->
+  | TUnit (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"()\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | TInt (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"Int\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | TString (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"String\\nLine: %d\n\
+         Starting char index: %d\n\
+         Ending char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | TBool (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"Bool\\nLine: %d\n\
+         Starting char index: %d\n\
+         Ending char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | TProd (typ1, typ2, (_, line, start_idx, end_idx)) ->
     let c1, n1 = dot_local_type typ1 in
     let c2, n2 = dot_local_type typ2 in
     let prod_node =
-      Printf.sprintf "%s [label=\"Product\\nLine: %d\"];\n" node_name line
+      Printf.sprintf
+        "%s [label=\"Product\\nLine: %d\n\
+         Starting char index: %d\n\
+         Ending char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
     in
     let edge1 = Printf.sprintf "%s -> %s;\n" node_name n1 in
     let edge2 = Printf.sprintf "%s -> %s;\n" node_name n2 in
     prod_node ^ edge1 ^ edge2 ^ c1 ^ c2, node_name
-  | TSum (typ1, typ2, (_, line)) ->
+  | TSum (typ1, typ2, (_, line, start_idx, end_idx)) ->
     let c1, n1 = dot_local_type typ1 in
     let c2, n2 = dot_local_type typ2 in
-    let sum_node = Printf.sprintf "%s [label=\"Sum\\nLine: %d\"];\n" node_name line in
+    let sum_node =
+      Printf.sprintf
+        "%s [label=\"Sum\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    in
     let edge1 = Printf.sprintf "%s -> %s;\n" node_name n1 in
     let edge2 = Printf.sprintf "%s -> %s;\n" node_name n2 in
     sum_node ^ edge1 ^ edge2 ^ c1 ^ c2, node_name
@@ -105,77 +214,190 @@ and dot_local_type (typ : Local.typ) : string * string =
 and dot_local_expr (loc_expr : Local.expr) : string * string =
   let node_name = generate_node_name () in
   match loc_expr with
-  | Unit (_, line) ->
-    Printf.sprintf "%s [label=\"()\\nLine: %d\"];\n" node_name line, node_name
+  | Unit (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"()\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
   | Val (v, _) ->
     (match v with
-     | Int (i, (_, line)) ->
-       ( Printf.sprintf "%s [label=\"%s\\nLine: %d\"];\n" node_name (string_of_int i) line
+     | Int (i, (_, line, start_idx, end_idx)) ->
+       ( Printf.sprintf
+           "%s [label=\"%s\\nLine: %d\n\
+            Starting char index: %d\n\
+            Ending char index: %d\"];\n"
+           node_name
+           (string_of_int i)
+           line
+           start_idx
+           end_idx
        , node_name )
-     | String (s, (_, line)) ->
-       Printf.sprintf "%s [label=\"%s\\nLine: %d\"];\n" node_name s line, node_name
-     | Bool (b, (_, line)) ->
-       ( Printf.sprintf "%s [label=\"%s\\nLine: %d\"];\n" node_name (string_of_bool b) line
+     | String (s, (_, line, start_idx, end_idx)) ->
+       ( Printf.sprintf
+           "%s [label=\"%s\\nLine: %d\n\
+            Starting char index: %d\n\
+            Ending char index: %d\"];\n"
+           node_name
+           s
+           line
+           start_idx
+           end_idx
+       , node_name )
+     | Bool (b, (_, line, start_idx, end_idx)) ->
+       ( Printf.sprintf
+           "%s [label=\"%s\\nLine: %d\n\
+            Starting char index: %d\n\
+            Ending char index: %d\"];\n"
+           node_name
+           (string_of_bool b)
+           line
+           start_idx
+           end_idx
        , node_name ))
-  | Var (VarId (id, _), (_, line)) ->
-    Printf.sprintf "%s [label=\"%s\\nLine: %d\"];\n" node_name id line, node_name
-  | UnOp (op, e, (_, line)) ->
+  | Var (VarId (id, _), (_, line, start_idx, end_idx)) ->
+    ( Printf.sprintf
+        "%s [label=\"%s\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        id
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | UnOp (op, e, (_, line, start_idx, end_idx)) ->
     let c1, n1 = dot_local_expr e in
-    let un_op_node = Printf.sprintf "%s [label=\"UnOp\\nLine: %d\"];\n" node_name line in
+    let un_op_node =
+      Printf.sprintf
+        "%s [label=\"UnOp\\nLine: %d\n\
+         Starting char index: %d\n\
+         Ending char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    in
     let c2, n2 = dot_un_op op in
     let edge1 = Printf.sprintf "%s -> %s;\n" node_name n1 in
     let edge2 = Printf.sprintf "%s -> %s;\n" node_name n2 in
     un_op_node ^ edge1 ^ edge2 ^ c1 ^ c2, node_name
-  | BinOp (e1, op, e2, (_, line)) ->
+  | BinOp (e1, op, e2, (_, line, start_idx, end_idx)) ->
     let c1, n1 = dot_local_expr e1 in
     let c2, n2 = dot_local_expr e2 in
     let bin_op_node =
-      Printf.sprintf "%s [label=\"BinOp\\nLine: %d\"];\n" node_name line
+      Printf.sprintf
+        "%s [label=\"BinOp\\nLine: %d\n\
+         Starting char index: %d\n\
+         Ending char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
     in
     let c3, n3 = dot_bin_op op in
     let edge1 = Printf.sprintf "%s -> %s;\n" node_name n1 in
     let edge2 = Printf.sprintf "%s -> %s;\n" node_name n2 in
     let edge3 = Printf.sprintf "%s -> %s;\n" node_name n3 in
     bin_op_node ^ edge1 ^ edge2 ^ edge3 ^ c1 ^ c2 ^ c3, node_name
-  | Let (VarId (id, _), e1, e2, (_, line)) ->
+  | Let (VarId (id, _), _, e1, e2, (_, line, start_idx, end_idx)) ->
+    (*the Let is changed to take in the additional type!!!!!!!!!!!!!!!!!!!!!!!!!*)
     let c1, n1 = dot_local_expr e1 in
     let c2, n2 = dot_local_expr e2 in
     let let_node =
-      Printf.sprintf "%s [label=\"Let: %s\\nLine: %d\"];\n" node_name id line
+      Printf.sprintf
+        "%s [label=\"Let: %s\\nLine: %d\n\
+         Starting char index: %d\n\
+         Ending char index: %d\"];\n"
+        node_name
+        id
+        line
+        start_idx
+        end_idx
     in
     let edge1 = Printf.sprintf "%s -> %s;\n" node_name n1 in
     let edge2 = Printf.sprintf "%s -> %s;\n" node_name n2 in
     let_node ^ edge1 ^ edge2 ^ c1 ^ c2, node_name
-  | Pair (e1, e2, (_, line)) ->
+  | Pair (e1, e2, (_, line, start_idx, end_idx)) ->
     let c1, n1 = dot_local_expr e1 in
     let c2, n2 = dot_local_expr e2 in
-    let pair_node = Printf.sprintf "%s [label=\"Pair\\nLine: %d\"];\n" node_name line in
+    let pair_node =
+      Printf.sprintf
+        "%s [label=\"Pair\\nLine: %d\n\
+         Starting char index: %d\n\
+         Ending char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    in
     let edge1 = Printf.sprintf "%s -> %s;\n" node_name n1 in
     let edge2 = Printf.sprintf "%s -> %s;\n" node_name n2 in
     pair_node ^ edge1 ^ edge2 ^ c1 ^ c2, node_name
-  | Fst (e, (_, line)) ->
+  | Fst (e, (_, line, start_idx, end_idx)) ->
     let c, n = dot_local_expr e in
-    let fst_node = Printf.sprintf "%s [label=\"Fst\\nLine: %d\"];\n" node_name line in
+    let fst_node =
+      Printf.sprintf
+        "%s [label=\"Fst\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    in
     let edge = Printf.sprintf "%s -> %s;\n" node_name n in
     fst_node ^ edge ^ c, node_name
-  | Snd (e, (_, line)) ->
+  | Snd (e, (_, line, start_idx, end_idx)) ->
     let c, n = dot_local_expr e in
-    let snd_node = Printf.sprintf "%s [label=\"Snd\\nLine: %d\"];\n" node_name line in
+    let snd_node =
+      Printf.sprintf
+        "%s [label=\"Snd\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    in
     let edge = Printf.sprintf "%s -> %s;\n" node_name n in
     snd_node ^ edge ^ c, node_name
-  | Left (e, (_, line)) ->
+  | Left (e, (_, line, start_idx, end_idx)) ->
     let c, n = dot_local_expr e in
-    let left_node = Printf.sprintf "%s [label=\"Left\\nLine: %d\"];\n" node_name line in
+    let left_node =
+      Printf.sprintf
+        "%s [label=\"Left\\nLine: %d\n\
+         Starting char index: %d\n\
+         Ending char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    in
     let edge = Printf.sprintf "%s -> %s;\n" node_name n in
     left_node ^ edge ^ c, node_name
-  | Right (e, (_, line)) ->
+  | Right (e, (_, line, start_idx, end_idx)) ->
     let c, n = dot_local_expr e in
-    let right_node = Printf.sprintf "%s [label=\"Right\\nLine: %d\"];\n" node_name line in
+    let right_node =
+      Printf.sprintf
+        "%s [label=\"Right\\nLine: %d\n\
+         Starting char index: %d\n\
+         Ending char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    in
     let edge = Printf.sprintf "%s -> %s;\n" node_name n in
     right_node ^ edge ^ c, node_name
-  | Match (e, cases, (_, line)) ->
+  | Match (e, cases, (_, line, start_idx, end_idx)) ->
     let c1, n1 = dot_local_expr e in
-    let match_node = Printf.sprintf "%s [label=\"Match\\nLine: %d\"];\n" node_name line in
+    let match_node =
+      Printf.sprintf
+        "%s [label=\"Match\\nLine: %d\n\
+         Starting char index: %d\n\
+         Ending char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    in
     let c2, n2 = dot_local_cases cases in
     let edge1 = Printf.sprintf "%s -> %s;\n" node_name n1 in
     let edge2 = Printf.sprintf "%s -> %s;\n" node_name n2 in
@@ -217,38 +439,122 @@ and dot_local_case (patn, expr) =
 and dot_bin_op (op : Local.bin_op) : string * string =
   let node_name = generate_node_name () in
   match op with
-  | Plus (_, line) ->
-    Printf.sprintf "%s [label=\"+\\nLine: %d\"];\n" node_name line, node_name
-  | Minus (_, line) ->
-    Printf.sprintf "%s [label=\"-\\nLine: %d\"];\n" node_name line, node_name
-  | Times (_, line) ->
-    Printf.sprintf "%s [label=\"*\\nLine: %d\"];\n" node_name line, node_name
-  | Div (_, line) ->
-    Printf.sprintf "%s [label=\"/\\nLine: %d\"];\n" node_name line, node_name
-  | And (_, line) ->
-    Printf.sprintf "%s [label=\"&&\\nLine: %d\"];\n" node_name line, node_name
-  | Or (_, line) ->
-    Printf.sprintf "%s [label=\"||\\nLine: %d\"];\n" node_name line, node_name
-  | Eq (_, line) ->
-    Printf.sprintf "%s [label=\"=\\nLine: %d\"];\n" node_name line, node_name
-  | Neq (_, line) ->
-    Printf.sprintf "%s [label=\"!=\\nLine: %d\"];\n" node_name line, node_name
-  | Lt (_, line) ->
-    Printf.sprintf "%s [label=\"<\\nLine: %d\"];\n" node_name line, node_name
-  | Leq (_, line) ->
-    Printf.sprintf "%s [label=\"<=\\nLine: %d\"];\n" node_name line, node_name
-  | Gt (_, line) ->
-    Printf.sprintf "%s [label=\">\\nLine: %d\"];\n" node_name line, node_name
-  | Geq (_, line) ->
-    Printf.sprintf "%s [label=\">=\\nLine: %d\"];\n" node_name line, node_name
+  | Plus (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"+\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | Minus (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"-\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | Times (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"*\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | Div (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"/\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | And (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"&&\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | Or (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"||\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | Eq (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"=\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | Neq (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"!=\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | Lt (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"<\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | Leq (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"<=\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | Gt (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\">\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | Geq (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\">=\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
 
 and dot_un_op (op : Local.un_op) : string * string =
   let node_name = generate_node_name () in
   match op with
-  | Not (_, line) ->
-    Printf.sprintf "%s [label=\"!\\nLine: %d\"];\n" node_name line, node_name
-  | Neg (_, line) ->
-    Printf.sprintf "%s [label=\"¬\\nLine: %d\"];\n" node_name line, node_name
+  | Not (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"!\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
+  | Neg (_, line, start_idx, end_idx) ->
+    ( Printf.sprintf
+        "%s [label=\"¬\\nLine: %d\nStarting char index: %d\nEnding char index: %d\"];\n"
+        node_name
+        line
+        start_idx
+        end_idx
+    , node_name )
 
 (** [string_of_value v] returns a string representation of the value [v]
 

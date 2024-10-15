@@ -16,6 +16,8 @@
 
   let filename lexbuf = lexbuf.lex_curr_p.pos_fname
   let line lexbuf = lexbuf.lex_curr_p.pos_lnum
+  let start_char lexbuf = lexbuf.lex_start_p.pos_cnum - lexbuf.lex_start_p.pos_bol
+  let end_char lexbuf = lexbuf.lex_curr_p.pos_cnum - lexbuf.lex_curr_p.pos_bol
 
   (** [metainfo lexbuf] retrieves the current file name and line number from the lexer buffer.
     
@@ -24,7 +26,7 @@
     - This function is useful for error reporting and debugging, providing context
       about where in the source file the lexer is currently operating.
   *)
-  let metainfo lexbuf= (filename lexbuf, line lexbuf)
+  let metainfo lexbuf= (filename lexbuf, line lexbuf, start_char lexbuf, end_char lexbuf)
 }
 
 let digit = ['0'-'9']

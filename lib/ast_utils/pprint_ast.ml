@@ -67,11 +67,13 @@ let rec pprint_local_expr ppf (e : Ast.Local.expr) =
        | Geq _ -> ">=")
       pprint_local_expr
       e2
-  | Let (VarId (id, _), e1, e2, _) ->
+  | Let (VarId (id, _), typ, e1, e2, _) ->
     fprintf
       ppf
-      "@[<v2>let@ %s := %a@;<1 -2>in@ %a@]"
+      "@[<v2>let@ %s : %a := %a@;<1 -2>in@ %a@]"
       id
+      pprint_local_type
+      typ
       pprint_local_expr
       e1
       pprint_local_expr
@@ -111,7 +113,7 @@ and pprint_local_pattern ppf = function
       (fun ppf (v : Ast.Local.value) ->
         match v with
         | Int (i, _) -> fprintf ppf "%d" i
-        | String (s, _) -> fprintf ppf "%s" s
+        | String (s, _) -> fprintf ppf "\"%s\"" s
         | Bool (b, _) -> fprintf ppf "%b" b)
       v
   | Var (VarId (id, _), _) -> fprintf ppf "@[<h>%s@]" id

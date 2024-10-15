@@ -13,6 +13,11 @@
  (modules marshal_test)
  (libraries ounit2 http types_test))
 
+(test
+ (name typcheck_test)
+ (modules typcheck_test testcases)
+ (libraries parsing ounit2 type_check))
+
 (library
  (name types_test)
  (modules types_test))
