@@ -41,7 +41,7 @@ rule read = parse
   | "<="               { LEQ }
   | ">"                { GT }
   | ">="               { GEQ }
-  | '|'                { VERTICAL }
+  | '|'                { BAR }
   | '_'                { UNDERSCORE }
   | ":="               { COLONEQ }
   | "->"               { ARROW }

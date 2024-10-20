@@ -9,14 +9,16 @@
 %token TRUE FALSE
 %token UNIT_T INT_T STRING_T BOOL_T
 %token FUN TYPE
+%token UNDERSCORE
+%token COLONEQ
 %token PLUS MINUS TIMES DIV
 %token NOT
 %token AND OR
 %token EQ NEQ LT LEQ GT GEQ
 %token LPAREN RPAREN LBRACKET RBRACKET
 %token COMMA DOT COLON SEMICOLON
-%token VERTICAL UNDERSCORE
-%token COLONEQ ARROW TILDE_ARROW
+%token ARROW TILDE_ARROW
+%token BAR
 %token LET IN
 %token IF THEN ELSE
 %token FST SND LEFT RIGHT
@@ -40,12 +42,12 @@
 %type <Ast.Local.sync_label> sync_label
 
 %nonassoc IN
-%nonassoc VERTICAL
+%right ARROW
+%nonassoc BAR
 %nonassoc FST SND LEFT RIGHT
 %right OR
 %right AND
 %left EQ NEQ LT LEQ GT GEQ
-%right ARROW
 %left PLUS MINUS
 %left TIMES DIV
 %nonassoc UNARY
@@ -163,10 +165,10 @@ value:
   | FALSE  { Bool false }
 
 %inline choreo_case:
-  | VERTICAL choreo_pattern ARROW choreo_expr { ($2, $4) }
+  | BAR choreo_pattern ARROW choreo_expr { ($2, $4) }
 
 %inline local_case:
-  | VERTICAL local_pattern ARROW local_expr    { ($2, $4) }
+  | BAR local_pattern ARROW local_expr    { ($2, $4) }
 
 %inline un_op:
   | MINUS { Neg }
