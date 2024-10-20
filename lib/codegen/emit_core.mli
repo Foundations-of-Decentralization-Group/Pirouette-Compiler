@@ -1,3 +1,5 @@
+exception Main_expr of Parsetree.expression
+
 val emit_local_pexp : Ast.Local.expr -> Parsetree.expression
 val emit_local_ppat : Ast.Local.pattern -> Parsetree.pattern
 

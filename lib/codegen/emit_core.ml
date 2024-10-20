@@ -1,8 +1,20 @@
 module Local = Ast.Local
 module Net = Ast.Net
-open Ppxlib
 
 module type Msg_intf = Msg_intf.M
+
+exception Main_expr of Parsetree.expression
+
+module Id = struct
+  let i = ref 0
+
+  let gen name =
+    incr i;
+    Printf.sprintf "%s%d" name !i
+  ;;
+end
+
+open Ppxlib
 
 let loc = { !Ast_helper.default_loc with loc_ghost = true }
 
@@ -78,23 +90,30 @@ let rec emit_net_fun_body
   ~(self_id : string)
   (module Msg : Msg_intf)
   (pats : Local.pattern list)
-  (expr : Net.expr)
+  (exp : Net.expr)
   =
   match pats with
-  | [] -> emit_net_pexp ~self_id (module Msg : Msg_intf) expr
+  | [] -> emit_net_pexp ~self_id (module Msg : Msg_intf) exp
   | f :: ps ->
     Ast_builder.Default.pexp_fun
       ~loc
       Nolabel
       None
       (emit_local_ppat f)
-      (emit_net_fun_body ~self_id (module Msg) ps expr)
+      (emit_net_fun_body ~self_id (module Msg) ps exp)
 
 and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (stmt : Net.stmt) =
   match stmt with
-  | Net.Assign (ps, e) ->
+  | Assign (ps, e) ->
     (match ps with
-     | [] -> failwith "Error: Empty pattern in assignment"
+     | [] -> failwith "Error: Empty assignment"
+     | Var (VarId "main") :: _ ->
+       raise (Main_expr (emit_net_pexp ~self_id (module Msg) e))
+     | Default :: _ ->
+       Ast_builder.Default.value_binding
+         ~loc
+         ~pat:(Ast_builder.Default.pvar ~loc (Id.gen "_unit_"))
+         ~expr:(emit_net_pexp ~self_id (module Msg) e)
      | [ var ] ->
        Ast_builder.Default.value_binding
          ~loc
@@ -111,37 +130,37 @@ and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (stmt : Net.stm
       ~pat:[%pat? _unit]
       ~expr:(Ast_builder.Default.eunit ~loc)
 
-and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (expr : Net.expr) =
-  match expr with
-  | Net.Unit -> Ast_builder.Default.eunit ~loc
-  | Net.Var (VarId v) -> Ast_builder.Default.evar ~loc v
-  | Net.Ret e -> emit_local_pexp e
-  | Net.If (e1, e2, e3) ->
+and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : Net.expr) =
+  match exp with
+  | Unit -> Ast_builder.Default.eunit ~loc
+  | Var (VarId v) -> Ast_builder.Default.evar ~loc v
+  | Ret e -> emit_local_pexp e
+  | If (e1, e2, e3) ->
     Ast_builder.Default.pexp_ifthenelse
       ~loc
       (emit_net_pexp ~self_id (module Msg) e1)
       (emit_net_pexp ~self_id (module Msg) e2)
       (Some (emit_net_pexp ~self_id (module Msg) e3))
-  | Net.Let (stmts, e) ->
+  | Let (stmts, e) ->
     Ast_builder.Default.pexp_let
       ~loc
       Recursive
       (List.map (emit_net_binding ~self_id (module Msg)) stmts)
       (emit_net_pexp ~self_id (module Msg) e)
-  | Net.FunDef (ps, e) -> emit_net_fun_body ~self_id (module Msg) ps e
-  | Net.FunApp (e1, e2) ->
+  | FunDef (ps, e) -> emit_net_fun_body ~self_id (module Msg) ps e
+  | FunApp (e1, e2) ->
     [%expr
       [%e emit_net_pexp ~self_id (module Msg) e1]
         [%e emit_net_pexp ~self_id (module Msg) e2]]
-  | Net.Pair (e1, e2) ->
+  | Pair (e1, e2) ->
     [%expr
       [%e emit_net_pexp ~self_id (module Msg) e1]
       , [%e emit_net_pexp ~self_id (module Msg) e2]]
-  | Net.Fst e -> [%expr Net.Fst [%e emit_net_pexp ~self_id (module Msg) e]]
-  | Net.Snd e -> [%expr Net.Snd [%e emit_net_pexp ~self_id (module Msg) e]]
-  | Net.Left e -> [%expr Either.Left [%e emit_net_pexp ~self_id (module Msg) e]]
-  | Net.Right e -> [%expr Either.Right [%e emit_net_pexp ~self_id (module Msg) e]]
-  | Net.Match (e, cases) ->
+  | Fst e -> [%expr fst [%e emit_net_pexp ~self_id (module Msg) e]]
+  | Snd e -> [%expr snd [%e emit_net_pexp ~self_id (module Msg) e]]
+  | Left e -> [%expr Either.Left [%e emit_net_pexp ~self_id (module Msg) e]]
+  | Right e -> [%expr Either.Right [%e emit_net_pexp ~self_id (module Msg) e]]
+  | Match (e, cases) ->
     let cases =
       List.map
         (fun (p, e) ->
@@ -152,20 +171,30 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (expr : Net.expr) 
         cases
     in
     Ast_builder.Default.pexp_match ~loc (emit_net_pexp ~self_id (module Msg) e) cases
-  | Net.Send (e, LocId dst) ->
-    Msg.emit_net_send
-      ~src:self_id
-      ~dst
-      [%expr Marshal.to_string [%e emit_net_pexp ~self_id (module Msg) e] []]
-  | Net.Recv (LocId src) ->
+  | Send (e, LocId dst) ->
+    (* Msg.emit_net_send
+       ~src:self_id
+       ~dst
+       [%expr Marshal.to_string [%e emit_net_pexp ~self_id (module Msg) e] []] *)
+    let val_id = Id.gen "val_" in
+    [%expr
+      let [%p Ast_builder.Default.pvar ~loc val_id] =
+        [%e emit_net_pexp ~self_id (module Msg) e]
+      in
+      [%e
+        Msg.emit_net_send
+          ~src:self_id
+          ~dst
+          [%expr Marshal.to_string [%e Ast_builder.Default.evar ~loc val_id] []]]]
+  | Recv (LocId src) ->
     [%expr Marshal.from_string [%e Msg.emit_net_recv ~src ~dst:self_id] 0]
-  | Net.ChooseFor (LabelId label, LocId dst, e) ->
+  | ChooseFor (LabelId label, LocId dst, e) ->
     Ast_builder.Default.esequence
       ~loc
       [ Msg.emit_net_send ~src:self_id ~dst (Ast_builder.Default.estring ~loc label)
       ; emit_net_pexp ~self_id (module Msg) e
       ]
-  | Net.AllowChoice (LocId src, cases) ->
+  | AllowChoice (LocId src, cases) ->
     let cases =
       List.map
         (fun (Local.LabelId label, e) ->

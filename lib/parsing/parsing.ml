@@ -10,6 +10,7 @@ let pos_string pos =
 let parse_program lexbuf =
   try Parser.program Lexer.read lexbuf with
   | SyntaxError msg ->
-    raise (Failure ("Syntax error: " ^ msg ^ " at " ^ pos_string lexbuf.lex_curr_p))
-  | Parser.Error -> raise (Failure ("Parse error at " ^ pos_string lexbuf.lex_curr_p))
+    failwith (Printf.sprintf "Syntax error: %s at %s" msg (pos_string lexbuf.lex_curr_p))
+  | Parser.Error ->
+    failwith (Printf.sprintf "Parse error at %s" (pos_string lexbuf.lex_curr_p))
 ;;

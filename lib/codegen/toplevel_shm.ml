@@ -12,14 +12,20 @@ let emit_toplevel_shm
   (net_stmtblock_l : Net.stmt_block list)
   =
   let emit_domain_stri (loc_id : string) (net_stmts : Net.stmt_block) =
+    let main_expr = ref (Ast_builder.Default.eunit ~loc) in
     let rec emit_net_toplevel = function
-      | [] -> Ast_builder.Default.eunit ~loc
+      | [] -> !main_expr
       | stmt :: stmts ->
-        Ast_builder.Default.pexp_let
-          ~loc
-          Recursive
-          [ Emit_core.emit_net_binding ~self_id:loc_id (module Msg) stmt ]
-          (emit_net_toplevel stmts)
+        (match Emit_core.emit_net_binding ~self_id:loc_id (module Msg) stmt with
+         | exception Emit_core.Main_expr e ->
+           main_expr := e;
+           emit_net_toplevel stmts
+         | binding ->
+           Ast_builder.Default.pexp_let
+             ~loc
+             Recursive
+             [ binding ]
+             (emit_net_toplevel stmts))
     in
     [%stri
       let [%p Ast_builder.Default.pvar ~loc (spf "domain_%s" loc_id)] =
