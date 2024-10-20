@@ -1,11 +1,14 @@
-(* ============================== Local ============================== *)
+module Local = Ast_core.Local
+module Choreo = Ast_core.Choreo
+module Net = Ast_core.Net
 
-let jsonify_un_op (op : Ast.Local.un_op) =
+(* ============================== Local ============================== *)
+let jsonify_un_op (op : Local.un_op) =
   match op with
   | Not -> `String "Not"
   | Neg -> `String "Neg"
 
-and jsonify_bin_op (op : Ast.Local.bin_op) =
+and jsonify_bin_op (op : Local.bin_op) =
   match op with
   | Plus -> `String "Plus"
   | Minus -> `String "Minus"
@@ -21,7 +24,7 @@ and jsonify_bin_op (op : Ast.Local.bin_op) =
   | Geq -> `String "Geq"
 ;;
 
-let rec jsonify_local_type (typ : Ast.Local.typ) =
+let rec jsonify_local_type (typ : Local.typ) =
   match typ with
   | TUnit -> `String "TUnit"
   | TInt -> `String "TInt"
@@ -33,7 +36,7 @@ let rec jsonify_local_type (typ : Ast.Local.typ) =
     `Assoc [ "TSum", `List [ jsonify_local_type t1; jsonify_local_type t2 ] ]
 ;;
 
-let rec jsonify_local_pattern (pat : Ast.Local.pattern) =
+let rec jsonify_local_pattern (pat : Local.pattern) =
   match pat with
   | Default -> `String "Default"
   | Val v ->
@@ -51,7 +54,7 @@ let rec jsonify_local_pattern (pat : Ast.Local.pattern) =
     `Assoc [ "Pair", `List [ jsonify_local_pattern p1; jsonify_local_pattern p2 ] ]
 ;;
 
-let rec jsonify_local_expr (expr : Ast.Local.expr) =
+let rec jsonify_local_expr (expr : Local.expr) =
   match expr with
   | Unit -> `String "Unit"
   | Val v ->
@@ -108,8 +111,7 @@ let rec jsonify_local_expr (expr : Ast.Local.expr) =
 ;;
 
 (* ============================== Choreo ============================== *)
-
-let rec jsonify_choreo_type (typ : Ast.Choreo.typ) =
+let rec jsonify_choreo_type (typ : Choreo.typ) =
   match typ with
   | TUnit -> `String "TUnit"
   | TLoc (LocId loc, t) ->
@@ -122,7 +124,7 @@ let rec jsonify_choreo_type (typ : Ast.Choreo.typ) =
     `Assoc [ "TSum", `List [ jsonify_choreo_type t1; jsonify_choreo_type t2 ] ]
 ;;
 
-let rec jsonify_choreo_pattern (pat : Ast.Choreo.pattern) =
+let rec jsonify_choreo_pattern (pat : Choreo.pattern) =
   match pat with
   | Default -> `String "Default"
   | Var (VarId id) -> `Assoc [ "Var", `String id ]
@@ -135,7 +137,7 @@ let rec jsonify_choreo_pattern (pat : Ast.Choreo.pattern) =
       [ "LocPatt", `Assoc [ "loc", `String loc; "local_patt", jsonify_local_pattern p ] ]
 ;;
 
-let rec jsonify_choreo_stmt (stmt : Ast.Choreo.stmt) =
+let rec jsonify_choreo_stmt (stmt : Choreo.stmt) =
   match stmt with
   | Decl (p, t) ->
     `Assoc
@@ -157,7 +159,7 @@ let rec jsonify_choreo_stmt (stmt : Ast.Choreo.stmt) =
     `Assoc
       [ "TypeDecl", `Assoc [ "id", `String id; "choreo_type", jsonify_choreo_type t ] ]
 
-and jsonify_choreo_expr (expr : Ast.Choreo.expr) =
+and jsonify_choreo_expr (expr : Choreo.expr) =
   match expr with
   | Unit -> `String "Unit"
   | Var (VarId id) -> `Assoc [ "Var", `String id ]
@@ -234,13 +236,13 @@ and jsonify_choreo_expr (expr : Ast.Choreo.expr) =
       ]
 ;;
 
-let[@inline] jsonify_choreo_stmt_block (stmts : Ast.Choreo.stmt_block) =
+let[@inline] jsonify_choreo_stmt_block (stmts : Choreo.stmt_block) =
   `List (List.map jsonify_choreo_stmt stmts)
 ;;
 
 (* ============================== Net ============================== *)
 
-let rec jsonify_net_type (typ : Ast.Net.typ) =
+let rec jsonify_net_type (typ : Net.typ) =
   match typ with
   | TUnit -> `String "TUnit"
   | TLoc t -> `Assoc [ "TLoc", jsonify_local_type t ]
@@ -250,7 +252,7 @@ let rec jsonify_net_type (typ : Ast.Net.typ) =
   | TSum (t1, t2) -> `Assoc [ "TSum", `List [ jsonify_net_type t1; jsonify_net_type t2 ] ]
 ;;
 
-let rec jsonify_net_stmt (stmt : Ast.Net.stmt) =
+let rec jsonify_net_stmt (stmt : Net.stmt) =
   match stmt with
   | Decl (p, t) ->
     `Assoc
@@ -269,7 +271,7 @@ let rec jsonify_net_stmt (stmt : Ast.Net.stmt) =
   | TypeDecl (TypId id, t) ->
     `Assoc [ "TypeDecl", `Assoc [ "id", `String id; "net_type", jsonify_net_type t ] ]
 
-and jsonify_net_expr (expr : Ast.Net.expr) =
+and jsonify_net_expr (expr : Net.expr) =
   match expr with
   | Unit -> `String "Unit"
   | Var (VarId id) -> `Assoc [ "Var", `String id ]
@@ -309,7 +311,7 @@ and jsonify_net_expr (expr : Ast.Net.expr) =
             ; ( "choices"
               , `List
                   (List.map
-                     (fun (Ast.Local.LabelId label, e) ->
+                     (fun (Local.LabelId label, e) ->
                        `Assoc [ "label", `String label; "net_expr", jsonify_net_expr e ])
                      choices) )
             ] )
@@ -342,6 +344,6 @@ and jsonify_net_expr (expr : Ast.Net.expr) =
       ]
 ;;
 
-let jsonify_net_stmt_block (stmts : Ast.Net.stmt_block) =
+let jsonify_net_stmt_block (stmts : Net.stmt_block) =
   `List (List.map jsonify_net_stmt stmts)
 ;;

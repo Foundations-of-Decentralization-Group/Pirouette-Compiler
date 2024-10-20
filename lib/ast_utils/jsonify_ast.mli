@@ -1,5 +1,5 @@
 val jsonify_choreo_stmt_block
-  :  Ast.Choreo.stmt_block
+  :  Ast_core.Choreo.stmt_block
   -> [> `List of
         ([> `Assoc of (string * 'a) list
          | `Bool of bool
@@ -13,7 +13,7 @@ val jsonify_choreo_stmt_block
      ]
 
 val jsonify_net_stmt_block
-  :  Ast.Net.stmt_block
+  :  Ast_core.Net.stmt_block
   -> [> `List of
         ([> `Assoc of (string * 'a) list
          | `Bool of bool

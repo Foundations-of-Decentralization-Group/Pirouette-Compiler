@@ -11,4 +11,4 @@
 
 (library
  (name parsing)
- (libraries ast))
+ (libraries ast_core))

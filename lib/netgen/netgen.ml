@@ -1,5 +1,9 @@
+module Local = Ast_core.Local
+module Choreo = Ast_core.Choreo
+module Net = Ast_core.Net
+
 (* TODO: change Hashtbl to List *)
-let rec merge_net_stmt (s1 : Ast.Net.stmt) (s2 : Ast.Net.stmt) : Ast.Net.stmt option =
+let rec merge_net_stmt (s1 : Net.stmt) (s2 : Net.stmt) : Net.stmt option =
   match s1, s2 with
   | Decl (p, t), Decl (p', t') when p = p' && t = t' -> Some (Decl (p, t))
   | TypeDecl (id, t), TypeDecl (id', t') when id = id' && t = t' ->
@@ -10,7 +14,7 @@ let rec merge_net_stmt (s1 : Ast.Net.stmt) (s2 : Ast.Net.stmt) : Ast.Net.stmt op
      | None -> None)
   | _ -> None
 
-and merge_net_expr (e1 : Ast.Net.expr) (e2 : Ast.Net.expr) : Ast.Net.expr option =
+and merge_net_expr (e1 : Net.expr) (e2 : Net.expr) : Net.expr option =
   match e1, e2 with
   | Unit, Unit -> Some Unit
   | Var id1, Var id2 when id1 = id2 -> Some (Var id1)
@@ -119,7 +123,7 @@ and merge_net_expr (e1 : Ast.Net.expr) (e2 : Ast.Net.expr) : Ast.Net.expr option
   | _ -> None
 ;;
 
-let rec epp_choreo_type (t : Ast.Choreo.typ) (loc : string) : Ast.Net.typ =
+let rec epp_choreo_type (t : Choreo.typ) (loc : string) : Net.typ =
   match t with
   | TLoc (LocId loc1, t1) -> if loc1 = loc then TLoc t1 else TUnit
   | TMap (t1, t2) -> TMap (epp_choreo_type t1 loc, epp_choreo_type t2 loc)
@@ -128,7 +132,7 @@ let rec epp_choreo_type (t : Ast.Choreo.typ) (loc : string) : Ast.Net.typ =
   | _ -> TUnit
 ;;
 
-let rec epp_choreo_pattern (p : Ast.Choreo.pattern) (loc : string) : Ast.Local.pattern =
+let rec epp_choreo_pattern (p : Choreo.pattern) (loc : string) : Local.pattern =
   match p with
   | Default -> Default
   | Var id -> Var id
@@ -138,14 +142,14 @@ let rec epp_choreo_pattern (p : Ast.Choreo.pattern) (loc : string) : Ast.Local.p
   | Right p -> Right (epp_choreo_pattern p loc)
 ;;
 
-let rec epp_choreo_stmt (stmt : Ast.Choreo.stmt) (loc : string) : Ast.Net.stmt =
+let rec epp_choreo_stmt (stmt : Choreo.stmt) (loc : string) : Net.stmt =
   match stmt with
   | Decl (p, t) -> Decl (epp_choreo_pattern p loc, epp_choreo_type t loc)
   | Assign (ps, e) ->
     Assign (List.map (fun p -> epp_choreo_pattern p loc) ps, epp_choreo_expr e loc)
   | TypeDecl (id, t) -> TypeDecl (id, epp_choreo_type t loc)
 
-and epp_choreo_expr (c : Ast.Choreo.expr) (loc : string) : Ast.Net.expr =
+and epp_choreo_expr (c : Choreo.expr) (loc : string) : Net.expr =
   match c with
   | LocExpr (LocId loc1, e) when loc1 = loc -> Ret e
   | FunDef (ps, c) ->
@@ -201,6 +205,6 @@ and epp_choreo_expr (c : Ast.Choreo.expr) (loc : string) : Ast.Net.expr =
   | _ -> Unit
 ;;
 
-let epp_choreo_to_net (Ast.Choreo.Prog prog) loc =
-  Ast.Net.Prog (List.map (fun stmt -> epp_choreo_stmt stmt loc) prog)
+let epp_choreo_to_net stmt_block loc =
+  List.map (fun stmt -> epp_choreo_stmt stmt loc) stmt_block
 ;;

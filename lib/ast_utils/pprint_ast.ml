@@ -1,3 +1,6 @@
+module Local = Ast_core.Local
+module Choreo = Ast_core.Choreo
+module Net = Ast_core.Net
 open Format
 
 (* ============================== Local ============================== *)
@@ -9,7 +12,7 @@ open Format
    type * type
    type + type
 *)
-let rec pprint_local_type ppf (typ : Ast.Local.typ) =
+let rec pprint_local_type ppf (typ : Local.typ) =
   match typ with
   | TUnit -> fprintf ppf "@[<h>unit@]"
   | TInt -> fprintf ppf "@[<h>int@]"
@@ -30,7 +33,7 @@ let rec pprint_local_type ppf (typ : Ast.Local.typ) =
    left (pattern)
    right (pattern)
 *)
-let rec pprint_local_pattern ppf (pat : Ast.Local.pattern) =
+let rec pprint_local_pattern ppf (pat : Local.pattern) =
   match pat with
   | Default -> fprintf ppf "@[<h>_@]"
   | Val v ->
@@ -38,7 +41,7 @@ let rec pprint_local_pattern ppf (pat : Ast.Local.pattern) =
       ppf
       "@[<h>%a@]"
       (fun ppf -> function
-        | Ast.Local.Int i -> fprintf ppf "%d" i
+        | Local.Int i -> fprintf ppf "%d" i
         | String s -> fprintf ppf "%s" s
         | Bool b -> fprintf ppf "%b" b)
       v
@@ -64,7 +67,7 @@ let rec pprint_local_pattern ppf (pat : Ast.Local.pattern) =
    | case2
    | ...
 *)
-let rec pprint_local_expr ppf (expr : Ast.Local.expr) =
+let rec pprint_local_expr ppf (expr : Local.expr) =
   match expr with
   | Unit -> fprintf ppf "@[<h>()@]"
   | Val v ->
@@ -72,7 +75,7 @@ let rec pprint_local_expr ppf (expr : Ast.Local.expr) =
       ppf
       "@[<h>%a@]"
       (fun ppf -> function
-        | Ast.Local.Int i -> fprintf ppf "%d" i
+        | Local.Int i -> fprintf ppf "%d" i
         | String s -> fprintf ppf "\"%s\"" s
         | Bool b -> fprintf ppf "%b" b)
       v
@@ -145,7 +148,7 @@ let rec pprint_local_expr ppf (expr : Ast.Local.expr) =
    type * type
    type + type
 *)
-let rec pprint_choreo_type ppf (typ : Ast.Choreo.typ) =
+let rec pprint_choreo_type ppf (typ : Choreo.typ) =
   match typ with
   | TUnit -> fprintf ppf "@[<h>unit@]"
   | TLoc (LocId loc, t) -> fprintf ppf "@[<h>%s.(%a)@]" loc pprint_local_type t
@@ -165,7 +168,7 @@ let rec pprint_choreo_type ppf (typ : Ast.Choreo.typ) =
    left (pattern)
    right (pattern)
 *)
-let rec pprint_choreo_pattern ppf (pat : Ast.Choreo.pattern) =
+let rec pprint_choreo_pattern ppf (pat : Choreo.pattern) =
   match pat with
   | Default -> fprintf ppf "@[<h>_@]"
   | Var (VarId id) -> fprintf ppf "@[<h>%s@]" id
@@ -183,7 +186,7 @@ let rec pprint_choreo_pattern ppf (pat : Ast.Choreo.pattern) =
       ...
     }
 *)
-let[@specialise] rec pprint_choreo_stmt_block ppf (stmts : Ast.Choreo.stmt_block) =
+let[@specialise] rec pprint_choreo_stmt_block ppf (stmts : Choreo.stmt_block) =
   fprintf ppf "@[<v>(@[<v1>@,%a@]@,)@]" (pp_print_list pprint_choreo_stmt) stmts
 
 (* (choreo_pattern) : choreo_type
@@ -286,7 +289,7 @@ and pprint_choreo_expr ppf = function
    type * type
    type + type
 *)
-let rec pprint_net_type ppf (typ : Ast.Net.typ) =
+let rec pprint_net_type ppf (typ : Net.typ) =
   match typ with
   | TUnit -> fprintf ppf "@[<h>unit@]"
   | TLoc t -> fprintf ppf "@[<h>%a@]" pprint_local_type t
@@ -298,7 +301,7 @@ let rec pprint_net_type ppf (typ : Ast.Net.typ) =
     fprintf ppf "@[<h>(%a) + (%a)@]" pprint_net_type t1 pprint_net_type t2
 ;;
 
-let[@specialise] rec pprint_net_stmt_block ppf (stmts : Ast.Net.stmt_block) =
+let[@specialise] rec pprint_net_stmt_block ppf (stmts : Net.stmt_block) =
   fprintf ppf "@[<v>(@[<v1>@,%a@]@,)@]" (pp_print_list pprint_net_stmt) stmts
 
 and pprint_net_stmt ppf = function
@@ -367,7 +370,7 @@ and pprint_net_expr ppf = function
   | ChooseFor (LabelId id, LocId locid, e) ->
     fprintf ppf "@[<hv>choose %s for %s;@ %a@]" id locid pprint_net_expr e
   | AllowChoice (LocId loc, choices) ->
-    let[@inline] pprint_net_choice ppf (Ast.Local.LabelId id, e) =
+    let[@inline] pprint_net_choice ppf (Local.LabelId id, e) =
       fprintf ppf "@[<hv2>%s ->@ %a@]" id pprint_net_expr e
     in
     fprintf
