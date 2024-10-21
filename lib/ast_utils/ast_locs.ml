@@ -1,5 +1,5 @@
-module Local = Ast_core.Local
-module Choreo = Ast_core.Choreo
+module Local = Ast_core.Local.M
+module Choreo = Ast_core.Choreo.M
 module LocSet = Set.Make (String)
 
 let rec extract_pattern : Choreo.pattern -> LocSet.t = function

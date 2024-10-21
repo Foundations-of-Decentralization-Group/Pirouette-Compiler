@@ -1,6 +1,6 @@
 %{
-  open Ast_core.Local
-  open Ast_core.Choreo
+  open Ast_core.Local.M
+  open Ast_core.Choreo.M
 %}
 
 %token <string> ID
@@ -25,20 +25,20 @@
 %token MATCH WITH
 %token EOF
 
-%type <Ast_core.Choreo.stmt_block> stmt_block
-%type <Ast_core.Choreo.stmt> stmt
-%type <Ast_core.Choreo.expr> choreo_expr
-%type <Ast_core.Choreo.pattern> choreo_pattern
-%type <Ast_core.Choreo.typ> choreo_type
-%type <Ast_core.Local.expr> local_expr
-%type <Ast_core.Local.pattern> local_pattern
-%type <Ast_core.Local.typ> local_type
-%type <Ast_core.Local.bin_op> bin_op
-%type <Ast_core.Local.value> value
-%type <Ast_core.Local.loc_id> loc_id
-%type <Ast_core.Local.var_id> var_id
-%type <Ast_core.Local.typ_id> typ_id
-%type <Ast_core.Local.sync_label> sync_label
+%type <Ast_core.Choreo.M.stmt_block> stmt_block
+%type <Ast_core.Choreo.M.stmt> stmt
+%type <Ast_core.Choreo.M.expr> choreo_expr
+%type <Ast_core.Choreo.M.pattern> choreo_pattern
+%type <Ast_core.Choreo.M.typ> choreo_type
+%type <Ast_core.Local.M.expr> local_expr
+%type <Ast_core.Local.M.pattern> local_pattern
+%type <Ast_core.Local.M.typ> local_type
+%type <Ast_core.Local.M.bin_op> bin_op
+%type <Ast_core.Local.M.value> value
+%type <Ast_core.Local.M.loc_id> loc_id
+%type <Ast_core.Local.M.var_id> var_id
+%type <Ast_core.Local.M.typ_id> typ_id
+%type <Ast_core.Local.M.sync_label> sync_label
 %type <stmt_block> program
 
 %nonassoc IN

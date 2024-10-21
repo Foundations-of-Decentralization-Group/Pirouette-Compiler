@@ -1,4 +1,4 @@
-module M = struct
+module M : sig
   type value =
     | Int of int
     | String of string
@@ -58,10 +58,11 @@ module M = struct
     | Match of expr * (pattern * expr) list
 end
 
-module With (Info : sig
-    type t
-  end) =
-struct
+module With : functor
+    (Info : sig
+       type t
+     end)
+    -> sig
   type value = M.value * Info.t
   type loc_id = M.loc_id * Info.t
   type var_id = M.var_id * Info.t
@@ -73,5 +74,5 @@ struct
   type pattern = M.pattern * Info.t
   type expr = M.expr * Info.t
 
-  let info_of (_, i) = i
+  val info_of : 'a * 'b -> 'b
 end

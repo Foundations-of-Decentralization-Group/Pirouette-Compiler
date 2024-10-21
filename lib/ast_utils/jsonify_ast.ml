@@ -1,6 +1,6 @@
-module Local = Ast_core.Local
-module Choreo = Ast_core.Choreo
-module Net = Ast_core.Net
+module Local = Ast_core.Local.M
+module Choreo = Ast_core.Choreo.M
+module Net = Ast_core.Net.M
 
 (* ============================== Local ============================== *)
 let jsonify_un_op (op : Local.un_op) =

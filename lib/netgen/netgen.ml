@@ -1,6 +1,6 @@
-module Local = Ast_core.Local
-module Choreo = Ast_core.Choreo
-module Net = Ast_core.Net
+module Local = Ast_core.Local.M
+module Choreo = Ast_core.Choreo.M
+module Net = Ast_core.Net.M
 
 (* TODO: change Hashtbl to List *)
 let rec merge_net_stmt (s1 : Net.stmt) (s2 : Net.stmt) : Net.stmt option =

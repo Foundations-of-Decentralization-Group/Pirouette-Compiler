@@ -1,6 +1,8 @@
+(* Refactoring needed *)
+
 open OUnit2
-open Ast_core.Local
-open Ast_core.Choreo
+open Ast_core.Local.M
+open Ast_core.Choreo.M
 
 (* open Ast.Net *)
 open Parsing
