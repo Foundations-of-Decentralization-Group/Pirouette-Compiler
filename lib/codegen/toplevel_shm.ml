@@ -1,5 +1,5 @@
-module Local = Ast.Local
-module Net = Ast.Net
+module Local = Ast_core.Local.M
+module Net = Ast_core.Net.M
 open Ppxlib
 
 let spf = Printf.sprintf
@@ -9,9 +9,9 @@ let emit_toplevel_shm
   chan
   (module Msg : Msg_intf.M)
   (loc_ids : string list)
-  (net_stmtblock_l : Net.stmt_block list)
+  (net_stmtblock_l : 'a Net.stmt_block list)
   =
-  let emit_domain_stri (loc_id : string) (net_stmts : Net.stmt_block) =
+  let emit_domain_stri (loc_id : string) (net_stmts : 'a Net.stmt_block) =
     let main_expr = ref (Ast_builder.Default.eunit ~loc) in
     let rec emit_net_toplevel = function
       | [] -> !main_expr
