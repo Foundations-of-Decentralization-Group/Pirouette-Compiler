@@ -1,23 +1,23 @@
-exception Main_expr of Parsetree.expression
+exception Main_expr of Ppxlib.expression
 
-val emit_local_pexp : 'a Ast_core.Local.M.expr -> Parsetree.expression
-val emit_local_ppat : 'a Ast_core.Local.M.pattern -> Parsetree.pattern
+val emit_local_pexp : 'a Ast_core.Local.M.expr -> Ppxlib.expression
+val emit_local_ppat : 'a Ast_core.Local.M.pattern -> Ppxlib.pattern
 
 val emit_net_fun_body
   :  self_id:string
   -> (module Msg_intf.M)
   -> 'a Ast_core.Local.M.pattern list
   -> 'a Ast_core.Net.M.expr
-  -> Parsetree.expression
+  -> Ppxlib.expression
 
 val emit_net_binding
   :  self_id:string
   -> (module Msg_intf.M)
   -> 'a Ast_core.Net.M.stmt
-  -> Parsetree.value_binding
+  -> Ppxlib.value_binding
 
 val emit_net_pexp
   :  self_id:string
   -> (module Msg_intf.M)
   -> 'a Ast_core.Net.M.expr
-  -> Parsetree.expression
+  -> Ppxlib.expression

@@ -4,15 +4,15 @@ let spf = Printf.sprintf
 let loc = { !Ast_helper.default_loc with loc_ghost = true }
 
 module type M = sig
-  val emit_toplevel_init : string list -> Parsetree.structure
+  val emit_toplevel_init : string list -> structure
 
   val emit_net_send
     :  src:string
     -> dst:string
-    -> Parsetree.expression
-    -> Parsetree.expression
+    -> expression
+    -> expression
 
-  val emit_net_recv : src:string -> dst:string -> Parsetree.expression
+  val emit_net_recv : src:string -> dst:string -> expression
 end
 
 module Msg_chan_intf : M = struct
