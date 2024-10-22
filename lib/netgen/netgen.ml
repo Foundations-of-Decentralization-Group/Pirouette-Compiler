@@ -1,56 +1,63 @@
+module Local = Ast_core.Local.M
+module Choreo = Ast_core.Choreo.M
+module Net = Ast_core.Net.M
+
+let _m = Obj.magic () (* dummy metainfo to make the types work *)
+
 (* TODO: change Hashtbl to List *)
-let rec merge_net_stmt (s1 : Ast.Net.stmt) (s2 : Ast.Net.stmt) : Ast.Net.stmt option =
-  match s1, s2 with
-  | Decl (p, t), Decl (p', t') when p = p' && t = t' -> Some (Decl (p, t))
-  | TypeDecl (id, t), TypeDecl (id', t') when id = id' && t = t' ->
-    Some (TypeDecl (id, t))
-  | Assign (p, e1), Assign (p', e2) when p = p' ->
-    (match merge_net_expr e1 e2 with
-     | Some e -> Some (Assign (p, e))
+let rec merge_net_stmt (stmt : 'a Net.stmt) (stmt' : 'a Net.stmt) : 'a Net.stmt option =
+  match stmt, stmt' with
+  | Decl (p, t, _), Decl (p', t', _) when p = p' && t = t' -> Some (Decl (p, t, _m))
+  | TypeDecl (id, t, _), TypeDecl (id', t', _) when id = id' && t = t' ->
+    Some (TypeDecl (id, t, _m))
+  | Assign (p, e, _), Assign (p', e', _) when p = p' ->
+    (match merge_net_expr e e' with
+     | Some e -> Some (Assign (p, e, _m))
      | None -> None)
   | _ -> None
 
-and merge_net_expr (e1 : Ast.Net.expr) (e2 : Ast.Net.expr) : Ast.Net.expr option =
-  match e1, e2 with
-  | Unit, Unit -> Some Unit
-  | Var id1, Var id2 when id1 = id2 -> Some (Var id1)
-  | Ret e, Ret e' when e = e' -> Some (Ret e)
-  | Pair (e1, e2), Pair (e1', e2') ->
+and merge_net_expr (expr : 'a Net.expr) (expr' : 'a Net.expr) : 'a Net.expr option =
+  match expr, expr' with
+  | Unit _, Unit _ -> Some (Unit _m)
+  | Var (id1, _), Var (id2, _) when id1 = id2 -> Some (Var (id1, _m))
+  | Ret (e, _), Ret (e', _) when e = e' -> Some (Ret (e, _m))
+  | Pair (e1, e2, _), Pair (e1', e2', _) ->
     (match merge_net_expr e1 e1', merge_net_expr e2 e2' with
-     | Some e1, Some e2 -> Some (Pair (e1, e2))
+     | Some e1, Some e2 -> Some (Pair (e1, e2, _m))
      | _ -> None)
-  | Fst e, Fst e' ->
+  | Fst (e, _), Fst (e', _) ->
     (match merge_net_expr e e' with
-     | Some e -> Some (Fst e)
+     | Some e -> Some (Fst (e, _m))
      | None -> None)
-  | Snd e, Snd e' ->
+  | Snd (e, _), Snd (e', _) ->
     (match merge_net_expr e e' with
-     | Some e -> Some (Snd e)
+     | Some e -> Some (Snd (e, _m))
      | None -> None)
-  | Left e, Left e' ->
+  | Left (e, _), Left (e', _) ->
     (match merge_net_expr e e' with
-     | Some e -> Some (Left e)
+     | Some e -> Some (Left (e, _m))
      | None -> None)
-  | Right e, Right e' ->
+  | Right (e, _), Right (e', _) ->
     (match merge_net_expr e e' with
-     | Some e -> Some (Right e)
+     | Some e -> Some (Right (e, _m))
      | None -> None)
-  | Send (e1, LocId loc), Send (e2, LocId loc') when loc = loc' ->
+  | Send (e1, LocId (loc, _), _), Send (e2, LocId (loc', _), _) when loc = loc' ->
     (match merge_net_expr e1 e2 with
-     | Some e -> Some (Send (e, LocId loc))
+     | Some e -> Some (Send (e, LocId (loc, _m), _m))
      | None -> None)
-  | Recv (LocId loc), Recv (LocId loc') when loc = loc' -> Some (Recv (LocId loc))
-  | FunDef (p, e), FunDef (p', e') when p = p' && e = e' -> Some (FunDef (p, e))
-  | FunApp (e1, e2), FunApp (e1', e2') ->
+  | Recv (LocId (loc, _), _), Recv (LocId (loc', _), _) when loc = loc' ->
+    Some (Recv (LocId (loc, _m), _m))
+  | FunDef (p, e, _), FunDef (p', e', _) when p = p' && e = e' -> Some (FunDef (p, e, _m))
+  | FunApp (e1, e2, _), FunApp (e1', e2', _) ->
     (match merge_net_expr e1 e1', merge_net_expr e2 e2' with
-     | Some e1, Some e2 -> Some (FunApp (e1, e2))
+     | Some e1, Some e2 -> Some (FunApp (e1, e2, _m))
      | _ -> None)
-  | If (e1, e2, e3), If (e1', e2', e3') when e1 = e1' ->
+  | If (e1, e2, e3, _), If (e1', e2', e3', _) when e1 = e1' ->
     (match merge_net_expr e2 e2', merge_net_expr e3 e3' with
-     | Some e2, Some e3 -> Some (If (e1, e2, e3))
+     | Some e2, Some e3 -> Some (If (e1, e2, e3, _m))
      | _ -> None)
-  | Let (stmts1, e1), Let (stmts2, e2) ->
-    if List.length stmts1 <> List.length stmts2
+  | Let (stmts, e, _), Let (stmts', e', _) ->
+    if List.length stmts <> List.length stmts'
     then None
     else (
       let merged_stmts =
@@ -65,20 +72,20 @@ and merge_net_expr (e1 : Ast.Net.expr) (e2 : Ast.Net.expr) : Ast.Net.expr option
                  | None -> raise Not_matched)
               | None -> raise Not_matched)
             (Some [])
-            stmts1
-            stmts2
+            stmts
+            stmts'
         with
         | Not_matched -> None
       in
       match merged_stmts with
       | Some stmts ->
-        (match merge_net_expr e1 e2 with
-         | Some e -> Some (Let (List.rev stmts, e))
+        (match merge_net_expr e e' with
+         | Some e -> Some (Let (List.rev stmts, e, _m))
          | None -> None)
       | None -> None)
-  | Match (e, cases1), Match (e', cases2) when e = e' ->
-    let cases1_tbl = Hashtbl.create (List.length cases1) in
-    List.iter (fun (p, e) -> Hashtbl.add cases1_tbl p e) cases1;
+  | Match (e, cases, _), Match (e', cases', _) when e = e' ->
+    let cases1_tbl = Hashtbl.create (List.length cases) in
+    List.iter (fun (p, e) -> Hashtbl.add cases1_tbl p e) cases;
     let exception Not_matched in
     (try
        List.iter
@@ -89,17 +96,17 @@ and merge_net_expr (e1 : Ast.Net.expr) (e2 : Ast.Net.expr) : Ast.Net.expr option
               | Some e -> Hashtbl.replace cases1_tbl p e
               | None -> raise Not_matched)
            | None -> raise Not_matched)
-         cases2;
-       Some (Match (e, Hashtbl.fold (fun p e acc -> (p, e) :: acc) cases1_tbl []))
+         cases';
+       Some (Match (e, Hashtbl.fold (fun p e acc -> (p, e) :: acc) cases1_tbl [], _m))
      with
      | Not_matched -> None)
-  | ChooseFor (l, LocId loc, e1), ChooseFor (l', LocId loc', e2) when l = l' && loc = loc'
-    ->
-    (match merge_net_expr e1 e2 with
-     | Some e -> Some (ChooseFor (l, LocId loc, e))
+  | ChooseFor (l, LocId (loc, _), e, _), ChooseFor (l', LocId (loc', _), e', _)
+    when l = l' && loc = loc' ->
+    (match merge_net_expr e e' with
+     | Some e -> Some (ChooseFor (l, LocId (loc, _m), e, _m))
      | None -> None)
-  | AllowChoice (LocId loc, choices1), AllowChoice (LocId loc', choices2) when loc = loc'
-    ->
+  | AllowChoice (LocId (loc, _), choices, _), AllowChoice (LocId (loc', _), choices', _)
+    when loc = loc' ->
     let merge_choice_into tbl (label, expr) =
       match Hashtbl.find_opt tbl label with
       | Some expr' ->
@@ -110,95 +117,97 @@ and merge_net_expr (e1 : Ast.Net.expr) (e2 : Ast.Net.expr) : Ast.Net.expr option
     in
     Some
       (AllowChoice
-         ( LocId loc
-         , let tbl = Hashtbl.create 2 in
-           List.iter (merge_choice_into tbl) choices1;
-           List.iter (merge_choice_into tbl) choices2;
-           Hashtbl.fold (fun l e acc -> (l, e) :: acc) tbl [] ))
+         ( LocId (loc, _m)
+         , (let tbl = Hashtbl.create 2 in
+            List.iter (merge_choice_into tbl) choices;
+            List.iter (merge_choice_into tbl) choices';
+            Hashtbl.fold (fun l e acc -> (l, e) :: acc) tbl [])
+         , _m ))
     (* use list *)
   | _ -> None
 ;;
 
-let rec epp_choreo_type (t : Ast.Choreo.typ) (loc : string) : Ast.Net.typ =
-  match t with
-  | TLoc (LocId loc1, t1) -> if loc1 = loc then TLoc t1 else TUnit
-  | TMap (t1, t2) -> TMap (epp_choreo_type t1 loc, epp_choreo_type t2 loc)
-  | TProd (t1, t2) -> TProd (epp_choreo_type t1 loc, epp_choreo_type t2 loc)
-  | TSum (t1, t2) -> TSum (epp_choreo_type t1 loc, epp_choreo_type t2 loc)
-  | _ -> TUnit
+let rec epp_choreo_type (typ : 'a Choreo.typ) (loc : string) : 'a Net.typ =
+  match typ with
+  | TLoc (LocId (loc1, _), t1, _) -> if loc1 = loc then TLoc (t1, _m) else TUnit _m
+  | TMap (t1, t2, _) -> TMap (epp_choreo_type t1 loc, epp_choreo_type t2 loc, _m)
+  | TProd (t1, t2, _) -> TProd (epp_choreo_type t1 loc, epp_choreo_type t2 loc, _m)
+  | TSum (t1, t2, _) -> TSum (epp_choreo_type t1 loc, epp_choreo_type t2 loc, _m)
+  | _ -> TUnit _m
 ;;
 
-let rec epp_choreo_pattern (p : Ast.Choreo.pattern) (loc : string) : Ast.Local.pattern =
-  match p with
-  | Default -> Default
-  | Var id -> Var id
-  | Pair (p1, p2) -> Pair (epp_choreo_pattern p1 loc, epp_choreo_pattern p2 loc)
-  | LocPatt (LocId id, p) -> if id = loc then p else Default
-  | Left p -> Left (epp_choreo_pattern p loc)
-  | Right p -> Right (epp_choreo_pattern p loc)
+let rec epp_choreo_pattern (pat : 'a Choreo.pattern) (loc : string) : 'a Local.pattern =
+  match pat with
+  | Default _ -> Default _m
+  | Var (id, _) -> Var (id, _m)
+  | Pair (p1, p2, _) -> Pair (epp_choreo_pattern p1 loc, epp_choreo_pattern p2 loc, _m)
+  | LocPat (LocId (id, _), p, _) -> if id = loc then p else Default _m
+  | Left (p, _) -> Left (epp_choreo_pattern p loc, _m)
+  | Right (p, _) -> Right (epp_choreo_pattern p loc, _m)
 ;;
 
-let rec epp_choreo_stmt (stmt : Ast.Choreo.stmt) (loc : string) : Ast.Net.stmt =
+let rec epp_choreo_stmt (stmt : 'a Choreo.stmt) (loc : string) : 'a Net.stmt =
   match stmt with
-  | Decl (p, t) -> Decl (epp_choreo_pattern p loc, epp_choreo_type t loc)
-  | Assign (ps, e) ->
-    Assign (List.map (fun p -> epp_choreo_pattern p loc) ps, epp_choreo_expr e loc)
-  | TypeDecl (id, t) -> TypeDecl (id, epp_choreo_type t loc)
+  | Decl (p, t, _) -> Decl (epp_choreo_pattern p loc, epp_choreo_type t loc, _m)
+  | Assign (ps, e, _) ->
+    Assign (List.map (fun p -> epp_choreo_pattern p loc) ps, epp_choreo_expr e loc, _m)
+  | TypeDecl (id, t, _) -> TypeDecl (id, epp_choreo_type t loc, _m)
 
-and epp_choreo_expr (c : Ast.Choreo.expr) (loc : string) : Ast.Net.expr =
-  match c with
-  | LocExpr (LocId loc1, e) when loc1 = loc -> Ret e
-  | FunDef (ps, c) ->
-    FunDef (List.map (fun p -> epp_choreo_pattern p loc) ps, epp_choreo_expr c loc)
-  | FunApp (c1, c2) -> FunApp (epp_choreo_expr c1 loc, epp_choreo_expr c2 loc)
-  | Pair (c1, c2) -> Pair (epp_choreo_expr c1 loc, epp_choreo_expr c2 loc)
-  | Fst c -> Fst (epp_choreo_expr c loc)
-  | Snd c -> Snd (epp_choreo_expr c loc)
-  | Left c -> Left (epp_choreo_expr c loc)
-  | Right c -> Right (epp_choreo_expr c loc)
-  | Let (stmts, c) ->
-    Let (List.map (fun stmt -> epp_choreo_stmt stmt loc) stmts, epp_choreo_expr c loc)
-  | Send (LocId loc1, c, LocId loc2) ->
+and epp_choreo_expr (expr : 'a Choreo.expr) (loc : string) : 'a Net.expr =
+  match expr with
+  | LocExpr (LocId (loc1, _), e, _) when loc1 = loc -> Ret (e, _m)
+  | FunDef (ps, e, _) ->
+    FunDef (List.map (fun p -> epp_choreo_pattern p loc) ps, epp_choreo_expr e loc, _m)
+  | FunApp (e1, e2, _) -> FunApp (epp_choreo_expr e1 loc, epp_choreo_expr e2 loc, _m)
+  | Pair (e1, e2, _) -> Pair (epp_choreo_expr e1 loc, epp_choreo_expr e2 loc, _m)
+  | Fst (e, _) -> Fst (epp_choreo_expr e loc, _m)
+  | Snd (e, _) -> Snd (epp_choreo_expr e loc, _m)
+  | Left (e, _) -> Left (epp_choreo_expr e loc, _m)
+  | Right (e, _) -> Right (epp_choreo_expr e loc, _m)
+  | Let (stmts, e, _) ->
+    Let (List.map (fun stmt -> epp_choreo_stmt stmt loc) stmts, epp_choreo_expr e loc, _m)
+  | Send (LocId (loc1, _), e, LocId (loc2, _), _) ->
     if loc1 = loc2
-    then epp_choreo_expr c loc
+    then epp_choreo_expr e loc
     else if loc1 = loc
-    then Send (epp_choreo_expr c loc, LocId loc2)
+    then Send (epp_choreo_expr e loc, LocId (loc2, _m), _m)
     else if loc2 = loc
-    then Recv (LocId loc1)
-    else epp_choreo_expr c loc
-  | Sync (LocId id1, l, LocId id2, c) ->
+    then Recv (LocId (loc1, _m), _m)
+    else epp_choreo_expr e loc
+  | Sync (LocId (id1, _), l, LocId (id2, _), e, _) ->
     if id1 = loc && id2 <> loc
-    then ChooseFor (l, LocId id2, epp_choreo_expr c loc)
+    then ChooseFor (l, LocId (id2, _m), epp_choreo_expr e loc, _m)
     else if id2 = loc && id1 <> loc
-    then AllowChoice (LocId id1, [ l, epp_choreo_expr c loc ])
+    then AllowChoice (LocId (id1, _m), [ l, epp_choreo_expr e loc ], _m)
     else if id1 <> id2
-    then epp_choreo_expr c loc
-    else Unit
-  | If (c1, c2, c3) ->
-    (match merge_net_expr (epp_choreo_expr c2 loc) (epp_choreo_expr c3 loc) with
+    then epp_choreo_expr e loc
+    else Unit _m
+  | If (e1, e2, e3, _m) ->
+    (match merge_net_expr (epp_choreo_expr e2 loc) (epp_choreo_expr e3 loc) with
      | Some e -> e
-     | None -> If (epp_choreo_expr c1 loc, epp_choreo_expr c2 loc, epp_choreo_expr c3 loc))
-  | Match (c, cases) ->
+     | None ->
+       If (epp_choreo_expr e1 loc, epp_choreo_expr e2 loc, epp_choreo_expr e3 loc, _m))
+  | Match (match_e, cases, _) ->
     let merged_cases =
       match cases with
       | [] -> None
-      | (_, c) :: rest ->
+      | (_, case_e) :: rest ->
         List.fold_left
-          (fun acc (_, c) ->
+          (fun acc (_, e) ->
             match acc with
-            | Some e' -> merge_net_expr e' (epp_choreo_expr c loc)
+            | Some e' -> merge_net_expr e' (epp_choreo_expr e loc)
             | None -> None)
-          (Some (epp_choreo_expr c loc))
+          (Some (epp_choreo_expr case_e loc))
           rest
     in
     (match merged_cases with
      | Some e -> e
      | None ->
        Match
-         ( epp_choreo_expr c loc
+         ( epp_choreo_expr match_e loc
          , List.map (fun (p, e) -> epp_choreo_pattern p loc, epp_choreo_expr e loc) cases
-         ))
-  | _ -> Unit
+         , _m ))
+  | _ -> Unit _m
 ;;
 
 let epp_choreo_to_net stmt_block loc =

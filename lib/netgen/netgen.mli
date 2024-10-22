@@ -1,1 +1,4 @@
-val epp_choreo_to_net : Ast.Choreo.stmt_block -> string -> Ast.Net.stmt_block
+val epp_choreo_to_net
+  :  'a Ast_core.Choreo.M.stmt list
+  -> string
+  -> 'a Ast_core.Net.M.stmt list

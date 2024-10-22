@@ -46,4 +46,4 @@ module LocSet : sig
   val of_seq : elt Seq.t -> t
 end
 
-val extract_stmt_block : Ast.Choreo.stmt_block -> LocSet.t
+val extract_stmt_block : 'a Ast_core.Choreo.M.stmt_block -> LocSet.t
