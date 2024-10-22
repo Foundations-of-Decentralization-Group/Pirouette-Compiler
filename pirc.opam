@@ -11,13 +11,14 @@ doc: "https://dl.acm.org/doi/10.1145/3498684"
 bug-reports:
   "https://github.com/Foundations-of-Decentralization-Group/Pirouette-Compiler/issues"
 depends: [
-  "ocaml"
+  "ocaml" {>= "5.0.0"}
   "dune" {>= "3.14"}
   "cohttp-lwt-unix"
   "logs"
   "lwt"
   "menhir"
   "ounit2"
+  "ppxlib"
   "yojson"
   "yaml"
   "lwt_ppx"

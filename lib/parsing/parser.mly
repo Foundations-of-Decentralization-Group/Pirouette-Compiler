@@ -65,10 +65,11 @@
 %type <Parsed_ast.Local.sync_label> sync_label
 
 %start prog
+%start prog
 
 %%
 
-(** [program] parses a stmt_block aka list of statements and add EOF at the end of code block.*)
+(** [prog] parses a stmt_block aka list of statements and add EOF at the end of code block.*)
 prog:
   | stmt_block EOF { $1 }
 
