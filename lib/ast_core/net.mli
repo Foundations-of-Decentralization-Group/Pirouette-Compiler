@@ -1,36 +1,36 @@
 module M : sig
-  type typ =
-    | TUnit
-    | TLoc of Local.M.typ
-    | TMap of typ * typ
-    | TProd of typ * typ
-    | TSum of typ * typ
+  type 'a typ =
+    | TUnit of 'a
+    | TLoc of 'a Local.M.typ * 'a
+    | TMap of 'a typ * 'a typ * 'a
+    | TProd of 'a typ * 'a typ * 'a
+    | TSum of 'a typ * 'a typ * 'a
 
-  type expr =
-    | Unit
-    | Var of Local.M.var_id
-    | Ret of Local.M.expr
-    | If of expr * expr * expr
-    | Let of stmt list * expr
-    | Send of expr * Local.M.loc_id
-    | Recv of Local.M.loc_id
-    | ChooseFor of Local.M.sync_label * Local.M.loc_id * expr
-    | AllowChoice of Local.M.loc_id * (Local.M.sync_label * expr) list
-    | FunDef of Local.M.pattern list * expr
-    | FunApp of expr * expr
-    | Pair of expr * expr
-    | Fst of expr
-    | Snd of expr
-    | Left of expr
-    | Right of expr
-    | Match of expr * (Local.M.pattern * expr) list
+  type 'a expr =
+    | Unit of 'a
+    | Var of 'a Local.M.var_id * 'a
+    | Ret of 'a Local.M.expr * 'a
+    | If of 'a expr * 'a expr * 'a expr * 'a
+    | Let of 'a stmt list * 'a expr * 'a
+    | Send of 'a expr * 'a Local.M.loc_id * 'a
+    | Recv of 'a Local.M.loc_id * 'a
+    | ChooseFor of 'a Local.M.sync_label * 'a Local.M.loc_id * 'a expr * 'a
+    | AllowChoice of 'a Local.M.loc_id * ('a Local.M.sync_label * 'a expr) list * 'a
+    | FunDef of 'a Local.M.pattern list * 'a expr * 'a
+    | FunApp of 'a expr * 'a expr * 'a
+    | Pair of 'a expr * 'a expr * 'a
+    | Fst of 'a expr * 'a
+    | Snd of 'a expr * 'a
+    | Left of 'a expr * 'a
+    | Right of 'a expr * 'a
+    | Match of 'a expr * ('a Local.M.pattern * 'a expr) list * 'a
 
-  and stmt =
-    | Decl of Local.M.pattern * typ
-    | Assign of Local.M.pattern list * expr
-    | TypeDecl of Local.M.typ_id * typ
+  and 'a stmt =
+    | Decl of 'a Local.M.pattern * 'a typ * 'a
+    | Assign of 'a Local.M.pattern list * 'a expr * 'a
+    | TypeDecl of 'a Local.M.typ_id * 'a typ * 'a
 
-  and stmt_block = stmt list
+  and 'a stmt_block = 'a stmt list
 end
 
 module With : functor
@@ -38,11 +38,15 @@ module With : functor
        type t
      end)
     -> sig
-  type 'a with_info = 'a * Info.t
-  type typ = M.typ with_info
-  type expr = M.expr with_info
-  type stmt = M.stmt with_info
-  type stmt_block = stmt list
+  type nonrec typ = Info.t M.typ
+  type nonrec expr = Info.t M.expr
+  type nonrec stmt = Info.t M.stmt
+  type nonrec stmt_block = Info.t M.stmt_block
 
-  val info_of : 'a with_info -> Info.t
+  val get_info_typ : typ -> Info.t
+  val get_info_expr : expr -> Info.t
+  val get_info_stmt : stmt -> Info.t
+  val set_info_typ : Info.t -> typ -> typ
+  val set_info_expr : Info.t -> expr -> expr
+  val set_info_stmt : Info.t -> stmt -> stmt
 end

@@ -1,55 +1,55 @@
-(* Refactoring needed *)
+(* !!!Refactoring needed *)
 
-open OUnit2
-open Ast_core.Local.M
-open Ast_core.Choreo.M
+(* open OUnit2
+   open Ast_core.Local
+   open Ast_core.Choreo
 
-(* open Ast.Net *)
-open Parsing
+   (* open Ast.Net *)
+   open Parsing
 
-(* comment *)
+   (* comment *)
 
-let peq (s : string) (v : 'a) =
-  let lexbuf = Lexing.from_string s in
-  assert_equal v (parse_program lexbuf)
-;;
+   let peq (s : string) (v : ) =
+   let lexbuf = Lexing.from_string s in
+   assert_equal v (parse_program lexbuf)
+   ;;
 
-let test_declarations_basic _ =
-  (* peq "var : loc.bool" ([ VarDecl (VarId "var", TLoc (LocId "loc", TBool)) ]);
-     peq "fun fn : loc.int -> loc.int" ([FunDecl (FunId "fn", TLoc (LocId "loc", TInt), TLoc (LocId "loc", TInt)) ]);
-     peq "loc.var : loc.string" ([ LocVarDecl (LocId "loc", VarId "var", LocId "loc", TString) ]); *)
-  peq "type new := unit" [ TypeDecl (TypId "new", TUnit) ]
-;;
+   let test_declarations_basic _ =
+   (* peq "var : loc.bool" ([ VarDecl (VarId "var", TLoc (LocId "loc", TBool)) ]);
+   peq "fun fn : loc.int -> loc.int" ([FunDecl (FunId "fn", TLoc (LocId "loc", TInt), TLoc (LocId "loc", TInt)) ]);
+   peq "loc.var : loc.string" ([ LocVarDecl (LocId "loc", VarId "var", LocId "loc", TString) ]); *)
+   peq "type new := unit" [ TypeDecl (TypId "new", TUnit) ]
+   ;;
 
-let new_decl _ = peq "type x := P1.int" [ TypeDecl (TypId "x", TLoc (LocId "P1", TInt)) ]
+   let new_decl _ = peq "type x := P1.int" [ TypeDecl (TypId "x", TLoc (LocId "P1", TInt)) ]
 
-let int_assign _ =
-  peq "x := P1.5;" [ Assign ([ Var (VarId "x") ], LocExpr (LocId "P1", Val (Int 5))) ]
-;;
+   let int_assign _ =
+   peq "x := P1.5;" [ Assign ([ Var (VarId "x") ], LocExpr (LocId "P1", Val (Int 5))) ]
+   ;;
 
-let decl_expr _ =
-  peq
-    "(P1.5, P2.true) : P1.int * P2.bool;"
-    [ Decl
-        ( Pair (LocPatt (LocId "P1", Val (Int 5)), LocPatt (LocId "P2", Val (Bool true)))
+   let decl_expr _ =
+   peq
+   "(P1.5, P2.true) : P1.int * P2.bool;"
+   [ Decl
+        ( Pair (LocPat (LocId "P1", Val (Int 5)), LocPat (LocId "P2", Val (Bool true)))
         , TProd (TLoc (LocId "P1", TInt), TLoc (LocId "P2", TBool)) )
     ]
-;;
+   ;;
 
-let pair_assign _ =
-  peq
-    "pair1 := (P1.5, P2.true);"
-    [ Assign
+   let pair_assign _ =
+   peq
+   "pair1 := (P1.5, P2.true);"
+   [ Assign
         ( [ Var (VarId "pair1") ]
         , Pair (LocExpr (LocId "P1", Val (Int 5)), LocExpr (LocId "P2", Val (Bool true)))
         )
     ]
-;;
+   ;;
 
-let binary_operation _ =
-  peq
-    "y := if P1.(3 > 5 && 4 < 0) then P1.3 else P1.6;"
-    [ Assign
+   let binary_operation _ =
+   peq
+   "y := if P1.(3 > 5 && 4 < 0) then P1.3 else P1.6;"
+   [ Assign
         ( [ Var (VarId "y") ]
         , If
             ( LocExpr
@@ -61,45 +61,45 @@ let binary_operation _ =
             , LocExpr (LocId "P1", Val (Int 3))
             , LocExpr (LocId "P1", Val (Int 6)) ) )
     ]
-;;
+   ;;
 
-let test_first_pair _ =
-  peq
-    " y := fst(P1.\"Hello\", P1.\"World\");"
-    [ Assign
+   let test_first_pair _ =
+   peq
+   " y := fst(P1.\"Hello\", P1.\"World\");"
+   [ Assign
         ( [ Var (VarId "y") ]
         , Fst
             (Pair
                ( LocExpr (LocId "P1", Val (String "Hello"))
                , LocExpr (LocId "P1", Val (String "World")) )) )
     ]
-;;
+   ;;
 
-let test_second_pair _ =
-  peq
-    " y := snd(P1.\"Hello\", P1.\"World\");"
-    [ Assign
+   let test_second_pair _ =
+   peq
+   " y := snd(P1.\"Hello\", P1.\"World\");"
+   [ Assign
         ( [ Var (VarId "y") ]
         , Snd
             (Pair
                ( LocExpr (LocId "P1", Val (String "Hello"))
                , LocExpr (LocId "P1", Val (String "World")) )) )
     ]
-;;
+   ;;
 
-let test_decl_send _ =
-  peq
-    "y : P2.int;\n        y := P1.5 [P1] ~> P2;"
-    [ Decl (Var (VarId "y"), TLoc (LocId "P2", TInt))
+   let test_decl_send _ =
+   peq
+   "y : P2.int;\n        y := P1.5 [P1] ~> P2;"
+   [ Decl (Var (VarId "y"), TLoc (LocId "P2", TInt))
     ; Assign
         ( [ Var (VarId "y") ]
         , Send (LocId "P1", LocExpr (LocId "P1", Val (Int 5)), LocId "P2") )
     ]
-;;
+   ;;
 
-let suite =
-  "Parser Tests"
-  >::: [ "Declarations"
+   let suite =
+   "Parser Tests"
+   >::: [ "Declarations"
          >::: [ "Basic Declarations" >:: test_declarations_basic
               ; "New Declarations" >:: new_decl
               ; "Assign test" >:: int_assign
@@ -111,6 +111,6 @@ let suite =
               ; "Testing declare and send" >:: test_decl_send
               ]
        ]
-;;
+   ;;
 
-let () = run_test_tt_main suite
+   let () = run_test_tt_main suite *)

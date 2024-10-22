@@ -1,7 +1,7 @@
 let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json>]"
 let ast_dump_format = ref "pprint"
 let file_ic = ref None
-let basename = ref "choreo"
+let basename = ref ""
 
 let anon_fun filename =
   basename := Filename.remove_extension filename;
