@@ -1,10 +1,5 @@
-%{
-  open Ast.Local
-  open Ast.Choreo
-%}
-
 %token <string> ID
-%token <int>    INT
+%token <int> INT
 %token <string> STRING
 %token TRUE FALSE
 %token UNIT_T INT_T STRING_T BOOL_T
@@ -25,22 +20,6 @@
 %token MATCH WITH
 %token EOF
 
-%type <Ast.Choreo.program> program
-%type <Ast.Choreo.stmt_block> stmt_block
-%type <Ast.Choreo.stmt> stmt
-%type <Ast.Choreo.expr> choreo_expr
-%type <Ast.Choreo.pattern> choreo_pattern
-%type <Ast.Choreo.typ> choreo_type
-%type <Ast.Local.expr> local_expr
-%type <Ast.Local.pattern> local_pattern
-%type <Ast.Local.typ> local_type
-%type <Ast.Local.bin_op> bin_op
-%type <Ast.Local.value> value
-%type <Ast.Local.loc_id> loc_id
-%type <Ast.Local.var_id> var_id
-%type <Ast.Local.typ_id> typ_id
-%type <Ast.Local.sync_label> sync_label
-
 %nonassoc IN
 %right ARROW
 %nonassoc BAR
@@ -53,137 +32,166 @@
 %nonassoc UNARY
 %left DOT
 
+%{
+  open Ast_core.Local.M
+  open Ast_core.Choreo.M
+  open Parsed_ast
 
-%start program
+  let gen_pos startpos endpos =
+    let open Lexing in
+    { Pos_info.fname = startpos.pos_fname
+    ; start = startpos.pos_lnum, startpos.pos_cnum - startpos.pos_bol
+    ; stop = endpos.pos_lnum, endpos.pos_cnum - endpos.pos_bol
+    }
+%}
+
+%type <Parsed_ast.Choreo.stmt_block> prog
+%type <Parsed_ast.Choreo.stmt_block> stmt_block
+%type <Parsed_ast.Choreo.stmt> stmt
+%type <Parsed_ast.Choreo.expr> choreo_expr
+%type <Parsed_ast.Choreo.pattern> choreo_pattern
+%type <Parsed_ast.Choreo.typ> choreo_type
+%type <Parsed_ast.Local.expr> local_expr
+%type <Parsed_ast.Local.pattern> local_pattern
+%type <Parsed_ast.Local.typ> local_type
+%type <Parsed_ast.Local.bin_op> bin_op
+%type <Parsed_ast.Local.value> value
+%type <Parsed_ast.Local.loc_id> loc_id
+%type <Parsed_ast.Local.var_id> var_id
+%type <Parsed_ast.Local.typ_id> typ_id
+%type <Parsed_ast.Local.sync_label> sync_label
+
+%start prog
 
 %%
 
-program:
-  | stmt_block EOF { Prog $1 }
+prog:
+  | stmt_block EOF { $1 }
 
 stmt_block:
   | list(stmt) { $1 }
 
 /* TODO: Removing the need for semicolons */
 stmt:
-  | choreo_pattern COLON choreo_type SEMICOLON                   { Decl ($1, $3)}
-  | nonempty_list(choreo_pattern) COLONEQ choreo_expr SEMICOLON  { Assign ($1, $3) }
-  | TYPE typ_id COLONEQ choreo_type SEMICOLON?                   { TypeDecl ($2, $4) }
+  | p=choreo_pattern COLON t=choreo_type SEMICOLON { Decl (p, t, gen_pos $startpos $endpos) }
+  | ps=nonempty_list(choreo_pattern) COLONEQ e=choreo_expr SEMICOLON { Assign (ps, e, gen_pos $startpos $endpos) }
+  | TYPE id=typ_id COLONEQ t=choreo_type SEMICOLON? { TypeDecl (id, t, gen_pos $startpos $endpos) }
 
 /* Associativity increases from expr to expr3, with each precedence level falling through to the next. */
 choreo_expr:
-  | IF choreo_expr THEN choreo_expr ELSE choreo_expr                                                 { If ($2, $4, $6) }
-  | LET stmt_block IN choreo_expr                                                                    { Let ($2, $4) }
-  | FUN nonempty_list(choreo_pattern) ARROW choreo_expr                                              { FunDef ($2, $4) }
-  | FST choreo_expr                                                                                  { Fst $2 }
-  | SND choreo_expr                                                                                  { Snd $2 }
-  | LEFT choreo_expr                                                                                 { Left $2 }
-  | RIGHT choreo_expr                                                                                { Right $2 }
-  | MATCH choreo_expr WITH nonempty_list(choreo_case)                                                { Match ($2, $4) }
-  | loc_id LBRACKET sync_label RBRACKET TILDE_ARROW loc_id SEMICOLON choreo_expr                     { Sync ($1, $3, $6, $8) }
-  | LBRACKET loc_id RBRACKET choreo_expr TILDE_ARROW loc_id                                          { Send ($2, $4, $6) }
-  | LBRACKET loc_id RBRACKET choreo_expr TILDE_ARROW loc_id DOT local_pattern SEMICOLON choreo_expr  { Let ([Assign ([LocPatt ($6, $8)], Send ($2, $4, $6))], $10) }
-  | choreo_expr1                                                                                     { $1 }
+  | IF e1=choreo_expr THEN e2=choreo_expr ELSE e3=choreo_expr { If (e1, e2, e3, gen_pos $startpos $endpos) }
+  | LET stmts=stmt_block IN e=choreo_expr { Let (stmts, e, gen_pos $startpos $endpos) }
+  | FUN ps=nonempty_list(choreo_pattern) ARROW e=choreo_expr { FunDef (ps, e, gen_pos $startpos $endpos) }
+  | FST e=choreo_expr { Fst (e, gen_pos $startpos $endpos) }
+  | SND e=choreo_expr { Snd (e, gen_pos $startpos $endpos) }
+  | LEFT e=choreo_expr { Left (e, gen_pos $startpos $endpos) }
+  | RIGHT e=choreo_expr { Right (e, gen_pos $startpos $endpos) }
+  | MATCH e=choreo_expr WITH cases=nonempty_list(choreo_case) { Match (e, cases, gen_pos $startpos $endpos) }
+  | id1=loc_id LBRACKET l=sync_label RBRACKET TILDE_ARROW id2=loc_id SEMICOLON e=choreo_expr { Sync (id1, l, id2, e, gen_pos $startpos $endpos) }
+  | LBRACKET id1=loc_id RBRACKET e=choreo_expr TILDE_ARROW id2=loc_id { Send (id1, e, id2, gen_pos $startpos $endpos) }
+  | LBRACKET id1=loc_id RBRACKET e1=choreo_expr TILDE_ARROW id2=loc_id DOT p=local_pattern SEMICOLON e2=choreo_expr
+      { Let ([Assign ([LocPat (id2, p, gen_pos $startpos(id2) $endpos(p))], Send (id1, e1, id2, gen_pos $startpos($1) $endpos(id2)), gen_pos $startpos($1) $endpos(p))], e2, gen_pos $startpos $endpos) }
+  | choreo_expr1 { $1 }
 
 choreo_expr1:
-  | choreo_expr1 choreo_expr2                                                                        { FunApp ($1, $2) }
-  | choreo_expr2 COMMA choreo_expr2                                                                  { Pair ($1, $3) }
-  | choreo_expr2                                                                                     { $1 }
+  | e1=choreo_expr1 e2=choreo_expr2 { FunApp (e1, e2, gen_pos $startpos $endpos) }
+  | e1=choreo_expr2 COMMA e2=choreo_expr2 { Pair (e1, e2, gen_pos $startpos $endpos) }
+  | choreo_expr2 { $1 }
 
 choreo_expr2:
-  | LPAREN RPAREN                                                                                    { Unit }
-  | var_id                                                                                           { Var $1 }
-  | loc_id DOT local_expr                                                                            { LocExpr ($1, $3) }
-  | LPAREN choreo_expr RPAREN                                                                        { $2 }
+  | LPAREN RPAREN { Unit (gen_pos $startpos $endpos) }
+  | id=var_id { Var (id, gen_pos $startpos $endpos) }
+  | id=loc_id DOT e=local_expr { LocExpr (id, e, gen_pos $startpos $endpos) }
+  | LPAREN e=choreo_expr RPAREN { Choreo.set_info_expr (gen_pos $startpos $endpos) e }
 
 local_expr:
-  | LPAREN RPAREN                                    { Unit }
-  | value                                            { Val $1 }                                                                    
-  | var_id                                           { Var $1 }
-  | un_op local_expr %prec UNARY                     { UnOp ($1, $2) }
-  | local_expr bin_op local_expr                     { BinOp ($1, $2, $3) }
-  | LET var_id COLONEQ local_expr IN local_expr      { Let ($2, $4, $6) }
-  | LPAREN local_expr COMMA local_expr RPAREN        { Pair ($2, $4) }
-  | FST local_expr                                   { Fst $2 }
-  | SND local_expr                                   { Snd $2 }
-  | LEFT local_expr                                  { Left $2 }
-  | RIGHT local_expr                                 { Right $2 }
-  | MATCH local_expr WITH nonempty_list(local_case)  { Match ($2, $4) }
-  | LPAREN local_expr RPAREN                         { $2 }
+  | LPAREN RPAREN { Unit (gen_pos $startpos $endpos) }
+  | v=value { Val (v, gen_pos $startpos $endpos) }
+  | id=var_id { Var (id, gen_pos $startpos $endpos) }
+  | op=un_op e=local_expr %prec UNARY { UnOp (op, e, gen_pos $startpos $endpos) }
+  | e1=local_expr op=bin_op e2=local_expr { BinOp (e1, op, e2, gen_pos $startpos $endpos) }
+  | LET id=var_id COLONEQ e1=local_expr IN e2=local_expr { Let (id, e1, e2, gen_pos $startpos $endpos) }
+  | LPAREN e1=local_expr COMMA e2=local_expr RPAREN { Pair (e1, e2, gen_pos $startpos $endpos) }
+  | FST e=local_expr { Fst (e, gen_pos $startpos $endpos) }
+  | SND e=local_expr { Snd (e, gen_pos $startpos $endpos) }
+  | LEFT e=local_expr { Left (e, gen_pos $startpos $endpos) }
+  | RIGHT e=local_expr { Right (e, gen_pos $startpos $endpos) }
+  | MATCH e=local_expr WITH cases=nonempty_list(local_case) { Match (e, cases, gen_pos $startpos $endpos) }
+  | LPAREN e=local_expr RPAREN { Local.set_info_expr (gen_pos $startpos $endpos) e }
 
 choreo_pattern:
-  | UNDERSCORE                                         { Default }
-  | var_id                                             { Var $1 }
-  | loc_id DOT local_pattern                           { LocPatt ($1, $3) }
-  | LPAREN choreo_pattern COMMA choreo_pattern RPAREN  { Pair ($2, $4) }
-  | LEFT choreo_pattern                                { Left $2 }
-  | RIGHT choreo_pattern                               { Right $2 }
-  | LPAREN choreo_pattern RPAREN                       { $2 }
+  | UNDERSCORE { Default (gen_pos $startpos $endpos) }
+  | id=var_id { Var (id, gen_pos $startpos $endpos) }
+  | id=loc_id DOT p=local_pattern { LocPat (id, p, gen_pos $startpos $endpos) }
+  | LPAREN p1=choreo_pattern COMMA p2=choreo_pattern RPAREN { Pair (p1, p2, gen_pos $startpos $endpos) }
+  | LEFT p=choreo_pattern { Left (p, gen_pos $startpos $endpos) }
+  | RIGHT p=choreo_pattern { Right (p, gen_pos $startpos $endpos) }
+  | LPAREN p=choreo_pattern RPAREN { Choreo.set_info_pattern (gen_pos $startpos $endpos) p }
   
 local_pattern:
-  | UNDERSCORE                                       { Default }
-  | value                                            { Val $1 }
-  | var_id                                           { Var $1 }
-  | LPAREN local_pattern COMMA local_pattern RPAREN  { Pair ($2, $4) }
-  | LEFT local_pattern                               { Left $2 }
-  | RIGHT local_pattern                              { Right $2 }
-  | LPAREN local_pattern RPAREN                      { $2 }
+  | UNDERSCORE { Default (gen_pos $startpos $endpos) }
+  | v=value { Val (v, gen_pos $startpos $endpos) }
+  | x=var_id { Var (x, gen_pos $startpos $endpos) }
+  | LPAREN p1=local_pattern COMMA p2=local_pattern RPAREN { Pair (p1, p2, gen_pos $startpos $endpos) }
+  | LEFT p=local_pattern { Left (p, gen_pos $startpos $endpos) }
+  | RIGHT p=local_pattern { Right (p, gen_pos $startpos $endpos) }
+  | LPAREN p=local_pattern RPAREN { Local.set_info_pattern (gen_pos $startpos $endpos) p }
 
 choreo_type:
-  | UNIT_T                         { TUnit }
-  | loc_id DOT local_type          { TLoc ($1, $3) }
-  | choreo_type ARROW choreo_type  { TMap ($1, $3) }
-  | choreo_type TIMES choreo_type  { TProd ($1, $3) }
-  | choreo_type PLUS choreo_type   { TSum ($1, $3) }
-  | LPAREN choreo_type RPAREN      { $2 }
+  | UNIT_T { TUnit (gen_pos $startpos $endpos) }
+  | id=loc_id DOT t=local_type { TLoc (id, t, gen_pos $startpos $endpos) }
+  | t1=choreo_type ARROW t2=choreo_type { TMap (t1, t2, gen_pos $startpos $endpos) }
+  | t1=choreo_type TIMES t2=choreo_type { TProd (t1, t2, gen_pos $startpos $endpos) }
+  | t1=choreo_type PLUS t2=choreo_type { TSum (t1, t2, gen_pos $startpos $endpos) }
+  | LPAREN t=choreo_type RPAREN { Choreo.set_info_typ (gen_pos $startpos $endpos) t }
 
 local_type:
-  | UNIT_T                       { TUnit }
-  | INT_T                        { TInt }
-  | STRING_T                     { TString }
-  | BOOL_T                       { TBool }
-  | local_type TIMES local_type  { TProd ($1, $3) }
-  | local_type PLUS local_type   { TSum ($1, $3) }
-  | LPAREN local_type RPAREN     { $2 }
+  | UNIT_T { TUnit (gen_pos $startpos $endpos) }
+  | INT_T { TInt (gen_pos $startpos $endpos) }
+  | STRING_T { TString (gen_pos $startpos $endpos) }
+  | BOOL_T { TBool (gen_pos $startpos $endpos) }
+  | t1=local_type TIMES t2=local_type { TProd (t1, t2, gen_pos $startpos $endpos) }
+  | t1=local_type PLUS t2=local_type { TSum (t1, t2, gen_pos $startpos $endpos) }
+  | LPAREN t=local_type RPAREN { Local.set_info_typ (gen_pos $startpos $endpos) t }
   
 loc_id:
-  | ID { LocId $1 }
+  | id=ID { LocId (id, gen_pos $startpos $endpos) }
 
 var_id:
-  | ID { VarId $1 }
+  | id=ID { VarId (id, gen_pos $startpos $endpos) }
 
 typ_id:
-  | ID { TypId $1 }
+  | id=ID { TypId (id, gen_pos $startpos $endpos) }
 
 sync_label:
-  | ID { LabelId $1 }
+  | id=ID { LabelId (id, gen_pos $startpos $endpos) }
 
 value:
-  | INT    { Int $1 }
-  | STRING { String $1 }
-  | TRUE   { Bool true }
-  | FALSE  { Bool false }
+  | i=INT { Int (i, gen_pos $startpos $endpos) }
+  | s=STRING { String (s, gen_pos $startpos $endpos) }
+  | TRUE { Bool (true, gen_pos $startpos $endpos) }
+  | FALSE { Bool (false, gen_pos $startpos $endpos) }
 
 %inline choreo_case:
-  | BAR choreo_pattern ARROW choreo_expr { ($2, $4) }
+  | BAR p=choreo_pattern ARROW e=choreo_expr { p, e }
 
 %inline local_case:
-  | BAR local_pattern ARROW local_expr    { ($2, $4) }
+  | BAR p=local_pattern ARROW e=local_expr { p, e }
 
 %inline un_op:
-  | MINUS { Neg }
-  | NOT   { Not }
+  | MINUS { Neg (gen_pos $startpos $endpos) }
+  | NOT { Not (gen_pos $startpos $endpos) }
 
 %inline bin_op:
-  | PLUS  { Plus }
-  | MINUS { Minus }
-  | TIMES { Times }
-  | DIV   { Div }
-  | AND   { And }
-  | OR    { Or }
-  | EQ    { Eq }
-  | NEQ   { Neq }
-  | LT    { Lt }
-  | LEQ   { Leq }
-  | GT    { Gt }
-  | GEQ   { Geq }
+  | PLUS { Plus (gen_pos $startpos $endpos) }
+  | MINUS { Minus (gen_pos $startpos $endpos) }
+  | TIMES { Times (gen_pos $startpos $endpos) }
+  | DIV { Div (gen_pos $startpos $endpos) }
+  | AND { And (gen_pos $startpos $endpos) }
+  | OR { Or (gen_pos $startpos $endpos) }
+  | EQ { Eq (gen_pos $startpos $endpos) }
+  | NEQ { Neq (gen_pos $startpos $endpos) }
+  | LT { Lt (gen_pos $startpos $endpos) }
+  | LEQ { Leq (gen_pos $startpos $endpos) }
+  | GT { Gt (gen_pos $startpos $endpos) }
+  | GEQ { Geq (gen_pos $startpos $endpos) }
