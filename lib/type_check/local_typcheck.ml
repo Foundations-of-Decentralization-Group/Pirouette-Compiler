@@ -1,10 +1,12 @@
 (*dummy metainfo to let compiler happy*)
-let m : Ast.Metainfo.metainfo = "", 0, 0, 0
+let _m = Obj.magic ()
+
+(* ============================== Types ============================== *)
 
 (*context: list of pair of variable name and its binding*)
-type local_context = (string * Ast.Local.typ) list
+type local_context = (string * Local.typ) list
 type choreo_context = (string * Ast.Choreo.typ) list
-type global_context = (string * string * Ast.Local.typ) list
+type global_context = (string * string * Local.typ) list
 
 (*add varname:vartype pair to context list*)
 let add_binding ctx var_name var_type = (var_name, var_type) :: ctx
@@ -25,7 +27,7 @@ and extract_local_ctx global_ctx loc_id =
 
 (* ============================== Local ============================== *)
 let rec check_local_expr ctx expected_typ = function
-  | Ast.Local.Unit _ -> expected_typ = Ast.Local.TUnit m
+  | Local.Unit _ -> expected_typ = Local.TUnit m
   | Val (v, _) -> expected_typ = typeof_Val v
   | Var (VarId (var_name, _), _) ->
     (match ctx_lookup ctx var_name with

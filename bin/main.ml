@@ -28,7 +28,7 @@ let () =
     prerr_endline usage_msg;
     exit 1);
   let lexbuf = Lexing.from_channel (Option.get !file_ic) in
-  let program = Parsing.parse_program lexbuf in
+  let program = Parsing.Parse.parse_with_error lexbuf in
   if (not !pprint_flag) && (not !json_flag) && not !dot_flag then pprint_flag := true;
   if !outfile_name <> ""
   then (
@@ -42,7 +42,7 @@ let () =
       let locs = Ast_utils.extract_locs program in
       List.iter
         (fun loc ->
-          let ir = Irgen.epp program loc in
+          let ir = Netgen.epp_choreo_to_net program loc in
           if !json_flag
           then
             Ast_utils.jsonify_net_ast (open_out (!outfile_name ^ "." ^ loc ^ ".json")) ir;
@@ -58,7 +58,7 @@ let () =
       let locs = Ast_utils.extract_locs program in
       List.iter
         (fun loc ->
-          let ir = Irgen.epp program loc in
+          let ir = Netgen.epp_choreo_to_net program loc in
           if !json_flag then Ast_utils.jsonify_net_ast stdout ir;
           if !pprint_flag then Ast_utils.pprint_net_ast stdout ir)
         locs))

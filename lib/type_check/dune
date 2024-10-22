@@ -1,5 +1,3 @@
-(library
- (name type_check)
- (libraries ast)
- (instrumentation
-  (backend bisect_ppx)))
+; (library
+;  (name type_check)
+;  (libraries ast_core))

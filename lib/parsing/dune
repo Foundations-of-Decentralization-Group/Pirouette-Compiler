@@ -11,4 +11,5 @@
 
 (library
  (name parsing)
- (libraries ast))
+ (private_modules lexer parser)
+ (libraries ast_core))
