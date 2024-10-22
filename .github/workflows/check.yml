@@ -1,4 +1,4 @@
-name: Pirouette CI
+name: check
 
 on:
   workflow_call:
@@ -43,12 +43,8 @@ jobs:
   build:
     strategy:
       fail-fast: false
-      matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
