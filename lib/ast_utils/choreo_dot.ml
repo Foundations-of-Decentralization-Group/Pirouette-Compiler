@@ -92,7 +92,7 @@ let rec dot_choreo_pattern (pat : Choreo.pattern) : string * string =
     - Recursively calls [dot_stmts] on the rest of the list of statements [stmts].
     - Returns: A tuple of strings where the first element is the dot code for the list of statements [stmts] and the
       second element is the node name of the list of statements [stmts]. *)
-let[@specialised] rec dot_stmts (stmts : Choreo.stmt_block) : string * string =
+let rec dot_stmts (stmts : Choreo.stmt_block) : string * string =
   match stmts with
   | [] -> "", ""
   | stmt :: rest ->
