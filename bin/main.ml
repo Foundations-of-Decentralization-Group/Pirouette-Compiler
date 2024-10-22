@@ -30,13 +30,16 @@ let () =
   let lexbuf = Lexing.from_channel (Option.get !file_ic) in
   let program = Parsing.Parse.parse_with_error lexbuf in
   if (not !pprint_flag) && (not !json_flag) && not !dot_flag then pprint_flag := true;
+  let string_of_info = Parsing.Parsed_ast.Pos_info.string_of_pos in
   if !outfile_name <> ""
   then (
     if !pprint_flag
     then Ast_utils.pprint_choreo_ast (open_out (!outfile_name ^ ".pir")) program;
     if !json_flag
     then Ast_utils.jsonify_choreo_ast (open_out (!outfile_name ^ ".json")) program;
-    if !dot_flag then Ast_utils.dot_choreo_ast (open_out (!outfile_name ^ ".dot")) program;
+    if !dot_flag
+    then
+      Ast_utils.dot_choreo_ast (open_out (!outfile_name ^ ".dot")) string_of_info program;
     if !pprint_flag || !json_flag
     then (
       let locs = Ast_utils.extract_locs program in
@@ -52,7 +55,7 @@ let () =
   else (
     if !pprint_flag then Ast_utils.pprint_choreo_ast stdout program;
     if !json_flag then Ast_utils.jsonify_choreo_ast stdout program;
-    if !dot_flag then Ast_utils.dot_choreo_ast stdout program;
+    if !dot_flag then Ast_utils.dot_choreo_ast stdout string_of_info program;
     if !pprint_flag || !json_flag
     then (
       let locs = Ast_utils.extract_locs program in
