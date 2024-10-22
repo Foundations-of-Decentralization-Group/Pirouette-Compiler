@@ -40,8 +40,9 @@ let rec pprint_local_pattern ppf (pat : 'a Local.pattern) =
     fprintf
       ppf
       "@[<h>%a@]"
-      (fun ppf -> function
-        | Local.Int (i, _) -> fprintf ppf "%d" i
+      (fun ppf (v : 'a Local.value) ->
+        match v with
+        | Int (i, _) -> fprintf ppf "%d" i
         | String (s, _) -> fprintf ppf "%s" s
         | Bool (b, _) -> fprintf ppf "%b" b)
       v
@@ -74,8 +75,9 @@ let rec pprint_local_expr ppf (expr : 'a Local.expr) =
     fprintf
       ppf
       "@[<h>%a@]"
-      (fun ppf -> function
-        | Local.Int (i, _) -> fprintf ppf "%d" i
+      (fun ppf (v : 'a Local.value) ->
+        match v with
+        | Int (i, _) -> fprintf ppf "%d" i
         | String (s, _) -> fprintf ppf "\"%s\"" s
         | Bool (b, _) -> fprintf ppf "%b" b)
       v
@@ -194,7 +196,8 @@ let[@specialise] rec pprint_choreo_stmt_block ppf (stmts : 'a Choreo.stmt_block)
    (choreo_pattern) = (choreo_expr)
    id : choreo_type
 *)
-and pprint_choreo_stmt ppf = function
+and pprint_choreo_stmt ppf (stmt : 'a Choreo.stmt) =
+  match stmt with
   | Decl (p, t, _) ->
     fprintf ppf "@[<h>(%a) : %a;@]" pprint_choreo_pattern p pprint_choreo_type t
   | Assign (ps, e, _) ->
@@ -319,7 +322,8 @@ and pprint_net_stmt ppf (stmt : 'a Net.stmt) =
       e
   | TypeDecl (TypId (id, _), t, _) -> fprintf ppf "@[<h>%s : %a@]" id pprint_net_type t
 
-and pprint_net_expr ppf = function
+and pprint_net_expr ppf (expr : 'a Net.expr) =
+  match expr with
   | Unit _ -> fprintf ppf "@[<h>()@]"
   | Var (VarId (id, _), _) -> fprintf ppf "@[<h>%s@]" id
   | Ret (e, _) -> fprintf ppf "@[<hv2>ret@ (%a)@]" pprint_local_expr e

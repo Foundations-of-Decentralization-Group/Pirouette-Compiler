@@ -23,7 +23,7 @@ let () =
     prerr_endline (Sys.argv.(0) ^ ": No input file");
     exit 1);
   let lexbuf = Lexing.from_channel (Option.get !file_ic) in
-  let program = Parsing.parse_program lexbuf in
+  let program = Parsing.Parse.parse_with_error lexbuf in
   (match !ast_dump_format with
    | "json" -> Ast_utils.jsonify_choreo_ast (open_out (!basename ^ ".json")) program
    | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (!basename ^ ".ast")) program

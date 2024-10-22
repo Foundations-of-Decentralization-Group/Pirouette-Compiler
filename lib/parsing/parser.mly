@@ -45,7 +45,7 @@
     }
 %}
 
-%type <Parsed_ast.Choreo.stmt_block> program
+%type <Parsed_ast.Choreo.stmt_block> prog
 %type <Parsed_ast.Choreo.stmt_block> stmt_block
 %type <Parsed_ast.Choreo.stmt> stmt
 %type <Parsed_ast.Choreo.expr> choreo_expr
@@ -61,11 +61,11 @@
 %type <Parsed_ast.Local.typ_id> typ_id
 %type <Parsed_ast.Local.sync_label> sync_label
 
-%start program
+%start prog
 
 %%
 
-program:
+prog:
   | stmt_block EOF { $1 }
 
 stmt_block:
