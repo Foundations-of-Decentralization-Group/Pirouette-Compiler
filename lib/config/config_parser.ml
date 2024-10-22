@@ -1,5 +1,4 @@
 open Lwt.Infix
-open Ast_utils
 
 type location_config =
   { location : string
@@ -32,7 +31,7 @@ let load_config filename =
 ;;
 
 let check_locations config choreo_ast =
-  let extracted_locs = extract_locs choreo_ast in
+  let extracted_locs = Ast_utils.extract_locs choreo_ast in
   let config_locs = List.map (fun loc_config -> loc_config.location) config.locations in
   let undefined_locs =
     List.filter (fun loc -> not (List.mem loc config_locs)) extracted_locs
@@ -57,7 +56,7 @@ let () =
     (Lwt.both (load_config config_filename) (load_pir_code pir_filename)
      >>= function
      | Some config, pir_code ->
-       let choreo_ast = Parsing.parse_program (Lexing.from_string pir_code) in
+       let choreo_ast = Parsing.Parse.parse_with_error (Lexing.from_string pir_code) in
        (match check_locations config choreo_ast with
         | Error msg -> Lwt_io.printf "Error: %s\n" msg
         | Ok defined_locations ->
@@ -66,7 +65,7 @@ let () =
               (fun loc_config ->
                 ( loc_config.location
                 , loc_config.http_address
-                , Irgen.epp choreo_ast loc_config.location ))
+                , Netgen.epp_choreo_to_net choreo_ast loc_config.location ))
               defined_locations
           in
           Lwt_io.printf
@@ -87,7 +86,7 @@ let () =
                       "Location: %s\nAddress: %s\nNetIR:\n%s\n"
                       loc
                       addr
-                      (stringify_pprint_net_ast net_ir))
+                      (Ast_utils.stringify_pprint_net_ast net_ir))
                   net_ir_code)))
      | None, _ -> Lwt_io.printf "Failed to parse config file\n")
 ;;

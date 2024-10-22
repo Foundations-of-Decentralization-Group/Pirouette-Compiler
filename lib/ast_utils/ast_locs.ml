@@ -1,9 +1,24 @@
+module Choreo = Ast_core.Choreo.M
 module LocSet = Set.Make (String)
 
-let rec extract_stmt_block (stmts : Ast.Choreo.stmt_block) =
+let rec extract_pattern : 'a Choreo.pattern -> LocSet.t = function
+  | Default _ | Var _ -> LocSet.empty
+  | Pair (p1, p2, _) -> LocSet.union (extract_pattern p1) (extract_pattern p2)
+  | LocPat (LocId (id, _), _, _) -> LocSet.singleton id
+  | Left (p, _) | Right (p, _) -> extract_pattern p
+;;
+
+let rec extract_type : 'a Choreo.typ -> LocSet.t = function
+  | TUnit _ -> LocSet.empty
+  | TLoc (LocId (id, _), _, _) -> LocSet.singleton id
+  | TMap (t1, t2, _) | TProd (t1, t2, _) | TSum (t1, t2, _) ->
+    LocSet.union (extract_type t1) (extract_type t2)
+;;
+
+let[@specialise] rec extract_stmt_block (stmts : 'a Choreo.stmt_block) =
   List.fold_left (fun acc stmt -> LocSet.union acc (extract_stmt stmt)) LocSet.empty stmts
 
-and extract_stmt = function
+and extract_stmt : 'a Choreo.stmt -> LocSet.t = function
   | Decl (p, t, _) -> LocSet.union (extract_pattern p) (extract_type t)
   | Assign (ps, e, _) ->
     LocSet.union
@@ -11,7 +26,7 @@ and extract_stmt = function
       (extract_expr e)
   | TypeDecl (_, t, _) -> extract_type t
 
-and extract_expr = function
+and extract_expr : 'a Choreo.expr -> LocSet.t = function
   | Unit _ | Var _ -> LocSet.empty
   | LocExpr (LocId (id, _), _, _) -> LocSet.singleton id
   | Send (LocId (id1, _), e, LocId (id2, _), _) ->
@@ -34,16 +49,4 @@ and extract_expr = function
         LocSet.union acc (LocSet.union (extract_pattern p) (extract_expr e)))
       (extract_expr e)
       cases
-
-and extract_pattern = function
-  | Default _ | Var _ -> LocSet.empty
-  | Pair (p1, p2, _) -> LocSet.union (extract_pattern p1) (extract_pattern p2)
-  | LocPatt (LocId (id, _), _, _) -> LocSet.singleton id
-  | Left (p, _) | Right (p, _) -> extract_pattern p
-
-and extract_type = function
-  | TUnit _ -> LocSet.empty
-  | TLoc (LocId (id, _), _, _) -> LocSet.singleton id
-  | TMap (t1, t2, _) | TProd (t1, t2, _) | TSum (t1, t2, _) ->
-    LocSet.union (extract_type t1) (extract_type t2)
 ;;

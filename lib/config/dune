@@ -2,7 +2,7 @@
  (name config_parser)
  (public_name config_parser)
  (modules config_parser)
- (libraries lwt lwt.unix yaml ast_utils parsing irgen)
+ (libraries lwt lwt.unix yaml ast_utils parsing netgen)
  (preprocess
   (pps lwt_ppx)))
 
