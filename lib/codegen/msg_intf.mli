@@ -1,5 +1,5 @@
 module type M = sig
-  val emit_toplevel_init : string list -> Ppxlib.Parsetree.structure
+  val emit_toplevel_init : string list -> Parsetree.structure
 
   val emit_net_send
     :  src:string

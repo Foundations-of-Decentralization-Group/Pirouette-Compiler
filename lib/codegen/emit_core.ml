@@ -3,8 +3,6 @@ module Net = Ast_core.Net.M
 
 module type Msg_intf = Msg_intf.M
 
-exception Main_expr of Parsetree.expression
-
 module Id = struct
   let i = ref 0
 
@@ -15,6 +13,8 @@ module Id = struct
 end
 
 open Ppxlib
+
+exception Main_expr of expression
 
 let loc = { !Ast_helper.default_loc with loc_ghost = true }
 
