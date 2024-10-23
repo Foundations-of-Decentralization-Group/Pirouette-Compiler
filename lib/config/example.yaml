@@ -1,0 +1,13 @@
+locations:
+  - location: Bob
+    http_address: http://localhost:8080/BOB
+  - location: Alice
+    http_address: http://localhost:8081/E
+  - location: S
+    http_address: http://localhost:8082/S
+  - location: R
+    http_address: http://localhost:8083/R
+  - location: P1
+    http_address: http://localhost:8084/P1
+  - location: P2
+    http_address: http://localhost:8085/P2
