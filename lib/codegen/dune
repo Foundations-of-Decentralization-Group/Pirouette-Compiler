@@ -1,6 +1,0 @@
-(library
- (name codegen)
- (libraries ast ppxlib)
- (private_modules emit_core)
- (preprocess
-  (pps ppxlib.metaquot)))
