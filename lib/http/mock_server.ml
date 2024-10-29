@@ -36,4 +36,12 @@ let server =
   Server.create ~mode:(`TCP (`Port 8080)) (Server.make ~callback ())
 ;;
 
-let () = Lwt_main.run server
+let setup_logs () =
+  Logs.set_reporter (Logs_fmt.reporter ());
+  Logs.set_level (Some Logs.Debug)
+
+let () =
+  setup_logs ();  (* Initialize logging *)
+  Printf.printf "Starting server on port 8080...\n";
+  flush stdout;
+  Lwt_main.run (server)
