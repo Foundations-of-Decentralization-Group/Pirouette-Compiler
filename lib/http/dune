@@ -1,7 +1,12 @@
 (library
  (name http)
- (modules Send_receive)
- (libraries cohttp cohttp-lwt-unix lwt))
+ (modules send_receive)
+ (libraries 
+   cohttp-lwt-unix 
+   lwt 
+   config_parser)  ; Add this line
+ (preprocess
+  (pps lwt_ppx)))
 
 (executable
  (name mock_server)

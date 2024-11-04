@@ -1,6 +1,5 @@
 module Choreo = Ast_core.Choreo.M
 module Net = Ast_core.Net.M
-module Parsed_choreo = Parsing.Parsed_ast.Choreo
 
 let extract_locs (stmt_block : 'a Choreo.stmt_block) =
   Ast_locs.extract_stmt_block stmt_block |> Ast_locs.LocSet.elements
@@ -45,10 +44,16 @@ let pprint_net_ast out_chan (stmt_block : 'a Net.stmt_block) =
   Format.pp_print_newline ppf ()
 ;;
 
-let stringify_dot_choreo_ast program = Choreo_dot.generate_dot_code program
+let stringify_dot_choreo_ast (string_of_info : 'a -> string) program =
+  Dot_ast.generate_dot_code string_of_info program
+;;
 
-let dot_choreo_ast out_chan (stmt_block : Parsed_choreo.stmt_block) =
-  let dot_code = stringify_dot_choreo_ast stmt_block in
+let dot_choreo_ast
+  out_chan
+  (string_of_info : 'a -> string)
+  (stmt_block : 'a Choreo.stmt_block)
+  =
+  let dot_code = stringify_dot_choreo_ast string_of_info stmt_block in
   output_string out_chan dot_code;
   flush out_chan
 ;;

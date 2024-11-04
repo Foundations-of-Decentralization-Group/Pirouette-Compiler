@@ -1,4 +1,4 @@
-name: Check PR Base
+name: check-pr-base
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - 'dev'
 
 jobs:
-  check-pr-base:
+  main-sync:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check if PR is based on latest main
+      - name: Check with latest main
         run: |
           git fetch origin main:main
           if git merge-base --is-ancestor origin/main ${{ github.event.pull_request.head.sha }}; then
