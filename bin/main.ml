@@ -1,68 +1,58 @@
-let usage_msg = "USAGE: pirc <src_file> [-pprint] [-json] [-dot] [-o <output_file>]"
-let pprint_flag = ref false
-let json_flag = ref false
-let dot_flag = ref false
+let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json>] [-backend <shm|http>]"
+let ast_dump_format = ref "pprint"
+let backend = ref "shm"
 let file_ic = ref None
-let outfile_name = ref ""
-let open_file_ic filename = file_ic := Some (open_in filename)
+let basename = ref ""
+
+let anon_fun filename =
+  basename := Filename.remove_extension filename;
+  file_ic := Some (open_in filename)
+;;
 
 let speclist =
   [ "-", Arg.Unit (fun () -> file_ic := Some stdin), "Read source from stdin"
-  ; ( "-pprint"
-    , Arg.Set pprint_flag
-    , "Pretty print the parsed program and Net IR, default option if no flag provided" )
-  ; "-json", Arg.Set json_flag, "Output the AST in JSON format"
-  ; "-dot", Arg.Set dot_flag, "Output the AST in DOT format"
-  ; ( "-o"
-    , Arg.Set_string outfile_name
-    , "Specify the output file name (optional). If provided, the program will \
-       automatically add the .pir/.json/.dot extension" )
+  ; ( "-ast-dump"
+    , Arg.Symbol ([ "pprint"; "json" ], fun s -> ast_dump_format := s)
+    , "Dump the AST in the specified format (pprint, json)" )
+  ; ( "-backend"
+    , Arg.Symbol ([ "shm"; "http" ], fun s -> backend := s)
+    , "Choose communication backend (shm: shared memory, http: HTTP)" )
   ]
 ;;
 
 let () =
-  Arg.parse speclist open_file_ic usage_msg;
+  Arg.parse speclist anon_fun usage_msg;
   if !file_ic = None
   then (
     prerr_endline (Sys.argv.(0) ^ ": No input file");
-    prerr_endline usage_msg;
     exit 1);
   let lexbuf = Lexing.from_channel (Option.get !file_ic) in
   let program = Parsing.Parse.parse_with_error lexbuf in
-  if (not !pprint_flag) && (not !json_flag) && not !dot_flag then pprint_flag := true;
-  let string_of_info = Parsing.Parsed_ast.Pos_info.string_of_pos in
-  if !outfile_name <> ""
-  then (
-    if !pprint_flag
-    then Ast_utils.pprint_choreo_ast (open_out (!outfile_name ^ ".pir")) program;
-    if !json_flag
-    then Ast_utils.jsonify_choreo_ast (open_out (!outfile_name ^ ".json")) program;
-    if !dot_flag
-    then
-      Ast_utils.dot_choreo_ast (open_out (!outfile_name ^ ".dot")) string_of_info program;
-    if !pprint_flag || !json_flag
-    then (
-      let locs = Ast_utils.extract_locs program in
-      List.iter
-        (fun loc ->
-          let ir = Netgen.epp_choreo_to_net program loc in
-          if !json_flag
-          then
-            Ast_utils.jsonify_net_ast (open_out (!outfile_name ^ "." ^ loc ^ ".json")) ir;
-          if !pprint_flag
-          then Ast_utils.pprint_net_ast (open_out (!outfile_name ^ "." ^ loc ^ ".pir")) ir)
-        locs))
-  else (
-    if !pprint_flag then Ast_utils.pprint_choreo_ast stdout program;
-    if !json_flag then Ast_utils.jsonify_choreo_ast stdout program;
-    if !dot_flag then Ast_utils.dot_choreo_ast stdout string_of_info program;
-    if !pprint_flag || !json_flag
-    then (
-      let locs = Ast_utils.extract_locs program in
-      List.iter
-        (fun loc ->
-          let ir = Netgen.epp_choreo_to_net program loc in
-          if !json_flag then Ast_utils.jsonify_net_ast stdout ir;
-          if !pprint_flag then Ast_utils.pprint_net_ast stdout ir)
-        locs))
+  (match !ast_dump_format with
+   | "json" -> Ast_utils.jsonify_choreo_ast (open_out (!basename ^ ".json")) program
+   | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (!basename ^ ".ast")) program
+   | _ -> invalid_arg "Invalid ast-dump format");
+  let locs = Ast_utils.extract_locs program in
+  let netir_l = List.map (fun loc -> Netgen.epp_choreo_to_net program loc) locs in
+  List.iter2
+    (fun loc ir ->
+      match !ast_dump_format with
+      | "json" ->
+        Ast_utils.jsonify_net_ast (open_out (!basename ^ "." ^ loc ^ ".json")) ir
+      | "pprint" ->
+        Ast_utils.pprint_net_ast (open_out (!basename ^ "." ^ loc ^ ".ast")) ir
+      | _ -> invalid_arg "Invalid ast-dump format")
+    locs
+    netir_l;
+  let msg_module =
+    match !backend with
+    | "shm" -> (module Codegen.Msg_intf.Msg_chan_intf : Codegen.Msg_intf.M)
+    | "http" -> (module Codegen.Msg_intf.Msg_http_intf : Codegen.Msg_intf.M)
+    | _ -> invalid_arg "Invalid backend"
+  in
+  Codegen.Toplevel_shm.emit_toplevel_shm
+    (open_out (!basename ^ ".ml"))
+    msg_module
+    locs
+    netir_l
 ;;
