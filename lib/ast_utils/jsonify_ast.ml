@@ -78,11 +78,12 @@ let rec jsonify_local_expr = function
             ; "choreo_e2", jsonify_local_expr e2
             ] )
       ]
-  | Local.Let (VarId (id, _), e1, e2, _) ->
+  | Local.Let (VarId (id, _), t, e1, e2, _) ->
     `Assoc
       [ ( "Let"
         , `Assoc
             [ "id", `String id
+            ; "local_type", jsonify_local_type t
             ; "binding", jsonify_local_expr e1
             ; "body", jsonify_local_expr e2
             ] )

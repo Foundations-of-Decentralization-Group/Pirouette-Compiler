@@ -5,7 +5,6 @@ main := let R.x := [S] S.3 ~> R; in
   else R[R] ~> S;
        S."Bye";
 
-
 {-
 NetIR:
   S:

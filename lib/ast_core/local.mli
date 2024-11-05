@@ -49,7 +49,7 @@ module M : sig
     | Var of 'a var_id * 'a
     | UnOp of 'a un_op * 'a expr * 'a
     | BinOp of 'a expr * 'a bin_op * 'a expr * 'a
-    | Let of 'a var_id * 'a expr * 'a expr * 'a
+    | Let of 'a var_id * 'a typ * 'a expr * 'a expr * 'a
     | Pair of 'a expr * 'a expr * 'a
     | Fst of 'a expr * 'a
     | Snd of 'a expr * 'a

@@ -6,7 +6,7 @@ let spf = Printf.sprintf
 let loc = { !Ast_helper.default_loc with loc_ghost = true }
 
 let emit_toplevel_shm
-  chan
+  out_chan
   (module Msg : Msg_intf.M)
   (loc_ids : string list)
   (net_stmtblock_l : 'a Net.stmt_block list)
@@ -33,6 +33,6 @@ let emit_toplevel_shm
       ;;]
   in
   Pprintast.structure
-    (Format.formatter_of_out_channel chan)
+    (Format.formatter_of_out_channel out_chan)
     (Msg.emit_toplevel_init loc_ids @ List.map2 emit_domain_stri loc_ids net_stmtblock_l)
 ;;

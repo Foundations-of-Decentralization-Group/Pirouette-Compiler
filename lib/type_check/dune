@@ -1,0 +1,3 @@
+; (library
+;  (name type_check)
+;  (libraries ast_core))

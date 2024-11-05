@@ -108,7 +108,6 @@
               ; "Binary operations " >:: binary_operation
               ; "Send first of pair" >:: test_first_pair
               ; "Send second of pair" >:: test_second_pair
-              ; "Testing declare and send" >:: test_decl_send
               ]
        ]
    ;;

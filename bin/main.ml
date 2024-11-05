@@ -1,5 +1,6 @@
-let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json>]"
+let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json>] [-backend <shm|http>]"
 let ast_dump_format = ref "pprint"
+let backend = ref "shm"
 let file_ic = ref None
 let basename = ref ""
 
@@ -13,6 +14,9 @@ let speclist =
   ; ( "-ast-dump"
     , Arg.Symbol ([ "pprint"; "json" ], fun s -> ast_dump_format := s)
     , "Dump the AST in the specified format (pprint, json)" )
+  ; ( "-backend"
+    , Arg.Symbol ([ "shm"; "http" ], fun s -> backend := s)
+    , "Choose communication backend (shm: shared memory, http: HTTP)" )
   ]
 ;;
 
@@ -40,9 +44,15 @@ let () =
       | _ -> invalid_arg "Invalid ast-dump format")
     locs
     netir_l;
+  let msg_module =
+    match !backend with
+    | "shm" -> (module Codegen.Msg_intf.Msg_chan_intf : Codegen.Msg_intf.M)
+    | "http" -> (module Codegen.Msg_intf.Msg_http_intf : Codegen.Msg_intf.M)
+    | _ -> invalid_arg "Invalid backend"
+  in
   Codegen.Toplevel_shm.emit_toplevel_shm
     (open_out (!basename ^ ".ml"))
-    (module Codegen.Msg_intf.Msg_chan_intf)
+    msg_module
     locs
     netir_l
 ;;
