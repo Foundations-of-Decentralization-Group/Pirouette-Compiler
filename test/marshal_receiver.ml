@@ -9,47 +9,46 @@ let setup_logs () =
   Lwt.return_unit
 ;;
 
-let send_data url data =
-  Send_receive.send_message ~url ~data
+let send_data location data =
+  Send_receive.send_message ~location ~data
   >>= function
   | Ok () -> Lwt.return_unit
   | Error msg -> Lwt.return (assert_failure msg)
 ;;
 
 let test_send_int _ =
-  let url = "http://localhost:8080/send" in
-  Lwt_main.run (send_data url 10)
+  let data = 10 in
+  Lwt_main.run (send_data "Bob" data)
 ;;
 
 let test_send_float _ =
-  let url = "http://localhost:8080/send" in
-  Lwt_main.run (send_data url 3.14)
+  let data = 3.14 in
+  Lwt_main.run (send_data "Bob" data)
 ;;
 
 let test_send_bool _ =
-  let url = "http://localhost:8080/send" in
-  Lwt_main.run (send_data url true)
+  let data = true in
+  Lwt_main.run (send_data "Bob" data)
 ;;
 
 let test_send_string _ =
-  let url = "http://localhost:8080/send" in
-  Lwt_main.run (send_data url "Hello, world!")
+  let data = "Hello, world!" in
+  Lwt_main.run (send_data "Bob" data)
 ;;
 
 let test_send_list _ =
-  let url = "http://localhost:8080/send" in
-  Lwt_main.run (send_data url [ 1; 2; 3; 4; 5 ])
+  let data = [ 1; 2; 3; 4; 5 ] in
+  Lwt_main.run (send_data "Bob" data)
 ;;
 
 let test_send_color _ =
-  let url = "http://localhost:8080/send" in
-  Lwt_main.run (send_data url Red)
+  let data = Red in
+  Lwt_main.run (send_data "Bob" data)
 ;;
 
 let test_send_person _ =
-  let url = "http://localhost:8080/send" in
   let data = { name = "Ethan"; age = 20; favorite_colors = [ Green; Blue ] } in
-  Lwt_main.run (send_data url data)
+  Lwt_main.run (send_data "Bob" data)
 ;;
 
 let suite =
