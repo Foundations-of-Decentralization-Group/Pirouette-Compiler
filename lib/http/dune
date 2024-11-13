@@ -1,10 +1,7 @@
 (library
  (name http)
  (modules send_receive)
- (libraries 
-   cohttp-lwt-unix 
-   lwt 
-   config_parser)  ; Add this line
+ (libraries cohttp-lwt-unix lwt config_parser)
  (preprocess
   (pps lwt_ppx)))
 

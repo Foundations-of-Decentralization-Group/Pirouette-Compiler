@@ -19,6 +19,7 @@
 %token FST SND LEFT RIGHT
 %token MATCH WITH
 %token EOF
+%token FOREIGN
 
 (** Operator Precedence and Associativity:
     - Defines the precedence and associativity rules for operators to resolve ambiguities in expressions.
@@ -63,6 +64,7 @@
 %type <Parsed_ast.Local.var_id> var_id
 %type <Parsed_ast.Local.typ_id> typ_id
 %type <Parsed_ast.Local.sync_label> sync_label
+%type <Parsed_ast.Choreo.stmt> foreign_decl
 
 %start prog
 %start prog
@@ -86,6 +88,7 @@ stmt:
   | p=choreo_pattern COLON t=choreo_type SEMICOLON { Decl (p, t, gen_pos $startpos $endpos) }
   | ps=nonempty_list(choreo_pattern) COLONEQ e=choreo_expr SEMICOLON { Assign (ps, e, gen_pos $startpos $endpos) }
   | TYPE id=typ_id COLONEQ t=choreo_type SEMICOLON? { TypeDecl (id, t, gen_pos $startpos $endpos) }
+  | f=foreign_decl { f }
 
 /* Associativity increases from expr to expr3, with each precedence level falling through to the next. */
 choreo_expr:
@@ -244,3 +247,8 @@ value:
   | LEQ { Leq (gen_pos $startpos $endpos) }
   | GT { Gt (gen_pos $startpos $endpos) }
   | GEQ { Geq (gen_pos $startpos $endpos) }
+
+// foreign myFunction : SomeType := "external_function";
+foreign_decl:
+  | FOREIGN id=var_id COLON t=choreo_type COLONEQ s=STRING SEMICOLON 
+    { ForeignDecl (id, t, s, gen_pos $startpos $endpos) }
