@@ -1,89 +1,149 @@
-# Implementing FFI (Foreign Function Interface) in the Compiler
+# Adding features to a Compiler: A Step-by-Step Guide
 
-This guide explains how to extend the compiler to support FFI, allowing integration with external functions. We’ll walk through the key components and steps required, leveraging the updated implementation in `choreo.ml` and `choreo.mli`. Additionally, we’ll discuss the design decisions behind making FFI declarations as statements and placing them within the `choreo` module instead of the `local` module. We’ll also review the changes made to `pprint_ast.ml`.
+This guide walks you through the essential parts of building a compiler. We'll use a real-world example - adding support for external functions (FFI) - to demonstrate each component and why it's important. You'll learn:
 
+- How to design syntax for your programming language
+- How to break down code into meaningful pieces (lexing)
+- How to understand the structure of code (parsing)
+- How to represent code inside the compiler (AST)
+- How to generate working code from your representation
+
+Think of this as building a translation machine that turns your programming language into something a computer can understand. Let's break it down into simple, understandable steps!
 ## Table of Contents
 
-1. [Syntax Design](#syntax-design)  
-2. [Lexer Extension](#lexer-extension)  
-3. [Parser Extension](#parser-extension)  
-   - 3.1. [Add Token Declaration](#31-add-token-declaration)  
-   - 3.2. [Define Grammar Rules](#32-define-grammar-rules)  
-4. [AST Modification](#ast-modification)  
-   - 4.1. [Update Choreo AST Nodes](#41-update-choreo-ast-nodes)  
-   - 4.2. [Why Statements Over Expressions?](#42-why-statements-over-expressions)  
-   - 4.3. [Placement in Choreo Module](#43-placement-in-choreo-module)  
-5. [AST Utility and Pretty Printing](#ast-utility-and-pretty-printing)  
-   - 5.1. [Reviewing pprint_ast.ml](#51-reviewing-pprint_astml)  
-   - 5.2. [Key Updates](#52-key-updates)  
-   - 5.3. [Benefits of Pretty Printing](#53-benefits-of-pretty-printing)  
-6. [Code Generation](#code-generation)  
-   - 6.1. [Emit FFI Bindings](#61-emit-ffi-bindings)  
-7. [Why These Components?](#why-these-components)  
-8. [Conclusion](#conclusion)  
+1. [Syntax Design](#1-syntax-design)  
+   - [What is Syntax Design?](#what-is-syntax-design)
+   - [How to Design New Syntax](#how-to-design-new-syntax)
+
+2. [Lexer Extension](#2-lexer-extension)  
+   - [What is a Lexer?](#what-is-a-lexer)
+   - [How Does a Lexer Work?](#how-does-a-lexer-work)
+   - [Adding New Features to the Lexer](#adding-new-features-to-the-lexer)
+
+3. [Parser Extension](#3-parser-extension)  
+   - [What is a Parser?](#what-is-a-parser)
+   - [How Does a Parser Work?](#how-does-a-parser-work)
+   - [Adding New Rules to the Parser](#adding-new-rules-to-the-parser)
+
+4. [AST (Abstract Syntax Tree)](#4-ast-abstract-syntax-tree)  
+   - [What is an AST?](#what-is-an-ast)
+   - [Why Do We Need an AST?](#why-do-we-need-an-ast)
+   - [How to Add New Features to the AST](#how-to-add-new-features-to-the-ast)
+   - [Where to Put New AST Nodes](#where-to-put-new-ast-nodes)
+
+5. [Pretty Printing](#5-pretty-printing)  
+   - [What is Pretty Printing?](#what-is-pretty-printing)
+   - [Why Do We Need Pretty Printing?](#why-do-we-need-pretty-printing)
+   - [Adding New Pretty Printing Rules](#adding-new-pretty-printing-rules)
+
+6. [Code Generation](#6-code-generation)  
+   - [What is Code Generation?](#what-is-code-generation)
+   - [How Does Code Generation Work?](#how-does-code-generation-work)
+
+7. [Why Do We Need All These Parts?](#7-why-do-we-need-all-these-parts)
+
+8. [Conclusion](#8-conclusion)
 
 ---
 
 ## 1. Syntax Design
 
-### Why Update Syntax Design?
+### What is Syntax Design?
 
-To integrate external functions seamlessly, the compiler needs a clear and consistent syntax for FFI declarations. This ensures that developers can easily declare and use external functions within their codebase.
+When building a compiler, one of the first steps is deciding how programmers will write code in your language. This is called syntax design - it's like creating the "grammar rules" for your programming language. Just like English has rules for how to structure sentences, programming languages need clear rules for how to write code.
 
-### How to Implement with FFI Example
+### How to Design New Syntax
 
-We design the concrete syntax for FFI declarations using the `foreign` keyword. This syntax allows us to:
-- Declare external functions with the `foreign` keyword.
-- Specify the function name and type.
-- Provide the external function identifier as a string.
+Let's use a real example to understand this. We'll add support for calling functions from other programming languages (called Foreign Function Interface or FFI). To do this, we need to:
 
-Example:
+1. Choose keywords that make sense (we'll use `foreign`)
+2. Decide how to structure the code (what information needs to go where)
+3. Make it easy for programmers to read and write
+
+Here's what our new syntax looks like:
 ```ocaml
 foreign myFunction : SomeType := "external_function";
 ```
+
+This tells the compiler:
+- We're declaring a foreign function (using the `foreign` keyword)
+- The function will be called `myFunction` in our code
+- It has a type `SomeType`
+- The actual function name in the other language is "external_function"
+
+Think of it like creating a new road sign - it needs to be clear, consistent, and easy to understand for everyone who will use it!
 
 ---
 
 ## 2. Lexer Extension
 
-### Why Update the Lexer?
+### What is a Lexer?
 
-The lexer must recognize new syntax elements introduced for FFI declarations. Without updating the lexer, the compiler would fail to tokenize FFI-specific keywords and constructs, leading to parsing errors.
+A lexer is like a scanner for your code - it reads through your program character by character and groups them into meaningful chunks called "tokens". Think of it like reading a sentence: you naturally break it down into individual words. The lexer does the same thing for code!
 
-### How to Implement with FFI Example
+### How Does a Lexer Work?
 
-Add new tokens to the lexer:
+Let's see how our lexer breaks down this line of code:
+```ocaml
+foreign myFunction : SomeType := "external_function";
+```
+
+The lexer will identify:
+1. `foreign` as a keyword token
+2. `myFunction` as an identifier token
+3. `:` as a colon token
+4. `SomeType` as another identifier token
+5. `:=` as an assignment token
+6. `"external_function"` as a string token
+7. `;` as a semicolon token
+
+### Adding New Features to the Lexer
+
+To make our lexer understand new parts of our language, we need to teach it about new keywords and symbols. Here's how we do that:
+
 ```ocaml
 (* lib/parsing/lexer.mll *)
 let read = parse
   ...
-  | "foreign" { FOREIGN }
+  | "foreign" { FOREIGN }  (* Recognize the 'foreign' keyword *)
   ...
 ```
 
-The lexer now recognizes:
-- The `foreign` keyword.
-- String literals for external function names.
+
+Think of the lexer as the first step in translating your code - it's taking your raw text and turning it into something more structured that the compiler can work with.
 
 ---
 
 ## 3. Parser Extension
 
-### Why Update the Parser?
+### What is a Parser?
 
-The parser needs to understand the new FFI declarations’ structure and integrate them into the language’s grammar.
+After the lexer breaks code into tokens, the parser figures out how these tokens relate to each other - like understanding the grammar of a sentence. If the lexer identifies the individual words, the parser understands how they form a complete thought!
 
-### 3.1. Add Token Declaration
+### How Does a Parser Work?
 
-Declare the new `FOREIGN` token:
+Let's look at our example again:
+```ocaml
+foreign myFunction : SomeType := "external_function";
+```
+
+The parser takes the tokens from the lexer and understands that:
+1. This is a function declaration (because it starts with `foreign`)
+2. `myFunction` is the name we'll use in our code
+3. `SomeType` is the type of the function
+4. `"external_function"` is the actual name of the function we're connecting to
+
+### Adding New Rules to the Parser
+
+We need to teach the parser about our new syntax in two steps:
+
+1. First, tell the parser about our new keyword:
 ```ocaml
 (* lib/parsing/parser.mly *)
 %token FOREIGN
 ```
 
-### 3.2. Define Grammar Rules
-
-Add grammar rules to parse FFI declarations:
+2. Then, teach it the rules for how this keyword can be used:
 ```ocaml
 (* lib/parsing/parser.mly *)
 foreign_decl:
@@ -91,15 +151,29 @@ foreign_decl:
     { ForeignDecl (id, t, s, gen_pos $startpos $endpos) }
 ```
 
+This rule tells the parser: "When you see FOREIGN followed by an identifier, colon, type, assignment, and string, that's a valid foreign function declaration!"
+
+Think of the parser as a grammar teacher - it knows all the rules about how words (tokens) can be put together to make valid "sentences" in your programming language.
+
+
 ---
 
-## 4. AST Modification
+## 4. AST (Abstract Syntax Tree)
 
-### Why Modify the AST?
+### What is an AST?
 
-The AST must include new nodes to represent FFI declarations, enabling the compiler to process them.
+An AST is like a map of your code - it shows how all the different parts connect together. While the parser understands the basic rules, the AST shows the complete picture of your program in a way that makes sense to the compiler.
 
-### 4.1. Update Choreo AST Nodes
+### Why Do We Need an AST?
+
+Think about giving someone directions:
+- The code you write is like your destination
+- The AST is like the step-by-step directions to get there
+- The compiler is like the person following these directions
+
+### How to Add New Features to the AST
+
+Let's add our new feature to the AST. We need to create a new "route" in our map for foreign function declarations:
 
 ```ocaml
 (* lib/ast_core/choreo.ml *)
@@ -107,35 +181,44 @@ module M = struct
   ...
   type 'a stmt =
     | Decl of 'a pattern * 'a typ * 'a
-    | ForeignDecl of 'a Local.var_id * 'a typ * string * 'a
+    | ForeignDecl of 'a Local.var_id * 'a typ * string * 'a  (* New route *)
   ...
 end
 ```
 
-### 4.2. Why Statements Over Expressions?
+This tells the compiler that a `ForeignDecl` needs:
+- A name (`var_id`) - like the name of a place
+- A type (`typ`) - like what kind of place it is
+- A string (the external function name) - like its address
+- Some extra information (`'a`) - like landmarks to help find it
 
-- **Clarity of Structure:** FFI declarations introduce bindings rather than producing a value.  
-- **Syntax Semantics:** Statements represent actions or instructions.  
-- **Modularity:** Maintains a clear separation of concerns.  
+### Where to Put New AST Nodes
 
-### 4.3. Placement in Choreo Module
+We put our new `ForeignDecl` in the statements section because:
+- It's declaring something new (like adding a new location)
+- It doesn't compute anything (like following directions would)
+- It belongs with similar features (like keeping related places together)
 
-- **Module Responsibility:** FFI declarations align with choreography-specific constructs.  
-- **Scalability:** Supports scalability for future features.  
+Think of it like organizing a map - you want to group similar locations together so they're easy to find!
 
 ---
 
-## 5. AST Utility and Pretty Printing
+## 5. Pretty Printing
 
-### Why Update AST Utilities and Pretty Printing?
+### What is Pretty Printing?
 
-Updating the AST structure requires corresponding updates to the pretty-printing utilities to handle new constructs.
+Pretty printing is like making your code look nice and readable when it's displayed. Think of it like formatting a text message - instead of sending everything in one long line, you add spaces, line breaks, and proper spacing to make it easy to read.
 
-### 5.1. Reviewing pprint_ast.ml
+### Why Do We Need Pretty Printing?
 
-Add handling for `ForeignDecl` in `pprint_ast.ml`.
+Pretty printing helps us:
+- Debug our code (find problems more easily)
+- See what our compiler is doing
+- Make sure our code is working correctly
 
-### 5.2. Key Updates
+### Adding New Pretty Printing Rules
+
+We need to tell our compiler how to display our new foreign function declarations nicely. Here's how we do it:
 
 ```ocaml
 (* lib/ast_utils/pprint_ast.ml *)
@@ -145,43 +228,93 @@ and pprint_choreo_stmt ppf (stmt : 'a Choreo.stmt) =
     fprintf ppf "@[<h>foreign %s : %a := \"%s\"@]" id pprint_choreo_type t s
 ```
 
-### 5.3. Benefits of Pretty Printing
+This tells the printer:
+- Start with the keyword "foreign"
+- Add the function name
+- Show its type
+- Add the external name in quotes
 
-- **Debugging:** Clear and structured representations.  
-- **Documentation:** Visualize the structure of the code.  
-- **Maintenance:** Readable output for complex AST nodes.  
+When we run this, instead of seeing messy computer code like:
+```
+ForeignDecl(VarId("myFunction",_),SomeType,"external_function",_)
+```
+
+We'll see nice, readable code like:
+```ocaml
+foreign myFunction : SomeType := "external_function"
+```
+
+Think of it like translating computer language into human-readable text.
 
 ---
 
 ## 6. Code Generation
 
-### Why Update Code Generation?
+### What is Code Generation?
 
-To ensure that FFI declarations are correctly translated into executable code.
+Code generation is the final step where our compiler turns our code into something the computer can actually run. Think of it like a translator converting a book from one language to another!
 
-### 6.1. Emit FFI Bindings
+### How Does Code Generation Work?
 
-Add code generation rules:
+When we write code like:
+```ocaml
+foreign myFunction : SomeType := "external_function";
+```
+
+The compiler needs to turn this into real, working code. Here's how we tell it to do that:
+
 ```ocaml
 (* lib/codegen/emit_core.ml *)
 let emit_foreign_decl id typ external_name =
   [%expr 
     let [%p pvar id] = External.[%e evar external_name] in
-    [%e type_annotation typ]a
+    [%e type_annotation typ]
   ]
 ```
 
----
+This is like giving the translator rules for how to convert words from one language to another. The compiler uses these rules to create code that actually works on your computer!
 
-## 7. Why These Components?
+## 7. Why Do We Need All These Parts?
 
-Each component plays a critical role:
-- **Lexer/Parser:** Provides syntax recognition.  
-- **AST:** Represents program structure.  
-- **Code Generation:** Produces target code.  
+Think of building a compiler like setting up a translation service:
+
+- **Lexer:** Like someone who splits a sentence into individual words
+  ```ocaml
+  "foreign myFunction" → ["foreign"] ["myFunction"]
+  ```
+
+- **Parser:** Like someone who understands grammar rules
+  ```ocaml
+  ["foreign"] ["myFunction"] → "This is a function declaration"
+  ```
+
+- **AST:** Like organizing the translation notes in a clear way
+  ```ocaml
+  ForeignDecl(myFunction, ...)
+  ```
+
+- **Pretty Printer:** Like making sure the translation looks nice and readable
+  ```ocaml
+  foreign myFunction : SomeType
+  ```
+
+- **Code Generator:** Like writing out the final translation
+  ```ocaml
+  let myFunction = External.some_function
+  ```
+
+Each part has an important job, and they work together like a team to turn your code into something the computer understands.
 
 ---
 
 ## 8. Conclusion
 
-By updating the AST to include `ForeignDecl` and representing FFI declarations as statements, the compiler achieves a cleaner and more organized architecture. Updates in `pprint_ast.ml` ensure accurate representation during debugging. This robust implementation ensures seamless FFI integration.
+Building a compiler is like building a translation machine - it takes code that humans can write and turns it into instructions that computers can understand. Let's review what we learned:
+
+1. **Syntax Design** - Creating clear rules for writing code, like designing a new language
+2. **Lexer** - Breaking code into meaningful pieces, like identifying words in a sentence
+3. **Parser** - Understanding how the pieces fit together, like understanding grammar
+4. **AST** - Creating a map of the code's structure, like drawing directions
+5. **Pretty Printing** - Making the code readable for humans, like formatting a message
+6. **Code Generation** - Creating the final computer instructions, like translating to a new language
+
