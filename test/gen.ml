@@ -5,8 +5,10 @@ let gen_rules flags base =
     {|
       (rule
       (target %s.ml)
-      (deps ../test_src/%s.pir)
-        (action
+      (deps
+        %%{bin:pirc}
+        ../test_src/%s.pir)
+      (action
         (run %%{bin:pirc} ../test_src/%s.pir)))
 
       (rule
