@@ -4,7 +4,7 @@ let spf = Printf.sprintf
 let loc = { !Ast_helper.default_loc with loc_ghost = true }
 
 module type M = sig
-  val emit_toplevel_init : string list -> structure
+  val emit_toplevel_init : string list -> value_binding list
   val emit_net_send : src:string -> dst:string -> expression -> expression
   val emit_net_recv : src:string -> dst:string -> expression
 end
@@ -18,10 +18,10 @@ module Msg_chan_intf : M = struct
     in
     List.map
       (fun (a, b) ->
-        [%stri
-          let [%p Ast_builder.Default.pvar ~loc (spf "chan_%s_%s" a b)] =
-            Domainslib.Chan.make_bounded 0
-          ;;])
+        Ast_builder.Default.value_binding
+          ~loc
+          ~pat:(Ast_builder.Default.pvar ~loc (spf "chan_%s_%s" a b))
+          ~expr:[%expr Domainslib.Chan.make_bounded 0])
       loc_pairs
   ;;
 

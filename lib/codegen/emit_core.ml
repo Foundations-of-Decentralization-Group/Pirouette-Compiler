@@ -149,9 +149,12 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
       (emit_net_pexp ~self_id (module Msg) e)
   | FunDef (ps, e, _) -> emit_net_fun_body ~self_id (module Msg) ps e
   | FunApp (e1, e2, _) ->
-    [%expr
-      [%e emit_net_pexp ~self_id (module Msg) e1]
-        [%e emit_net_pexp ~self_id (module Msg) e2]]
+    (match e1 with (* Need to be handled in preprocessing pass *)
+     | Unit _ -> [%expr ()]
+     | _ ->
+       [%expr
+         [%e emit_net_pexp ~self_id (module Msg) e1]
+           [%e emit_net_pexp ~self_id (module Msg) e2]])
   | Pair (e1, e2, _) ->
     [%expr
       [%e emit_net_pexp ~self_id (module Msg) e1]
