@@ -212,7 +212,7 @@ and pprint_choreo_stmt ppf (stmt : 'a Choreo.stmt) =
   | TypeDecl (TypId (id, _), t, _) ->
     fprintf ppf "@[<h>type %s := %a;@]" id pprint_choreo_type t
   | ForeignDecl (VarId (id, _), t, s, _) ->
-    fprintf ppf "@[<h>foreign %s : %a := \"%s\"@]" id pprint_choreo_type t s
+    fprintf ppf "@[<h>foreign %s : %a := \"%s\";@]" id pprint_choreo_type t s
 
 (** [pp_choreo_expr] takes a formatter [ppf] and a choreo expression
     and prints the formatted code of the choreo expression
@@ -308,7 +308,7 @@ and pprint_net_stmt ppf (stmt : 'a Net.stmt) =
       e
   | TypeDecl (TypId (id, _), t, _) -> fprintf ppf "@[<h>%s : %a@]" id pprint_net_type t
   | ForeignDecl (VarId (id, _), t, s, _) ->
-    fprintf ppf "@[<h>foreign %s : %a := \"%s\"@]" id pprint_net_type t s
+    fprintf ppf "@[<h>foreign %s : %a := \"%s\";@]" id pprint_net_type t s
 
 and pprint_net_expr ppf (expr : 'a Net.expr) =
   match expr with

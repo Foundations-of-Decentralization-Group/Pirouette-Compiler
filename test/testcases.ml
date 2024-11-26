@@ -32,8 +32,8 @@ let testcase_3 =
    then P1[L] ~> P2;\n\n\
    P2.5\n\n\
    else P1[R] ~> P2;\n\n\
-   ()\n\
-   P2.3\n\
+   ()\n\n\
+   P2.3\n\n\
    ;"
 ;;
 
@@ -46,17 +46,14 @@ let testcase_4 =
 ;;
 
 let choreo_typs =
-  "type choreo_sum_typ := P1.int + P2.int;\n\
-  \ \n\
+  "type choreo_sum_typ := P1.int + P2.int;\n\n\
    type choreo_unit := unit;\n\n\
-   type choreo_prod_typ := P1.bool * P2.bool;\n\
-  \ \n\
+   type choreo_prod_typ := P1.bool * P2.bool;\n\n\
    type choreo_map_typ := P1.bool -> P2.bool;\n"
 ;;
 
 let local_typs =
-  "type local_unit := P1.unit;\n\
-  \ \n\
+  "type local_unit := P1.unit;\n\n\
    type local_string := P1.string;\n\n\
    type local_prod_typ := P1.(int*string);\n\n\
    type local_sum_typ := P1.(int+string);\n"
@@ -82,4 +79,8 @@ let lcl_pat_match =
 
 let lcl_pat_match_2 =
   "y := P.let y : int := 3 in\n\nmatch (x,z) with\n\n|(left 1,right \"None\")->();\n"
+;;
+
+let foreign_decl =
+  "foreign myFunc : unit -> unit := \"external_function\";\n"
 ;;
