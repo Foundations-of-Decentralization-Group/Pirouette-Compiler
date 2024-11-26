@@ -7,7 +7,7 @@ let config = ref None
 
 (* Initialize config from file *)
 let init () =
-  let config_filename = "../test/example.yaml" in
+  let config_filename = "test/example.yaml" in
   Printf.printf "Loading config from: %s\n" config_filename;
   Config_parser.load_config config_filename >>= function
   | Some cfg -> 
