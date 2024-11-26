@@ -1,13 +1,3 @@
-(*
-   File: prettyprint_tests.ml
-   Date: 04-25-2024
-
-   Tests for the pretty print module.
-   Read and parse the string representation of a program from Testcases.ml to AST
-   pretty print it in formatted code and then parse the result back to check
-   if the ASTs are identical.
-*)
-
 open OUnit2
 
 let peq (s : string) =
