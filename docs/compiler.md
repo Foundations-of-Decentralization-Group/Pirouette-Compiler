@@ -36,6 +36,8 @@ Think of this as building a translation machine that turns your programming lang
    - [Why Do We Need Pretty Printing?](#why-do-we-need-pretty-printing)
    - [Adding New Pretty Printing Rules](#adding-new-pretty-printing-rules)
 
+5.5. [Extending the Net AST](#5-5-extending-the-net-ast)
+
 6. [Code Generation](#6-code-generation)  
    - [What is Code Generation?](#what-is-code-generation)
    - [How Does Code Generation Work?](#how-does-code-generation-work)
@@ -245,6 +247,50 @@ foreign myFunction : SomeType := "external_function"
 ```
 
 Think of it like translating computer language into human-readable text.
+
+---
+
+## 5.5. Extending the Net AST
+
+### What is the Net AST?
+
+The Net AST represents the network-level structure of your program. While the core AST handles basic program features, the Net AST specifically deals with network communication and distributed aspects of your code.
+
+### Adding Foreign Functions to Net AST
+
+To support foreign functions in our network code, we need to extend the Net AST similar to how we did with the core AST. Here's how we add it:
+
+```ocaml:lib/ast_core/net.ml
+type 'a stmt =
+  | Decl of 'a Local.pattern * 'a typ * 'a
+  | Assign of 'a Local.pattern list * 'a expr * 'a
+  | TypeDecl of 'a Local.typ_id * 'a typ * 'a
+  | ForeignDecl of 'a Local.var_id * 'a typ * string * 'a  (* Add this line *)
+```
+
+This addition allows us to:
+- Declare foreign functions in network code
+- Keep track of their types and external names
+- Maintain consistency with the core AST structure
+
+We also need to update the info handling functions to support our new statement type:
+
+```ocaml:lib/ast_core/net.ml
+let get_info_stmt : stmt -> Info.t = function
+  | Decl (_, _, i) -> i
+  | Assign (_, _, i) -> i
+  | TypeDecl (_, _, i) -> i
+  | ForeignDecl (_, _, _, i) -> i  (* Add this line *)
+
+let set_info_stmt : Info.t -> stmt -> stmt =
+  fun i -> function
+  | Decl (p, t, _) -> Decl (p, t, i)
+  | Assign (ps, e, _) -> Assign (ps, e, i)
+  | TypeDecl (id, t, _) -> TypeDecl (id, t, i)
+  | ForeignDecl (id, t, s, _) -> ForeignDecl (id, t, s, i)  (* Add this line *)
+```
+
+Think of this as extending our translation system to handle foreign functions at the network level, just like we did at the core level!
 
 ---
 
