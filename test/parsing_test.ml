@@ -1,115 +1,48 @@
-(* !!!Refactoring needed *)
+open OUnit2
+open Parsing
+open Lexing
 
-(* open OUnit2
-   open Ast_core.Local
-   open Ast_core.Choreo
+let parse_string input =
+  let lexbuf = Lexing.from_string input in
+  lexbuf.lex_curr_p <- { lexbuf.lex_curr_p with pos_fname = "test" };
+  Parse.parse_with_error lexbuf
 
-   (* open Ast.Net *)
-   open Parsing
+let test_foreign_decl _ =
+  let input = {|foreign myFunc : unit -> unit := "external_function";|} in
+  let result = parse_string input in
+  match result with
+  | [Ast_core.Choreo.M.ForeignDecl (var_id, typ, str, _)] ->
+    (* Check variable name *)
+    assert_equal "myFunc" 
+      (match var_id with Ast_core.Local.M.VarId (name, _) -> name);
+    (* Check type *)
+    assert_equal true
+      (match typ with 
+       | Ast_core.Choreo.M.TMap (TUnit _, TUnit _, _) -> true 
+       | _ -> false);
+    (* Check external function name *)
+    assert_equal "external_function" str
+  | _ -> assert_failure "Expected ForeignDecl, got different AST structure"
 
-   (* comment *)
 
-   let peq (s : string) (v : ) =
-   let lexbuf = Lexing.from_string s in
-   assert_equal v (parse_program lexbuf)
-   ;;
+  let test_foreign_decl_unit_to_unit _ =
+    let input = {|foreign myFunc : unit -> unit := "external_function";|} in
+    let result = parse_string input in
+    match result with
+    | [Ast_core.Choreo.M.ForeignDecl (var_id, typ, str, _)] ->
+      assert_equal "myFunc" 
+        (match var_id with Ast_core.Local.M.VarId (name, _) -> name);
+      assert_equal true
+        (match typ with 
+         | Ast_core.Choreo.M.TMap (TUnit _, TUnit _, _) -> true 
+         | _ -> false);
+      assert_equal "external_function" str
+    | _ -> assert_failure "Expected ForeignDecl, got different AST structure"
+let suite =
+  "Parser Tests" >::: [
+    "test_foreign_decl" >:: test_foreign_decl;
+    "test_foreign_decl_unit_to_unit" >:: test_foreign_decl_unit_to_unit;
+  ]
 
-   let test_declarations_basic _ =
-   (* peq "var : loc.bool" ([ VarDecl (VarId "var", TLoc (LocId "loc", TBool)) ]);
-   peq "fun fn : loc.int -> loc.int" ([FunDecl (FunId "fn", TLoc (LocId "loc", TInt), TLoc (LocId "loc", TInt)) ]);
-   peq "loc.var : loc.string" ([ LocVarDecl (LocId "loc", VarId "var", LocId "loc", TString) ]); *)
-   peq "type new := unit" [ TypeDecl (TypId "new", TUnit) ]
-   ;;
-
-   let new_decl _ = peq "type x := P1.int" [ TypeDecl (TypId "x", TLoc (LocId "P1", TInt)) ]
-
-   let int_assign _ =
-   peq "x := P1.5;" [ Assign ([ Var (VarId "x") ], LocExpr (LocId "P1", Val (Int 5))) ]
-   ;;
-
-   let decl_expr _ =
-   peq
-   "(P1.5, P2.true) : P1.int * P2.bool;"
-   [ Decl
-        ( Pair (LocPat (LocId "P1", Val (Int 5)), LocPat (LocId "P2", Val (Bool true)))
-        , TProd (TLoc (LocId "P1", TInt), TLoc (LocId "P2", TBool)) )
-    ]
-   ;;
-
-   let pair_assign _ =
-   peq
-   "pair1 := (P1.5, P2.true);"
-   [ Assign
-        ( [ Var (VarId "pair1") ]
-        , Pair (LocExpr (LocId "P1", Val (Int 5)), LocExpr (LocId "P2", Val (Bool true)))
-        )
-    ]
-   ;;
-
-   let binary_operation _ =
-   peq
-   "y := if P1.(3 > 5 && 4 < 0) then P1.3 else P1.6;"
-   [ Assign
-        ( [ Var (VarId "y") ]
-        , If
-            ( LocExpr
-                ( LocId "P1"
-                , BinOp
-                    ( BinOp (Val (Int 3), Gt, Val (Int 5))
-                    , And
-                    , BinOp (Val (Int 4), Lt, Val (Int 0)) ) )
-            , LocExpr (LocId "P1", Val (Int 3))
-            , LocExpr (LocId "P1", Val (Int 6)) ) )
-    ]
-   ;;
-
-   let test_first_pair _ =
-   peq
-   " y := fst(P1.\"Hello\", P1.\"World\");"
-   [ Assign
-        ( [ Var (VarId "y") ]
-        , Fst
-            (Pair
-               ( LocExpr (LocId "P1", Val (String "Hello"))
-               , LocExpr (LocId "P1", Val (String "World")) )) )
-    ]
-   ;;
-
-   let test_second_pair _ =
-   peq
-   " y := snd(P1.\"Hello\", P1.\"World\");"
-   [ Assign
-        ( [ Var (VarId "y") ]
-        , Snd
-            (Pair
-               ( LocExpr (LocId "P1", Val (String "Hello"))
-               , LocExpr (LocId "P1", Val (String "World")) )) )
-    ]
-   ;;
-
-   let test_decl_send _ =
-   peq
-   "y : P2.int;\n        y := P1.5 [P1] ~> P2;"
-   [ Decl (Var (VarId "y"), TLoc (LocId "P2", TInt))
-    ; Assign
-        ( [ Var (VarId "y") ]
-        , Send (LocId "P1", LocExpr (LocId "P1", Val (Int 5)), LocId "P2") )
-    ]
-   ;;
-
-   let suite =
-   "Parser Tests"
-   >::: [ "Declarations"
-         >::: [ "Basic Declarations" >:: test_declarations_basic
-              ; "New Declarations" >:: new_decl
-              ; "Assign test" >:: int_assign
-              ; "Pair Assignment" >:: pair_assign
-              ; "Pair Declaration " >:: decl_expr
-              ; "Binary operations " >:: binary_operation
-              ; "Send first of pair" >:: test_first_pair
-              ; "Send second of pair" >:: test_second_pair
-              ]
-       ]
-   ;;
-
-   let () = run_test_tt_main suite *)
+let () = 
+  run_test_tt_main suite

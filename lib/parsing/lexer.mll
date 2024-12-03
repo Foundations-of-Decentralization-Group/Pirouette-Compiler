@@ -72,6 +72,7 @@ rule read = parse
   | "type"             { TYPE }
   | "true"             { TRUE }
   | "false"            { FALSE }
+  | "foreign"          { FOREIGN }
   | "if"               { IF }
   | "then"             { THEN }
   | "else"             { ELSE }

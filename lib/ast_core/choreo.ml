@@ -37,6 +37,7 @@ module M = struct
     | Decl of 'a pattern * 'a typ * 'a
     | Assign of 'a pattern list * 'a expr * 'a (* list is only for F P1 P2 ... Pn := C *)
     | TypeDecl of 'a Local.typ_id * 'a typ * 'a
+    | ForeignDecl of 'a Local.var_id * 'a typ * string * 'a
 
   and 'a stmt_block = 'a stmt list
 end
@@ -90,6 +91,7 @@ struct
     | Decl (_, _, i) -> i
     | Assign (_, _, i) -> i
     | TypeDecl (_, _, i) -> i
+    | ForeignDecl (_, _, _, i) -> i
   ;;
 
   let set_info_typ : Info.t -> typ -> typ =
@@ -135,5 +137,6 @@ struct
     | Decl (pat, typ, _) -> Decl (pat, typ, i)
     | Assign (pats, e, _) -> Assign (pats, e, i)
     | TypeDecl (id, typ, _) -> TypeDecl (id, typ, i)
+    | ForeignDecl (id, t, s, _) -> ForeignDecl (id, t, s, i)
   ;;
 end
