@@ -44,14 +44,10 @@ module Msg_http_intf : M = struct
     []
 
   let emit_net_send ~src ~dst pexp =
-    [%expr
-      let url = Config_parser.get_http_address [%e Ast_builder.Default.estring ~loc dst] ^ 
-                "from/" ^ [%e Ast_builder.Default.estring ~loc src] in
-      Send_receive.send_message ~url ~data:[%e pexp]]
+    ignore src;
+    [%expr Send_receive.send_message ~location:[%e Ast_builder.Default.estring ~loc dst] ~data:[%e pexp]]
 
   let emit_net_recv ~src ~dst =
-    [%expr
-      let url = Config_parser.get_http_address [%e Ast_builder.Default.estring ~loc dst] ^ 
-                "from/" ^ [%e Ast_builder.Default.estring ~loc src] in
-      Send_receive.receive_message ~url]
+    ignore src;
+    [%expr Send_receive.receive_message ~location:[%e Ast_builder.Default.estring ~loc dst]]
 end
