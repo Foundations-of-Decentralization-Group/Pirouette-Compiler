@@ -72,7 +72,7 @@ let () =
       (fun loc ir ->
         let out_file = open_out (!basename ^ "_" ^ loc ^ ".ml") in
         output_string out_file "open Http\n\n";
-        Codegen.Toplevel_shm.emit_toplevel_shm
+        Codegen.Toplevel_shm.emit_toplevel_http
           out_file
           msg_module
           [loc]
