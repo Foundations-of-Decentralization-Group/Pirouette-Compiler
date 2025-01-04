@@ -27,7 +27,7 @@ let emit_toplevel_shm
          | binding ->
            Ast_builder.Default.pexp_let
              ~loc
-             Recursive
+             Recursive (*FIXME: how to handle tuples?*)
              [ binding ]
              (emit_net_toplevel loc_id stmts))
     in
@@ -50,20 +50,26 @@ let emit_toplevel_shm
         [%expr Domain.join [%e Ast_builder.Default.evar ~loc (spf "domain_%s" loc_id)]]
         (emit_domain_join_seq loc_ids)
   in
+  let domain_body =
+    Ast_builder.Default.pexp_let
+      ~loc
+      Nonrecursive
+      (emit_domain_bindings loc_ids net_stmtblock_l)
+      (emit_domain_join_seq loc_ids)
+  in
   let ppf = Format.formatter_of_out_channel chan in
   Pprintast.structure
     ppf
     [ Ast_builder.Default.pstr_eval
         ~loc
-        (Ast_builder.Default.pexp_let
-           ~loc
-           Nonrecursive
-           (Msg.emit_toplevel_init loc_ids)
-           (Ast_builder.Default.pexp_let
-              ~loc
-              Nonrecursive
-              (emit_domain_bindings loc_ids net_stmtblock_l)
-              (emit_domain_join_seq loc_ids)))
+        (match Msg.emit_toplevel_defs loc_ids with
+         | [] -> domain_body  (* When no initialization needed *)
+         | bindings -> 
+             Ast_builder.Default.pexp_let
+               ~loc
+               Nonrecursive
+               bindings
+               domain_body)
         []
     ];
   Format.pp_print_newline ppf ()

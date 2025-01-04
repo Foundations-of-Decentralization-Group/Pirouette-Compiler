@@ -96,6 +96,7 @@ and read_string buf = parse
   | eof { raise (SyntaxError "String is not terminated") }
 
 and read_single_line_comment = parse
+  | "--"    { read lexbuf }
   | newline { next_line lexbuf; read lexbuf }
   | _       { read_single_line_comment lexbuf }
   | eof     { EOF }

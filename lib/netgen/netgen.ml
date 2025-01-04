@@ -155,6 +155,7 @@ let rec epp_choreo_stmt (stmt : 'a Choreo.stmt) (loc : string) : 'a Net.stmt =
 
 and epp_choreo_expr (expr : 'a Choreo.expr) (loc : string) : 'a Net.expr =
   match expr with
+  | Var (id, _) -> Var (id, _m)
   | LocExpr (LocId (loc1, _), e, _) when loc1 = loc -> Ret (e, _m)
   | FunDef (ps, e, _) ->
     FunDef (List.map (fun p -> epp_choreo_pattern p loc) ps, epp_choreo_expr e loc, _m)

@@ -4,13 +4,13 @@ let spf = Printf.sprintf
 let loc = { !Ast_helper.default_loc with loc_ghost = true }
 
 module type M = sig
-  val emit_toplevel_init : string list -> value_binding list
+  val emit_toplevel_defs : string list -> value_binding list
   val emit_net_send : src:string -> dst:string -> expression -> expression
   val emit_net_recv : src:string -> dst:string -> expression
 end
 
 module Msg_chan_intf : M = struct
-  let emit_toplevel_init loc_ids =
+  let emit_toplevel_defs loc_ids =
     let loc_pairs =
       List.concat_map
         (fun a -> List.filter_map (fun b -> if a <> b then Some (a, b) else None) loc_ids)
