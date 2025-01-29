@@ -57,7 +57,7 @@ let emit_toplevel_shm
       (emit_domain_bindings loc_ids net_stmtblock_l)
       (emit_domain_join_seq loc_ids)
   in
-  let ppf = Format.formatter_of_out_channel chan in
+  let ppf = Format.formatter_of_out_channel out_chan in
   Pprintast.structure
     ppf
     [ Ast_builder.Default.pstr_eval
