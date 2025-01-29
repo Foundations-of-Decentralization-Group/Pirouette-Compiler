@@ -11,12 +11,13 @@ doc: "https://dl.acm.org/doi/10.1145/3498684"
 bug-reports:
   "https://github.com/Foundations-of-Decentralization-Group/Pirouette-Compiler/issues"
 depends: [
-  "ocaml" {>= "5.0.0"}
+  "ocaml" {= "5.2.1"}
   "dune" {>= "3.14"}
   "menhir"
   "ounit2"
   "ppxlib"
   "yojson"
+  "ocamlfind" {with-test}
   "odoc" {with-doc}
 ]
 build: [

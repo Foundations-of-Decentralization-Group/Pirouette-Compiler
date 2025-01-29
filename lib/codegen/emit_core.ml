@@ -144,14 +144,24 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
   | Let (stmts, e, _) ->
     Ast_builder.Default.pexp_let
       ~loc
-      Recursive
+      Recursive (*FIXME: how to handle tuples?*)
       (List.map (emit_net_binding ~self_id (module Msg)) stmts)
       (emit_net_pexp ~self_id (module Msg) e)
   | FunDef (ps, e, _) -> emit_net_fun_body ~self_id (module Msg) ps e
   | FunApp (e1, e2, _) ->
-    [%expr
-      [%e emit_net_pexp ~self_id (module Msg) e1]
-        [%e emit_net_pexp ~self_id (module Msg) e2]]
+    let exception UnitFunction in
+    let[@specialise] rec check_unit : 'a Net.expr -> unit = function
+      | Unit _ -> raise UnitFunction
+      | FunApp (e1, _, _) -> check_unit e1
+      | _ -> ()
+    in
+    (try
+       check_unit e1;
+       [%expr
+         [%e emit_net_pexp ~self_id (module Msg) e1]
+           [%e emit_net_pexp ~self_id (module Msg) e2]]
+     with
+     | UnitFunction -> [%expr ()])
   | Pair (e1, e2, _) ->
     [%expr
       [%e emit_net_pexp ~self_id (module Msg) e1]

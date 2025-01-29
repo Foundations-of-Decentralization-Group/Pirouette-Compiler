@@ -4,7 +4,7 @@ let file_ic = ref None
 let basename = ref ""
 
 let anon_fun filename =
-  basename := Filename.remove_extension filename;
+  basename := Filename.remove_extension (Filename.basename filename);
   file_ic := Some (open_in filename)
 ;;
 
