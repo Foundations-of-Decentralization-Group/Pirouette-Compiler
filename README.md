@@ -64,5 +64,9 @@ cat examples/1.pir | dune exec pirc -- -
 - You can enable repo-wide githooks to make sure your code is formatted and can build
 
     ```sh
+    chmod +x .githooks/pre-push
+    ```
+
+    ```sh
     git config core.hooksPath .githooks
     ```

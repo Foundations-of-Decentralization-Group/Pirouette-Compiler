@@ -4,27 +4,32 @@ let gen_rules flags base =
   Printf.printf
     {|
       (rule
-      (target %s.ml)
-      (deps
-        %%{bin:pirc}
-        ../test_src/%s.pir)
-      (action
-        (run %%{bin:pirc} ../test_src/%s.pir)))
+        (alias runtest)
+        (target %s.ml)
+        (deps
+          %%{bin:pirc}
+          ../test_src/%s.pir)
+        (action
+          (run %%{bin:pirc} ../test_src/%s.pir)))
 
       (rule
-      (target %s.exe)
-      (deps %s.ml)
-      (action
-        (run ocamlfind ocamlopt -o %s.exe %s %s.ml)))
-
-      (rule
-      (with-stdout-to %s.res
-        (run ./%s.exe)))
+        (alias runtest)
+        (target %s.exe)
+        (deps %s.ml)
+        (action
+          (run ocamlfind ocamlopt -o %s.exe %s %s.ml)))
 
       (rule 
-      (alias runtest)
+        (alias runtest)
+        (target %s.res)
+        (deps
+          %s.exe
+          (glob_files %s.ans))
         (action
-        (diff ../test_src/%s.ans %s.res)))
+          (progn
+            (with-stdout-to %s.res
+              (run ./%s.exe))
+            (diff ../test_src/%s.ans %s.res))))
     |}
     (* rule 1 *)
     base
@@ -39,7 +44,9 @@ let gen_rules flags base =
     (* rule 3 *)
     base
     base
-    (* rule 4 *)
+    base
+    base
+    base
     base
     base
 ;;
