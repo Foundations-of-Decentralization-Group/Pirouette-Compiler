@@ -23,12 +23,13 @@
  (description "Higher-order typed functional choreographies")
  (depends
   (ocaml
-   (>= 5.0.0))
+   (= 5.2.1))
   dune
   menhir
   ounit2
   ppxlib
-  yojson)
+  yojson
+  (ocamlfind :with-test))
  (allow_empty))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
