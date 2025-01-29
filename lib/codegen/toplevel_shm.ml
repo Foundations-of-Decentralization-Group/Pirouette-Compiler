@@ -63,13 +63,8 @@ let emit_toplevel_shm
     [ Ast_builder.Default.pstr_eval
         ~loc
         (match Msg.emit_toplevel_defs loc_ids with
-         | [] -> domain_body  (* When no initialization needed *)
-         | bindings -> 
-             Ast_builder.Default.pexp_let
-               ~loc
-               Nonrecursive
-               bindings
-               domain_body)
+         | [] -> domain_body (* When no initialization needed *)
+         | bindings -> Ast_builder.Default.pexp_let ~loc Nonrecursive bindings domain_body)
         []
     ];
   Format.pp_print_newline ppf ()
