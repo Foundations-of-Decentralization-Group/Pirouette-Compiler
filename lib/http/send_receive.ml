@@ -52,55 +52,94 @@ let get_location_config location =
         Error ("Unknown location: " ^ location)
 
 (* Function to marshal data *)
-let marshal_data data = Marshal.to_string data []
+let marshal_data data = 
+  try
+    Printf.printf "Marshaling data of type: %s\n" (Obj.tag (Obj.repr data) |> string_of_int);
+    let result = Marshal.to_string data [] in
+    Printf.printf "Successfully marshaled data to length: %d\n" (String.length result);
+    result
+  with e ->
+    Printf.printf "Error during marshaling: %s\n" (Printexc.to_string e);
+    raise e
 
 (* Function to unmarshal data *)
 let unmarshal_data data_str =
-  try Ok (Marshal.from_string data_str 0) with
-  | Failure msg -> Error ("Unmarshal error: " ^ msg)
-;;
+  try 
+    Printf.printf "Attempting to unmarshal data of length: %d\n" (String.length data_str);
+    if String.length data_str = 0 then
+      Error "Empty data string"
+    else
+      let result = Marshal.from_string data_str 0 in
+      Printf.printf "Successfully unmarshaled data\n";
+      Ok result
+  with e -> 
+    Printf.printf "Unmarshal error: %s\n" (Printexc.to_string e);
+    Error ("Unmarshal error: " ^ Printexc.to_string e)
+
+(* Internal Mapping Functions *)
+let map_send_location location = 
+  match location with
+  | "R" -> "S"  (* Map "R" to "S" for sending *)
+  | other -> other
+
+let map_receive_location location =
+  match location with
+  | "S" -> "R"  (* Map "S" to "R" for receiving *)
+  | other -> other
 
 (* Function to send a message *)
 let send_message ~location ~data =
-  Printf.printf "Attempting to send message to location: %s\n" location;
-  match get_location_config location with
-  | Error msg -> Lwt.return_error msg
+  let actual_location = map_send_location location in
+  Printf.printf "Attempting to send message to location: %s (mapped to: %s)\n" location actual_location;
+  match get_location_config actual_location with
+  | Error msg -> 
+      Printf.printf "Error getting location config: %s\n" msg;
+      Lwt.return_error msg
   | Ok loc_config ->
-    let marshaled_data = marshal_data data in
-    let headers = Header.init_with "Content-Type" "application/octet-stream" in
-    let body = Cohttp_lwt.Body.of_string marshaled_data in
-    Printf.printf "Sending request to: %s\n" loc_config.http_address;
-    Client.post ~headers ~body (Uri.of_string loc_config.http_address)
-    >>= fun (resp, body) ->
-    let status = resp |> Response.status |> Code.code_of_status in
-    Printf.printf "Received response with status: %d\n" status;
-    Cohttp_lwt.Body.drain_body body
-    >>= fun () ->
-    if status = 200
-    then Lwt.return_ok ()
-    else Lwt.return_error ("Failed to send message, status code: " ^ string_of_int status)
+    try
+      let marshaled_data = marshal_data data in
+      let headers = Header.init_with "Content-Type" "application/octet-stream" in
+      let body = Cohttp_lwt.Body.of_string marshaled_data in
+      Printf.printf "Sending request to: %s with data length: %d\n" 
+        loc_config.http_address (String.length marshaled_data);
+      Client.post ~headers ~body (Uri.of_string loc_config.http_address)
+      >>= fun (resp, body) ->
+      let status = resp |> Response.status |> Code.code_of_status in
+      Printf.printf "Received response with status: %d\n" status;
+      Cohttp_lwt.Body.drain_body body
+      >>= fun () ->
+      if status = 200
+      then Lwt.return_ok ()
+      else Lwt.return_error ("Failed to send message, status code: " ^ string_of_int status)
+    with e ->
+      Printf.printf "Error during send_message: %s\n" (Printexc.to_string e);
+      Lwt.return_error ("Send error: " ^ Printexc.to_string e)
 
 (* Function to receive a message *)
 let receive_message ~location =
-  Printf.printf "Attempting to receive message from location: %s\n" location;
-  match get_location_config location with
-  | Error msg -> Lwt.return_error msg
+  let actual_location = map_receive_location location in
+  Printf.printf "Attempting to receive message from location: %s (mapped to: %s)\n" location actual_location;
+  match get_location_config actual_location with
+  | Error msg -> 
+      Printf.printf "Error getting location config: %s\n" msg;
+      Lwt.return_error msg
   | Ok loc_config ->
-    Printf.printf "Sending GET request to: %s\n" loc_config.http_address;
-    Client.get (Uri.of_string loc_config.http_address)
-    >>= fun (resp, body) ->
-    let status = resp |> Response.status |> Code.code_of_status in
-    Printf.printf "Received response with status: %d\n" status;
-    if status = 200
-    then
-      body
-      |> Cohttp_lwt.Body.to_string
-      >|= fun body_str ->
+      let headers = Header.init_with "Content-Type" "application/octet-stream" in
+      let empty_body = Cohttp_lwt.Body.of_string "" in
+      Client.post ~headers ~body:empty_body (Uri.of_string loc_config.http_address)
+      >>= fun (resp, body) ->
+      let status = resp |> Response.status |> Code.code_of_status in
+      Cohttp_lwt.Body.to_string body >>= fun body_str ->
       Printf.printf "Received body of length: %d\n" (String.length body_str);
-      match unmarshal_data body_str with
-      | Ok data -> Ok data
-      | Error msg -> Error msg
-    else
-      Cohttp_lwt.Body.drain_body body
-      >>= fun () ->
-      Lwt.return_error ("Failed to receive message, status code: " ^ string_of_int status)
+      if status = 200 && String.length body_str > 0 then
+        try
+          let unmarshaled_data = Marshal.from_string body_str 0 in
+          Printf.printf "Successfully unmarshaled data.\n";
+          Lwt.return_ok unmarshaled_data
+        with e -> 
+          Printf.printf "Unmarshal error: %s\n" (Printexc.to_string e);
+          Lwt.return_error ("Failed to unmarshal data: " ^ Printexc.to_string e)
+      else if status = 200 then
+        Lwt.return_error "Received empty response"
+      else 
+        Lwt.return_error ("Received error status: " ^ string_of_int status)
