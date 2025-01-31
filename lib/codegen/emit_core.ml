@@ -124,16 +124,26 @@ and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (stmt : 'a Net.
          ~loc
          ~pat:(emit_local_ppat f)
          ~expr:(emit_net_fun_body ~self_id (module Msg) ps e))
-  | ForeignDecl (VarId (id, _), _, external_name, _) ->
-    Ast_builder.Default.value_binding
-      ~loc
-      ~pat:(Ast_builder.Default.pvar ~loc id)
-      ~expr:[%expr [%e Ast_builder.Default.evar ~loc ("External." ^ external_name)]]
+  | ForeignDecl (VarId (id, _), typ, external_name, _) ->
+    emit_foreign_decl id typ external_name
   | _ ->
     Ast_builder.Default.value_binding
       ~loc
       ~pat:[%pat? _unit]
       ~expr:(Ast_builder.Default.eunit ~loc)
+
+and emit_foreign_decl id _ external_name =
+  Ast_builder.Default.value_binding
+    ~loc
+    ~pat:(Ast_builder.Default.pvar ~loc id)
+    ~expr:(
+      match String.split_on_char '.' external_name with
+      | [name] -> [%expr [%e Ast_builder.Default.evar ~loc name]]
+      | module_name :: rest -> 
+          let full_path = String.concat "." rest in
+          [%expr [%e Ast_builder.Default.evar ~loc (module_name ^ "." ^ full_path)]]
+      | [] -> failwith "Invalid external function name"
+    )
 
 and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr) =
   match exp with
