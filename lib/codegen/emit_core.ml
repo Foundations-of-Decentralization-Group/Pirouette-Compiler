@@ -132,16 +132,25 @@ and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (stmt : 'a Net.
       ~pat:[%pat? _unit]
       ~expr:(Ast_builder.Default.eunit ~loc)
 
-and emit_foreign_decl id _ external_name =
+and emit_foreign_decl id _typ external_name =
   Ast_builder.Default.value_binding
     ~loc
     ~pat:(Ast_builder.Default.pvar ~loc id)
     ~expr:(
+      let module_path = Filename.remove_extension external_name in
+      let module_name = String.capitalize_ascii (Filename.basename module_path) in
       match String.split_on_char '.' external_name with
-      | [name] -> [%expr [%e Ast_builder.Default.evar ~loc name]]
-      | module_name :: rest -> 
+      | [name] -> 
+          (* For files in the same directory *)
+          [%expr [%e Ast_builder.Default.evar ~loc (module_name ^ "." ^ 
+            (if String.contains name '_' 
+             then name 
+             else String.uncapitalize_ascii name))]]
+      | module_path :: rest ->
+          (* For files in other directories *)
           let full_path = String.concat "." rest in
-          [%expr [%e Ast_builder.Default.evar ~loc (module_name ^ "." ^ full_path)]]
+          [%expr [%e Ast_builder.Default.evar ~loc 
+            (String.capitalize_ascii module_path ^ "." ^ full_path)]]
       | [] -> failwith "Invalid external function name"
     )
 
