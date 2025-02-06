@@ -47,7 +47,7 @@ let rec emit_local_pexp (expr : 'a Local.expr) =
       ~loc
       (Ast_builder.Default.evar ~loc op)
       [ emit_local_pexp e1; emit_local_pexp e2 ]
-  | Let (VarId (v, _), e1, e2, _) ->
+  | Let (VarId (v, _), _, e1, e2, _) ->
     Ast_builder.Default.pexp_let
       ~loc
       Nonrecursive

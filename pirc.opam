@@ -13,10 +13,16 @@ bug-reports:
 depends: [
   "ocaml" {= "5.2.1"}
   "dune" {>= "3.14"}
+  "cohttp-lwt-unix"
+  "logs"
+  "lwt"
+  "domainslib"
   "menhir"
   "ounit2"
   "ppxlib"
   "yojson"
+  "yaml"
+  "lwt_ppx"
   "ocamlfind" {with-test}
   "odoc" {with-doc}
 ]

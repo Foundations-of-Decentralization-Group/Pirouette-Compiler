@@ -5,3 +5,4 @@ module type M = sig
 end
 
 module Msg_chan_intf : M
+module Msg_http_intf : M

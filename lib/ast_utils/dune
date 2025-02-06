@@ -1,4 +1,4 @@
 (library
  (name ast_utils)
  (private_modules ast_locs jsonify_ast pprint_ast)
- (libraries ast_core yojson))
+ (libraries ast_core parsing yojson))

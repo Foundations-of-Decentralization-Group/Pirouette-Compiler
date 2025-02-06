@@ -25,10 +25,12 @@
   (ocaml
    (= 5.2.1))
   dune
+  cohttp-lwt-unix logs lwt
+  domainslib
   menhir
   ounit2
   ppxlib
-  yojson
+  yojson yaml lwt_ppx
   (ocamlfind :with-test))
  (allow_empty))
 

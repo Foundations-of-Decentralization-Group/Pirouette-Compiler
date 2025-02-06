@@ -49,7 +49,7 @@ module M = struct
     | Var of 'a var_id * 'a
     | UnOp of 'a un_op * 'a expr * 'a
     | BinOp of 'a expr * 'a bin_op * 'a expr * 'a
-    | Let of 'a var_id * 'a expr * 'a expr * 'a
+    | Let of 'a var_id * 'a typ * 'a expr * 'a expr * 'a
     | Pair of 'a expr * 'a expr * 'a
     | Fst of 'a expr * 'a
     | Snd of 'a expr * 'a
@@ -135,7 +135,7 @@ struct
     | Var (_, i) -> i
     | UnOp (_, _, i) -> i
     | BinOp (_, _, _, i) -> i
-    | Let (_, _, _, i) -> i
+    | Let (_, _, _, _, i) -> i
     | Pair (_, _, i) -> i
     | Fst (_, i) -> i
     | Snd (_, i) -> i
@@ -215,7 +215,7 @@ struct
     | Var (x, _) -> Var (x, i)
     | UnOp (op, e, _) -> UnOp (op, e, i)
     | BinOp (e1, op, e2, _) -> BinOp (e1, op, e2, i)
-    | Let (x, e1, e2, _) -> Let (x, e1, e2, i)
+    | Let (x, t, e1, e2, _) -> Let (x, t, e1, e2, i)
     | Pair (e1, e2, _) -> Pair (e1, e2, i)
     | Fst (e, _) -> Fst (e, i)
     | Snd (e, _) -> Snd (e, i)

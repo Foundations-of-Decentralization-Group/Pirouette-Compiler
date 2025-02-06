@@ -1,4 +1,4 @@
-name: check
+name: check-pirc
 
 on:
   workflow_call:
@@ -8,6 +8,7 @@ on:
     types: [opened, synchronize, closed]
     branches:
       - 'main'
+      - 'dev'
     paths-ignore:
       - '.githooks/**'
       - '**/LICENSE'
@@ -16,6 +17,7 @@ on:
   push:
     branches:
       - 'main'
+      - 'dev'
     paths-ignore:
       - '.githooks/**'
       - '**/LICENSE'

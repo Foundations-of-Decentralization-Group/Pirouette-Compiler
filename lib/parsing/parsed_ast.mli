@@ -4,6 +4,8 @@ module Pos_info : sig
     ; start : int * int
     ; stop : int * int
     }
+
+  val string_of_pos : t -> string
 end
 
 module Local : sig

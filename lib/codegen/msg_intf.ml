@@ -38,3 +38,16 @@ module Msg_chan_intf : M = struct
       Domainslib.Chan.recv [%e Ast_builder.Default.evar ~loc (spf "chan_%s_%s" src dst)]]
   ;;
 end
+
+module Msg_http_intf : M = struct
+  let emit_toplevel_init _loc_ids =
+    []
+
+  let emit_net_send ~src ~dst pexp =
+    ignore src;
+    [%expr Send_receive.send_message ~location:[%e Ast_builder.Default.estring ~loc dst] ~data:[%e pexp]]
+
+  let emit_net_recv ~src ~dst =
+    ignore src;
+    [%expr Send_receive.receive_message ~location:[%e Ast_builder.Default.estring ~loc dst]]
+end

@@ -25,6 +25,7 @@ and extract_stmt : 'a Choreo.stmt -> LocSet.t = function
       (List.fold_left (fun acc p -> LocSet.union acc (extract_pattern p)) LocSet.empty ps)
       (extract_expr e)
   | TypeDecl (_, t, _) -> extract_type t
+  | ForeignDecl (_, t, _, _) -> extract_type t
 
 and extract_expr : 'a Choreo.expr -> LocSet.t = function
   | Unit _ | Var _ -> LocSet.empty

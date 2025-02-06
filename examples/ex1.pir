@@ -6,7 +6,6 @@ main := let R.x := [S] S.3 ~> R; in
        S.print_endline S."Bye"
 ;
 
-
 {-
 NetIR:
   S:

@@ -19,7 +19,11 @@
 %token FST SND LEFT RIGHT
 %token MATCH WITH
 %token EOF
+%token FOREIGN
 
+(** Operator Precedence and Associativity:
+    - Defines the precedence and associativity rules for operators to resolve ambiguities in expressions.
+*)
 %nonassoc IN
 %right ARROW
 %nonassoc BAR
@@ -60,22 +64,31 @@
 %type <Parsed_ast.Local.var_id> var_id
 %type <Parsed_ast.Local.typ_id> typ_id
 %type <Parsed_ast.Local.sync_label> sync_label
+%type <Parsed_ast.Choreo.stmt> foreign_decl
 
+%start prog
 %start prog
 
 %%
 
+(** [prog] parses a stmt_block aka list of statements and add EOF at the end of code block.*)
 prog:
   | stmt_block EOF { $1 }
 
+(** [stmt_block] parses and returns the list of statements. *)
 stmt_block:
   | list(stmt) { $1 }
 
+(** [stmt] parses statements within a choreography and constructs corresponding AST nodes.
+
+    - Returns: An AST node representing the statement.
+    - Example: Parsing a pattern, a colon, a choreography type, and a semicolon results in a `Decl` node with the pattern, type, and metadata.*)
 /* TODO: Removing the need for semicolons */
 stmt:
   | p=choreo_pattern COLON t=choreo_type SEMICOLON { Decl (p, t, gen_pos $startpos $endpos) }
   | ps=nonempty_list(choreo_pattern) COLONEQ e=choreo_expr SEMICOLON { Assign (ps, e, gen_pos $startpos $endpos) }
   | TYPE id=typ_id COLONEQ t=choreo_type SEMICOLON? { TypeDecl (id, t, gen_pos $startpos $endpos) }
+  | f=foreign_decl { f }
 
 /* Associativity increases from expr to expr3, with each precedence level falling through to the next. */
 choreo_expr:
@@ -104,13 +117,16 @@ choreo_expr2:
   | id=loc_id DOT e=local_expr { LocExpr (id, e, gen_pos $startpos $endpos) }
   | LPAREN e=choreo_expr RPAREN { Choreo.set_info_expr (gen_pos $startpos $endpos) e }
 
+(** [local_expr] parses local expressions and constructs corresponding AST nodes.
+
+    - Returns: An AST node representing the local expression.*)
 local_expr:
   | LPAREN RPAREN { Unit (gen_pos $startpos $endpos) }
   | v=value { Val (v, gen_pos $startpos $endpos) }
   | id=var_id { Var (id, gen_pos $startpos $endpos) }
   | op=un_op e=local_expr %prec UNARY { UnOp (op, e, gen_pos $startpos $endpos) }
   | e1=local_expr op=bin_op e2=local_expr { BinOp (e1, op, e2, gen_pos $startpos $endpos) }
-  | LET id=var_id COLONEQ e1=local_expr IN e2=local_expr { Let (id, e1, e2, gen_pos $startpos $endpos) }
+  | LET id=var_id COLON t=local_type COLONEQ e1=local_expr IN e2=local_expr { Let (id, t, e1, e2, gen_pos $startpos $endpos) }
   | LPAREN e1=local_expr COMMA e2=local_expr RPAREN { Pair (e1, e2, gen_pos $startpos $endpos) }
   | FST e=local_expr { Fst (e, gen_pos $startpos $endpos) }
   | SND e=local_expr { Snd (e, gen_pos $startpos $endpos) }
@@ -119,6 +135,7 @@ local_expr:
   | MATCH e=local_expr WITH cases=nonempty_list(local_case) { Match (e, cases, gen_pos $startpos $endpos) }
   | LPAREN e=local_expr RPAREN { Local.set_info_expr (gen_pos $startpos $endpos) e }
 
+(** [choreo_pattern] parses patterns used in choreography expressions and constructs corresponding AST nodes.*)
 choreo_pattern:
   | UNDERSCORE { Default (gen_pos $startpos $endpos) }
   | id=var_id { Var (id, gen_pos $startpos $endpos) }
@@ -128,6 +145,7 @@ choreo_pattern:
   | RIGHT p=choreo_pattern { Right (p, gen_pos $startpos $endpos) }
   | LPAREN p=choreo_pattern RPAREN { Choreo.set_info_pattern (gen_pos $startpos $endpos) p }
   
+  (** [local_pattern] parses patterns used in local expressions within choreographies and constructs corresponding AST nodes.*)
 local_pattern:
   | UNDERSCORE { Default (gen_pos $startpos $endpos) }
   | v=value { Val (v, gen_pos $startpos $endpos) }
@@ -137,6 +155,10 @@ local_pattern:
   | RIGHT p=local_pattern { Right (p, gen_pos $startpos $endpos) }
   | LPAREN p=local_pattern RPAREN { Local.set_info_pattern (gen_pos $startpos $endpos) p }
 
+(** [choreo_type] parses choreography types and constructs corresponding AST nodes.
+
+    - Returns: An AST node representing the choreography type.
+*)
 choreo_type:
   | UNIT_T { TUnit (gen_pos $startpos $endpos) }
   | id=loc_id DOT t=local_type { TLoc (id, t, gen_pos $startpos $endpos) }
@@ -145,6 +167,10 @@ choreo_type:
   | t1=choreo_type PLUS t2=choreo_type { TSum (t1, t2, gen_pos $startpos $endpos) }
   | LPAREN t=choreo_type RPAREN { Choreo.set_info_typ (gen_pos $startpos $endpos) t }
 
+(** [local_type] parses local types and constructs corresponding AST nodes.
+
+    - Returns: An AST node representing the local type.
+*) 
 local_type:
   | UNIT_T { TUnit (gen_pos $startpos $endpos) }
   | INT_T { TInt (gen_pos $startpos $endpos) }
@@ -157,6 +183,11 @@ local_type:
 loc_id:
   | id=ID { LocId (id, gen_pos $startpos $endpos) }
 
+(** [var_id] parses an identifier for a variable and constructs a corresponding AST node.
+
+    - Returns: A `VarId` node containing the identifier and its metadata.
+    - Example: Parsing an `ID` token results in a `VarId` node with the identifier and associated metadata.
+*)
 var_id:
   | id=ID { VarId (id, gen_pos $startpos $endpos) }
 
@@ -172,9 +203,23 @@ value:
   | TRUE { Bool (true, gen_pos $startpos $endpos) }
   | FALSE { Bool (false, gen_pos $startpos $endpos) }
 
+(** [choreo_case] parses case expressions for choreography expressions and constructs corresponding AST nodes.
+
+    Each case is defined by a pattern and an expression, separated by an arrow.
+
+    - Returns: A tuple containing the parsed pattern and the corresponding choreography expression.
+    - Example: Parsing a vertical bar, a pattern, an arrow, and a choreography expression results in a tuple of the pattern and expression.
+*)
 %inline choreo_case:
   | BAR p=choreo_pattern ARROW e=choreo_expr { p, e }
 
+(** [local_case] parses case expressions for local expressions and constructs corresponding AST nodes.
+
+    Similar to [case], but specifically for local expressions within a choreography.
+
+    - Returns: A tuple containing the parsed local pattern and the corresponding local expression.
+    - Example: Parsing a vertical bar, a local pattern, an arrow, and a local expression results in a tuple of the local pattern and expression.
+*)
 %inline local_case:
   | BAR p=local_pattern ARROW e=local_expr { p, e }
 
@@ -182,6 +227,13 @@ value:
   | MINUS { Neg (gen_pos $startpos $endpos) }
   | NOT { Not (gen_pos $startpos $endpos) }
 
+(** [bin_op] parses binary operators and constructs corresponding AST nodes.
+
+    Each operator is associated with a specific constructor that takes location information as an argument.
+
+    - Returns: An AST node representing the binary operation.
+    - Example: Parsing the token PLUS with location info at position 1 results in [Plus ($1)].
+*)
 %inline bin_op:
   | PLUS { Plus (gen_pos $startpos $endpos) }
   | MINUS { Minus (gen_pos $startpos $endpos) }
@@ -195,3 +247,8 @@ value:
   | LEQ { Leq (gen_pos $startpos $endpos) }
   | GT { Gt (gen_pos $startpos $endpos) }
   | GEQ { Geq (gen_pos $startpos $endpos) }
+
+// foreign myFunction : SomeType := "external_function";
+foreign_decl:
+  | FOREIGN id=var_id COLON t=choreo_type COLONEQ s=STRING SEMICOLON 
+    { ForeignDecl (id, t, s, gen_pos $startpos $endpos) }

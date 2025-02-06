@@ -1,5 +1,8 @@
-let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json>]"
+open Http
+
+let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json>] [-backend <shm|http>]"
 let ast_dump_format = ref "pprint"
+let backend = ref "shm"
 let file_ic = ref None
 let basename = ref ""
 
@@ -13,6 +16,9 @@ let speclist =
   ; ( "-ast-dump"
     , Arg.Symbol ([ "pprint"; "json" ], fun s -> ast_dump_format := s)
     , "Dump the AST in the specified format (pprint, json)" )
+  ; ( "-backend"
+    , Arg.Symbol ([ "shm"; "http" ], fun s -> backend := s)
+    , "Choose communication backend (shm: shared memory, http: HTTP)" )
   ]
 ;;
 
@@ -40,9 +46,31 @@ let () =
       | _ -> invalid_arg "Invalid ast-dump format")
     locs
     netir_l;
-  Codegen.Toplevel_shm.emit_toplevel_shm
-    (open_out (!basename ^ ".ml"))
-    (module Codegen.Msg_intf.Msg_chan_intf)
-    locs
-    netir_l
+  match !backend with
+  | "shm" ->
+    let msg_module = (module Codegen.Msg_intf.Msg_chan_intf : Codegen.Msg_intf.M) in
+    Codegen.Toplevel_shm.emit_toplevel_shm
+      (open_out (!basename ^ ".ml"))
+      msg_module
+      locs
+      netir_l
+  | "http" ->
+    let msg_module = (module Codegen.Msg_intf.Msg_http_intf : Codegen.Msg_intf.M) in
+    let () = 
+      match Lwt_main.run (Send_receive.init ()) with
+      | Ok () -> ()
+      | Error msg -> failwith ("Failed to initialize HTTP config: " ^ msg)
+    in
+    List.iter2
+      (fun loc ir ->
+        let out_file = open_out (!basename ^ "_" ^ loc ^ ".ml") in
+        output_string out_file "open Send_receive\n\n";
+        Codegen.Toplevel_shm.emit_toplevel_shm
+          out_file
+          msg_module
+          [loc]
+          [ir])
+      locs
+      netir_l
+  | _ -> invalid_arg "Invalid backend"
 ;;
