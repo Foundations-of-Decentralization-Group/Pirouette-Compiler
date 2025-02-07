@@ -134,25 +134,23 @@ and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (stmt : 'a Net.
 
 and emit_foreign_decl id _typ external_name =
   let open Ast_builder.Default in
-  let module_path = Filename.remove_extension external_name in
-  let module_name = String.capitalize_ascii (Filename.basename module_path) in
-  let parts = String.split_on_char '.' external_name in
+  (* Split the external name to handle @file:function format *)
+  let module_path, function_name = 
+    if String.starts_with ~prefix:"@" external_name then
+      match String.split_on_char ':' (String.sub external_name 1 (String.length external_name - 1)) with
+      | [file; func] -> file, func
+      | _ -> failwith "Invalid external function format. Expected @file:function"
+    else
+      external_name, external_name
+  in
+  let module_name = 
+    String.capitalize_ascii 
+      (Filename.basename (Filename.remove_extension module_path))
+  in
+  (* Create the function expression *)
   let fun_expr =
-    match parts with
-    | [name] ->
-        let fun_id =
-          if String.contains name '_' then name
-          else String.uncapitalize_ascii name
-        in
-        (* Non-recursive function binding for FFI call *)
-        pexp_fun ~loc Nolabel None (pvar ~loc "arg")
-          [%expr ([%e evar ~loc (module_name ^ "." ^ fun_id)]) arg]
-    | module_path :: rest ->
-        let full_path = String.concat "." rest in
-        pexp_fun ~loc Nolabel None (pvar ~loc "arg")
-          [%expr ([%e evar ~loc (String.capitalize_ascii module_path ^ "." ^ full_path)]) arg]
-    | [] ->
-        failwith "Invalid external function name"
+    pexp_fun ~loc Nolabel None (pvar ~loc "arg")
+      [%expr ([%e evar ~loc (module_name ^ "." ^ function_name)]) arg]
   in
   value_binding ~loc ~pat:(pvar ~loc id) ~expr:fun_expr
 
@@ -168,11 +166,10 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
       (emit_net_pexp ~self_id (module Msg) e2)
       (Some (emit_net_pexp ~self_id (module Msg) e3))
   | Let (stmts, e, _) ->
-    (* Use Nonrecursive for let bindings that include foreign declarations *)
     let is_foreign_decl = function
       | Net.ForeignDecl _ -> true
       | _ -> false
-    in
+    in 
     let rec_flag = 
       if List.exists is_foreign_decl stmts
       then Nonrecursive

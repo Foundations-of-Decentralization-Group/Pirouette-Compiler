@@ -1,11 +1,11 @@
-foreign print : unit -> unit := "print_string_unit";
+foreign print : unit -> unit := "@printer.ml:print_string_unit";
 
 main := let R.x := [S] S.3 ~> R; in 
   if R.(x>5) 
   then R[L] ~> S;
-       print S."Hello"
+       R.print S."Hello"
   else R[R] ~> S;
-       print S."Bye";
+       R.print S."Bye";
 
 {-
 NetIR:
