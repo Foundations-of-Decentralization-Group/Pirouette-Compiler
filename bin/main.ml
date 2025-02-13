@@ -61,18 +61,11 @@ let () =
       | Ok () -> ()
       | Error msg -> failwith ("Failed to initialize HTTP config: " ^ msg)
     in
-    let dune_oc = open_out (Filename.dirname !basename ^ "/dune") in
-    output_string dune_oc "(executables\n";
-    output_string dune_oc (Printf.sprintf " (names %s)\n" 
-      (String.concat " " (List.map (fun loc -> 
-        Filename.basename (!basename ^ "_" ^ loc)) locs)));
-    output_string dune_oc " (libraries http unix))\n";
-    close_out dune_oc;
     List.iter2
       (fun loc ir ->
         let out_file = open_out (!basename ^ "_" ^ loc ^ ".ml") in
-        output_string out_file "open Http\n\n";
-        Codegen.Toplevel_shm.emit_toplevel_http
+        output_string out_file "open Send_receive\n\n";
+        Codegen.Toplevel_shm.emit_toplevel_shm
           out_file
           msg_module
           [loc]
