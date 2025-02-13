@@ -172,22 +172,19 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
     in
     Ast_builder.Default.pexp_match ~loc (emit_net_pexp ~self_id (module Msg) e) cases
   | Send (e, LocId (dst, _), _) ->
-    (* Msg.emit_net_send
-       ~src:self_id
-       ~dst
-       [%expr Marshal.to_string [%e emit_net_pexp ~self_id (module Msg) e] []] *)
     let val_id = Id.gen "val_" in
     [%expr
       let [%p Ast_builder.Default.pvar ~loc val_id] =
         [%e emit_net_pexp ~self_id (module Msg) e]
       in
-      [%e
-        Msg.emit_net_send
-          ~src:self_id
-          ~dst
-          [%expr Marshal.to_string [%e Ast_builder.Default.evar ~loc val_id] []]]]
+      match [%e Msg.emit_net_send ~src:self_id ~dst [%expr [%e Ast_builder.Default.evar ~loc val_id]]] with
+      | Ok () -> ()
+      | Error msg -> failwith ("Send error: " ^ msg)]
   | Recv (LocId (src, _), _) ->
-    [%expr Marshal.from_string [%e Msg.emit_net_recv ~src ~dst:self_id] 0]
+    [%expr
+      match [%e Msg.emit_net_recv ~src ~dst:self_id] with
+      | Ok msg -> msg 
+      | Error msg -> failwith ("Receive error: " ^ msg)]
   | ChooseFor (LabelId (label, _), LocId (dst, _), e, _) ->
     Ast_builder.Default.esequence
       ~loc
