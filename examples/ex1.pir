@@ -7,7 +7,7 @@ main := let R.x := [S] S.3 ~> R; in
 {-
 NetIR:
   S:
-  2+
+  2+3
   send 3 to R
   Allow R choice
   | L => "Hello"
