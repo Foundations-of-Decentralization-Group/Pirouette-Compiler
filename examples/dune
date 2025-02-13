@@ -1,3 +1,0 @@
-(executables
- (names ex1_R ex1_S)
- (libraries http unix))
