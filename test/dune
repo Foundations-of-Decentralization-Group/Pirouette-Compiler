@@ -1,19 +1,19 @@
 (executable
- (name gen))
+ (name pipeline_gen))
 
 (subdir
- test_run
- (dynamic_include ../test_gen/dune.inc))
+ pipeline_run
+ (dynamic_include ../pipeline_gen/dune.inc))
 
 (subdir
- test_gen
+ pipeline_gen
  (rule
   (deps
-   (source_tree ../test_src))
+   (source_tree ../pipeline_src))
   (action
    (with-stdout-to
     dune.inc
-    (run ../gen.exe)))))
+    (run ../pipeline_gen.exe)))))
 
 (test
  (name prettyprint_test)

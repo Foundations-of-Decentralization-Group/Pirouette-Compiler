@@ -48,6 +48,11 @@ make docs
 
 Then open pdf files in `docs` directory.
 
+
+## Pipeline Testing
+
+Tests are added by placing <testcase>.pir and <testcase>.ans files in test/test_src, then running `dune test` in the root directory. The test runner will compile the `.pir` file, run the compiled program, and compare the output to the `.ans` file. If the output matches the `.ans` file, the test passes.
+
 ## Contribute
 
 - [Git Guides](https://github.com/git-guides)

@@ -24,14 +24,18 @@
  (depends
   (ocaml
    (= 5.2.1))
-  dune
+  (dune :build)
   cohttp-lwt-unix logs lwt
   domainslib
-  menhir
-  ounit2
-  ppxlib
-  yojson yaml lwt_ppx
-  (ocamlfind :with-test))
+  (menhir :build)
+  (ppxlib :build)
+  (yojson yaml lwt_ppx :build)
+  (ocamlfind :with-test)
+  (ounit2 :with-test)
+  (ocamlformat
+   (and
+    (>= 0.27.0)
+    :dev)))
  (allow_empty))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
