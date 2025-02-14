@@ -199,7 +199,7 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
       let [%p Ast_builder.Default.pvar ~loc val_id] =
         [%e emit_net_pexp ~self_id (module Msg) e]
       in
-      [%e Msg.emit_net_send ~src:self_id ~dst [%expr [%e Ast_builder.Default.evar ~loc val_id]]]]
+      [%e Msg.emit_net_send ~src:self_id ~dst [%expr Ok [%e Ast_builder.Default.evar ~loc val_id]]]]
   | Recv (LocId (src, _), _) ->
     [%expr
       match [%e Msg.emit_net_recv ~src ~dst:self_id] with
