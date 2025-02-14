@@ -50,7 +50,7 @@ let rec emit_local_pexp (expr : 'a Local.expr) =
   | Let (VarId (v, _), _, e1, e2, _) ->
     Ast_builder.Default.pexp_let
       ~loc
-      Nonrecursive
+      Recursive
       [ Ast_builder.Default.value_binding
           ~loc
           ~pat:(Ast_builder.Default.pvar ~loc v)
@@ -166,7 +166,7 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
   | Let (stmts, e, _) ->
     Ast_builder.Default.pexp_let
       ~loc
-      Nonrecursive
+      Recursive
       (List.map (emit_net_binding ~self_id (module Msg)) stmts)
       (emit_net_pexp ~self_id (module Msg) e)
   | FunDef (ps, e, _) -> emit_net_fun_body ~self_id (module Msg) ps e
@@ -199,9 +199,7 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
       let [%p Ast_builder.Default.pvar ~loc val_id] =
         [%e emit_net_pexp ~self_id (module Msg) e]
       in
-      match [%e Msg.emit_net_send ~src:self_id ~dst [%expr [%e Ast_builder.Default.evar ~loc val_id]]] with
-      | Ok () -> ()
-      | Error msg -> failwith ("Send error: " ^ msg)]
+      [%e Msg.emit_net_send ~src:self_id ~dst [%expr [%e Ast_builder.Default.evar ~loc val_id]]]]
   | Recv (LocId (src, _), _) ->
     [%expr
       match [%e Msg.emit_net_recv ~src ~dst:self_id] with
