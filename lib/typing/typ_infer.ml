@@ -361,6 +361,7 @@ let rec infer_choreo_stmt choreo_ctx global_ctx stmt
     in
     compose_subst_choreo s_comp s3, t1, ctx_list @ choreo_ctx
   | Choreo.TypeDecl (_typ_id, _choreo_typ, _) -> failwith "Not implemented"
+  | Choreo.ForeignDecl (_, _, _, _) -> failwith "Not implemented"
 
 and infer_choreo_stmt_block choreo_ctx global_ctx stmts
   : choreo_subst * ftv Choreo.typ * choreo_ctx
