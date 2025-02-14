@@ -162,8 +162,8 @@ and epp_choreo_expr (expr : 'a Choreo.expr) (loc : string) : 'a Net.expr =
   | FunApp (e1, e2, _) ->
     let e1' = epp_choreo_expr e1 loc in
     let e2' = epp_choreo_expr e2 loc in
-    (match e1' with
-     | Unit _ -> Unit _m  
+    (match e1', e2' with
+     | Unit _, _ | _, Unit _ -> Unit _m  
      | _ -> FunApp (e1', e2', _m))
   | Pair (e1, e2, _) -> Pair (epp_choreo_expr e1 loc, epp_choreo_expr e2 loc, _m)
   | Fst (e, _) -> Fst (epp_choreo_expr e loc, _m)
