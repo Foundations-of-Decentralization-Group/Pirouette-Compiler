@@ -34,7 +34,8 @@ dot:
 	dune exec pirc -- -dot $(FILE)
 
 test-infer: cleanall
-	dune exec test/typcheck_test.exe
+	dune exec --instrument-with bisect_ppx test/typcheck_test.exe
+	bisect-ppx-report html
 
 test-pp: cleanall
 	dune exec test/prettyprint_test.exe

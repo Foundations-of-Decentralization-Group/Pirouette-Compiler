@@ -124,7 +124,7 @@ let local_ctx_eq ctx expected_ctx =
   try
     List.for_all2
       (fun (var_name, typ) (expected_var_name, expected_typ) ->
-         var_name = expected_var_name && local_typ_eq typ expected_typ)
+        var_name = expected_var_name && local_typ_eq typ expected_typ)
       ctx
       expected_ctx
   with
@@ -274,7 +274,7 @@ let choreo_ctx_eq ctx expected_ctx =
   try
     List.for_all2
       (fun (var_name, typ) (expected_var_name, expected_typ) ->
-         var_name = expected_var_name && chreo_typ_eq typ expected_typ)
+        var_name = expected_var_name && chreo_typ_eq typ expected_typ)
       ctx
       expected_ctx
   with
@@ -313,8 +313,8 @@ let correct_choreo_send =
 let correct_choreo_if =
   Choreo.If
     ( Choreo.LocExpr (Local.LocId ("Alice", m), Local.Val (Local.Bool (true, m), m), m)
-    , correct_choreo_loc_expr
-    , correct_choreo_send
+    , Choreo.LocExpr (Local.LocId ("Alice", m), Local.Val (Local.Int (1, m), m), m)
+    , Choreo.LocExpr (Local.LocId ("Alice", m), Local.Val (Local.Int (2, m), m), m)
     , m )
 ;;
 
@@ -322,34 +322,41 @@ let correct_choreo_fundef =
   Choreo.FunDef ([ Choreo.Var (Local.VarId ("foo", m), m) ], correct_choreo_loc_expr, m)
 ;;
 
+(* let correct_choreo_funapp =
+   Choreo.FunApp (correct_choreo_fundef, correct_choreo_loc_expr, m)
+   ;; *)
 let correct_choreo_funapp =
-  Choreo.FunApp (correct_choreo_fundef, correct_choreo_loc_expr, m)
+  Choreo.FunApp
+    ( Choreo.FunDef
+        ( [ Choreo.Var (Local.VarId ("x", m), m) ]
+        , Choreo.LocExpr (Local.LocId ("Alice", m), Local.Val (Local.Int (1, m), m), m)
+        , m )
+    , Choreo.LocExpr (Local.LocId ("Alice", m), Local.Val (Local.Int (0, m), m), m)
+    , m )
 ;;
+
+(* let correct_choreo_funapp =
+   Choreo.FunApp
+   ( correct_choreo_fundef
+   , Choreo.LocExpr (Local.LocId ("Alice", m), Local.Val (Local.Int (0, m), m), m)
+   , m )
+   ;; *)
 
 let correct_choreo_pair = Choreo.Pair (correct_choreo_loc_expr, correct_choreo_send, m)
 let correct_fst = Choreo.Fst (correct_choreo_pair, m)
 let correct_snd = Choreo.Snd (correct_choreo_pair, m)
-let correct_left = Choreo.Left (correct_choreo_loc_expr, m)
-let correct_right = Choreo.Right (correct_choreo_loc_expr, m)
+
+let correct_left =
+  Choreo.Left
+    (Choreo.LocExpr (Local.LocId ("Alice", m), Local.Val (Local.Int (5, m), m), m), m)
+;;
+
+let correct_right =
+  Choreo.Right
+    (Choreo.LocExpr (Local.LocId ("Alice", m), Local.Val (Local.Int (5, m), m), m), m)
+;;
 
 (*--------------------Binding choreo type variables--------------------*)
-let choreo_int_var =
-  Choreo.Send
-    ( Local.LocId ("Alice", m)
-    , Choreo.Var (Local.VarId ("x", m), m)
-    , Local.LocId ("Bob", m)
-    , m )
-;;
-
-let choreo_bool_var =
-  Choreo.If
-    (Choreo.Var (Local.VarId ("y", m), m), correct_choreo_loc_expr, correct_choreo_send, m)
-;;
-
-let choreo_string_var =
-  Choreo.Pair (correct_choreo_loc_expr, Choreo.Var (Local.VarId ("z", m), m), m)
-;;
-
 let correct_choreo_let_int_e =
   Choreo.Let
     ( [ Choreo.Decl
@@ -357,7 +364,7 @@ let correct_choreo_let_int_e =
           , Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
           , m )
       ]
-    , choreo_int_var
+    , Choreo.LocExpr (Local.LocId ("Alice", m), Local.Val (Local.Int (5, m), m), m)
     , m )
 ;;
 
@@ -368,7 +375,7 @@ let correct_choreo_let_bool_e =
           , Choreo.TLoc (Local.LocId ("Bob", m), Local.TBool m, m)
           , m )
       ]
-    , choreo_bool_var
+    , Choreo.LocExpr (Local.LocId ("Bob", m), Local.Val (Local.Bool (true, m), m), m)
     , m )
 ;;
 
@@ -379,7 +386,11 @@ let correct_choreo_let_str_e =
           , Choreo.TLoc (Local.LocId ("Charlie", m), Local.TString m, m)
           , m )
       ]
-    , choreo_string_var
+    , Choreo.Pair
+        ( Choreo.LocExpr (Local.LocId ("Charlie", m), Local.Val (Local.Int (1, m), m), m)
+        , Choreo.LocExpr
+            (Local.LocId ("Charlie", m), Local.Val (Local.String ("hello", m), m), m)
+        , m )
     , m )
 ;;
 
@@ -387,10 +398,17 @@ let correct_choreo_nested_binding =
   Choreo.Let
     ( [ Choreo.Decl
           ( Choreo.Var (Local.VarId ("x", m), m)
-          , Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
+          , Choreo.TLoc (Local.LocId ("Bob", m), Local.TInt m, m)
           , m )
       ]
-    , correct_choreo_let_bool_e
+    , Choreo.Let
+        ( [ Choreo.Decl
+              ( Choreo.Var (Local.VarId ("y", m), m)
+              , Choreo.TLoc (Local.LocId ("Bob", m), Local.TBool m, m)
+              , m )
+          ]
+        , Choreo.LocExpr (Local.LocId ("Bob", m), Local.Val (Local.Bool (true, m), m), m)
+        , m )
     , m )
 ;;
 
@@ -422,12 +440,14 @@ let incorrect_choreo_let_type =
   Choreo.Let
     ( [ Choreo.Decl
           ( Choreo.Var (Local.VarId ("x", m), m)
-          , Choreo.TLoc (Local.LocId ("Alice", m), Local.TBool m, m)
+          , Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
           , m )
       ]
-    , choreo_int_var
-    , (*trying to use int var with bool declaration*)
-      m )
+    , Choreo.LocExpr
+        ( Local.LocId ("Alice", m)
+        , Local.Val (Local.Bool (true, m), m) (* Bool where Int expected *)
+        , m )
+    , m )
 ;;
 
 let incorrect_choreo_let_binding =
@@ -466,11 +486,6 @@ let choreo_loc_int_p : ftv Choreo.pattern =
   Choreo.LocPat (Local.LocId ("Alice", m), Local.Val (Local.Int (1, m), m), m)
 ;;
 
-(*
-   let choreo_loc_bool_p : ftv Choreo.pattern =
-   Choreo.LocPat (Local.LocId ("Bob", m), Local.Val (Local.Bool (true, m), m), m)
-   ;; *)
-
 let choreo_pair_p : ftv Choreo.pattern = Choreo.Pair (choreo_var_p, choreo_loc_int_p, m)
 let choreo_left_loc_p : ftv Choreo.pattern = Choreo.Left (choreo_loc_int_p, m)
 let choreo_right_def_p : ftv Choreo.pattern = Choreo.Right (choreo_def_p, m)
@@ -479,7 +494,7 @@ let choreo_correct_pattn_match =
   Choreo.Match
     ( Choreo.Var (Local.VarId ("foo", m), m)
     , [ choreo_left_loc_p, correct_choreo_loc_expr
-      ; choreo_right_def_p, correct_choreo_send
+      ; choreo_right_def_p, correct_choreo_loc_expr
       ]
     , m )
 ;;
@@ -572,7 +587,7 @@ let choreo_binding_suite =
        ; ("Correct infer let with string"
           >:: fun _ ->
           Choreo.TProd
-            ( Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
+            ( Choreo.TLoc (Local.LocId ("Charlie", m), Local.TInt m, m)
             , Choreo.TLoc (Local.LocId ("Charlie", m), Local.TString m, m)
             , m )
           |> choreo_expr_typ_eq correct_choreo_let_str_e)
