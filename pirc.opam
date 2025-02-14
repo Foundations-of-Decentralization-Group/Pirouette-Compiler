@@ -20,8 +20,8 @@ depends: [
   "menhir" {build}
   "ppxlib" {build}
   "yojson" {build}
-  "yaml"
-  "lwt_ppx"
+  "yaml" {build}
+  "lwt_ppx" {build}
   "ocamlfind" {with-test}
   "ounit2" {with-test}
   "ocamlformat" {>= "0.27.0" & dev}

@@ -29,7 +29,9 @@
   domainslib
   (menhir :build)
   (ppxlib :build)
-  (yojson yaml lwt_ppx :build)
+  (yojson :build)
+  (yaml :build)
+  (lwt_ppx :build)
   (ocamlfind :with-test)
   (ounit2 :with-test)
   (ocamlformat
