@@ -19,14 +19,14 @@ pingpong counter init_value :=
                        if C.(x = 1)
 		       {-- B has to be able to know when to terminate; this is based on C's choice of either restarting the whole process from A or stopping all computation --}
 		       then C [L] ~> A;
-                            C [R] ~> B;
+                            C [L] ~> B;
 
                            let A.new_counter := A.(counter + 1); in
                            pingpong A.new_counter A.init_value	
 
                        else
                           C[R] ~> A;
-                          C[L] ~> B;
+                          C[R] ~> B;
 
                            C.print_endline C."Mismatch at C"
 
