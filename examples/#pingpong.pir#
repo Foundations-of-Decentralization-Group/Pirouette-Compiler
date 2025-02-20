@@ -1,0 +1,45 @@
+{-- The aim of this program is for a participant to send a value to the next participant.
+After the first participant, all the rest will increment the value by one before sending it.
+--}
+
+pingpong init_value freq :=
+
+         let A.x := A.init_value; in
+         if A.(freq < 100000)
+	    theng A[L] ~> B;
+                 A[L] ~> C;
+
+		let B.x := [A] A.x ~> B; in
+                 
+	        if B.(x = 0)
+		then B[L] ~> A;
+                     B[L] ~> C;
+
+                   let B.y := B.(x + 1); in   
+                   let C.x := [B] B.y ~> C; in
+		   
+		   if C.(x = 2) then
+		   C[L] ~> A;
+		   C[L] ~> B;
+
+			let A.new_freq := A.(freq + 1); in
+		   	pingpong A.init_value A.new_freq
+		   
+		   else
+		   C[R] ~> A;
+                   C[R] ~> B;
+
+			C.print_endline C."Failed at C"
+
+                else	
+		B[R] ~> A;
+		B[R] ~> C;
+		
+		   B.print_endline B."Failed at B"
+
+          else
+             A[R] ~> B;
+             A[R] ~> C;	     
+             A.print_endline A."All iterations are done";
+	
+ main := pingpong A.0 A.100000;
