@@ -12,4 +12,5 @@
 (library
  (name parsing)
  (private_modules lexer parser)
+ (instrumentation (backend bisect_ppx))
  (libraries ast_core))
