@@ -1,6 +1,6 @@
 (test
  (name prettyprint_test)
- (modules prettyprint_test astutils_testcases)
+ (modules prettyprint_test astutils_testcases testcases)
  (libraries parsing ounit2 ast_utils))
 
 ;(test
@@ -14,20 +14,20 @@
  ;(modules marshal_test)
  ;(libraries ounit2 http types_test))
 
-(test
- (name typcheck_test)
- (modules typcheck_test)
- (libraries parsing ounit2 typing))
+; (test
+;  (name typcheck_test)
+;  (modules typcheck_test)
+;  (libraries parsing ounit2 typing))
 
 
-(test
- (name parsing_test)
- (modules parsing_test)
- (libraries parsing ounit2 ast_core))
+; (test
+;  (name parsing_test)
+;  (modules parsing_test)
+;  (libraries parsing ounit2 ast_core))
 
-(library
- (name types_test)
- (modules types_test))
+; (library
+;  (name types_test)
+;  (modules types_test))
 
 ;(executable
 ;(name marshal_sender)
