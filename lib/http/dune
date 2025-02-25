@@ -1,5 +1,6 @@
 (library
  (name http)
+ (instrumentation (backend bisect_ppx))
  (modules send_receive)
  (libraries cohttp-lwt-unix lwt config_parser)
  (preprocess

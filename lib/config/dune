@@ -1,5 +1,6 @@
 (library
  (name config_parser)
+ (instrumentation (backend bisect_ppx))
  (modules config_parser)
  (libraries lwt lwt.unix yaml ast_utils parsing netgen)
  (preprocess
