@@ -5,8 +5,8 @@
 ; 0% (0 / 65) -> lib/ast_utils/ast_locs.ml
 ; 16% (4 / 24) -> lib/ast_utils/ast_utils.ml
 ; 0% (0 / 417) -> lib/ast_utils/dot_ast.ml
-; 66% (142 / 213) -> lib/ast_utils/jsonify_ast.ml
-; 67% (90 / 134) ->lib/ast_utils/pprint_ast.ml
+; 66% (142 / 213) -> lib/ast_utils/jsonify_ast.ml (focus)
+; 67% (90 / 134) ->lib/ast_utils/pprint_ast.ml (focus)
 ; 63% (67 / 105) -> lib/parsing/lexer.ml
 ; 18% (2 / 11) -> lib/parsing/parse.ml
 ; 0% (0 / 5) -> lib/parsing/parsed_ast.ml
@@ -24,7 +24,7 @@
 ; 18% (2 / 11) -> lib/parsing/parse.ml
 ; 0% (0 / 5) -> lib/parsing/parsed_ast.ml
 ; 2% (67 / 2362) -> lib/parsing/parser.ml
-; 78% (344 / 437) -> lib/typing/typ_infer.ml
+; 78% (344 / 437) -> lib/typing/typ_infer.ml (focus)
 (test
  (name typcheck_test)
  (modules typcheck_test)
@@ -35,8 +35,8 @@
 ; TESTED FILES 2/25
 ; 0% (0 / 64) -> lib/ast_core/choreo.ml
 ; 0% (0 / 90) -> lib/ast_core/local.ml
-; 20% (21 / 105) -> lib/parsing/lexer.ml
-; 18% (2 / 11) -> lib/parsing/parse.ml
+; 20% (21 / 105) -> lib/parsing/lexer.ml (focus)
+; 18% (2 / 11) -> lib/parsing/parse.ml (focus)
 ; 0% (0 / 5) -> lib/parsing/parsed_ast.ml
 ; 2% (67 / 2362) -> lib/parsing/parser.m
 (test
