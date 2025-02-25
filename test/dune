@@ -38,14 +38,17 @@
 ; 20% (21 / 105) -> lib/parsing/lexer.ml (focus)
 ; 18% (2 / 11) -> lib/parsing/parse.ml (focus)
 ; 0% (0 / 5) -> lib/parsing/parsed_ast.ml
-; 2% (67 / 2362) -> lib/parsing/parser.m
+; 2% (67 / 2362) -> lib/parsing/parser.m (focus)
 (test
  (name parsing_test)
  (modules parsing_test)
  (libraries ounit2 parsing ast_core))
 
-
-
+;runs dotast_test.ml (TO DO)
+(test
+ (name dotast_test)
+ (modules dotast_test)
+ (libraries ounit2 parsing ast_utils))
 
 ; -----------------------------------------------------------------
 ; The test below is codegen testing- Alex is working on currently
