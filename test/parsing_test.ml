@@ -1,6 +1,6 @@
 open OUnit2
 open Parsing
-open Lexing
+(*open Lexing*) (* this is not needed for running, I am not sure why it was added *)
 
 let parse_string input =
   let lexbuf = Lexing.from_string input in
