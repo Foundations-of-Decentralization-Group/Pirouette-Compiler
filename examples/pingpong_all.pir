@@ -26,7 +26,7 @@ pingpong counter init_value :=
 
 
                    let B.y := B.(x + 1); in
-		   let C.x := [B] B.y ~> C; in
+		         let C.x := [B] B.y ~> C; in
 
                        if C.(x = 1)
 		       {-- B has to be able to know when to terminate; this is based on C's choice of either restarting the whole process from A or stopping all computation --}

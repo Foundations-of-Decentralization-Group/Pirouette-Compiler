@@ -16,6 +16,13 @@ broadcast_unopt input_num :=
      let L.x := [A] A.x ~> L; in
      let M.x := [A] A.x ~> M; in
      let N.x := [A] A.x ~> N; in
-     let O.x := [A] A.x ~> O; in O.print_endline O."A has finished broadcasting all the values";
+     let O.x := [A] A.x ~> O; in 
+     let P.x := [A] A.x ~> P; in 
+     let Q.x := [A] A.x ~> Q; in 
+     let R.x := [A] A.x ~> R; in 
+     let S.x := [A] A.x ~> S; in 
+     let T.x := [A] A.x ~> T; in 
+     let U.x := [A] A.x ~> U; in 
+     U.print_endline U."A has finished broadcasting all the values";
 
 main := broadcast_unopt A.2;

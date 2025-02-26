@@ -16,6 +16,12 @@ broadcast_opt input_num :=
      let L.x := [F] F.x ~> L; in
      let M.x := [F] F.x ~> M; in
      let N.x := [G] G.x ~> N; in
-     let O.x := [G] G.x ~> O; in O.print_endline O."Done with all broadcasting with assist";
+     let O.x := [G] G.x ~> O; in
+     let P.x := [H] H.x ~> P; in
+     let Q.x := [H] H.x ~> Q; in
+     let R.x := [I] I.x ~> R; in
+     let S.x := [I] I.x ~> S; in
+     let T.x := [J] J.x ~> T; in
+     let U.x := [J] J.x ~> U; in U.print_endline U."Done with all broadcasting with assist";
      
 main := broadcast_opt A.2;
