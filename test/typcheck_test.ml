@@ -93,6 +93,15 @@ let int_pattn_match =
     , m )
 ;;
 
+let local_right_left_match =
+  Local.Match
+    ( Local.Var (Local.VarId ("x", m), m)
+    , [ right_def_p, Local.Val (Local.Int (42, m), m)
+      ; left_int_p, Local.Val (Local.Int (43, m), m)
+      ]
+    , m )
+;;
+
 let mismatched_return_match =
   Local.Match
     ( Var (VarId ("foo", m), m)
@@ -214,6 +223,8 @@ let correct_pattn_suite =
           TSum (TVar (TypId ("T0", m), m), TUnit m, m)
           |> local_pattn_typ_eq right_def_p [])
        ; ("Correct pattern match" >:: fun _ -> TInt m |> local_expr_typ_eq int_pattn_match)
+       ; ("Correct local match with right-left order"
+          >:: fun _ -> TInt m |> local_expr_typ_eq local_right_left_match)
        ]
 ;;
 
@@ -253,6 +264,14 @@ let incorrect_local_type_suite =
           >:: fun _ ->
           Failure "Type of patterns are not sum types"
           |> local_expr_typ_failures mismatched_pattn_match)
+       ; ("Incorrect fst on non-product type"
+          >:: fun _ ->
+          let bad_fst = Local.Fst (Local.Val (Local.Int (1, m), m), m) in
+          Failure "Fst Type error" |> local_expr_typ_failures bad_fst)
+       ; ("Incorrect snd on non-product type"
+          >:: fun _ ->
+          let bad_snd = Local.Snd (Local.Val (Local.Bool (true, m), m), m) in
+          Failure "Snd Type error" |> local_expr_typ_failures bad_snd)
        ]
 ;;
 
@@ -298,6 +317,32 @@ let choreo_pattern_typ_eq p expected_ctx expected_t =
   |> assert_true
 ;;
 
+let unify_local_success t1 t2 expected_subst =
+  let result = unify_local t1 t2 in
+  assert_equal expected_subst result
+;;
+
+let unify_local_failure t1 t2 expected_msg =
+  try
+    let _ = unify_local t1 t2 in
+    assert_failure "Expected failure but got success"
+  with
+  | Failure msg -> assert_equal expected_msg msg
+;;
+
+let unify_choreo_success t1 t2 expected_subst =
+  let result = unify_choreo t1 t2 in
+  assert_equal expected_subst result
+;;
+
+let unify_choreo_failure t1 t2 expected_msg =
+  try
+    let _ = unify_choreo t1 t2 in
+    assert_failure "Expected failure but got success"
+  with
+  | Failure msg -> assert_equal expected_msg msg
+;;
+
 (*--------------------Choreo const type inference testcases--------------------*)
 let correct_choreo_unit_e = Choreo.Unit m
 
@@ -322,9 +367,6 @@ let correct_choreo_fundef =
   Choreo.FunDef ([ Choreo.Var (Local.VarId ("foo", m), m) ], correct_choreo_loc_expr, m)
 ;;
 
-(* let correct_choreo_funapp =
-   Choreo.FunApp (correct_choreo_fundef, correct_choreo_loc_expr, m)
-   ;; *)
 let correct_choreo_funapp =
   Choreo.FunApp
     ( Choreo.FunDef
@@ -335,12 +377,12 @@ let correct_choreo_funapp =
     , m )
 ;;
 
-(* let correct_choreo_funapp =
-   Choreo.FunApp
-   ( correct_choreo_fundef
-   , Choreo.LocExpr (Local.LocId ("Alice", m), Local.Val (Local.Int (0, m), m), m)
-   , m )
-   ;; *)
+let unit_funapp =
+  Choreo.FunApp
+    ( Choreo.FunDef ([ Choreo.Var (Local.VarId ("x", m), m) ], Choreo.Unit m, m)
+    , Choreo.LocExpr (Local.LocId ("Alice", m), Local.Val (Local.Int (0, m), m), m)
+    , m )
+;;
 
 let correct_choreo_pair = Choreo.Pair (correct_choreo_loc_expr, correct_choreo_send, m)
 let correct_fst = Choreo.Fst (correct_choreo_pair, m)
@@ -489,12 +531,23 @@ let choreo_loc_int_p : ftv Choreo.pattern =
 let choreo_pair_p : ftv Choreo.pattern = Choreo.Pair (choreo_var_p, choreo_loc_int_p, m)
 let choreo_left_loc_p : ftv Choreo.pattern = Choreo.Left (choreo_loc_int_p, m)
 let choreo_right_def_p : ftv Choreo.pattern = Choreo.Right (choreo_def_p, m)
+let choreo_left_def_p : ftv Choreo.pattern = Choreo.Left (choreo_def_p, m)
+let choreo_right_loc_p : ftv Choreo.pattern = Choreo.Right (choreo_loc_int_p, m)
 
 let choreo_correct_pattn_match =
   Choreo.Match
     ( Choreo.Var (Local.VarId ("foo", m), m)
     , [ choreo_left_loc_p, correct_choreo_loc_expr
       ; choreo_right_def_p, correct_choreo_loc_expr
+      ]
+    , m )
+;;
+
+let choreo_right_left_match =
+  Choreo.Match
+    ( Choreo.Var (Local.VarId ("x", m), m)
+    , [ choreo_right_loc_p, correct_choreo_loc_expr
+      ; choreo_left_loc_p, correct_choreo_loc_expr
       ]
     , m )
 ;;
@@ -571,6 +624,21 @@ let choreo_const_suite =
             , Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
             , m )
           |> choreo_expr_typ_eq correct_right)
+       ; ("Correct infer sync"
+          >:: fun _ ->
+          let sync_expr =
+            Choreo.Sync
+              ( Local.LocId ("Alice", m)
+              , Local.LabelId ("Bob", m)
+              , Local.LocId ("Charlie", m)
+              , Choreo.LocExpr
+                  (Local.LocId ("Alice", m), Local.Val (Local.Int (1, m), m), m)
+              , m )
+          in
+          Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
+          |> choreo_expr_typ_eq sync_expr)
+       ; ("Correct funapp with non-TLoc type"
+          >:: fun _ -> Choreo.TUnit m |> choreo_expr_typ_eq unit_funapp)
        ]
 ;;
 
@@ -632,6 +700,25 @@ let correct_choreo_pattern_suite =
           >:: fun _ ->
           Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
           |> choreo_expr_typ_eq choreo_correct_pattn_match)
+       ; ("Correct left pattern with non-TLoc type"
+          >:: fun _ ->
+          Choreo.TSum
+            ( Choreo.TLoc
+                (Local.LocId ("dummy", m), Local.TVar (Local.TypId ("T0", m), m), m)
+            , Choreo.TVar (Choreo.Typ_Id ("T1", m), m)
+            , m )
+          |> choreo_pattern_typ_eq choreo_left_def_p [])
+       ; ("Correct right pattern with TLoc type"
+          >:: fun _ ->
+          Choreo.TSum
+            ( Choreo.TVar (Choreo.Typ_Id ("T0", m), m)
+            , Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
+            , m )
+          |> choreo_pattern_typ_eq choreo_right_loc_p [])
+       ; ("Correct choreo match with TLoc patterns"
+          >:: fun _ ->
+          Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
+          |> choreo_expr_typ_eq choreo_right_left_match)
        ]
 ;;
 
@@ -668,6 +755,260 @@ let incorrect_choreo_type_suite =
           >:: fun _ ->
           Failure "Type of patterns are not sum types"
           |> choreo_expr_typ_failures choreo_mismatched_pattn_match)
+       ; ("Send with mismatched types"
+          >:: fun _ ->
+          let mismatch_send =
+            Choreo.Send
+              ( Local.LocId ("Alice", m)
+              , Choreo.Let
+                  (*expression of wrong type at Alice's loc*)
+                  ( [ Choreo.Decl
+                        ( Choreo.Var (Local.VarId ("x", m), m)
+                        , Choreo.TLoc (Local.LocId ("Alice", m), Local.TString m, m)
+                        , m )
+                    ]
+                  , Choreo.LocExpr
+                      ( Local.LocId ("Alice", m)
+                      , Local.Val (Local.Int (1, m), m) (*string expected but got int*)
+                      , m )
+                  , m )
+              , Local.LocId ("Bob", m)
+              , m )
+          in
+          Failure "Type mismatch" |> choreo_expr_typ_failures mismatch_send)
+       ; ("Send with non-TLoc type"
+          >:: fun _ ->
+          let bad_send =
+            Choreo.Send
+              (Local.LocId ("Alice", m), Choreo.Unit m, Local.LocId ("Bob", m), m)
+          in
+          Failure "Type mismatch" |> choreo_expr_typ_failures bad_send)
+       ; ("Let with multiple declarations"
+          >:: fun _ ->
+          let multi_decl_let =
+            Choreo.Let
+              ( [ Choreo.Decl
+                    ( Choreo.Var (Local.VarId ("x", m), m)
+                    , Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
+                    , m )
+                ; Choreo.Decl
+                    ( Choreo.Var (Local.VarId ("y", m), m)
+                    , Choreo.TLoc (Local.LocId ("Bob", m), Local.TInt m, m)
+                    , m )
+                ]
+              , Choreo.Unit m
+              , m )
+          in
+          Choreo.TUnit m |> choreo_expr_typ_eq multi_decl_let)
+       ; ("Fst on non-product type"
+          >:: fun _ ->
+          let bad_fst = Choreo.Fst (Choreo.Unit m, m) in
+          Failure "Expected product type" |> choreo_expr_typ_failures bad_fst)
+       ; ("Snd on non-product type"
+          >:: fun _ ->
+          let bad_snd = Choreo.Snd (Choreo.Unit m, m) in
+          Failure "Expected product type" |> choreo_expr_typ_failures bad_snd)
+       ; ("Left with non-TLoc type"
+          >:: fun _ ->
+          let bad_left = Choreo.Left (Choreo.Unit m, m) in
+          Failure "Expected location type in Left" |> choreo_expr_typ_failures bad_left)
+       ; ("Right with non-TLoc type"
+          >:: fun _ ->
+          let bad_right = Choreo.Right (Choreo.Unit m, m) in
+          Failure "Expected location type in Right" |> choreo_expr_typ_failures bad_right
+         )
+       ]
+;;
+
+(*------------------------Choreo stmt tests-------------------------------*)
+let choreo_assign_test =
+  Choreo.Assign
+    ( [ Choreo.Var (Local.VarId ("x", m), m); Choreo.Var (Local.VarId ("y", m), m) ]
+    , Choreo.LocExpr (Local.LocId ("Alice", m), Local.Val (Local.Int (1, m), m), m)
+    , m )
+;;
+
+let choreo_decl_pattern_mismatch =
+  Choreo.Let
+    ( [ Choreo.Decl
+          ( Choreo.Pair
+              (*pair instead of var for a pattern mismatch case*)
+              ( Choreo.Var (Local.VarId ("x", m), m)
+              , Choreo.Var (Local.VarId ("y", m), m)
+              , m )
+          , Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
+          , m )
+      ]
+    , Choreo.Unit m
+    , m )
+;;
+
+let choreo_stmt_suite =
+  "Choreo statement tests"
+  >::: [ ("choreo assign test"
+          >:: fun _ ->
+          let _, t, _ = infer_choreo_stmt [] [] choreo_assign_test in
+          let expected_t = Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m) in
+          assert_equal true (chreo_typ_eq t expected_t))
+       ; ("choreo decl pattern mismatch"
+          >:: fun _ ->
+          Failure "Pattern mismatch"
+          |> choreo_expr_typ_failures choreo_decl_pattern_mismatch)
+       ]
+;;
+
+(*------------------Bisect (Coverage check) test--------------------------*)
+let unification_suite =
+  "Unification helper functions tests"
+  >::: [ ("Correct unify_local string"
+          >:: fun _ -> unify_local_success (Local.TString m) (Local.TString m) [])
+       ; ("Correct unify_local unit"
+          >:: fun _ -> unify_local_success (Local.TUnit m) (Local.TUnit m) [])
+       ; ("Correct unify_local var"
+          >:: fun _ ->
+          unify_local_success
+            (Local.TVar (Local.TypId ("X", m), m))
+            (Local.TInt m)
+            [ "X", Local.TInt m ])
+       ; ("Incorrect unify_local var occurs check"
+          >:: fun _ ->
+          let tvar = Local.TVar (Local.TypId ("X", m), m) in
+          unify_local_failure
+            tvar
+            (Local.TProd (tvar, Local.TUnit m, m))
+            "Occurs check failed")
+       ; ("Correct unify_local var right side"
+          >:: fun _ ->
+          let tvar = Local.TVar (Local.TypId ("X", m), m) in
+          unify_local_success (Local.TInt m) tvar [ "X", Local.TInt m ])
+       ; ("Correct unify_local same var"
+          >:: fun _ ->
+          let tvar = Local.TVar (Local.TypId ("X", m), m) in
+          unify_local_success tvar tvar [])
+       ; ("Correct unify_local prod"
+          >:: fun _ ->
+          unify_local_success
+            (Local.TProd (Local.TInt m, Local.TBool m, m))
+            (Local.TProd (Local.TInt m, Local.TBool m, m))
+            [])
+       ; ("Correct unify_local sum"
+          >:: fun _ ->
+          unify_local_success
+            (Local.TSum (Local.TInt m, Local.TBool m, m))
+            (Local.TSum (Local.TInt m, Local.TBool m, m))
+            [])
+       ; ("Incorrect unify_local prod mismatch"
+          >:: fun _ ->
+          unify_local_failure
+            (Local.TProd (Local.TInt m, Local.TBool m, m))
+            (Local.TProd (Local.TBool m, Local.TBool m, m))
+            "Unification failed")
+       ; ("Correct unify_choreo unit"
+          >:: fun _ -> unify_choreo_success (Choreo.TUnit m) (Choreo.TUnit m) [])
+       ; ("Incorrect unify_choreo loc"
+          >:: fun _ ->
+          unify_choreo_failure
+            (Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m))
+            (Choreo.TLoc (Local.LocId ("Bob", m), Local.TInt m, m))
+            "Location mismatch")
+       ; ("Incorrect unify_choreo var"
+          >:: fun _ ->
+          let tvar = Choreo.TVar (Choreo.Typ_Id ("X", m), m) in
+          unify_choreo_failure
+            tvar
+            (Choreo.TProd (tvar, Choreo.TUnit m, m))
+            "Occurs check failed")
+       ; ("Correct unify_choreo var right side"
+          >:: fun _ ->
+          let tvar = Choreo.TVar (Choreo.Typ_Id ("X", m), m) in
+          unify_choreo_success (Choreo.TUnit m) tvar [ "X", Choreo.TUnit m ])
+       ; ("Correct unify_choreo same var"
+          >:: fun _ ->
+          let tvar = Choreo.TVar (Choreo.Typ_Id ("X", m), m) in
+          unify_choreo_success tvar tvar [])
+       ; ("Correct unify_choreo map"
+          >:: fun _ ->
+          unify_choreo_success
+            (Choreo.TMap (Choreo.TUnit m, Choreo.TUnit m, m))
+            (Choreo.TMap (Choreo.TUnit m, Choreo.TUnit m, m))
+            [])
+       ; ("Correct unify_choreo prod"
+          >:: fun _ ->
+          unify_choreo_success
+            (Choreo.TProd (Choreo.TUnit m, Choreo.TUnit m, m))
+            (Choreo.TProd (Choreo.TUnit m, Choreo.TUnit m, m))
+            [])
+       ; ("Correct unify_choreo sum"
+          >:: fun _ ->
+          unify_choreo_success
+            (Choreo.TSum (Choreo.TUnit m, Choreo.TUnit m, m))
+            (Choreo.TSum (Choreo.TUnit m, Choreo.TUnit m, m))
+            [])
+       ; ("Incorrect unify_choreo map mismatch"
+          >:: fun _ ->
+          unify_choreo_failure
+            (Choreo.TMap (Choreo.TUnit m, Choreo.TUnit m, m))
+            (Choreo.TMap
+               (Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m), Choreo.TUnit m, m))
+            "Unification failed")
+       ]
+;;
+
+let helper_suite =
+  "Helper function tests"
+  >::: [ ("extract_local_ctx test"
+          >:: fun _ ->
+          let global_ctx =
+            [ "Alice", "x", Local.TInt m
+            ; "Bob", "y", Local.TBool m
+            ; "Alice", "z", Local.TString m
+            ]
+          in
+          let result = extract_local_ctx global_ctx "Alice" in
+          let expected = [ "x", Local.TInt m; "z", Local.TString m ] in
+          assert_equal expected result)
+       ; ("get_choreo_subst test"
+          >:: fun _ ->
+          let local_subst = [ "x", Local.TInt m; "y", Local.TBool m ] in
+          let loc_id = Local.LocId ("Alice", m) in
+          let result = get_choreo_subst local_subst loc_id in
+          assert_equal
+            [ "x", Choreo.TLoc (loc_id, Local.TInt m, m)
+            ; "y", Choreo.TLoc (loc_id, Local.TBool m, m)
+            ]
+            result)
+       ; ("get_choreo_ctx test"
+          >:: fun _ ->
+          let local_ctx = [ "x", Local.TInt m; "y", Local.TBool m ] in
+          let loc_id = Local.LocId ("Alice", m) in
+          let result = get_choreo_ctx local_ctx loc_id in
+          assert_equal
+            [ "x", Choreo.TLoc (loc_id, Local.TInt m, m)
+            ; "y", Choreo.TLoc (loc_id, Local.TBool m, m)
+            ]
+            result)
+       ; ("get_local_subst non-TLoc test"
+          >:: fun _ ->
+          let choreo_subst =
+            [ "x", Choreo.TUnit m
+            ; "y", Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
+            ]
+          in
+          let loc_id = Local.LocId ("Alice", m) in
+          let result = get_local_subst choreo_subst loc_id in
+          assert_equal [ "y", Local.TInt m ] result)
+       ; ("apply local substitution to TVar"
+          >:: fun _ ->
+          let tvar = Local.TVar (Local.TypId ("X", m), m) in
+          let subst = [ "X", Local.TInt m ] in
+          let result = apply_subst_typ_local subst tvar in
+          assert_equal true (local_typ_eq result (Local.TInt m)))
+       ; ("apply choreo substitution to TVar"
+          >:: fun _ ->
+          let tvar = Choreo.TVar (Choreo.Typ_Id ("X", m), m) in
+          let subst = [ "X", Choreo.TUnit m ] in
+          let result = apply_subst_typ_choreo subst tvar in
+          assert_equal true (chreo_typ_eq result (Choreo.TUnit m)))
        ]
 ;;
 
@@ -683,6 +1024,11 @@ let all_suites =
        ; choreo_binding_suite
        ; correct_choreo_pattern_suite
        ; incorrect_choreo_type_suite
+       ; choreo_stmt_suite
+       ; (*Unification test suite*)
+         unification_suite
+       ; (*Helper functions test suite*)
+         helper_suite
        ]
 ;;
 
