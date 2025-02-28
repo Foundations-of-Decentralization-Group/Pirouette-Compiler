@@ -65,12 +65,12 @@ and merge_net_expr (expr : 'a Net.expr) (expr' : 'a Net.expr) : 'a Net.expr opti
         try
           List.fold_left2
             (fun acc s1 s2 ->
-              match acc with
-              | Some acc ->
-                (match merge_net_stmt s1 s2 with
-                 | Some s -> Some (s :: acc)
-                 | None -> raise Not_matched)
-              | None -> raise Not_matched)
+               match acc with
+               | Some acc ->
+                 (match merge_net_stmt s1 s2 with
+                  | Some s -> Some (s :: acc)
+                  | None -> raise Not_matched)
+               | None -> raise Not_matched)
             (Some [])
             stmts
             stmts'
@@ -90,12 +90,12 @@ and merge_net_expr (expr : 'a Net.expr) (expr' : 'a Net.expr) : 'a Net.expr opti
     (try
        List.iter
          (fun (p, e) ->
-           match Hashtbl.find_opt cases1_tbl p with
-           | Some e' ->
-             (match merge_net_expr e e' with
-              | Some e -> Hashtbl.replace cases1_tbl p e
-              | None -> raise Not_matched)
-           | None -> raise Not_matched)
+            match Hashtbl.find_opt cases1_tbl p with
+            | Some e' ->
+              (match merge_net_expr e e' with
+               | Some e -> Hashtbl.replace cases1_tbl p e
+               | None -> raise Not_matched)
+            | None -> raise Not_matched)
          cases';
        Some (Match (e, Hashtbl.fold (fun p e acc -> (p, e) :: acc) cases1_tbl [], _m))
      with
@@ -187,7 +187,10 @@ and epp_choreo_expr (expr : 'a Choreo.expr) (loc : string) : 'a Net.expr =
     (match merge_net_expr (epp_choreo_expr e2 loc) (epp_choreo_expr e3 loc) with
      | Some e -> e
      | None ->
-       If (epp_choreo_expr e1 loc, epp_choreo_expr e2 loc, epp_choreo_expr e3 loc, _m))
+       let condition = epp_choreo_expr e1 loc in
+       if condition = Unit _m
+       then Unit _m
+       else If (condition, epp_choreo_expr e2 loc, epp_choreo_expr e3 loc, _m))
   | Match (match_e, cases, _) ->
     let merged_cases =
       match cases with
@@ -195,9 +198,9 @@ and epp_choreo_expr (expr : 'a Choreo.expr) (loc : string) : 'a Net.expr =
       | (_, case_e) :: rest ->
         List.fold_left
           (fun acc (_, e) ->
-            match acc with
-            | Some e' -> merge_net_expr e' (epp_choreo_expr e loc)
-            | None -> None)
+             match acc with
+             | Some e' -> merge_net_expr e' (epp_choreo_expr e loc)
+             | None -> None)
           (Some (epp_choreo_expr case_e loc))
           rest
     in
