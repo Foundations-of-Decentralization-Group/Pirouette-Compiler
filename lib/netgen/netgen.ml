@@ -188,9 +188,9 @@ and epp_choreo_expr (expr : 'a Choreo.expr) (loc : string) : 'a Net.expr =
      | Some e -> e
      | None ->
        let condition = epp_choreo_expr e1 loc in
-       if condition = Unit _m
-       then Unit _m
-       else If (condition, epp_choreo_expr e2 loc, epp_choreo_expr e3 loc, _m))
+       (match condition with
+        | Unit _ -> Unit _m
+        | _ -> If (condition, epp_choreo_expr e2 loc, epp_choreo_expr e3 loc, _m)))
   | Match (match_e, cases, _) ->
     let merged_cases =
       match cases with
