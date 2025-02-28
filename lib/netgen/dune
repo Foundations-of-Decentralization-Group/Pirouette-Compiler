@@ -1,3 +1,4 @@
 (library
  (name netgen)
+ (instrumentation (backend bisect_ppx))
  (libraries ast_core))
