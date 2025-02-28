@@ -1,6 +1,5 @@
 (library
  (name codegen)
- (instrumentation (backend bisect_ppx))
  (libraries ast_core ppxlib bisect_ppx)
  (modules emit_core msg_intf toplevel_shm)
  (preprocess
