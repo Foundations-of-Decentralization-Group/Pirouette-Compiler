@@ -44,6 +44,12 @@ bisect-pp: cleanall
 	dune exec --instrument-with bisect_ppx test/prettyprint_test.exe
 	bisect-ppx-report html
 
+bisect-all: cleanall
+	dune runtest --instrument-with bisect_ppx
+	bisect-ppx-report html
+	open _coverage/index.html
+
+
 cleandocs:
 	rm -rf $(shell find docs -name '*.aux' -o -name '*.log' -o -name '*.out' \
 	-o -name '*.bbl' -o -name '*.bcf' -o -name '*.blg' -o -name '*.run.xml' \
