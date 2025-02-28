@@ -134,21 +134,28 @@ and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (stmt : 'a Net.
 
 and emit_foreign_decl id _typ external_name =
   let open Ast_builder.Default in
-  let module_path, function_name = 
-    if String.starts_with ~prefix:"@" external_name then
-      match String.split_on_char ':' (String.sub external_name 1 (String.length external_name - 1)) with
-      | [file; func] when file <> "" && func <> "" -> file, func
-      | _ -> failwith "Invalid external function format. Expected @file:function"
-    else
-      external_name, external_name
+  let module_path, function_name =
+    if String.starts_with ~prefix:"@" external_name
+    then (
+      match
+        String.split_on_char
+          ':'
+          (String.sub external_name 1 (String.length external_name - 1))
+      with
+      | [ file; func ] when file <> "" && func <> "" -> file, func
+      | _ -> failwith "Invalid external function format. Expected @file:function")
+    else external_name, external_name
   in
-  let module_name = 
-    String.capitalize_ascii 
-      (Filename.basename (Filename.remove_extension module_path))
+  let module_name =
+    String.capitalize_ascii (Filename.basename (Filename.remove_extension module_path))
   in
   let fun_expr =
-    pexp_fun ~loc Nolabel None (pvar ~loc "arg")
-      [%expr ([%e evar ~loc (module_name ^ "." ^ function_name)]) [%e evar ~loc "arg"]]
+    pexp_fun
+      ~loc
+      Nolabel
+      None
+      (pvar ~loc "arg")
+      [%expr [%e evar ~loc (module_name ^ "." ^ function_name)] [%e evar ~loc "arg"]]
   in
   value_binding ~loc ~pat:(pvar ~loc id) ~expr:fun_expr
 
@@ -199,11 +206,15 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
       let [%p Ast_builder.Default.pvar ~loc val_id] =
         [%e emit_net_pexp ~self_id (module Msg) e]
       in
-      [%e Msg.emit_net_send ~src:self_id ~dst [%expr Ok [%e Ast_builder.Default.evar ~loc val_id]]]]
+      [%e
+        Msg.emit_net_send
+          ~src:self_id
+          ~dst
+          [%expr Ok [%e Ast_builder.Default.evar ~loc val_id]]]]
   | Recv (LocId (src, _), _) ->
     [%expr
       match [%e Msg.emit_net_recv ~src ~dst:self_id] with
-      | Ok msg -> msg 
+      | Ok msg -> msg
       | Error msg -> failwith ("Receive error: " ^ msg)]
   | ChooseFor (LabelId (label, _), LocId (dst, _), e, _) ->
     Ast_builder.Default.esequence
@@ -230,4 +241,4 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
       ~loc
       (Msg.emit_net_recv ~src ~dst:self_id)
       (cases @ [ default_case ])
-  ;;
+;;
