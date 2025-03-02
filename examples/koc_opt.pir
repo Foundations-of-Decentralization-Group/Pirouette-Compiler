@@ -8,29 +8,27 @@ spread freq :=
 		C[L5] ~> F;
 		C[L6] ~> G;
 
-			let B.x := B.10; in 
+		 	let B.x := B.10; in 
 			let C.x := C.10; in
 			let D.x := D.10; in
 			let E.x := E.10; in
 			let F.x := F.10; in
 			let G.x := G.10; in spread A.(freq - 1)
 
-
 	else	 
-	A[R1] ~> B;
-	A[R2] ~> C;
-	B[R3] ~> D;
-	B[R4] ~> E;
-	C[R5] ~> F;
-	C[R6] ~> G;
+		A[R1] ~> B;
+		A[R2] ~> C;
+		B[R3] ~> D;
+		B[R4] ~> E;
+		C[R5] ~> F;
+		C[R6] ~> G;
 
-		let B.x := B.11; in
-		let C.x := C.11; in
-		let D.x := D.11; in
-		let E.x := E.11; in
-		let F.x := F.11; in
-		let G.x := G.11; in G.print_endline G."Terminate";
-
+			let B.x := B.11; in
+			let C.x := C.11; in
+			let D.x := D.11; in
+			let E.x := E.11; in
+			let F.x := F.11; in
+			let G.x := G.11; in G.print_endline G."Terminate";
 
 main := spread A.1000000;
 

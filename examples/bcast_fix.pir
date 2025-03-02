@@ -8,10 +8,6 @@ broadcast_opt freq :=
     A[L] ~> E;
     A[L] ~> F;
     A[L] ~> G;
-
-        let B.factorial n := if B.(n <= 1) then B.1 else B.factorial B.(n - 1); in
-        let A.reply_B := [B] B.factorial B.20 ~> A; in 
-
     A[L] ~> C;
     
         let C.x := C.10; in 
