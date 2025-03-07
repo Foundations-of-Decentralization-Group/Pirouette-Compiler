@@ -8,17 +8,75 @@ end
 module LocalAst = Local.With(DummyInfo)
 module ChoreoAst = Ast_core.Choreo.With(DummyInfo)
 
-(* let test_type_int (new_meta: int) (input_unit: unit) =
-  let old_info = Local.M.TUnit(input_unit) in
+(* let test_pattern_value (old_meta: int) (new_meta: int) : Local.M.pattern =
+  let val_int = Local.M.Int (1,old_meta) in
+  let val_pat = Local.M.Val (val_int, 1) in
+  let new_info = LocalAst.set_info_pattern new_meta val_pat in
+  assert_equal new_meta (LocalAst.get_info_pattern (new_info));
+  let new_info = LocalAst.set_info_pattern new_meta old_info in
+  assert_equal new_meta (LocalAst.get_info_pattern (new_info));
+;;  *)
+let test_pattern_default (old_meta: int) (new_meta: int)  =
+  let old_info = Local.M.Default(1) in
+  let new_info = LocalAst.set_info_pattern old_meta old_info in
+  assert_equal old_meta (LocalAst.get_info_pattern (new_info));
+  let new_info = LocalAst.set_info_pattern new_meta old_info in
+  assert_equal new_meta (LocalAst.get_info_pattern (new_info));
+;; 
+let test_loc_id (old_meta: int) (new_meta: int)  =
+  let old_info = Local.M.LocId("string", old_meta) in
+  let new_info = LocalAst.set_info_locid new_meta old_info in
+  assert_equal new_meta (LocalAst.get_info_locid (new_info))
+;; 
+let test_var_id (old_meta: int) (new_meta: int) =
+  let old_info = Local.M.VarId("string", old_meta) in
+  let new_info = LocalAst.set_info_varid new_meta old_info in
+  assert_equal new_meta (LocalAst.get_info_varid (new_info))
+;; 
+let test_type_id (old_meta: int) (new_meta: int) =
+  let old_info = Local.M.TypId("string", old_meta) in
+  let new_info = LocalAst.set_info_typid new_meta old_info in
+  assert_equal new_meta (LocalAst.get_info_typid (new_info))
+;; 
+let test_type_sum (old_meta: int) (new_meta: int) (input_int: int) (input_int2: int) =
+  let old_info = Local.M.TSum ((Local.M.TUnit old_meta),(Local.M.TString input_int),input_int2) in
   let new_info = LocalAst.set_info_typ new_meta old_info in
   assert_equal new_meta (LocalAst.get_info_typ (new_info))
-;; *)
-(* 
-let test_type_string (new_meta: int) (input_string: string) =
-  let old_info = Local.M.TString(input_string) in
+;; 
+let test_type_prod (old_meta: int) (new_meta: int) (input_int: int) (input_int2: int) =
+  let old_info = Local.M.TProd ((Local.M.TUnit old_meta),(Local.M.TString input_int),input_int2) in
   let new_info = LocalAst.set_info_typ new_meta old_info in
   assert_equal new_meta (LocalAst.get_info_typ (new_info))
-;; *)
+;; 
+
+let test_type_var (old_meta: int) (new_meta: int) (input_int: int) =
+  let typ_id = Local.M.TypId("string", old_meta) in
+  let old_info = Local.M.TVar (typ_id ,input_int) in
+  let new_info = LocalAst.set_info_typ new_meta old_info in
+  assert_equal new_meta (LocalAst.get_info_typ (new_info))
+;; 
+let test_type_unit (new_meta: int) (input_int: int) =
+  let old_info = Local.M.TUnit(input_int) in
+  let new_info = LocalAst.set_info_typ new_meta old_info in
+  assert_equal new_meta (LocalAst.get_info_typ (new_info))
+;; 
+let test_type_bool (new_meta: int) (input_int: int) =
+  let old_info = Local.M.TBool(input_int) in
+  let new_info = LocalAst.set_info_typ new_meta old_info in
+  assert_equal new_meta (LocalAst.get_info_typ (new_info))
+;; 
+
+let test_type_string (new_meta: int) (input_int: int) =
+  let old_info = Local.M.TString(input_int) in
+  let new_info = LocalAst.set_info_typ new_meta old_info in
+  assert_equal new_meta (LocalAst.get_info_typ (new_info))
+;; 
+
+let test_type_int (new_meta: int) (input_int: int) =
+  let old_info = Local.M.TInt(input_int) in
+  let new_info = LocalAst.set_info_typ new_meta old_info in
+  assert_equal new_meta (LocalAst.get_info_typ (new_info))
+;;
 let test_not (new_meta: int) (old_meta: int) =
   let old_not_op = Local.M.Not(old_meta) in
   assert_equal old_meta (LocalAst.get_info_unop old_not_op);
@@ -107,11 +165,7 @@ let test_plus (new_meta: int) (old_meta: int) =
   let new_plus_op = LocalAst.set_info_binop new_meta old_plus_op in
   assert_equal new_meta (LocalAst.get_info_binop new_plus_op);
 ;;
-let test_type_int (new_meta: int) (input_int: int) =
-  let old_info = Local.M.TInt(input_int) in
-  let new_info = LocalAst.set_info_typ new_meta old_info in
-  assert_equal new_meta (LocalAst.get_info_typ (new_info))
-;;
+
 let test_change_bool (new_meta: int) (old_meta: int) (input_bool: bool) =
   let old_info = Local.M.Bool(input_bool, old_meta) in
   let new_info = LocalAst.set_info_value new_meta old_info in
@@ -154,7 +208,7 @@ let suite =
 ("test_simple" >:: fun _ -> test_change_bool 10 20 (false));
 ("test_simple" >:: fun _ -> test_change_bool 1000 2000 (true));
 ("test_simple" >:: fun _ -> test_change_bool (-1) (-2) (false));
-];"int type Tests" 
+];"operators Tests" 
 >::: [
 ("test_simple" >:: fun _ -> test_plus 1 2);
 ("test_simple" >:: fun _ -> test_minus 1 2);
@@ -163,6 +217,8 @@ let suite =
 ("test_simple" >:: fun _ -> test_not 1 2);
 ("test_simple" >:: fun _ -> test_neg 1 2);
 ("test_simple" >:: fun _ -> test_type_int 1 2);
+("test_simple" >:: fun _ -> test_type_string 1 2);
+("test_simple" >:: fun _ -> test_type_bool 1 2);
 ("test_simple" >:: fun _ -> test_times 1 2);
 ("test_simple" >:: fun _ -> test_div 1 2);
 ("test_simple" >:: fun _ -> test_lt 1 2);
@@ -171,7 +227,26 @@ let suite =
 ("test_simple" >:: fun _ -> test_geq 1 2);
 ("test_simple" >:: fun _ -> test_neq 1 2);
 ("test_simple" >:: fun _ -> test_eq 1 2);
-]
+];"type Tests" 
+>::: [
+("test_simple" >:: fun _ -> test_type_int 1 2);
+("test_simple" >:: fun _ -> test_type_string 1 2);
+("test_simple" >:: fun _ -> test_type_bool 1 2);
+("test_simple" >:: fun _ -> test_type_prod 1 2 3 4);
+("test_simple" >:: fun _ -> test_type_sum 1 2 3 4);
+("test_simple" >:: fun _ -> test_type_var 1 2 3);
+("test_simple" >:: fun _ -> test_type_unit 1 2 );
+("test_simple" >:: fun _ -> test_type_id 1 2 );
+("test_simple" >:: fun _ -> test_var_id 1 2 );
+("test_simple" >:: fun _ -> test_loc_id 1 2 );
+];"Pattern Tests" 
+    >::: [
+    ("test_simple" >:: fun _ -> test_pattern_default 1 2);
+    ("test_simple" >:: fun _ -> test_change_int 2 3);
+    ("test_simple" >:: fun _ -> test_change_int 10 20);
+    ("test_simple" >:: fun _ -> test_change_int (-1) (-2));
+    ("test_simple" >:: fun _ -> test_change_int 1000 2000);
+  ]
   ]
 
 
