@@ -6,11 +6,112 @@ module DummyInfo = struct
 end
 
 module LocalAst = Local.With(DummyInfo)
-(* let test_type_bool (new_meta: int) (old_meta: int) (input_bool: bool) =
-  let old_info = Local.M.TBool(input_bool, old_meta) in
-  let new_info = LocalAst.set_info_typ new_meta (old_info) in
+module ChoreoAst = Ast_core.Choreo.With(DummyInfo)
+
+(* let test_type_int (new_meta: int) (input_unit: unit) =
+  let old_info = Local.M.TUnit(input_unit) in
+  let new_info = LocalAst.set_info_typ new_meta old_info in
   assert_equal new_meta (LocalAst.get_info_typ (new_info))
 ;; *)
+(* 
+let test_type_string (new_meta: int) (input_string: string) =
+  let old_info = Local.M.TString(input_string) in
+  let new_info = LocalAst.set_info_typ new_meta old_info in
+  assert_equal new_meta (LocalAst.get_info_typ (new_info))
+;; *)
+let test_not (new_meta: int) (old_meta: int) =
+  let old_not_op = Local.M.Not(old_meta) in
+  assert_equal old_meta (LocalAst.get_info_unop old_not_op);
+  let new_not_op = LocalAst.set_info_unop new_meta old_not_op in
+  assert_equal new_meta (LocalAst.get_info_unop new_not_op);
+;;
+let test_neg (new_meta: int) (old_meta: int) =
+  let old_neg_op = Local.M.Neg(old_meta) in
+  assert_equal old_meta (LocalAst.get_info_unop old_neg_op);
+  let new_neg_op = LocalAst.set_info_unop new_meta old_neg_op in
+  assert_equal new_meta (LocalAst.get_info_unop new_neg_op);
+;;
+
+let test_geq (new_meta: int) (old_meta: int) =
+  let old_geq_op = Local.M.Geq(old_meta) in
+  assert_equal old_meta (LocalAst.get_info_binop old_geq_op);
+  let new_geq_op = LocalAst.set_info_binop new_meta old_geq_op in
+  assert_equal new_meta (LocalAst.get_info_binop new_geq_op);
+;;
+let test_gt (new_meta: int) (old_meta: int) =
+  let old_gt_op = Local.M.Gt(old_meta) in
+  assert_equal old_meta (LocalAst.get_info_binop old_gt_op);
+  let new_gt_op = LocalAst.set_info_binop new_meta old_gt_op in
+  assert_equal new_meta (LocalAst.get_info_binop new_gt_op);
+;;
+let test_lt (new_meta: int) (old_meta: int) =
+  let old_lt_op = Local.M.Lt(old_meta) in
+  assert_equal old_meta (LocalAst.get_info_binop old_lt_op);
+  let new_lt_op = LocalAst.set_info_binop new_meta old_lt_op in
+  assert_equal new_meta (LocalAst.get_info_binop new_lt_op);
+;;
+
+let test_neq (new_meta: int) (old_meta: int) =
+  let old_neq_op = Local.M.Neq(old_meta) in
+  assert_equal old_meta (LocalAst.get_info_binop old_neq_op);
+  let new_neq_op = LocalAst.set_info_binop new_meta old_neq_op in
+  assert_equal new_meta (LocalAst.get_info_binop new_neq_op);
+;;
+
+let test_leq (new_meta: int) (old_meta: int) =
+  let old_leq_op = Local.M.Leq(old_meta) in
+  assert_equal old_meta (LocalAst.get_info_binop old_leq_op);
+  let new_leq_op = LocalAst.set_info_binop new_meta old_leq_op in
+  assert_equal new_meta (LocalAst.get_info_binop new_leq_op);
+;;
+let test_eq (new_meta: int) (old_meta: int) =
+  let old_eq_op = Local.M.Eq(old_meta) in
+  assert_equal old_meta (LocalAst.get_info_binop old_eq_op);
+  let new_eq_op = LocalAst.set_info_binop new_meta old_eq_op in
+  assert_equal new_meta (LocalAst.get_info_binop new_eq_op);
+;;
+let test_div (new_meta: int) (old_meta: int) =
+  let old_div_op = Local.M.Div(old_meta) in
+  assert_equal old_meta (LocalAst.get_info_binop old_div_op);
+  let new_div_op = LocalAst.set_info_binop new_meta old_div_op in
+  assert_equal new_meta (LocalAst.get_info_binop new_div_op);
+;;
+
+let test_times (new_meta: int) (old_meta: int) =
+  let old_times_op = Local.M.Times(old_meta) in
+  assert_equal old_meta (LocalAst.get_info_binop old_times_op);
+  let new_times_op = LocalAst.set_info_binop new_meta old_times_op in
+  assert_equal new_meta (LocalAst.get_info_binop new_times_op);
+;;
+let test_and (new_meta: int) (old_meta: int) =
+  let old_and_op = Local.M.And(old_meta) in
+  assert_equal old_meta (LocalAst.get_info_binop old_and_op);
+  let new_and_op = LocalAst.set_info_binop new_meta old_and_op in
+  assert_equal new_meta (LocalAst.get_info_binop new_and_op);
+;;
+let test_or (new_meta: int) (old_meta: int) =
+  let old_or_op = Local.M.Or(old_meta) in
+  assert_equal old_meta (LocalAst.get_info_binop old_or_op);
+  let new_or_op = LocalAst.set_info_binop new_meta old_or_op in
+  assert_equal new_meta (LocalAst.get_info_binop new_or_op);
+;;
+let test_minus (new_meta: int) (old_meta: int) =
+  let old_minus_op = Local.M.Minus(old_meta) in
+  assert_equal old_meta (LocalAst.get_info_binop old_minus_op);
+  let new_minus_op = LocalAst.set_info_binop new_meta old_minus_op in
+  assert_equal new_meta (LocalAst.get_info_binop new_minus_op);
+;;
+let test_plus (new_meta: int) (old_meta: int) =
+  let old_plus_op = Local.M.Plus(old_meta) in
+  assert_equal old_meta (LocalAst.get_info_binop old_plus_op);
+  let new_plus_op = LocalAst.set_info_binop new_meta old_plus_op in
+  assert_equal new_meta (LocalAst.get_info_binop new_plus_op);
+;;
+let test_type_int (new_meta: int) (input_int: int) =
+  let old_info = Local.M.TInt(input_int) in
+  let new_info = LocalAst.set_info_typ new_meta old_info in
+  assert_equal new_meta (LocalAst.get_info_typ (new_info))
+;;
 let test_change_bool (new_meta: int) (old_meta: int) (input_bool: bool) =
   let old_info = Local.M.Bool(input_bool, old_meta) in
   let new_info = LocalAst.set_info_value new_meta old_info in
@@ -36,7 +137,7 @@ let suite =
     >::: [
     ("test_simple" >:: fun _ -> test_change_int 1 2);
     ("test_simple" >:: fun _ -> test_change_int 2 3);
-   ("test_simple" >:: fun _ -> test_change_int 10 20);
+    ("test_simple" >:: fun _ -> test_change_int 10 20);
     ("test_simple" >:: fun _ -> test_change_int (-1) (-2));
     ("test_simple" >:: fun _ -> test_change_int 1000 2000);
   ];"string Tests" 
@@ -53,6 +154,23 @@ let suite =
 ("test_simple" >:: fun _ -> test_change_bool 10 20 (false));
 ("test_simple" >:: fun _ -> test_change_bool 1000 2000 (true));
 ("test_simple" >:: fun _ -> test_change_bool (-1) (-2) (false));
+];"int type Tests" 
+>::: [
+("test_simple" >:: fun _ -> test_plus 1 2);
+("test_simple" >:: fun _ -> test_minus 1 2);
+("test_simple" >:: fun _ -> test_or 1 2);
+("test_simple" >:: fun _ -> test_and 1 2);
+("test_simple" >:: fun _ -> test_not 1 2);
+("test_simple" >:: fun _ -> test_neg 1 2);
+("test_simple" >:: fun _ -> test_type_int 1 2);
+("test_simple" >:: fun _ -> test_times 1 2);
+("test_simple" >:: fun _ -> test_div 1 2);
+("test_simple" >:: fun _ -> test_lt 1 2);
+("test_simple" >:: fun _ -> test_gt 1 2);
+("test_simple" >:: fun _ -> test_leq 1 2);
+("test_simple" >:: fun _ -> test_geq 1 2);
+("test_simple" >:: fun _ -> test_neq 1 2);
+("test_simple" >:: fun _ -> test_eq 1 2);
 ]
   ]
 
