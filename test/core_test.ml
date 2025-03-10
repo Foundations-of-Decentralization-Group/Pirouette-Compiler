@@ -8,6 +8,14 @@ end
 module LocalAst = Local.With(DummyInfo)
 module ChoreoAst = Ast_core.Choreo.With(DummyInfo)
 
+let test_pattern_pair (old_meta: int) (new_meta: int) =
+  let var_int = Local.M.Int (1,old_meta) in
+  let pat_pair1 : int Local.M.pattern = Local.M.Val (var_int, old_meta) in
+  let pat_pair2 : int Local.M.pattern = Local.M.Val (var_int, old_meta) in
+  let (val_pat: int Local.M.pattern) = Local.M.Pair (pat_pair1, pat_pair2, old_meta) in
+  let (new_info: int Local.M.pattern) = LocalAst.set_info_pattern new_meta val_pat in
+  assert_equal new_meta (LocalAst.get_info_pattern (new_info));
+;; 
 let test_pattern_right (old_meta: int) (new_meta: int) =
   let var_id = Local.M.VarId ("hi", 1) in
   let (var_pat1: int Local.M.pattern) = Local.M.Var (var_id, old_meta) in
@@ -264,6 +272,7 @@ let suite =
     ("test_simple" >:: fun _ -> test_pattern_variable 1 2);
     ("test_simple" >:: fun _ -> test_pattern_left 1 2);
     ("test_simple" >:: fun _ -> test_pattern_right 1 2);
+    ("test_simple" >:: fun _ -> test_pattern_pair 1 2)
   ]
   ]
 
