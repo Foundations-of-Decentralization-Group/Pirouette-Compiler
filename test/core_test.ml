@@ -8,6 +8,53 @@ end
 module LocalAst = Local.With(DummyInfo)
 module ChoreoAst = Ast_core.Choreo.With(DummyInfo)
 
+let test_expression_match (old_meta: int) (new_meta: int) =
+  let var_int = Local.M.Int (1,old_meta) in
+  let expr_pair1 : int Local.M.expr = Local.M.Val (var_int, old_meta) in
+  let expr_pair2 : int Local.M.expr = Local.M.Val (var_int, old_meta) in
+  let pat_pair1 : int Local.M.pattern = Local.M.Val (var_int, old_meta) in
+  let (val_pat: int Local.M.expr) = Local.M.Match (expr_pair1, [(pat_pair1, expr_pair2)], old_meta) in
+  let (new_info: int Local.M.expr) = LocalAst.set_info_expr new_meta val_pat in
+  assert_equal new_meta (LocalAst.get_info_expr (new_info));
+;; 
+let test_expression_right (old_meta:int) (new_meta: int) =
+  let var_int = Local.M.Int (1,old_meta) in
+  let expr_1 : int Local.M.expr = Local.M.Val (var_int, old_meta) in
+  let var_unit = Local.M.Right (expr_1, 1) in
+  let (new_info: int Local.M.expr) = LocalAst.set_info_expr new_meta var_unit in
+  assert_equal new_meta (LocalAst.get_info_expr (new_info));
+;; 
+let test_expression_left (old_meta:int) (new_meta: int) =
+  let var_int = Local.M.Int (1,old_meta) in
+  let expr_1 : int Local.M.expr = Local.M.Val (var_int, old_meta) in
+  let var_unit = Local.M.Left (expr_1, 1) in
+  let (new_info: int Local.M.expr) = LocalAst.set_info_expr new_meta var_unit in
+  assert_equal new_meta (LocalAst.get_info_expr (new_info));
+;; 
+
+let test_expression_snd (old_meta:int) (new_meta: int) =
+  let var_int = Local.M.Int (1,old_meta) in
+  let expr_1 : int Local.M.expr = Local.M.Val (var_int, old_meta) in
+  let var_unit = Local.M.Snd (expr_1, 1) in
+  let (new_info: int Local.M.expr) = LocalAst.set_info_expr new_meta var_unit in
+  assert_equal new_meta (LocalAst.get_info_expr (new_info));
+;; 
+let test_expression_fst (old_meta:int) (new_meta: int) =
+  let var_int = Local.M.Int (1,old_meta) in
+  let expr_1 : int Local.M.expr = Local.M.Val (var_int, old_meta) in
+  let var_unit = Local.M.Fst (expr_1, 1) in
+  let (new_info: int Local.M.expr) = LocalAst.set_info_expr new_meta var_unit in
+  assert_equal new_meta (LocalAst.get_info_expr (new_info));
+;; 
+let test_expression_pair (old_meta: int) (new_meta: int) =
+  let var_int = Local.M.Int (1,old_meta) in
+  let expr_pair1 : int Local.M.expr = Local.M.Val (var_int, old_meta) in
+  let expr_pair2 : int Local.M.expr = Local.M.Val (var_int, old_meta) in
+  let (val_pat: int Local.M.expr) = Local.M.Pair (expr_pair1, expr_pair2, old_meta) in
+  let (new_info: int Local.M.expr) = LocalAst.set_info_expr new_meta val_pat in
+  assert_equal new_meta (LocalAst.get_info_expr (new_info));
+;; 
+
 let test_expression_let (old_meta:int) (new_meta: int) (input_int: int) (input_int2: int) =
   let var_id = Local.M.VarId ("hi", old_meta) in
   let old_info = Local.M.TSum ((Local.M.TUnit old_meta),(Local.M.TString input_int),input_int2) in
@@ -323,8 +370,11 @@ let suite =
   ("test_simple" >:: fun _ -> test_expression_var 1 2);
   ("test_simple" >:: fun _ -> test_expression_binop 1 2);
   ("test_simple" >:: fun _ -> test_expression_let 1 2 3 4);
-  ("test_simple" >:: fun _ -> test_pattern_right 1 2);
-  ("test_simple" >:: fun _ -> test_pattern_pair 1 2)
+  ("test_simple" >:: fun _ -> test_expression_fst 1 2);
+  ("test_simple" >:: fun _ -> test_expression_snd 1 2);
+  ("test_simple" >:: fun _ -> test_expression_left 1 2);
+  ("test_simple" >:: fun _ -> test_expression_right 1 2);
+  ("test_simple" >:: fun _ -> test_expression_match 1 2);
 ]
   ]
 
