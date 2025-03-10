@@ -2,20 +2,18 @@ open OUnit2
 open Ast_core
 
 module DummyInfo = struct
-  type t = int
+  type t = int 
 end
 
 module LocalAst = Local.With(DummyInfo)
 module ChoreoAst = Ast_core.Choreo.With(DummyInfo)
 
-(* let test_pattern_value (old_meta: int) (new_meta: int) : Local.M.pattern =
+let test_pattern_value (old_meta: int) (new_meta: int) : int Local.M.pattern =
   let val_int = Local.M.Int (1,old_meta) in
-  let val_pat = Local.M.Val (val_int, 1) in
-  let new_info = LocalAst.set_info_pattern new_meta val_pat in
-  assert_equal new_meta (LocalAst.get_info_pattern (new_info));
-  let new_info = LocalAst.set_info_pattern new_meta old_info in
-  assert_equal new_meta (LocalAst.get_info_pattern (new_info));
-;;  *)
+  let (val_pat: int Local.M.pattern) = Local.M.Val (val_int, 1) in
+  let (new_info: int Local.M.pattern) = LocalAst.set_info_pattern new_meta val_pat in
+  assert_equal new_meta (LocalAst.get_info_pattern (new_info))
+;; 
 let test_pattern_default (old_meta: int) (new_meta: int)  =
   let old_info = Local.M.Default(1) in
   let new_info = LocalAst.set_info_pattern old_meta old_info in
