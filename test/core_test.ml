@@ -240,7 +240,7 @@ let suite =
 ];"Pattern Tests" 
     >::: [
     ("test_simple" >:: fun _ -> test_pattern_default 1 2);
-    ("test_simple" >:: fun _ -> test_change_int 2 3);
+    ("test_simple" >:: fun _ -> test_pattern_value 1 2);
     ("test_simple" >:: fun _ -> test_change_int 10 20);
     ("test_simple" >:: fun _ -> test_change_int (-1) (-2));
     ("test_simple" >:: fun _ -> test_change_int 1000 2000);
