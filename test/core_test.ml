@@ -375,6 +375,7 @@ let suite =
   ("test_simple" >:: fun _ -> test_expression_left 1 2);
   ("test_simple" >:: fun _ -> test_expression_right 1 2);
   ("test_simple" >:: fun _ -> test_expression_match 1 2);
+  ("test_simple" >:: fun _ -> test_expression_pair 1 2);
 ]
   ]
 
