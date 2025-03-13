@@ -44,6 +44,10 @@ bisect-pp: cleanall
 	dune exec --instrument-with bisect_ppx test/prettyprint_test.exe
 	bisect-ppx-report html
 
+test-msg-intf: cleanall
+	dune exec --instrument-with bisect_ppx test/msg_intf_test.exe
+	bisect-ppx-report html
+
 cleandocs:
 	rm -rf $(shell find docs -name '*.aux' -o -name '*.log' -o -name '*.out' \
 	-o -name '*.bbl' -o -name '*.bcf' -o -name '*.blg' -o -name '*.run.xml' \
