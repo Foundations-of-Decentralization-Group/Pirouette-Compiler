@@ -160,9 +160,10 @@ and epp_choreo_expr (expr : 'a Choreo.expr) (loc : string) : 'a Net.expr =
   | FunDef (ps, e, _) ->
     FunDef (List.map (fun p -> epp_choreo_pattern p loc) ps, epp_choreo_expr e loc, _m)
   | FunApp (e1, e2, _) ->
-    (match e1 with
+    let epp_e1 = epp_choreo_expr e1 loc in
+    (match epp_e1 with
      | Unit _m -> Unit _m
-     | _ -> FunApp (epp_choreo_expr e1 loc, epp_choreo_expr e2 loc, _m))
+     | _ -> FunApp (epp_e1, epp_choreo_expr e2 loc, _m))
   | Pair (e1, e2, _) -> Pair (epp_choreo_expr e1 loc, epp_choreo_expr e2 loc, _m)
   | Fst (e, _) -> Fst (epp_choreo_expr e loc, _m)
   | Snd (e, _) -> Snd (epp_choreo_expr e loc, _m)
