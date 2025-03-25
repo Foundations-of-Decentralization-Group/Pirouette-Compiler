@@ -37,7 +37,8 @@ let suite =
          >::: [ ("foreign_decl" >:: fun _ -> peq Astutils_testcases.foreign_decl) ]
        ; "Net IR" 
          >::: [ ("test_net_peq" >:: fun _ -> net_peq Astutils_testcases.net_test_1) ] (* ADD more net_peq tests here *)
-         ]
+       ]
+
 ;;
 
 let () = run_test_tt_main suite

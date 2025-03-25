@@ -396,12 +396,13 @@ and dot_stmt (string_of_info : 'a -> string) (stmt : 'a Choreo.stmt) : string * 
     var_node ^ edge ^ c, node_name
   | ForeignDecl (VarId (id, _), typ, s, info) ->
     let node_name = generate_node_name () in
-    let decl_node = 
-      spf "%s [label=\"ForeignDecl: %s -> %s %s\"];\n" 
-        node_name 
-        id 
+    let decl_node =
+      spf
+        "%s [label=\"ForeignDecl: %s -> %s %s\"];\n"
+        node_name
+        id
         s
-        (string_of_info info) 
+        (string_of_info info)
     in
     let c, n = dot_choreo_type string_of_info typ in
     let edge = spf "%s -> %s;\n" node_name n in

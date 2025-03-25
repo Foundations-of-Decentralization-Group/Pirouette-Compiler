@@ -43,3 +43,20 @@ val infer_choreo_stmt_block
   -> global_ctx
   -> ftv Ast_core.Choreo.M.stmt_block
   -> choreo_subst * ftv Ast_core.Choreo.M.typ * choreo_ctx
+
+(*Functions below are included here to allow testings of these functions*)
+val unify_local : ftv Local.typ -> ftv Local.typ -> local_subst
+
+val unify_choreo : ftv Choreo.typ -> ftv Choreo.typ -> choreo_subst
+
+val apply_subst_typ_local : local_subst -> ftv Local.typ -> ftv Local.typ
+
+val apply_subst_typ_choreo : choreo_subst -> ftv Choreo.typ -> ftv Choreo.typ
+
+val extract_local_ctx : global_ctx -> string -> local_ctx
+
+val get_choreo_subst : local_subst -> ftv Local.loc_id -> choreo_subst
+
+val get_choreo_ctx : local_ctx -> ftv Local.loc_id -> choreo_ctx
+
+val get_local_subst : choreo_subst -> ftv Local.loc_id -> local_subst

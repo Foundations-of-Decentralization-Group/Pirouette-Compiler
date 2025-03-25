@@ -165,15 +165,6 @@ and get_choreo_ctx local_ctx loc_id =
     []
 ;;
 
-(*
-   and loc_compatible (loc1 : ftv Local.loc_id) (loc2 : ftv Local.loc_id) =
-   match loc1, loc2 with
-   | Local.LocId (name1, _), Local.LocId (name2, _) ->
-   let result = name1 = name2 in
-   Printf.printf "comparing locations %s and %s: %b\n" name1 name2 result;
-   result
-   ;; *)
-
 (* ============================== Local ============================== *)
 
 let rec infer_local_expr local_ctx = function
@@ -396,17 +387,6 @@ and infer_choreo_expr choreo_ctx (global_ctx : global_ctx) = function
          compose_subst_choreo s1 s2, Choreo.TLoc (Local.LocId (dst, m), local_t, m))
        else failwith "Source location mismatch"
      | _ -> failwith "Type mismatch")
-  (* | Choreo.Send ((Local.LocId (src, _) as src_loc), e, Local.LocId (dst, _), _) ->
-     let s1, t = infer_choreo_expr choreo_ctx global_ctx e in
-     let t' = apply_subst_typ_choreo s1 t in
-     (match t' with
-     | Choreo.TLoc (loc, local_t, _) ->
-     if loc_compatible loc src_loc
-     then (
-     let s2 = unify_choreo t' (Choreo.TLoc (Local.LocId (src, m), local_t, m)) in
-     compose_subst_choreo s1 s2, Choreo.TLoc (Local.LocId (dst, m), local_t, m))
-     else failwith "Source location mismatch"
-     | _ -> failwith "Type mismatch") *)
   | Choreo.Sync (_, _, _, e, _) -> infer_choreo_expr choreo_ctx global_ctx e
   | Choreo.If (cond, e1, e2, _) ->
     let s_cond, t_cond = infer_choreo_expr choreo_ctx global_ctx cond in
@@ -457,20 +437,6 @@ and infer_choreo_expr choreo_ctx (global_ctx : global_ctx) = function
     let t_body' = apply_subst_typ_choreo s_comp t_body in
     ( compose_subst_choreo s1 s2
     , List.fold_right (fun t_in t_out -> Choreo.TMap (t_in, t_out, m)) t_args t_body' )
-  (*| Choreo.FunApp (func, param, _) ->
-    let s1, func_typ = infer_choreo_expr choreo_ctx global_ctx func in
-    let s2, param_typ =
-    infer_choreo_expr (apply_subst_ctx_choreo s1 choreo_ctx) global_ctx param
-    in
-    let s_comp = compose_subst_choreo s1 s2 in
-    let func_typ' = apply_subst_typ_choreo s_comp func_typ in
-    (match func_typ' with
-    | Choreo.TMap (func_in, func_out, _) ->
-    let s3 = unify_choreo func_in param_typ in
-    let final_s = compose_subst_choreo s_comp s3 in
-    final_s, apply_subst_typ_choreo final_s func_out
-    | _ -> failwith "Expected function type")
-  *)
   | Choreo.FunApp (func, param, _) ->
     let s1, func_typ = infer_choreo_expr choreo_ctx global_ctx func in
     let s2, param_typ =
@@ -480,7 +446,7 @@ and infer_choreo_expr choreo_ctx (global_ctx : global_ctx) = function
     let func_typ' = apply_subst_typ_choreo s_comp func_typ in
     (match func_typ' with
      | Choreo.TMap (func_in, func_out, _) ->
-       (*if function type is correct and param type is correct, then everything is correct also check for *)
+       (*if function type is correct and param type is correct, then everything is correct*)
        let s3 = unify_choreo func_in param_typ in
        let final_s = compose_subst_choreo s_comp s3 in
        let final_out = apply_subst_typ_choreo final_s func_out in
@@ -628,129 +594,3 @@ and infer_choreo_pattern choreo_ctx global_ctx = function
     in
     s, Choreo.TSum (Choreo.TVar (Choreo.Typ_Id (gen_ftv (), m), m), t_wrapped, m), ctx
 ;;
-
-(* let rec check_local_expr ctx expected_typ = function
-   | Local.Unit _ -> expected_typ = Local.TUnit m
-   | Val (v, _) -> expected_typ = typeof_Val v
-   | Var (VarId (var_name, _), _) ->
-   (match List.assoc_opt var_name ctx with
-   | Some t -> expected_typ = t
-   | None -> false)
-   | UnOp (op, e, _) ->
-   (match op with
-   | Neg _ -> check_local_expr ctx (TInt m) e && expected_typ = TInt m
-   | Not _ -> check_local_expr ctx (TBool m) e && expected_typ = TBool m)
-   | BinOp (e1, op, e2, _) ->
-   (match op with
-   | Plus _ | Minus _ | Times _ | Div _ ->
-   check_local_expr ctx (TInt m) e1
-   && check_local_expr ctx (TInt m) e2
-   && expected_typ = TInt m
-   | Eq _ | Neq _ | Lt _ | Leq _ | Gt _ | Geq _ ->
-   check_local_expr ctx (TInt m) e1
-   && check_local_expr ctx (TInt m) e2
-   && expected_typ = TBool m
-   | And _ | Or _ ->
-   check_local_expr ctx (TBool m) e1
-   && check_local_expr ctx (TBool m) e2
-   && expected_typ = TBool m)
-   | Let (VarId (var_name, _), local_type, e1, e2, _) ->
-   (match check_local_expr ctx local_type e1 with
-   | true ->
-   let ctx' = List.cons (var_name, local_type) ctx in
-   check_local_expr ctx' expected_typ e2
-   | _ -> false)
-   | Pair (e1, e2, _) ->
-   (match expected_typ with
-   | TProd (t1, t2, _) -> check_local_expr ctx t1 e1 && check_local_expr ctx t2 e2
-   | _ -> false)
-   | Fst (e, _) ->
-   (match expected_typ with
-   | TProd (t1, _, _) -> check_local_expr ctx t1 e
-   | _ -> false)
-   | Snd (e, _) ->
-   (match expected_typ with
-   | TProd (_, t2, _) -> check_local_expr ctx t2 e
-   | _ -> false)
-   | Left (e, _) ->
-   (match expected_typ with
-   | TSum (t1, _, _) -> check_local_expr ctx t1 e
-   | _ -> false)
-   | Right (e, _) ->
-   (match expected_typ with
-   | TSum (_, t2, _) -> check_local_expr ctx t2 e
-   | _ -> false)
-   | Match (_e, _cases, _) -> true
-
-   and typeof_Val = function
-   | Int _ -> TInt m
-   | Bool _ -> TBool m
-   | String _ -> TString m
-   ;; *)
-
-(* ============================== Choreo ============================== *)
-
-(* let rec check_stmts stmts expected_typ =
-   let choreo_ctx = [] in
-   let global_ctx = [] in
-   List.for_all (fun stmt -> check_stmt choreo_ctx global_ctx expected_typ stmt) stmts
-
-   and check_stmt choreo_ctx global_ctx expected_typ = function
-   | Ast.Choreo.Decl (_pattn, _choreo_typ, _) -> true
-   | Assign (_pattn_ls, expr, _) ->
-   check_choreo_expr choreo_ctx global_ctx expected_typ expr
-   | TypeDecl (TypId (_id, _), _choreo_typ, _) -> true
-
-   and check_choreo_expr choreo_ctx global_ctx expected_typ = function
-   | Unit _ -> expected_typ = Ast.Choreo.TUnit m
-   | Var (VarId (var_name, _), _) ->
-   (match List.assoc_opt var_name choreo_ctx with
-   | Some t -> expected_typ = t
-   | None -> false)
-   | LocExpr (LocId (loc_id, _), e, _) ->
-   (match expected_typ with
-   | TLoc (LocId (loc_id', _), local_typ, _) ->
-   loc_id = loc_id'
-   && check_local_expr (extract_local_ctx global_ctx loc_id) local_typ e
-   | _ -> false)
-   | Send (LocId (loc_id1, _), e, LocId (loc_id2, _), _) ->
-   (match expected_typ with
-   | TLoc (LocId (loc_id2', _), local_typ, _) ->
-   check_choreo_expr choreo_ctx global_ctx (TLoc (LocId (loc_id1, m), local_typ, m)) e
-   && loc_id2 = loc_id2'
-   | _ -> false)
-   | Sync (_, _, _, e, _) -> check_choreo_expr choreo_ctx global_ctx expected_typ e
-   | If (cond, c1, c2, _) ->
-   (match cond with
-   | LocExpr (loc_id, _, _) ->
-   check_choreo_expr choreo_ctx global_ctx expected_typ c1
-   && check_choreo_expr choreo_ctx global_ctx expected_typ c2
-   && check_choreo_expr choreo_ctx global_ctx (TLoc (loc_id, TBool m, m)) cond
-   | _ -> false)
-   | Pair (e1, e2, _) ->
-   (match expected_typ with
-   | TProd (t1, t2, _) ->
-   check_choreo_expr choreo_ctx global_ctx t1 e1
-   && check_choreo_expr choreo_ctx global_ctx t2 e2
-   | _ -> false)
-   | Fst (e, _) ->
-   (match expected_typ with
-   | TProd (t1, _, _) -> check_choreo_expr choreo_ctx global_ctx t1 e
-   | _ -> false)
-   | Snd (e, _) ->
-   (match expected_typ with
-   | TProd (_, t2, _) -> check_choreo_expr choreo_ctx global_ctx t2 e
-   | _ -> false)
-   | Left (e, _) ->
-   (match expected_typ with
-   | TSum (t1, _, _) -> check_choreo_expr choreo_ctx global_ctx t1 e
-   | _ -> false)
-   | Right (e, _) ->
-   (match expected_typ with
-   | TSum (_, t2, _) -> check_choreo_expr choreo_ctx global_ctx t2 e
-   | _ -> false)
-   | Match (_e, _ls, _) -> true
-   | Let (_stmt_block, _e, _) -> true
-   | FunDef (_pattern_ls, _e, _) -> true
-   | FunApp (_e1, _e2, _) -> true
-   ;; *)
