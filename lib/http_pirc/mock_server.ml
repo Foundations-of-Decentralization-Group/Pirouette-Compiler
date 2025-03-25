@@ -10,9 +10,9 @@ let server =
     let uri = req |> Request.uri |> Uri.path in
     match uri with
     | "/init" ->
-        initialized := true;
-        let response = Response.make ~status:`OK () in
-        Lwt.return (response, Cohttp_lwt.Body.empty)
+      initialized := true;
+      let response = Response.make ~status:`OK () in
+      Lwt.return (response, Cohttp_lwt.Body.empty)
     | "/send" when !initialized ->
       body
       |> Cohttp_lwt.Body.to_string
@@ -33,8 +33,10 @@ let server =
       Lwt.return (response, Cohttp_lwt.Body.empty)
   in
   Server.create ~mode:(`TCP (`Port 8080)) (Server.make ~callback ())
+;;
 
 let () =
   Printf.printf "Starting server on port 8080...\n";
   flush stdout;
   Lwt_main.run server
+;;

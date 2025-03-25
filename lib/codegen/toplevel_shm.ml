@@ -60,18 +60,20 @@ let emit_toplevel_http
              (emit_net_toplevel stmts))
     in
     [%stri
-      let () = 
+      let () =
         Printf.printf "Starting initialization...\n";
         match Lwt_main.run (Send_receive.init ()) with
-        | Ok () -> 
-            Printf.printf "Initialization successful, starting process_%s...\n" [%e Ast_builder.Default.estring ~loc loc_id];
-            let [%p Ast_builder.Default.pvar ~loc (spf "process_%s" loc_id)] =
-              [%e emit_net_toplevel net_stmts]
-            in
-            ignore [%e Ast_builder.Default.evar ~loc (spf "process_%s" loc_id)]
-        | Error msg -> 
-            Printf.printf "Initialization failed: %%s\n" msg;
-            failwith ("Init error: " ^ msg)
+        | Ok () ->
+          Printf.printf
+            "Initialization successful, starting process_%s...\n"
+            [%e Ast_builder.Default.estring ~loc loc_id];
+          let [%p Ast_builder.Default.pvar ~loc (spf "process_%s" loc_id)] =
+            [%e emit_net_toplevel net_stmts]
+          in
+          ignore [%e Ast_builder.Default.evar ~loc (spf "process_%s" loc_id)]
+        | Error msg ->
+          Printf.printf "Initialization failed: %%s\n" msg;
+          failwith ("Init error: " ^ msg)
       ;;]
   in
   let process_bindings = List.map2 emit_domain_stri loc_ids net_stmtblock_l in

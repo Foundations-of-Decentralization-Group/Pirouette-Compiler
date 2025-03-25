@@ -11,6 +11,7 @@
 ; 18% (2 / 11) -> lib/parsing/parse.ml
 ; 0% (0 / 5) -> lib/parsing/parsed_ast.ml
 ; 40% (949 / 2362) -> lib/parsing/parser.ml
+
 (test
  (name prettyprint_test)
  (modules prettyprint_test astutils_testcases)
@@ -25,6 +26,7 @@
 ; 0% (0 / 5) -> lib/parsing/parsed_ast.ml
 ; 2% (67 / 2362) -> lib/parsing/parser.ml
 ; 78% (344 / 437) -> lib/typing/typ_infer.ml (focus)
+
 (test
  (name typcheck_test)
  (modules typcheck_test)
@@ -39,13 +41,15 @@
 ; 18% (2 / 11) -> lib/parsing/parse.ml (focus)
 ; 0% (0 / 5) -> lib/parsing/parsed_ast.ml
 ; 2% (67 / 2362) -> lib/parsing/parser.m (focus)
+
 (test
  (name parsing_test)
  (modules parsing_test)
  (libraries ounit2 parsing ast_core))
 
 ;this library is a requisite for marshal_test
-(library 
+
+(library
  (name types_test)
  (modules types_test))
 
@@ -58,34 +62,35 @@
 ; 0% (0 / 134) -> lib/ast_utils/pprint_ast.ml
 ; 0% (0 / 27) -> lib/config/config_parser.ml
 ; 12% (15 / 123) -> lib/http/send_receive.ml (focus)
+
 (test
  (name marshal_test)
  (modules marshal_test)
  (libraries ounit2 http_pirc types_test))
 
 (executable
-(name marshal_sender)
+ (name marshal_sender)
  (modules marshal_sender)
-(libraries ounit2 http_pirc cohttp-lwt-unix logs types_test))
+ (libraries ounit2 http_pirc cohttp-lwt-unix logs types_test))
 
 (executable
-(name marshal_receiver)
-(modules marshal_receiver)
-(libraries ounit2 http_pirc cohttp-lwt-unix logs types_test))
+ (name marshal_receiver)
+ (modules marshal_receiver)
+ (libraries ounit2 http_pirc cohttp-lwt-unix logs types_test))
 
 ;runs dotast_test.ml
+
 (test
  (name dotast_test)
  (modules dotast_test)
  (libraries ounit2 parsing ast_utils))
 
 ;runs core_test.ml
+
 (test
  (name core_test)
  (modules core_test)
  (libraries ounit2 ast_core))
-
-
 
 ; -----------------------------------------------------------------
 ; The test below is codegen testing- Alex did this
