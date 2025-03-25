@@ -154,14 +154,14 @@ let rec jsonify_choreo_stmt = function
     `Assoc
       [ "TypeDecl", `Assoc [ "id", `String id; "choreo_type", jsonify_choreo_type t ] ]
   | Choreo.ForeignDecl (VarId (id, _), t, s, _) ->
-    `Assoc [
-      "ForeignDecl",
-      `Assoc [
-        "id", `String id;
-        "choreo_type", jsonify_choreo_type t;
-        "foreign_name", `String s
+    `Assoc
+      [ ( "ForeignDecl"
+        , `Assoc
+            [ "id", `String id
+            ; "choreo_type", jsonify_choreo_type t
+            ; "foreign_name", `String s
+            ] )
       ]
-    ]
 
 and jsonify_choreo_expr = function
   | Choreo.Unit _ -> `String "Unit"
@@ -274,14 +274,14 @@ let rec jsonify_net_stmt = function
   | Net.TypeDecl (TypId (id, _), t, _) ->
     `Assoc [ "TypeDecl", `Assoc [ "id", `String id; "net_type", jsonify_net_type t ] ]
   | Net.ForeignDecl (VarId (id, _), t, s, _) ->
-    `Assoc [
-      "ForeignDecl",
-      `Assoc [
-        "id", `String id;
-        "net_type", jsonify_net_type t;
-        "foreign_name", `String s
+    `Assoc
+      [ ( "ForeignDecl"
+        , `Assoc
+            [ "id", `String id
+            ; "net_type", jsonify_net_type t
+            ; "foreign_name", `String s
+            ] )
       ]
-    ]
 
 and jsonify_net_expr = function
   | Net.Unit _ -> `String "Unit"
