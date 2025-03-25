@@ -1,5 +1,5 @@
 open OUnit2
-open Http
+open Http_pirc
 
 let setup_test () =
   match Lwt_main.run (Send_receive.init ()) with

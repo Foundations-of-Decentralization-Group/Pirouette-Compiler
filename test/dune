@@ -61,17 +61,17 @@
 (test
  (name marshal_test)
  (modules marshal_test)
- (libraries ounit2 http types_test))
+ (libraries ounit2 http_pirc types_test))
 
 (executable
 (name marshal_sender)
  (modules marshal_sender)
-(libraries ounit2 http cohttp-lwt-unix logs types_test))
+(libraries ounit2 http_pirc cohttp-lwt-unix logs types_test))
 
 (executable
 (name marshal_receiver)
 (modules marshal_receiver)
-(libraries ounit2 http cohttp-lwt-unix logs types_test))
+(libraries ounit2 http_pirc cohttp-lwt-unix logs types_test))
 
 ;runs dotast_test.ml
 (test
