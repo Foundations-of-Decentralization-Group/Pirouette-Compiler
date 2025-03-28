@@ -7,9 +7,9 @@
 (ocamllex lexer)
 
 (menhir
- (modules parser))
+ (modules parser net_parser))
 
 (library
  (name parsing)
- (private_modules lexer parser)
+ (private_modules lexer parser net_parser)
  (libraries ast_core))

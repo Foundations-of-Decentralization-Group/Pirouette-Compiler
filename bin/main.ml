@@ -1,6 +1,6 @@
 open Http
 
-let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json>] [-backend <shm|http>]"
+let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json|dot>] [-backend <shm|http>]"
 let ast_dump_format = ref "pprint"
 let backend = ref "shm"
 let file_ic = ref None
@@ -14,8 +14,8 @@ let anon_fun filename =
 let speclist =
   [ "-", Arg.Unit (fun () -> file_ic := Some stdin), "Read source from stdin"
   ; ( "-ast-dump"
-    , Arg.Symbol ([ "pprint"; "json" ], fun s -> ast_dump_format := s)
-    , "Dump the AST in the specified format (pprint, json)" )
+    , Arg.Symbol ([ "pprint"; "json"; "dot" ], fun s -> ast_dump_format := s)
+    , "Dump the AST in the specified format (pprint, json, dot)" )
   ; ( "-backend"
     , Arg.Symbol ([ "shm"; "http" ], fun s -> backend := s)
     , "Choose communication backend (shm: shared memory, http: HTTP)" )
@@ -33,6 +33,9 @@ let () =
   (match !ast_dump_format with
    | "json" -> Ast_utils.jsonify_choreo_ast (open_out (!basename ^ ".json")) program
    | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (!basename ^ ".ast")) program
+   | "dot" -> 
+      let string_of_info = Parsing.Parsed_ast.Pos_info.string_of_pos in
+      Ast_utils.dot_choreo_ast (open_out (!basename ^ ".dot")) string_of_info program
    | _ -> invalid_arg "Invalid ast-dump format");
   let locs = Ast_utils.extract_locs program in
   let netir_l = List.map (fun loc -> Netgen.epp_choreo_to_net program loc) locs in
@@ -43,6 +46,9 @@ let () =
         Ast_utils.jsonify_net_ast (open_out (!basename ^ "." ^ loc ^ ".json")) ir
       | "pprint" ->
         Ast_utils.pprint_net_ast (open_out (!basename ^ "." ^ loc ^ ".ast")) ir
+      | "dot" ->
+        (* Skip dot generation for network IR since it's not implemented yet *)
+        ()
       | _ -> invalid_arg "Invalid ast-dump format")
     locs
     netir_l;
