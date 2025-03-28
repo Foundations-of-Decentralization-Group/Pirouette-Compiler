@@ -52,6 +52,10 @@ test-emit-core: cleanall
 	dune exec --instrument-with bisect_ppx test/emit_core_test.exe
 	bisect-ppx-report html
 
+test-toplevel-shm: cleanall
+	dune exec --instrument-with bisect_ppx test/toplevel_shm_test.exe
+	bisect-ppx-report html
+
 cleandocs:
 	rm -rf $(shell find docs -name '*.aux' -o -name '*.log' -o -name '*.out' \
 	-o -name '*.bbl' -o -name '*.bcf' -o -name '*.blg' -o -name '*.run.xml' \
