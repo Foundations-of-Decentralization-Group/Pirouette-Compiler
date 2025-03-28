@@ -1,0 +1,334 @@
+
+** Conflict (shift/reduce) in state 204.
+** Token involved: LPAREN
+** This state is reached from prog after reading:
+
+nonempty_list(local_pattern) COLONEQ SND net_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+stmt_block EOF 
+list(stmt) 
+stmt list(stmt) 
+nonempty_list(local_pattern) COLONEQ net_expr SEMICOLON 
+                                     (?)
+
+** In state 204, looking ahead at LPAREN, reducing production
+** net_expr -> SND net_expr
+** is permitted because of the following sub-derivation:
+
+net_expr net_expr2 // lookahead token appears because net_expr2 can begin with LPAREN
+SND net_expr . 
+
+** In state 204, looking ahead at LPAREN, shifting is permitted
+** because of the following sub-derivation:
+
+SND net_expr 
+    net_expr net_expr2 
+             . LPAREN RPAREN 
+
+** Conflict (shift/reduce) in state 200.
+** Token involved: LPAREN
+** This state is reached from prog after reading:
+
+nonempty_list(local_pattern) COLONEQ RIGHT net_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+stmt_block EOF 
+list(stmt) 
+stmt list(stmt) 
+nonempty_list(local_pattern) COLONEQ net_expr SEMICOLON 
+                                     (?)
+
+** In state 200, looking ahead at LPAREN, reducing production
+** net_expr -> RIGHT net_expr
+** is permitted because of the following sub-derivation:
+
+net_expr net_expr2 // lookahead token appears because net_expr2 can begin with LPAREN
+RIGHT net_expr . 
+
+** In state 200, looking ahead at LPAREN, shifting is permitted
+** because of the following sub-derivation:
+
+RIGHT net_expr 
+      net_expr net_expr2 
+               . LPAREN RPAREN 
+
+** Conflict (shift/reduce) in state 197.
+** Token involved: LPAREN
+** This state is reached from prog after reading:
+
+nonempty_list(local_pattern) COLONEQ MATCH net_expr WITH BAR local_pattern ARROW net_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+stmt_block EOF 
+list(stmt) 
+stmt list(stmt) 
+nonempty_list(local_pattern) COLONEQ net_expr SEMICOLON 
+                                     (?)
+
+** In state 197, looking ahead at LPAREN, shifting is permitted
+** because of the following sub-derivation:
+
+MATCH net_expr WITH nonempty_list(net_case) 
+                    BAR local_pattern ARROW net_expr 
+                                            net_expr net_expr2 
+                                                     . LPAREN RPAREN 
+
+** In state 197, looking ahead at LPAREN, reducing production
+** nonempty_list(net_case) -> BAR local_pattern ARROW net_expr
+** is permitted because of the following sub-derivation:
+
+net_expr net_expr2 // lookahead token appears because net_expr2 can begin with LPAREN
+MATCH net_expr WITH nonempty_list(net_case) // lookahead token is inherited
+                    BAR local_pattern ARROW net_expr . 
+
+** Conflict (reduce/reduce) in state 188.
+** Tokens involved: WITH TILDE_ARROW THEN SEMICOLON RPAREN LPAREN ELSE COMMA BAR
+** The following explanations concentrate on token SEMICOLON.
+** This state is reached from prog after reading:
+
+nonempty_list(local_pattern) COLONEQ LPAREN net_expr RPAREN
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+stmt_block EOF 
+list(stmt) 
+stmt list(stmt) 
+nonempty_list(local_pattern) COLONEQ net_expr SEMICOLON // lookahead token appears
+                                     (?)
+
+** In state 188, looking ahead at SEMICOLON, reducing production
+** net_expr -> LPAREN net_expr RPAREN
+** is permitted because of the following sub-derivation:
+
+LPAREN net_expr RPAREN . 
+
+** In state 188, looking ahead at SEMICOLON, reducing production
+** net_expr2 -> LPAREN net_expr RPAREN
+** is permitted because of the following sub-derivation:
+
+net_expr2 // lookahead token is inherited
+LPAREN net_expr RPAREN . 
+
+** Conflict (shift/reduce) in state 180.
+** Token involved: LPAREN
+** This state is reached from prog after reading:
+
+nonempty_list(local_pattern) COLONEQ LET stmt_block IN net_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+stmt_block EOF 
+list(stmt) 
+stmt list(stmt) 
+nonempty_list(local_pattern) COLONEQ net_expr SEMICOLON 
+                                     (?)
+
+** In state 180, looking ahead at LPAREN, reducing production
+** net_expr -> LET stmt_block IN net_expr
+** is permitted because of the following sub-derivation:
+
+net_expr net_expr2 // lookahead token appears because net_expr2 can begin with LPAREN
+LET stmt_block IN net_expr . 
+
+** In state 180, looking ahead at LPAREN, shifting is permitted
+** because of the following sub-derivation:
+
+LET stmt_block IN net_expr 
+                  net_expr net_expr2 
+                           . LPAREN RPAREN 
+
+** Conflict (shift/reduce) in state 179.
+** Token involved: LPAREN
+** This state is reached from prog after reading:
+
+nonempty_list(local_pattern) COLONEQ LEFT net_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+stmt_block EOF 
+list(stmt) 
+stmt list(stmt) 
+nonempty_list(local_pattern) COLONEQ net_expr SEMICOLON 
+                                     (?)
+
+** In state 179, looking ahead at LPAREN, reducing production
+** net_expr -> LEFT net_expr
+** is permitted because of the following sub-derivation:
+
+net_expr net_expr2 // lookahead token appears because net_expr2 can begin with LPAREN
+LEFT net_expr . 
+
+** In state 179, looking ahead at LPAREN, shifting is permitted
+** because of the following sub-derivation:
+
+LEFT net_expr 
+     net_expr net_expr2 
+              . LPAREN RPAREN 
+
+** Conflict (shift/reduce) in state 178.
+** Token involved: LPAREN
+** This state is reached from prog after reading:
+
+nonempty_list(local_pattern) COLONEQ IF net_expr THEN net_expr ELSE net_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+stmt_block EOF 
+list(stmt) 
+stmt list(stmt) 
+nonempty_list(local_pattern) COLONEQ net_expr SEMICOLON 
+                                     (?)
+
+** In state 178, looking ahead at LPAREN, reducing production
+** net_expr -> IF net_expr THEN net_expr ELSE net_expr
+** is permitted because of the following sub-derivation:
+
+net_expr net_expr2 // lookahead token appears because net_expr2 can begin with LPAREN
+IF net_expr THEN net_expr ELSE net_expr . 
+
+** In state 178, looking ahead at LPAREN, shifting is permitted
+** because of the following sub-derivation:
+
+IF net_expr THEN net_expr ELSE net_expr 
+                               net_expr net_expr2 
+                                        . LPAREN RPAREN 
+
+** Conflict (shift/reduce) in state 171.
+** Token involved: LPAREN
+** This state is reached from prog after reading:
+
+nonempty_list(local_pattern) COLONEQ FUN nonempty_list(local_pattern) ARROW net_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+stmt_block EOF 
+list(stmt) 
+stmt list(stmt) 
+nonempty_list(local_pattern) COLONEQ net_expr SEMICOLON 
+                                     (?)
+
+** In state 171, looking ahead at LPAREN, reducing production
+** net_expr -> FUN nonempty_list(local_pattern) ARROW net_expr
+** is permitted because of the following sub-derivation:
+
+net_expr net_expr2 // lookahead token appears because net_expr2 can begin with LPAREN
+FUN nonempty_list(local_pattern) ARROW net_expr . 
+
+** In state 171, looking ahead at LPAREN, shifting is permitted
+** because of the following sub-derivation:
+
+FUN nonempty_list(local_pattern) ARROW net_expr 
+                                       net_expr net_expr2 
+                                                . LPAREN RPAREN 
+
+** Conflict (shift/reduce) in state 170.
+** Token involved: LPAREN
+** This state is reached from prog after reading:
+
+nonempty_list(local_pattern) COLONEQ FST net_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+stmt_block EOF 
+list(stmt) 
+stmt list(stmt) 
+nonempty_list(local_pattern) COLONEQ net_expr SEMICOLON 
+                                     (?)
+
+** In state 170, looking ahead at LPAREN, reducing production
+** net_expr -> FST net_expr
+** is permitted because of the following sub-derivation:
+
+net_expr net_expr2 // lookahead token appears because net_expr2 can begin with LPAREN
+FST net_expr . 
+
+** In state 170, looking ahead at LPAREN, shifting is permitted
+** because of the following sub-derivation:
+
+FST net_expr 
+    net_expr net_expr2 
+             . LPAREN RPAREN 
+
+** Conflict (shift/reduce) in state 169.
+** Token involved: LPAREN
+** This state is reached from prog after reading:
+
+nonempty_list(local_pattern) COLONEQ CHOOSE sync_label FOR loc_id IN net_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+stmt_block EOF 
+list(stmt) 
+stmt list(stmt) 
+nonempty_list(local_pattern) COLONEQ net_expr SEMICOLON 
+                                     (?)
+
+** In state 169, looking ahead at LPAREN, reducing production
+** net_expr -> CHOOSE sync_label FOR loc_id IN net_expr
+** is permitted because of the following sub-derivation:
+
+net_expr net_expr2 // lookahead token appears because net_expr2 can begin with LPAREN
+CHOOSE sync_label FOR loc_id IN net_expr . 
+
+** In state 169, looking ahead at LPAREN, shifting is permitted
+** because of the following sub-derivation:
+
+CHOOSE sync_label FOR loc_id IN net_expr 
+                                net_expr net_expr2 
+                                         . LPAREN RPAREN 
+
+** Conflict (shift/reduce) in state 162.
+** Token involved: LPAREN
+** This state is reached from prog after reading:
+
+nonempty_list(local_pattern) COLONEQ ALLOW CHOICE FROM loc_id WITH BAR sync_label ARROW net_expr
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+prog 
+stmt_block EOF 
+list(stmt) 
+stmt list(stmt) 
+nonempty_list(local_pattern) COLONEQ net_expr SEMICOLON 
+                                     (?)
+
+** In state 162, looking ahead at LPAREN, shifting is permitted
+** because of the following sub-derivation:
+
+ALLOW CHOICE FROM loc_id WITH nonempty_list(sync_choice_case) 
+                              BAR sync_label ARROW net_expr 
+                                                   net_expr net_expr2 
+                                                            . LPAREN RPAREN 
+
+** In state 162, looking ahead at LPAREN, reducing production
+** nonempty_list(sync_choice_case) -> BAR sync_label ARROW net_expr
+** is permitted because of the following sub-derivation:
+
+net_expr net_expr2 // lookahead token appears because net_expr2 can begin with LPAREN
+ALLOW CHOICE FROM loc_id WITH nonempty_list(sync_choice_case) // lookahead token is inherited
+                              BAR sync_label ARROW net_expr . 
