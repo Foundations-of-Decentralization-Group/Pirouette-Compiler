@@ -16,7 +16,7 @@
 %token AND OR
 %token EQ NEQ LT LEQ GT GEQ
 %token LPAREN RPAREN LBRACKET RBRACKET
-%token COMMA DOT COLON SEMICOLON
+%token COMMA COLON SEMICOLON
 %token ARROW
 %token BAR
 %token LET IN
@@ -40,7 +40,7 @@
 %left PLUS MINUS
 %left TIMES DIV
 %nonassoc UNARY
-%left DOT
+
 
 (********************************************************************************)
 (*                                                                            *)
@@ -50,18 +50,16 @@
 %{
   open Ast_core.Local.M
   open Ast_core.Net.M
-  open Parsed_ast
+  open Parsed_ast   (* Use the Pos_info from Parsed_ast *)
 
   let gen_pos startpos endpos =
     let open Lexing in
-      { Pos_info.fname = startpos.pos_fname;
-        start = startpos.pos_lnum, startpos.pos_cnum - startpos.pos_bol;
-        stop = endpos.pos_lnum, endpos.pos_cnum - endpos.pos_bol;
-      }
+    { Pos_info.fname = startpos.pos_fname;
+      start = startpos.pos_lnum, startpos.pos_cnum - startpos.pos_bol;
+      stop = endpos.pos_lnum, endpos.pos_cnum - endpos.pos_bol;
+    }
 
-  let local_set_info_expr pos e = e
-  let local_set_info_typ pos t = t
-  let local_set_info_pattern pos p = p
+  let local_set_info_typ _ t = t
 %}
 
 (********************************************************************************)
@@ -69,6 +67,8 @@
 (*    TYPE DECLARATIONS AND START RULE (for Net and Local parsed types)         *)
 (*                                                                            *)
 (********************************************************************************)
+
+
 %type <Parsed_ast.Net.stmt_block> net_prog
 %type <Parsed_ast.Net.stmt_block> net_stmt_block
 %type <Parsed_ast.Net.stmt> net_stmt
@@ -115,13 +115,6 @@
   | GT    { Gt (gen_pos $startpos $endpos) }
   | GEQ   { Geq (gen_pos $startpos $endpos) }
 
-%inline nonempty_list(X):
-  | X                    { [$1] }
-  | X nonempty_list(X)   { $1 :: $2 }
-
-%inline list(X):
-  | /* empty */          { [] }
-  | nonempty_list(X)       { $1 }
 
 (********************************************************************************)
 (*                        IDENTIFIER RULES                                    *)
@@ -131,6 +124,10 @@ var_id:
 
 sync_label:
   | id=ID { LabelId (id, gen_pos $startpos $endpos) }
+
+
+typ_id:
+  | id=ID { TypId (id, gen_pos $startpos $endpos) }
 
 (********************************************************************************)
 (*                  MAIN NET GRAMMAR RULES                              *)
