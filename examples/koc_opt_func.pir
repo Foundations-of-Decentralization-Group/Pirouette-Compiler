@@ -47,4 +47,4 @@ broadcast_opt freq :=
         A.print_endline A."Done with all the computations";
 
 
-main := broadcast_opt A.10000000;
+main := broadcast_opt A.1000000;

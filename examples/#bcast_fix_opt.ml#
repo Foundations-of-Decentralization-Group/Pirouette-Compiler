@@ -1,0 +1,163 @@
+;;let chan_A_B = Domainslib.Chan.make_bounded 0
+  and chan_A_C = Domainslib.Chan.make_bounded 0
+
+  and chan_B_D = Domainslib.Chan.make_bounded 0
+  and chan_B_E = Domainslib.Chan.make_bounded 0
+
+  and chan_C_F = Domainslib.Chan.make_bounded 0
+  and chan_C_G = Domainslib.Chan.make_bounded 0 in
+  let t = Sys.time() in
+  let domain_A =
+    Domain.spawn
+      (fun _ ->
+         let rec broadcast_opt freq =
+           if freq > 0
+           then
+             (Domainslib.Chan.send chan_A_B "L";
+              Domainslib.Chan.send chan_A_C "L";
+              (let rec _unit_11 = () in
+               let rec _unit_10 = () in
+               let rec _unit_9 = () in
+               let rec _unit_8 = () in
+               let rec _unit_7 = () in broadcast_opt (freq - 1)))
+           else
+             (Domainslib.Chan.send chan_A_B "R";
+              Domainslib.Chan.send chan_A_C "R";
+              (let rec _unit_6 = () in
+               let rec _unit_5 = () in
+               let rec _unit_4 = () in
+               let rec _unit_3 = () in
+               let rec _unit_2 = () in let rec _unit_1 = () in ())) in
+         broadcast_opt 1000)
+  and domain_B =
+    Domain.spawn
+      (fun _ ->
+         let rec broadcast_opt freq =
+           match Domainslib.Chan.recv chan_A_B with
+           | "L" ->
+               (Domainslib.Chan.send chan_B_D "L";
+                Domainslib.Chan.send chan_B_E "L";
+                (let rec _unit_16 = () in
+                 let rec _unit_15 = () in
+                 let rec _unit_14 = () in
+                 let rec _unit_13 = () in
+                 let rec _unit_12 = () in broadcast_opt ()))
+           | "R" ->
+               (Domainslib.Chan.send chan_B_D "R";
+                Domainslib.Chan.send chan_B_E "R";
+                (let rec x = 9 in
+                 let rec _unit_21 = () in
+                 let rec _unit_20 = () in
+                 let rec _unit_19 = () in
+                 let rec _unit_18 = () in let rec _unit_17 = () in ()))
+           | _ -> failwith "Error: Unmatched label" in
+         broadcast_opt ())
+  and domain_C =
+    Domain.spawn
+      (fun _ ->
+         let rec broadcast_opt freq =
+           match Domainslib.Chan.recv chan_A_C with
+           | "L" ->
+               (Domainslib.Chan.send chan_C_F "L";
+                Domainslib.Chan.send chan_C_G "L";
+                (let rec x = 10 in
+                 let rec _unit_25 = () in
+                 let rec _unit_24 = () in
+                 let rec _unit_23 = () in
+                 let rec _unit_22 = () in broadcast_opt ()))
+           | "R" ->
+               (Domainslib.Chan.send chan_C_F "R";
+                Domainslib.Chan.send chan_C_G "R";
+                (let rec _unit_30 = () in
+                 let rec x = 9 in
+                 let rec _unit_29 = () in
+                 let rec _unit_28 = () in
+                 let rec _unit_27 = () in let rec _unit_26 = () in ()))
+           | _ -> failwith "Error: Unmatched label" in
+         broadcast_opt ())
+  and domain_D =
+    Domain.spawn
+      (fun _ ->
+         let rec broadcast_opt freq =
+           match Domainslib.Chan.recv chan_B_D with
+           | "L" ->
+               let () = Printf.printf "Decision receieved at D from B: %fs\n" (Sys.time() -. t) in             
+               let rec _unit_34 = () in
+               let rec x = 10 in
+               let rec _unit_33 = () in
+               let rec _unit_32 = () in
+               let rec _unit_31 = () in broadcast_opt ()
+           | "R" ->
+               let rec _unit_39 = () in
+               let rec _unit_38 = () in
+               let rec x = 9 in
+               let rec _unit_37 = () in
+               let rec _unit_36 = () in let rec _unit_35 = () in ()
+           | _ -> failwith "Error: Unmatched label" in
+         broadcast_opt ())
+  and domain_E =
+    Domain.spawn
+      (fun _ ->
+         let rec broadcast_opt freq =
+           match Domainslib.Chan.recv chan_B_E with
+           | "R" ->
+               let () = Printf.printf "Decision receieved at E from B: %fs\n" (Sys.time() -. t) in             
+               let rec _unit_44 = () in
+               let rec _unit_43 = () in
+               let rec _unit_42 = () in
+               let rec x = 9 in
+               let rec _unit_41 = () in let rec _unit_40 = () in ()
+           | "L" ->
+               let rec _unit_48 = () in
+               let rec _unit_47 = () in
+               let rec x = 10 in
+               let rec _unit_46 = () in
+               let rec _unit_45 = () in broadcast_opt ()
+           | _ -> failwith "Error: Unmatched label" in
+         broadcast_opt ())
+  and domain_F =
+    Domain.spawn
+      (fun _ ->
+         let rec broadcast_opt freq =
+           match Domainslib.Chan.recv chan_C_F with
+           | "L" ->
+               let () = Printf.printf "Decision receieved at F from C: %fs\n" (Sys.time() -. t) in            
+               let rec _unit_52 = () in
+               let rec _unit_51 = () in
+               let rec _unit_50 = () in
+               let rec x = 10 in let rec _unit_49 = () in broadcast_opt ()
+           | "R" ->
+               let rec _unit_57 = () in
+               let rec _unit_56 = () in
+               let rec _unit_55 = () in
+               let rec _unit_54 = () in
+               let rec x = 9 in let rec _unit_53 = () in ()
+           | _ -> failwith "Error: Unmatched label" in
+         broadcast_opt ())
+  and domain_G =
+    Domain.spawn
+      (fun _ ->
+         let rec broadcast_opt freq =
+           match Domainslib.Chan.recv chan_C_G with
+           | "L" ->
+               let () = Printf.printf "Decision receieved at G from C: %fs\n" (Sys.time() -. t) in             
+               let rec _unit_61 = () in
+               let rec _unit_60 = () in
+               let rec _unit_59 = () in
+               let rec _unit_58 = () in let rec x = 10 in broadcast_opt ()
+           | "R" ->
+               let rec _unit_66 = () in
+               let rec _unit_65 = () in
+               let rec _unit_64 = () in
+               let rec _unit_63 = () in
+               let rec _unit_62 = () in
+               let rec x = 9 in print_endline "Terminate"
+           | _ -> failwith "Error: Unmatched label" in
+         broadcast_opt ()) in
+  Domain.join domain_A;
+  Domain.join domain_B;
+  Domain.join domain_C;
+  Domain.join domain_D;
+  Domain.join domain_E;
+  Domain.join domain_F;
+  Domain.join domain_G;

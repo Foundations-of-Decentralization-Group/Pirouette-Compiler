@@ -31,4 +31,4 @@ broadcast_opt freq :=
         let F.x := F.9; in
         let G.x := G.9; in G.print_endline G."Terminate";
 
-main := broadcast_opt A.1000000;
+main := broadcast_opt A.10000000;
