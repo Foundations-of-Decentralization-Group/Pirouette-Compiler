@@ -1,4 +1,4 @@
-open Http
+open Http_pirc
 
 let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json|dot>] [-backend <shm|http>]"
 let ast_dump_format = ref "pprint"
@@ -62,7 +62,7 @@ let () =
       netir_l
   | "http" ->
     let msg_module = (module Codegen.Msg_intf.Msg_http_intf : Codegen.Msg_intf.M) in
-    let () = 
+    let () =
       match Lwt_main.run (Send_receive.init ()) with
       | Ok () -> ()
       | Error msg -> failwith ("Failed to initialize HTTP config: " ^ msg)
@@ -71,11 +71,7 @@ let () =
       (fun loc ir ->
         let out_file = open_out (!basename ^ "_" ^ loc ^ ".ml") in
         output_string out_file "open Send_receive\n\n";
-        Codegen.Toplevel_shm.emit_toplevel_shm
-          out_file
-          msg_module
-          [loc]
-          [ir])
+        Codegen.Toplevel_shm.emit_toplevel_shm out_file msg_module [ loc ] [ ir ])
       locs
       netir_l
   | _ -> invalid_arg "Invalid backend"

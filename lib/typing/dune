@@ -1,5 +1,3 @@
 (library
  (name typing)
- (libraries ast_core)
- (instrumentation
-  (backend bisect_ppx)))
+ (libraries ast_core))
