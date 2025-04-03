@@ -14,3 +14,10 @@ let parse_with_error lexbuf =
     failwith (spf "Syntax error at %s: %s" (string_of_pos lexbuf.lex_start_p) msg)
   | Parser.Error -> failwith (spf "Parse error at %s" (string_of_pos lexbuf.lex_start_p))
 ;;
+
+let parse_net_with_error lexbuf =
+  try Net_parser.prog Net_lexer.read lexbuf with
+  | Net_lexer.SyntaxError msg ->
+    failwith (spf "Syntax error at %s: %s" (string_of_pos lexbuf.lex_start_p) msg)
+  | Net_parser.Error -> failwith (spf "Parse error at %s" (string_of_pos lexbuf.lex_start_p))
+;;
