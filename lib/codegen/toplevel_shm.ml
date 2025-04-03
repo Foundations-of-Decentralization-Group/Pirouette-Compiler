@@ -32,9 +32,13 @@ let emit_toplevel_shm
         Domain.spawn (fun _ -> [%e emit_net_toplevel net_stmts])
       ;;]
   in
-  Pprintast.structure
-    (Format.formatter_of_out_channel out_chan)
-    (Msg.emit_toplevel_init loc_ids @ List.map2 emit_domain_stri loc_ids net_stmtblock_l)
+  (*FIXED BUG: single loc cases or small cases wouldn't return anything.
+    So to flush the formatter's buffer, create the formatter explicitly*)
+  let formatter = Format.formatter_of_out_channel out_chan in
+  let process_bindings = List.map2 emit_domain_stri loc_ids net_stmtblock_l in
+  Pprintast.structure formatter (Msg.emit_toplevel_init loc_ids @ process_bindings);
+  (*this line fixed the bug, just needed to flush to make sure all output was written out properly*)
+  Format.pp_print_flush formatter ()
 ;;
 
 let emit_toplevel_http
