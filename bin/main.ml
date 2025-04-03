@@ -33,9 +33,9 @@ let () =
   (match !ast_dump_format with
    | "json" -> Ast_utils.jsonify_choreo_ast (open_out (!basename ^ ".json")) program
    | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (!basename ^ ".ast")) program
-   | "dot" ->
-     let string_of_info = Parsing.Parsed_ast.Pos_info.string_of_pos in
-     Ast_utils.dot_choreo_ast (open_out (!basename ^ ".dot")) string_of_info program
+   | "dot" -> 
+      let string_of_info = Parsing.Parsed_ast.Pos_info.string_of_pos in
+      Ast_utils.dot_choreo_ast (open_out (!basename ^ ".dot")) string_of_info program
    | _ -> invalid_arg "Invalid ast-dump format");
   let locs = Ast_utils.extract_locs program in
   let netir_l = List.map (fun loc -> Netgen.epp_choreo_to_net program loc) locs in
