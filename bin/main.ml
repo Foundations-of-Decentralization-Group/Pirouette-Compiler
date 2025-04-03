@@ -1,4 +1,4 @@
-open Http
+open Http_pirc
 
 let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json|dot>] [-backend <shm|http>]"
 let ast_dump_format = ref "pprint"

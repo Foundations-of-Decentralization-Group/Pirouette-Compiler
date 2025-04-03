@@ -10,6 +10,8 @@ let peq (s : string) =
   assert_equal json_ast json_ast'
 ;;
 
+let net_peq (net_s : string) = assert_equal net_s net_s (* TO DO *)
+
 let suite =
   "Pretty print Tests"
   >::: [ "Examples"
@@ -31,6 +33,9 @@ let suite =
               ]
        ; "Foreign Declarations"
          >::: [ ("foreign_decl" >:: fun _ -> peq Astutils_testcases.foreign_decl) ]
+       ; "Net IR"
+         >::: [ ("test_net_peq" >:: fun _ -> net_peq Astutils_testcases.net_test_1) ]
+         (* ADD more net_peq tests here *)
        ]
 ;;
 

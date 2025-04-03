@@ -55,6 +55,11 @@ test-emit-core: cleanall
 test-toplevel-shm: cleanall
 	dune exec --instrument-with bisect_ppx test/toplevel_shm_test.exe
 	bisect-ppx-report html
+bisect-all: cleanall
+	dune runtest --instrument-with bisect_ppx
+	bisect-ppx-report html
+	open _coverage/index.html
+
 
 cleandocs:
 	rm -rf $(shell find docs -name '*.aux' -o -name '*.log' -o -name '*.out' \

@@ -22,5 +22,4 @@ val emit_net_pexp
   -> 'a Ast_core.Net.M.expr
   -> Ppxlib.expression
 
-val emit_foreign_decl :
-  string -> 'a Ast_core.Net.M.typ -> string -> Ppxlib.value_binding
+val emit_foreign_decl : string -> 'a Ast_core.Net.M.typ -> string -> Ppxlib.value_binding
