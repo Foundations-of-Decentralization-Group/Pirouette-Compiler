@@ -25,8 +25,6 @@ rule read = parse
   | "{-"               { read_multi_line_comment lexbuf }
   | '('                { LPAREN }
   | ')'                { RPAREN }
-  | '['                { LBRACKET }
-  | ']'                { RBRACKET }
   | ','                { COMMA }
   | '.'                { DOT }
   | ':'                { COLON }

@@ -10,7 +10,7 @@
 %token NOT
 %token AND OR
 %token EQ NEQ LT LEQ GT GEQ
-%token LPAREN RPAREN LBRACKET RBRACKET
+%token LPAREN RPAREN 
 %token COMMA DOT COLON SEMICOLON
 %token ARROW TILDE_ARROW
 %token BAR
@@ -94,7 +94,6 @@ net_expr:
   | CHOOSE sync=sync_label FOR id=loc_id IN e=net_expr { ChooseFor (sync, id, e, gen_pos $startpos $endpos) }
   | ALLOW CHOICE FROM id=loc_id WITH cases=nonempty_list(sync_choice_case) { AllowChoice (id, cases, gen_pos $startpos $endpos) }
   | FUN ps=nonempty_list(local_pattern) ARROW e=net_expr { FunDef (ps, e, gen_pos $startpos $endpos) }
-  | e1=net_expr e2=net_expr2 { FunApp (e1, e2, gen_pos $startpos $endpos) }
   | LPAREN e1=net_expr COMMA e2=net_expr RPAREN { Pair (e1, e2, gen_pos $startpos $endpos) }
   | FST e=net_expr { Fst (e, gen_pos $startpos $endpos) }
   | SND e=net_expr { Snd (e, gen_pos $startpos $endpos) }
@@ -102,11 +101,7 @@ net_expr:
   | RIGHT e=net_expr { Right (e, gen_pos $startpos $endpos) }
   | MATCH e=net_expr WITH cases=nonempty_list(net_case) { Match (e, cases, gen_pos $startpos $endpos) }
   | LPAREN e=net_expr RPAREN { Net.set_info_expr (gen_pos $startpos $endpos) e }
-  | net_expr2 { $1 }
 
-net_expr2:
-  | LPAREN RPAREN { Unit (gen_pos $startpos $endpos) }
-  | LPAREN e=net_expr RPAREN { Net.set_info_expr (gen_pos $startpos $endpos) e }
 
 local_expr:
   | LPAREN RPAREN { Unit (gen_pos $startpos $endpos) }
