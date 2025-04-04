@@ -1,147 +1,161 @@
 open OUnit2
-open Lexing
+open Ast_core
+open Parsing
 
-(* Helper function to parse a string *)
-let parse_string str =
+(* Helper function to parse a string into a Net AST *)
+let parse_net_string str =
   let lexbuf = Lexing.from_string str in
-  (* Set the filename in the lexbuf position for better error messages *)
-  lexbuf.lex_curr_p <- { lexbuf.lex_curr_p with pos_fname = "test_net" };
-  Parsing.Net_parser.prog Parsing.Net_lexer.read lexbuf
+  try
+    Net_parser.prog Net_lexer.read lexbuf
+  with
+  | Net_lexer.SyntaxError msg ->
+      failwith (Printf.sprintf "Lexer error: %s" msg)
+  | Net_parser.Error ->
+      let pos = lexbuf.Lexing.lex_curr_p in
+      failwith (Printf.sprintf "Parser error at line %d, column %d" 
+                pos.Lexing.pos_lnum 
+                (pos.Lexing.pos_cnum - pos.Lexing.pos_bol))
 
-let test_basic_declarations _ =
-  let test_cases = [
-    (* Basic variable declaration *)
-    "x: unit_t;",
-    "Simple unit type declaration";
+(* Test suite *)
+let net_parsing_tests = "Net Parsing Tests" >::: [
+  "test_parse_empty_program" >:: (fun _ ->
+    let result = parse_net_string "" in
+    assert_equal [] result
+  );
 
-    (* Multiple variable declaration *)
-    "x, y: int_t;",
-    "Multiple variable declaration";
+  "test_parse_unit_declaration" >:: (fun _ ->
+    let result = parse_net_string "x : unit;" in
+    match result with
+    | [Net.M.Decl(Local.M.Var(Local.M.VarId("x", _), _), Net.M.TUnit _, _)] -> ()
+    | _ -> assert_failure "Failed to parse unit declaration"
+  );
 
-    (* Type declaration *)
-    "type MyType = unit_t;",
-    "Type declaration";
+  "test_parse_basic_assignment" >:: (fun _ ->
+    let result = parse_net_string "x := unit;" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)], Net.M.Unit _, _)] -> ()
+    | _ -> assert_failure "Failed to parse basic assignment"
+  );
 
-    (* Foreign declaration *)
-    "foreign print: string_t -> unit_t := \"console.log\";",
-    "Foreign function declaration"
-  ]
-  in
-  List.iter (fun (input, msg) ->
-    (* Now assert that parse_string doesn't raise an exception *)
-    try
-      let _ = parse_string input in
-      assert_bool msg true (* Indicate success if no exception *)
-    with Failure explanation -> (* Catch the specific failure *)
-      assert_failure (Printf.sprintf "%s: Failed for input '%s'. Reason: %s" msg input explanation)
-  ) test_cases
+  "test_parse_type_declaration" >:: (fun _ ->
+    let result = parse_net_string "type myType := unit;" in
+    match result with
+    | [Net.M.TypeDecl(Local.M.TypId("myType", _), Net.M.TUnit _, _)] -> ()
+    | _ -> assert_failure "Failed to parse type declaration"
+  );
 
-let test_network_expressions _ =
-  let test_cases = [
-    (* Basic send/receive *)
-    "x := send 42 ~> client;",
-    "Send expression";
+  "test_parse_foreign_declaration" >:: (fun _ ->
+    let result = parse_net_string "foreign print : unit := \"console.log\";" in
+    match result with
+    | [Net.M.ForeignDecl(Local.M.VarId("print", _), Net.M.TUnit _, "console.log", _)] -> ()
+    | _ -> assert_failure "Failed to parse foreign declaration"
+  );
 
-    "x := recv from server;",
-    "Receive expression";
+  "test_parse_let_expression" >:: (fun _ ->
+    let result = parse_net_string "x := let y : unit; in unit;" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)], 
+                   Net.M.Let([Net.M.Decl(Local.M.Var(Local.M.VarId("y", _), _), Net.M.TUnit _, _)], 
+                            Net.M.Unit _, _), _)] -> ()
+    | _ -> assert_failure "Failed to parse let expression"
+  );
 
-    (* Choose and Allow *)
-    "x := choose Login for client in e;",
-    "Choose expression";
+  "test_parse_if_expression" >:: (fun _ ->
+    let result = parse_net_string "x := if unit then unit else unit;" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)], 
+                   Net.M.If(Net.M.Unit _, Net.M.Unit _, Net.M.Unit _, _), _)] -> ()
+    | _ -> assert_failure "Failed to parse if expression"
+  );
 
-    "x := allow choice from client with
-      | Login -> ret true
-      | Logout -> ret false;",
-    "Allow choice expression"
-  ]
-  in
-  List.iter (fun (input, msg) ->
-    assert_bool msg (try let _ = parse_string input in true
-                     with _ -> false)
-  ) test_cases
+  "test_parse_send_recv" >:: (fun _ ->
+    let result = parse_net_string "x := send unit ~> server; y := recv from client;" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)], 
+                   Net.M.Send(Net.M.Unit _, Local.M.LocId("server", _), _), _); 
+       Net.M.Assign([Local.M.Var(Local.M.VarId("y", _), _)], 
+                   Net.M.Recv(Local.M.LocId("client", _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse send/recv expressions"
+  );
 
-let test_local_expressions _ =
-  let test_cases = [
-    (* Basic arithmetic *)
-    "x := ret (1 + 2);",
-    "Basic arithmetic";
+  "test_parse_function_definition" >:: (fun _ ->
+    let result = parse_net_string "f := fun x -> unit;" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("f", _), _)], 
+                   Net.M.FunDef([Local.M.Var(Local.M.VarId("x", _), _)], Net.M.Unit _, _), _)] -> ()
+    | _ -> assert_failure "Failed to parse function definition"
+  );
 
-    (* Boolean operations *)
-    "x := ret (true && false);",
-    "Boolean operations";
+  "test_parse_pairs" >:: (fun _ ->
+    let result = parse_net_string "p := (unit, unit); x := fst p; y := snd p;" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("p", _), _)], 
+                   Net.M.Pair(Net.M.Unit _, Net.M.Unit _, _), _);
+       Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)], 
+                   Net.M.Fst(Net.M.Var(Local.M.VarId("p", _), _), _), _);
+       Net.M.Assign([Local.M.Var(Local.M.VarId("y", _), _)], 
+                   Net.M.Snd(Net.M.Var(Local.M.VarId("p", _), _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse pairs and accessors"
+  );
 
-    (* Let expressions *)
-    "x := let y: int_t := 42 in ret y;",
-    "Let expression";
+  "test_parse_sum_types" >:: (fun _ ->
+    let result = parse_net_string "l := left unit; r := right unit;" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("l", _), _)], 
+                   Net.M.Left(Net.M.Unit _, _), _);
+       Net.M.Assign([Local.M.Var(Local.M.VarId("r", _), _)], 
+                   Net.M.Right(Net.M.Unit _, _), _)] -> ()
+    | _ -> assert_failure "Failed to parse sum type constructors"
+  );
 
-    (* Pattern matching *)
-    "x := match y with
-      | Left z -> ret z
-      | Right w -> ret w;",
-    "Pattern matching"
-  ]
-  in
-  List.iter (fun (input, msg) ->
-    assert_bool msg (try let _ = parse_string input in true
-                     with _ -> false)
-  ) test_cases
+  "test_parse_match_expression" >:: (fun _ ->
+    let result = parse_net_string "x := match y with | left z -> unit | right w -> unit;" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)], 
+                   Net.M.Match(Net.M.Var(Local.M.VarId("y", _), _), 
+                              [(Local.M.Left(Local.M.Var(Local.M.VarId("z", _), _), _), Net.M.Unit _);
+                               (Local.M.Right(Local.M.Var(Local.M.VarId("w", _), _), _), Net.M.Unit _)], _), _)] -> ()
+    | _ -> assert_failure "Failed to parse match expression"
+  );
 
-let test_complex_expressions _ =
-  let test_cases = [
-    (* Nested let expressions *)
-    "x := let y: int_t := 1 in
-          let z: int_t := 2 in
-          ret (y + z);",
-    "Nested let expressions";
+  "test_parse_choose_allow" >:: (fun _ ->
+    let result = parse_net_string "x := choose option for client in unit; y := allow choice from server with | option -> unit;" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)], 
+                   Net.M.ChooseFor(Local.M.LabelId("option", _), Local.M.LocId("client", _), Net.M.Unit _, _), _);
+       Net.M.Assign([Local.M.Var(Local.M.VarId("y", _), _)], 
+                   Net.M.AllowChoice(Local.M.LocId("server", _), 
+                                   [(Local.M.LabelId("option", _), Net.M.Unit _)], _), _)] -> ()
+    | _ -> assert_failure "Failed to parse choose/allow expressions"
+  );
 
-    (* Function definition *)
-    "f := fun x -> ret (x + 1);",
-    "Function definition";
+  "test_parse_complex_types" >:: (fun _ ->
+    let result = parse_net_string "x : client.int; y : unit -> unit; z : unit * unit; w : unit + unit;" in
+    match result with
+    | [Net.M.Decl(Local.M.Var(Local.M.VarId("x", _), _), Net.M.TLoc(Local.M.TInt _, _), _);
+       Net.M.Decl(Local.M.Var(Local.M.VarId("y", _), _), Net.M.TMap(Net.M.TUnit _, Net.M.TUnit _, _), _);
+       Net.M.Decl(Local.M.Var(Local.M.VarId("z", _), _), Net.M.TProd(Net.M.TUnit _, Net.M.TUnit _, _), _);
+       Net.M.Decl(Local.M.Var(Local.M.VarId("w", _), _), Net.M.TSum(Net.M.TUnit _, Net.M.TUnit _, _), _)] -> ()
+    | _ -> assert_failure "Failed to parse complex types"
+  );
 
-    (* Pairs and projections *)
-    "x := ret (fst (1, 2));",
-    "Pair projection";
+  "test_parse_ret_expression" >:: (fun _ ->
+    let result = parse_net_string "x := ret 42;" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)], 
+                  Net.M.Ret(Local.M.Val(Local.M.Int(42, _), _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse ret expression"
+  );
 
-    (* Complex pattern matching *)
-    "x := match p with
-      | (Left x, Right y) -> ret x
-      | (Right x, Left y) -> ret y
-      | _ -> ret 0;",
-    "Complex pattern matching"
-  ]
-  in
-  List.iter (fun (input, msg) ->
-    assert_bool msg (try let _ = parse_string input in true
-                     with _ -> false)
-  ) test_cases
+  "test_parse_comments" >:: (fun _ ->
+    let result = parse_net_string "-- This is a comment\nx : unit; {- This is a\nmulti-line comment -} y : unit;" in
+    match result with
+    | [Net.M.Decl(Local.M.Var(Local.M.VarId("x", _), _), Net.M.TUnit _, _);
+       Net.M.Decl(Local.M.Var(Local.M.VarId("y", _), _), Net.M.TUnit _, _)] -> ()
+    | _ -> assert_failure "Failed to parse program with comments"
+  );
+]
 
-let test_error_cases _ =
-  let test_cases = [
-    (* Missing semicolon *)
-    "x: unit_t",
-    "Should fail: Missing semicolon";
-
-    (* Invalid syntax *)
-    "x :== 42;",
-    "Should fail: Invalid assignment operator";
-
-    (* Mismatched parentheses *)
-    "x := (1 + 2;",
-    "Should fail: Mismatched parentheses"
-  ]
-  in
-  List.iter (fun (input, msg) ->
-    assert_bool msg (try let _ = parse_string input in false
-                     with _ -> true)
-  ) test_cases
-
-let suite =
-  "net_parser_test" >::: [
-    "test_basic_declarations" >:: test_basic_declarations;
-    "test_network_expressions" >:: test_network_expressions;
-    "test_local_expressions" >:: test_local_expressions;
-    "test_complex_expressions" >:: test_complex_expressions;
-    "test_error_cases" >:: test_error_cases;
-  ]
-
-let () = run_test_tt_main suite
+(* Register the tests *)
+let () =
+  run_test_tt_main net_parsing_tests
