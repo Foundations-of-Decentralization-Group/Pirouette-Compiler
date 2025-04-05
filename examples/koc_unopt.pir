@@ -7,13 +7,13 @@ broadcast_opt freq :=
         A[L4] ~> E;
         A[L5] ~> F;
         A[L5] ~> G;
-    
+
+            let B.x := B.10; in 
             let C.x := C.10; in 
             let D.x := D.10; in
             let E.x := E.10; in
             let F.x := F.10; in
             let G.x := G.10; in broadcast_opt A.(freq - 1)
-
     else 
         A[R1] ~> B;
         A[R2] ~> C;
