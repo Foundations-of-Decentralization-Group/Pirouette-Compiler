@@ -176,7 +176,17 @@ and epp_choreo_expr (expr : 'a Choreo.expr) (loc : string) : 'a Net.expr =
   | Left (e, _) -> Left (epp_choreo_expr e loc, _m)
   | Right (e, _) -> Right (epp_choreo_expr e loc, _m)
   | Let (stmts, e, _) ->
-    Let (List.map (fun stmt -> epp_choreo_stmt stmt loc) stmts, epp_choreo_expr e loc, _m)
+      let effective_stmts =
+        List.map (fun stmt -> epp_choreo_stmt stmt loc) stmts
+        |> List.filter (function
+          | Net.Decl (Default _, TUnit _, _) -> false
+          | Net.Assign ([ Default _ ], Unit _, _) -> false
+          | _ -> true)
+      in
+      if effective_stmts = [] then
+        epp_choreo_expr e loc
+      else
+        Let (effective_stmts, epp_choreo_expr e loc, _m)
   | Send (LocId (loc1, _), e, LocId (loc2, _), _) ->
     if loc1 = loc2
     then epp_choreo_expr e loc
