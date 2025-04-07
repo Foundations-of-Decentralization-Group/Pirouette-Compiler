@@ -150,7 +150,10 @@ let rec epp_choreo_stmt (stmt : 'a Choreo.stmt) (loc : string) : 'a Net.stmt =
   match stmt with
   | Decl (p, t, _) -> Decl (epp_choreo_pattern p loc, epp_choreo_type t loc, _m)
   | Assign (ps, e, _) ->
-    Assign (List.map (fun p -> epp_choreo_pattern p loc) ps, epp_choreo_expr e loc, _m)
+    let epp_ps = List.map (fun p -> epp_choreo_pattern p loc) ps in
+    (match epp_ps with
+     | Default _m :: _ -> Assign ([ Default _m ], epp_choreo_expr e loc, _m)
+     | _ -> Assign (epp_ps, epp_choreo_expr e loc, _m))
   | TypeDecl (id, t, _) -> TypeDecl (id, epp_choreo_type t loc, _m)
 
 and epp_choreo_expr (expr : 'a Choreo.expr) (loc : string) : 'a Net.expr =
@@ -158,7 +161,10 @@ and epp_choreo_expr (expr : 'a Choreo.expr) (loc : string) : 'a Net.expr =
   | Var (id, _) -> Var (id, _m)
   | LocExpr (LocId (loc1, _), e, _) when loc1 = loc -> Ret (e, _m)
   | FunDef (ps, e, _) ->
-    FunDef (List.map (fun p -> epp_choreo_pattern p loc) ps, epp_choreo_expr e loc, _m)
+    let epp_ps = List.map (fun p -> epp_choreo_pattern p loc) ps in
+    (match epp_ps with
+     | Default _m :: _ -> FunDef ([ Default _m ], epp_choreo_expr e loc, _m)
+     | _ -> FunDef (epp_ps, epp_choreo_expr e loc, _m))
   | FunApp (e1, e2, _) ->
     let epp_e1 = epp_choreo_expr e1 loc in
     (match epp_e1 with
