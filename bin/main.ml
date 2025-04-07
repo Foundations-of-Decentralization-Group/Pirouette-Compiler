@@ -40,9 +40,8 @@ let () =
       | _ -> invalid_arg "Invalid ast-dump format")
     locs
     netir_l;
-  Codegen.Toplevel_shm.emit_toplevel_shm
+  Codegen.Toplevel_domain.emit_toplevel_domain
     (open_out (!basename ^ ".ml"))
-    (module Codegen.Msg_intf.Msg_chan_intf)
     locs
     netir_l
 ;;

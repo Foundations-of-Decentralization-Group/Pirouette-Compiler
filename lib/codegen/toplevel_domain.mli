@@ -1,6 +1,5 @@
-val emit_toplevel_shm
+val emit_toplevel_domain
   :  out_channel
-  -> (module Msg_intf.M)
   -> string list
   -> 'a Ast_core.Net.M.stmt_block list
   -> unit
