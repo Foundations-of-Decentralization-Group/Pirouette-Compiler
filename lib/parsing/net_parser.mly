@@ -66,6 +66,12 @@
 %type <Parsed_ast.Local.typ_id> typ_id
 %type <Parsed_ast.Local.sync_label> sync_label
 %type <Parsed_ast.Net.stmt> foreign_decl
+%type <Parsed_ast.Net.stmt list> list(stmt)
+%type <(Parsed_ast.Local.pattern * Parsed_ast.Local.expr) list> nonempty_list(local_case)
+%type <Parsed_ast.Local.pattern list> nonempty_list(local_pattern)
+%type <(Parsed_ast.Local.pattern * Parsed_ast.Net.expr) list> nonempty_list(net_case)
+%type <(Parsed_ast.Local.sync_label * Parsed_ast.Net.expr) list> nonempty_list(sync_choice_case)
+%type <unit option> option(SEMICOLON)
 
 %start prog
 
