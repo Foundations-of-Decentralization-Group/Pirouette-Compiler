@@ -30,10 +30,5 @@ spread freq :=
 			let F.x := F.11; in
 			let G.x := G.11; in G.print_endline G."Terminate";
 
-<<<<<<< Updated upstream
-main := spread A.1000000;
-=======
-main := spread A.10000000;
 
-	
->>>>>>> Stashed changes
+main := spread A.1000000;
