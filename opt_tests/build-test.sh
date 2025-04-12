@@ -1,9 +1,6 @@
 #! /bin/sh
 
-# Script Parameters:
-# ./build-test.sh [-p|-x] <test name> <num iters>
-
-while getopts px opt
+while getopts pxh opt
 do
     case $opt in
         p)
@@ -11,6 +8,15 @@ do
             ;;
         x)
             send_recv_mod_flag=-x
+            ;;
+        h)
+            echo "Script Parameters:"
+            echo "  ./build-test.sh [-p|-x|-h] <test name> <num iters>"
+            echo ""
+            echo "Flags:"
+            echo "  -p : compile to use with perf"
+            echo "  -x : splice in extra computations in between sends and receives"
+            echo "  -h : display this help message"
             ;;
     esac
 done
@@ -53,6 +59,6 @@ cpp -DNUM_ITERS=$2 -xc -P -E $file.pir -o $file-.pir &&
     fi &&
     rm $file-.ml &&
     ln -fs ../../helper/helper.ml helper.ml &&
-    ocamlfind ocamlopt $perf_flag -package domainslib helper.ml -linkpkg $file.ml -o $file &&
+    ocamlfind ocamlopt $perf_flag -package domainslib helper.ml -linkpkg $file.ml -o $file.exe &&
     rm helper.cm* $file.cm* $file.o
     
