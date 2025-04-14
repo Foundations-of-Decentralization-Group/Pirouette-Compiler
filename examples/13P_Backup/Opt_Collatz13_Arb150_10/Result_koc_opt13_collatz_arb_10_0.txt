@@ -1,0 +1,2 @@
+Done with all the computations
+Loop execution time 243.439516s

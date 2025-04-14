@@ -8,7 +8,7 @@ set key outside
 set xlabel "Number of Iterations;% difference"
 set ylabel "Time taken in seconds"
 
-set xtics ("50;0.31-O" 0.25, "75;0.18-U" 1.75, "100;0.12-U" 3.25, "125;0.19-O" 4.75, "150;0.17-U" 6.25)
+set xtics ("50;0.64-U" 0.25, "75;0.74-U" 1.75, "100;0.69-U" 3.25, "125;0.71-U" 4.75, "150;0.78-U" 6.25)
 
 plot 'Graph_Info_Plot.txt' every 2    using 1:2 title "Unoptimized" with boxes ls 1,\
      'Graph_Info_Plot.txt' every 2::1 using 1:2 title "Optimized" with boxes ls 2
