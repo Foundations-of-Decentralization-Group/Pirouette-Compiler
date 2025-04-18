@@ -22,18 +22,16 @@
  (synopsis "Pirouette Compiler")
  (description "Higher-order typed functional choreographies")
  (depends
-  (ocaml
-   (= 5.2.1))
   (dune :build)
   (menhir :build)
+  (ocaml (>= 5.0.0))
   (ppxlib :build)
   (yojson :build)
+  (domainslib :with-test)
+  (mpi :with-test)
   (ocamlfind :with-test)
   (ounit2 :with-test)
-  (ocamlformat
-   (and
-    (>= 0.27.0)
-    :dev)))
+  (ocamlformat (and (>= 0.27.0):dev)))
  (allow_empty))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
