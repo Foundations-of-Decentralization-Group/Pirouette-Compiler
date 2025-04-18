@@ -56,11 +56,11 @@ Tests are added by placing <testcase>.pir and <testcase>.ans files in test/test_
 
 ## Contribute
 
-Install dependencies:
+- Install dependencies:
 
-```sh
-opam install . --deps-only --with-test --with-dev-setup
-```
+  ```sh
+  opam install . --deps-only --with-test --with-dev-setup
+  ```
 
 - [Git Guides](https://github.com/git-guides)
 
