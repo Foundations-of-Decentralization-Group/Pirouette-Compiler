@@ -61,13 +61,13 @@ let emit_toplevel_mpi
              ~rhs:[%expr failwith "Runtime Error: Unknown rank"]
          ])
   in
+  let loc_cases =
+    List.mapi
+      (fun i loc_id ->
+         Builder.case ~guard:None ~lhs:(Builder.pstring loc_id) ~rhs:(Builder.eint i))
+      loc_ids
+  in
   let loc_to_rank_fun =
-    let loc_cases =
-      List.mapi
-        (fun i loc_id ->
-           Builder.case ~guard:None ~lhs:(Builder.pstring loc_id) ~rhs:(Builder.eint i))
-        loc_ids
-    in
     Builder.pexp_function_cases
       (loc_cases
        @ [ Builder.case
