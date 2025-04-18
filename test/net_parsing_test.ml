@@ -452,9 +452,182 @@ let precedence_tests = "Operator Precedence Tests" >::: [
                        Local.M.Val(Local.M.Int(4, _), _), _), _), _), _)] -> ()
     | _ -> assert_failure "Failed to parse comparison operations with correct precedence"
   );
+
+  "test_parse_arithmetic_expression" >:: (fun _ ->
+    let result = parse_net_string "x := ret (1 + 2 * 3 - 4 / 2);" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)],
+        Net.M.Ret(
+          Local.M.BinOp(
+            Local.M.BinOp(
+              Local.M.Val(Local.M.Int(1, _), _),
+              Local.M.Plus _,
+              Local.M.BinOp(
+                Local.M.Val(Local.M.Int(2, _), _),
+                Local.M.Times _,
+                Local.M.Val(Local.M.Int(3, _), _), _), _),
+            Local.M.Minus _,
+            Local.M.BinOp(
+              Local.M.Val(Local.M.Int(4, _), _),
+              Local.M.Div _,
+              Local.M.Val(Local.M.Int(2, _), _), _), _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse arithmetic expression"
+  );
 ]
 
+(* Boolean Literal Tests *)
+let boolean_literal_tests = "Boolean Literal Tests" >::: [
+  "test_parse_ret_true" >:: (fun _ ->
+    let result = parse_net_string "x := ret true;" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)],
+                    Net.M.Ret(Local.M.Val(Local.M.Bool(true, _), _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse ret true"
+  );
 
+  "test_parse_ret_false" >:: (fun _ ->
+    let result = parse_net_string "x := ret false;" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)],
+                    Net.M.Ret(Local.M.Val(Local.M.Bool(false, _), _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse ret false"
+  );
+]
+
+let additional_token_tests = "Additional Token Tests" >::: [
+  (* Boolean AND operator *)
+  "test_parse_and_expression" >:: (fun _ ->
+    let result = parse_net_string "x := ret (true && false);" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)],
+        Net.M.Ret(
+          Local.M.BinOp(
+            Local.M.Val(Local.M.Bool(true, _), _),
+            Local.M.And _,
+            Local.M.Val(Local.M.Bool(false, _), _), _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse boolean AND expression"
+  );
+
+  (* Boolean OR operator *)
+  "test_parse_or_expression" >:: (fun _ ->
+    let result = parse_net_string "x := ret (true || false);" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)],
+        Net.M.Ret(
+          Local.M.BinOp(
+            Local.M.Val(Local.M.Bool(true, _), _),
+            Local.M.Or _,
+            Local.M.Val(Local.M.Bool(false, _), _), _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse boolean OR expression"
+  );
+
+  (* NOT operator (must be inside ret) *)
+  "test_parse_not_expression" >:: (fun _ ->
+    let result = parse_net_string "x := ret (not false);" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)],
+        Net.M.Ret(
+          Local.M.UnOp(Local.M.Not _, Local.M.Val(Local.M.Bool(false, _), _), _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse not expression"
+  );
+
+  (* String type declaration *)
+  "test_parse_string_type_declaration" >:: (fun _ ->
+    let result = parse_net_string "x : client.string;" in
+    match result with
+    | [Net.M.Decl(Local.M.Var(Local.M.VarId("x", _), _), Net.M.TLoc(Local.M.TString _, _), _)] -> ()
+    | _ -> assert_failure "Failed to parse string type declaration"
+  );
+
+  (* Bool type declaration *)
+  "test_parse_bool_type_declaration" >:: (fun _ ->
+    let result = parse_net_string "x : client.bool;" in
+    match result with
+    | [Net.M.Decl(Local.M.Var(Local.M.VarId("x", _), _), Net.M.TLoc(Local.M.TBool _, _), _)] -> ()
+    | _ -> assert_failure "Failed to parse bool type declaration"
+  );
+
+  (* String literal assignment *)
+  "test_parse_string_literal_assignment" >:: (fun _ ->
+    let result = parse_net_string "x := ret \"hello world\";" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)],
+        Net.M.Ret(Local.M.Val(Local.M.String("hello world", _), _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse string literal assignment"
+  );
+
+  "test_parse_eq_expression" >:: (fun _ ->
+    let result = parse_net_string "x := ret (1 = 2);" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)],
+        Net.M.Ret(
+          Local.M.BinOp(
+            Local.M.Val(Local.M.Int(1, _), _),
+            Local.M.Eq _,
+            Local.M.Val(Local.M.Int(2, _), _), _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse EQ expression"
+  );
+
+  "test_parse_neq_expression" >:: (fun _ ->
+    let result = parse_net_string "x := ret (1 != 2);" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)],
+        Net.M.Ret(
+          Local.M.BinOp(
+            Local.M.Val(Local.M.Int(1, _), _),
+            Local.M.Neq _,
+            Local.M.Val(Local.M.Int(2, _), _), _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse NEQ expression"
+  );
+
+  "test_parse_lt_expression" >:: (fun _ ->
+    let result = parse_net_string "x := ret (1 < 2);" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)],
+        Net.M.Ret(
+          Local.M.BinOp(
+            Local.M.Val(Local.M.Int(1, _), _),
+            Local.M.Lt _,
+            Local.M.Val(Local.M.Int(2, _), _), _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse LT expression"
+  );
+
+  "test_parse_leq_expression" >:: (fun _ ->
+    let result = parse_net_string "x := ret (1 <= 2);" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)],
+        Net.M.Ret(
+          Local.M.BinOp(
+            Local.M.Val(Local.M.Int(1, _), _),
+            Local.M.Leq _,
+            Local.M.Val(Local.M.Int(2, _), _), _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse LEQ expression"
+  );
+
+  "test_parse_gt_expression" >:: (fun _ ->
+    let result = parse_net_string "x := ret (1 > 2);" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)],
+        Net.M.Ret(
+          Local.M.BinOp(
+            Local.M.Val(Local.M.Int(1, _), _),
+            Local.M.Gt _,
+            Local.M.Val(Local.M.Int(2, _), _), _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse GT expression"
+  );
+
+  "test_parse_geq_expression" >:: (fun _ ->
+    let result = parse_net_string "x := ret (1 >= 2);" in
+    match result with
+    | [Net.M.Assign([Local.M.Var(Local.M.VarId("x", _), _)],
+        Net.M.Ret(
+          Local.M.BinOp(
+            Local.M.Val(Local.M.Int(1, _), _),
+            Local.M.Geq _,
+            Local.M.Val(Local.M.Int(2, _), _), _), _), _)] -> ()
+    | _ -> assert_failure "Failed to parse GEQ expression"
+  );
+]
 
 (* Register the tests *)
 let () =
@@ -469,5 +642,7 @@ let () =
       net_expr_tests;
       parser_error_tests;
       precedence_tests;
+      boolean_literal_tests;
+      additional_token_tests;
     ]
   )

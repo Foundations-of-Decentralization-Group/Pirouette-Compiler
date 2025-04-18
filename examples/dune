@@ -1,0 +1,4 @@
+(executables
+ (names ex1_R ex1_S)
+ (libraries http_pirc cohttp-lwt-unix lwt unix)
+ (modules ex1_R ex1_S))
