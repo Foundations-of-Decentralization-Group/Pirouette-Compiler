@@ -41,10 +41,10 @@ let rec pprint_local_pattern ppf (pat : 'a Local.pattern) =
       ppf
       "@[<h>%a@]"
       (fun ppf (v : 'a Local.value) ->
-        match v with
-        | Int (i, _) -> fprintf ppf "%d" i
-        | String (s, _) -> fprintf ppf "%s" s
-        | Bool (b, _) -> fprintf ppf "%b" b)
+         match v with
+         | Int (i, _) -> fprintf ppf "%d" i
+         | String (s, _) -> fprintf ppf "%s" s
+         | Bool (b, _) -> fprintf ppf "%b" b)
       v
   | Var (VarId (id, _), _) -> fprintf ppf "@[<h>%s@]" id
   | Pair (p1, p2, _) ->
@@ -76,10 +76,10 @@ let rec pprint_local_expr ppf (expr : 'a Local.expr) =
       ppf
       "@[<h>%a@]"
       (fun ppf (v : 'a Local.value) ->
-        match v with
-        | Int (i, _) -> fprintf ppf "%d" i
-        | String (s, _) -> fprintf ppf "\"%s\"" s
-        | Bool (b, _) -> fprintf ppf "%b" b)
+         match v with
+         | Int (i, _) -> fprintf ppf "%d" i
+         | String (s, _) -> fprintf ppf "\"%s\"" s
+         | Bool (b, _) -> fprintf ppf "%b" b)
       v
   | Var (VarId (id, _), _) -> fprintf ppf "@[<h>%s@]" id
   | UnOp (op, e, _) ->
