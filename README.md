@@ -32,20 +32,22 @@ E.g.:
 
 ```sh
 cd examples
-dune exec pirc -- -ast-dump json 1.pir
-pirc -ast-dump json 2.pir
+dune exec pirc -- -ast-dump json ex1.pir
+pirc -ast-dump json ex2.pir
 ```
 
 Then `pirc` will parse the file and dump the ASTs to the current directory (in pretty-printed format by default).
 
 ## Options
 
-- `-ast-dump <pprint|json>`: Dump the AST in pretty-printed or JSON format.
+- `-ast-dump <pprint|json>`: Dump the AST in pretty-printed (*default*) or JSON format.
+
+- `-msg-backend <domain|mpi>`: Specify the backend for parallel execution. `domain` (*default*) for [Domain(thread)-based parallelism](https://ocaml.org/manual/parallelism.html), `mpi` uses the Message Passing Interface, often across multiple machines.
 
 - use `-` to read the source code from `stdin`. E.g.:
 
 ```sh
-cat examples/1.pir | dune exec pirc -- -
+cat examples/ex1.pir | dune exec pirc -- -
 ```
 
 ## Pipeline Testing
@@ -53,6 +55,12 @@ cat examples/1.pir | dune exec pirc -- -
 Tests are added by placing <testcase>.pir and <testcase>.ans files in test/test_src, then running `dune test` in the root directory. The test runner will compile the `.pir` file, run the compiled program, and compare the output to the `.ans` file. If the output matches the `.ans` file, the test passes.
 
 ## Contribute
+
+Install dependencies:
+
+```sh
+opam install . --deps-only --with-test --with-dev-setup
+```
 
 - [Git Guides](https://github.com/git-guides)
 
@@ -69,7 +77,7 @@ Tests are added by placing <testcase>.pir and <testcase>.ans files in test/test_
 - You can enable repo-wide githooks to make sure your code is formatted and can build
 
     ```sh
-    chmod +x .githooks/pre-push
+    chmod +x .githooks/pre-commit
     ```
 
     ```sh
