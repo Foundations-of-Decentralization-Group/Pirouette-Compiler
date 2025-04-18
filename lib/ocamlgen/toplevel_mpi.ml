@@ -12,20 +12,12 @@ module Msg_mpi_intf : Msg_intf.M = struct
   let emit_net_send ~src ~dst pexp =
     ignore src;
     [%expr
-      Mpi.send
-        [%e pexp]
-        (loc_to_rank [%e Builder.estring dst])
-        Mpi.any_tag
-        Mpi.comm_world]
+      Mpi.send [%e pexp] (loc_to_rank [%e Builder.estring dst]) Mpi.any_tag Mpi.comm_world]
   ;;
 
   let emit_net_recv ~src ~dst =
     ignore dst;
-    [%expr
-      Mpi.receive
-        (loc_to_rank [%e Builder.estring src])
-        Mpi.any_tag
-        Mpi.comm_world]
+    [%expr Mpi.receive (loc_to_rank [%e Builder.estring src]) Mpi.any_tag Mpi.comm_world]
   ;;
 end
 
@@ -76,7 +68,7 @@ let emit_toplevel_mpi
            Builder.case ~guard:None ~lhs:(Builder.pstring loc_id) ~rhs:(Builder.eint i))
         loc_ids
     in
-    Builder.pexp_function
+    Builder.pexp_function_cases
       (loc_cases
        @ [ Builder.case
              ~guard:None
