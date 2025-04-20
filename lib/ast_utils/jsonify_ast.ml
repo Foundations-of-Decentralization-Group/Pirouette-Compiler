@@ -96,10 +96,10 @@ let rec jsonify_local_expr = function
               , `List
                   (List.map
                      (fun (p, e) ->
-                       `Assoc
-                         [ "local_patt", jsonify_local_pattern p
-                         ; "local_expr", jsonify_local_expr e
-                         ])
+                        `Assoc
+                          [ "local_patt", jsonify_local_pattern p
+                          ; "local_expr", jsonify_local_expr e
+                          ])
                      cases) )
             ] )
       ]
@@ -302,7 +302,7 @@ and jsonify_net_expr = function
               , `List
                   (List.map
                      (fun (Local.LabelId (label, _), e) ->
-                       `Assoc [ "label", `String label; "net_expr", jsonify_net_expr e ])
+                        `Assoc [ "label", `String label; "net_expr", jsonify_net_expr e ])
                      choices) )
             ] )
       ]

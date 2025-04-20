@@ -30,16 +30,18 @@ val jsonify_local_expr
 val jsonify_choreo_type
   :  'a Ast_core.Choreo.M.typ
   -> ([> `Assoc of
-         (string
-         * [> `Assoc of
-              (string
-              * ([> `Assoc of (string * [> `List of 'c list ]) list | `String of string ]
-                 as
-                 'c))
-                list
-           | `List of 'b list
-           ])
-           list
+           (string
+           * [> `Assoc of
+                  (string
+                  * ([> `Assoc of (string * [> `List of 'c list ]) list
+                     | `String of string
+                     ]
+                     as
+                     'c))
+                    list
+             | `List of 'b list
+             ])
+             list
       | `String of string
       ]
       as
@@ -81,28 +83,28 @@ val jsonify_choreo_expr
 val jsonify_choreo_stmt_block
   :  'a Ast_core.Choreo.M.stmt_block
   -> [> `List of
-        ([> `Assoc of (string * 'b) list
-         | `Bool of bool
-         | `Int of int
-         | `List of 'b list
-         | `String of string
-         ]
-         as
-         'b)
-          list
+          ([> `Assoc of (string * 'b) list
+           | `Bool of bool
+           | `Int of int
+           | `List of 'b list
+           | `String of string
+           ]
+           as
+           'b)
+            list
      ]
 
 val jsonify_net_type
   :  'a Ast_core.Net.M.typ
   -> ([> `Assoc of
-         (string
-         * ([> `Assoc of (string * [> `List of 'c list ]) list
-            | `List of 'b list
-            | `String of string
-            ]
-            as
-            'c))
-           list
+           (string
+           * ([> `Assoc of (string * [> `List of 'c list ]) list
+              | `List of 'b list
+              | `String of string
+              ]
+              as
+              'c))
+             list
       | `String of string
       ]
       as
@@ -133,13 +135,13 @@ val jsonify_net_expr
 val jsonify_net_stmt_block
   :  'a Ast_core.Net.M.stmt_block
   -> [> `List of
-        ([> `Assoc of (string * 'b) list
-         | `Bool of bool
-         | `Int of int
-         | `List of 'b list
-         | `String of string
-         ]
-         as
-         'b)
-          list
+          ([> `Assoc of (string * 'b) list
+           | `Bool of bool
+           | `Int of int
+           | `List of 'b list
+           | `String of string
+           ]
+           as
+           'b)
+            list
      ]
