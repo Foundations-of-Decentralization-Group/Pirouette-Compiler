@@ -47,7 +47,7 @@ let emit_toplevel_domain
       loc_ids
       net_stmtblocks
   in
-  let rec emit_domain_join_seq : label list -> expression = function
+  let rec emit_domain_join_seq : string list -> expression = function
     | [] -> assert false
     | [ loc_id ] -> [%expr Domain.join [%e Builder.evar (spf "domain_%s" loc_id)]]
     | loc_id :: loc_ids ->

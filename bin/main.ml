@@ -1,6 +1,7 @@
-let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json>]"
+let spf = Printf.sprintf
+let usage_msg = "USAGE: pirc [options] <file>"
 let ast_dump_format = ref "pprint"
-let msg_backend = ref ""
+let msg_backend = ref "domain"
 let file_ic = ref None
 let basename = ref ""
 
@@ -13,10 +14,10 @@ let speclist =
   [ "-", Arg.Unit (fun () -> file_ic := Some stdin), "Read source from stdin"
   ; ( "-ast-dump"
     , Arg.Symbol ([ "pprint"; "json" ], fun s -> ast_dump_format := s)
-    , "Dump the AST in the specified format (pprint, json)" )
+    , "Dump the AST in the specified format" )
   ; ( "-msg-backend"
     , Arg.Symbol ([ "domain"; "mpi" ], fun s -> msg_backend := s)
-    , "Specify the backend for parallel execution (domain, mpi)" )
+    , "Specify the backend for parallel execution" )
   ]
 ;;
 
@@ -24,13 +25,13 @@ let () =
   Arg.parse speclist anon_fun usage_msg;
   if !file_ic = None
   then (
-    prerr_endline (Sys.argv.(0) ^ ": No input file");
+    prerr_endline (Sys.argv.(0) ^ ": no input file");
     exit 1);
   let lexbuf = Lexing.from_channel (Option.get !file_ic) in
   let program = Parsing.Parse.parse_with_error lexbuf in
   (match !ast_dump_format with
-   | "json" -> Ast_utils.jsonify_choreo_ast (open_out (!basename ^ ".json")) program
-   | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (!basename ^ ".ast")) program
+   | "json" -> Ast_utils.jsonify_choreo_ast (open_out (spf "%s.json" !basename)) program
+   | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (spf "%s.ast" !basename)) program
    | _ -> invalid_arg "Invalid ast-dump format");
   let locs = Ast_utils.extract_locs program in
   let net_stmtblocks = List.map (fun loc -> Netgen.epp_choreo_to_net program loc) locs in
@@ -38,21 +39,21 @@ let () =
     (fun loc stmtblock ->
        match !ast_dump_format with
        | "json" ->
-         Ast_utils.jsonify_net_ast (open_out (!basename ^ "." ^ loc ^ ".json")) stmtblock
+         Ast_utils.jsonify_net_ast (open_out (spf "%s.%s.json" !basename loc)) stmtblock
        | "pprint" ->
-         Ast_utils.pprint_net_ast (open_out (!basename ^ "." ^ loc ^ ".ast")) stmtblock
+         Ast_utils.pprint_net_ast (open_out (spf "%s.%s.ast" !basename loc)) stmtblock
        | _ -> invalid_arg "Invalid ast-dump format")
     locs
     net_stmtblocks;
   match !msg_backend with
   | "domain" ->
     Ocamlgen.Toplevel_domain.emit_toplevel_domain
-      (open_out (!basename ^ ".ml"))
+      (open_out (spf "%s.domain.ml" !basename))
       locs
       net_stmtblocks
   | "mpi" ->
     Ocamlgen.Toplevel_mpi.emit_toplevel_mpi
-      (open_out (!basename ^ ".ml"))
+      (open_out (spf "%s.mpi.ml" !basename))
       locs
       net_stmtblocks
   | _ -> invalid_arg "Invalid backend"

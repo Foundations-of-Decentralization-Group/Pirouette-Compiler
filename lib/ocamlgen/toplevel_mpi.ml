@@ -11,8 +11,7 @@ let loc = Builder.loc
 module Msg_mpi_intf : Msg_intf.M = struct
   let emit_net_send ~src ~dst pexp =
     ignore src;
-    [%expr
-      Mpi.send [%e pexp] (loc_to_rank [%e Builder.estring dst]) Mpi.any_tag Mpi.comm_world]
+    [%expr Mpi.send [%e pexp] (loc_to_rank [%e Builder.estring dst]) 0 Mpi.comm_world]
   ;;
 
   let emit_net_recv ~src ~dst =
@@ -61,13 +60,13 @@ let emit_toplevel_mpi
              ~rhs:[%expr failwith "Runtime Error: Unknown rank"]
          ])
   in
+  let loc_cases =
+    List.mapi
+      (fun i loc_id ->
+         Builder.case ~guard:None ~lhs:(Builder.pstring loc_id) ~rhs:(Builder.eint i))
+      loc_ids
+  in
   let loc_to_rank_fun =
-    let loc_cases =
-      List.mapi
-        (fun i loc_id ->
-           Builder.case ~guard:None ~lhs:(Builder.pstring loc_id) ~rhs:(Builder.eint i))
-        loc_ids
-    in
     Builder.pexp_function_cases
       (loc_cases
        @ [ Builder.case
