@@ -11,8 +11,7 @@ let loc = Builder.loc
 module Msg_mpi_intf : Msg_intf.M = struct
   let emit_net_send ~src ~dst pexp =
     ignore src;
-    [%expr
-      Mpi.send [%e pexp] (loc_to_rank [%e Builder.estring dst]) 0 Mpi.comm_world]
+    [%expr Mpi.send [%e pexp] (loc_to_rank [%e Builder.estring dst]) 0 Mpi.comm_world]
   ;;
 
   let emit_net_recv ~src ~dst =
