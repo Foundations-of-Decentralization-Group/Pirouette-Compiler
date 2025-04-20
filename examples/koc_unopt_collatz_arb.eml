@@ -1,0 +1,401 @@
+let chan_A_B = Domainslib.Chan.make_bounded 0
+and chan_A_C = Domainslib.Chan.make_bounded 0
+and chan_A_D = Domainslib.Chan.make_bounded 0
+and chan_A_E = Domainslib.Chan.make_bounded 0
+and chan_A_F = Domainslib.Chan.make_bounded 0
+and chan_A_G = Domainslib.Chan.make_bounded 0
+and chan_B_A = Domainslib.Chan.make_bounded 0
+and chan_B_C = Domainslib.Chan.make_bounded 0
+and chan_B_D = Domainslib.Chan.make_bounded 0
+and chan_B_E = Domainslib.Chan.make_bounded 0
+and chan_B_F = Domainslib.Chan.make_bounded 0
+and chan_B_G = Domainslib.Chan.make_bounded 0
+and chan_C_A = Domainslib.Chan.make_bounded 0
+and chan_C_B = Domainslib.Chan.make_bounded 0
+and chan_C_D = Domainslib.Chan.make_bounded 0
+and chan_C_E = Domainslib.Chan.make_bounded 0
+and chan_C_F = Domainslib.Chan.make_bounded 0
+and chan_C_G = Domainslib.Chan.make_bounded 0
+and chan_D_A = Domainslib.Chan.make_bounded 0
+and chan_D_B = Domainslib.Chan.make_bounded 0
+and chan_D_C = Domainslib.Chan.make_bounded 0
+and chan_D_E = Domainslib.Chan.make_bounded 0
+and chan_D_F = Domainslib.Chan.make_bounded 0
+and chan_D_G = Domainslib.Chan.make_bounded 0
+and chan_E_A = Domainslib.Chan.make_bounded 0
+and chan_E_B = Domainslib.Chan.make_bounded 0
+and chan_E_C = Domainslib.Chan.make_bounded 0
+and chan_E_D = Domainslib.Chan.make_bounded 0
+and chan_E_F = Domainslib.Chan.make_bounded 0
+and chan_E_G = Domainslib.Chan.make_bounded 0
+and chan_F_A = Domainslib.Chan.make_bounded 0
+and chan_F_B = Domainslib.Chan.make_bounded 0
+and chan_F_C = Domainslib.Chan.make_bounded 0
+and chan_F_D = Domainslib.Chan.make_bounded 0
+and chan_F_E = Domainslib.Chan.make_bounded 0
+and chan_F_G = Domainslib.Chan.make_bounded 0
+and chan_G_A = Domainslib.Chan.make_bounded 0
+and chan_G_B = Domainslib.Chan.make_bounded 0
+and chan_G_C = Domainslib.Chan.make_bounded 0
+and chan_G_D = Domainslib.Chan.make_bounded 0
+and chan_G_E = Domainslib.Chan.make_bounded 0
+and chan_G_F = Domainslib.Chan.make_bounded 0 in
+let domain_A =
+  Domain.spawn (fun _ ->
+    let rec _unit_1 = () in
+    let rec _unit_2 = () in
+    let rec _unit_3 = () in
+    let rec _unit_4 = () in
+    let rec _unit_5 = () in
+    let rec _unit_6 = () in
+    let t = Unix.gettimeofday () in
+    let rec broadcast_opt freq =
+      if freq > 0
+      then (
+        Domainslib.Chan.send chan_A_B "L1";
+        Domainslib.Chan.send chan_A_C "L2";
+        Domainslib.Chan.send chan_A_D "L3";
+        Domainslib.Chan.send chan_A_E "L4";
+        Domainslib.Chan.send chan_A_F "L5";
+        Domainslib.Chan.send chan_A_G "L6";
+        let rec _unit_12 = () in
+        let rec reply_B = Marshal.from_string (Domainslib.Chan.recv chan_B_A) 0 in
+        (* let () = Printf.printf "This is the result from B %s\n" (Z.to_string reply_B) in *)
+        let rec _unit_11 = () in
+        let rec reply_C = Marshal.from_string (Domainslib.Chan.recv chan_C_A) 0 in
+        (* let () = Printf.printf "This is the result from C %s\n" (Z.to_string reply_C) in *)
+        let rec _unit_10 = () in
+        let rec reply_D = Marshal.from_string (Domainslib.Chan.recv chan_D_A) 0 in
+        (* let () = Printf.printf "This is the result from D %s\n" (Z.to_string reply_D) in *)
+        let rec _unit_9 = () in
+        let rec reply_E = Marshal.from_string (Domainslib.Chan.recv chan_E_A) 0 in
+        (* let () = Printf.printf "This is the result from E %s\n" (Z.to_string reply_E) in *)
+        let rec _unit_8 = () in
+        let rec reply_F = Marshal.from_string (Domainslib.Chan.recv chan_F_A) 0 in
+        (* let () = Printf.printf "This is the result from F %s\n" (Z.to_string reply_C) in *)
+        let rec _unit_7 = () in
+        let rec reply_G = Marshal.from_string (Domainslib.Chan.recv chan_G_A) 0 in
+        (* let () = Printf.printf "This is the result from G %s\n" (Z.to_string reply_C) in *)
+        (* let () = Printf.printf "Loop execution time %fs\n" (Unix.gettimeofday() -. t) in *)
+        broadcast_opt (freq - 1))
+      else (
+        Domainslib.Chan.send chan_A_B "R1";
+        Domainslib.Chan.send chan_A_C "R2";
+        Domainslib.Chan.send chan_A_D "R3";
+        Domainslib.Chan.send chan_A_E "R4";
+        Domainslib.Chan.send chan_A_F "R5";
+        Domainslib.Chan.send chan_A_G "R6";
+        let t1 = Unix.gettimeofday () in
+        print_endline "Done with all the computations";
+        Printf.printf "Loop execution time %fs\n" (t1 -. t))
+    in
+    broadcast_opt 1000)
+(* and let () = Printf.printf "Loop execution time %fs\n" (Unix.gettimeofday() -. t) *)
+and domain_B =
+  Domain.spawn (fun _ ->
+    let rec test_collatz inp : Z.t =
+      if Z.equal inp Z.one
+      then Z.zero
+      else (
+        let rec res1 = Z.div inp (Z.of_int 2) in
+        let rec res2 = Z.mul res1 (Z.of_int 2) in
+        if Z.equal inp res2
+        then (
+          let rec part_res = test_collatz res1 in
+          Z.add part_res Z.one)
+        else (
+          let rec res3_1 = Z.mul inp (Z.of_int 3) in
+          let rec res3 = Z.add res3_1 Z.one in
+          let rec res4 = test_collatz res3 in
+          Z.add Z.one res4))
+    in
+    let rec _unit_13 = () in
+    let rec _unit_14 = () in
+    let rec _unit_15 = () in
+    let rec _unit_16 = () in
+    let rec _unit_17 = () in
+    let rec broadcast_opt freq =
+      match Domainslib.Chan.recv chan_A_B with
+      | "L1" ->
+        let rec result =
+          test_collatz
+            (Z.of_string
+               "94732572450997603775556936847938035540528090394916071460746082960854060587346733467063319153546453597289611352942163411272698324573616918250750755380282081463501762932175145385091248564928107792285266565921141993863517887475780158488747284896216575520451855533766637327467123751134453958128697637476055247680792995308454507563880302539802325183922435497051044340900998097933191235731523414795003400845277107381229514153564994781664181719384688247711296857444486724229868780132281902328026793023569279")
+        in
+        let rec _unit_29 =
+          let val_28 = result in
+          Domainslib.Chan.send chan_B_A (Marshal.to_string val_28 [])
+        in
+        let rec _unit_27 = () in
+        let rec _unit_26 = () in
+        let rec _unit_25 = () in
+        let rec _unit_24 = () in
+        let rec _unit_23 = () in
+        let rec _unit_22 = () in
+        let rec _unit_21 = () in
+        let rec _unit_20 = () in
+        let rec _unit_19 = () in
+        let rec _unit_18 = () in
+        broadcast_opt ()
+      | "R1" -> ()
+      | _ -> failwith "Error: Unmatched label"
+    in
+    broadcast_opt ())
+and domain_C =
+  Domain.spawn (fun _ ->
+    let rec _unit_30 = () in
+    let rec test_collatz inp : Z.t =
+      if Z.equal inp Z.one
+      then Z.zero
+      else (
+        let rec res1 = Z.div inp (Z.of_int 2) in
+        let rec res2 = Z.mul res1 (Z.of_int 2) in
+        if Z.equal inp res2
+        then (
+          let rec part_res = test_collatz res1 in
+          Z.add part_res Z.one)
+        else (
+          let rec res3_1 = Z.mul inp (Z.of_int 3) in
+          let rec res3 = Z.add res3_1 Z.one in
+          let rec res4 = test_collatz res3 in
+          Z.add Z.one res4))
+    in
+    let rec _unit_31 = () in
+    let rec _unit_32 = () in
+    let rec _unit_33 = () in
+    let rec _unit_34 = () in
+    let rec broadcast_opt freq =
+      match Domainslib.Chan.recv chan_A_C with
+      | "R2" -> ()
+      | "L2" ->
+        let rec _unit_46 = () in
+        let rec _unit_45 = () in
+        let rec result =
+          test_collatz
+            (Z.of_string
+               "94732572450997603775556936847938035540528090394916071460746082960854060587346733467063319153546453597289611352942163411272698324573616918250750755380282081463501762932175145385091248564928107792285266565921141993863517887475780158488747284896216575520451855533766637327467123751134453958128697637476055247680792995308454507563880302539802325183922435497051044340900998097933191235731523414795003400845277107381229514153564994781664181719384688247711296857444486724229868780132281902328026793023569279")
+        in
+        let rec _unit_44 =
+          let val_43 = result in
+          Domainslib.Chan.send chan_C_A (Marshal.to_string val_43 [])
+        in
+        let rec _unit_42 = () in
+        let rec _unit_41 = () in
+        let rec _unit_40 = () in
+        let rec _unit_39 = () in
+        let rec _unit_38 = () in
+        let rec _unit_37 = () in
+        let rec _unit_36 = () in
+        let rec _unit_35 = () in
+        broadcast_opt ()
+      | _ -> failwith "Error: Unmatched label"
+    in
+    broadcast_opt ())
+and domain_D =
+  Domain.spawn (fun _ ->
+    let rec _unit_47 = () in
+    let rec _unit_48 = () in
+    let rec test_collatz inp : Z.t =
+      if Z.equal inp Z.one
+      then Z.zero
+      else (
+        let rec res1 = Z.div inp (Z.of_int 2) in
+        let rec res2 = Z.mul res1 (Z.of_int 2) in
+        if Z.equal inp res2
+        then (
+          let rec part_res = test_collatz res1 in
+          Z.add part_res Z.one)
+        else (
+          let rec res3_1 = Z.mul inp (Z.of_int 3) in
+          let rec res3 = Z.add res3_1 Z.one in
+          let rec res4 = test_collatz res3 in
+          Z.add Z.one res4))
+    in
+    let rec _unit_49 = () in
+    let rec _unit_50 = () in
+    let rec _unit_51 = () in
+    let rec broadcast_opt freq =
+      match Domainslib.Chan.recv chan_A_D with
+      | "R3" -> ()
+      | "L3" ->
+        let rec _unit_63 = () in
+        let rec _unit_62 = () in
+        let rec _unit_61 = () in
+        let rec _unit_60 = () in
+        let rec result =
+          test_collatz
+            (Z.of_string
+               "94732572450997603775556936847938035540528090394916071460746082960854060587346733467063319153546453597289611352942163411272698324573616918250750755380282081463501762932175145385091248564928107792285266565921141993863517887475780158488747284896216575520451855533766637327467123751134453958128697637476055247680792995308454507563880302539802325183922435497051044340900998097933191235731523414795003400845277107381229514153564994781664181719384688247711296857444486724229868780132281902328026793023569279")
+        in
+        let rec _unit_59 =
+          let val_58 = result in
+          Domainslib.Chan.send chan_D_A (Marshal.to_string val_58 [])
+        in
+        let rec _unit_57 = () in
+        let rec _unit_56 = () in
+        let rec _unit_55 = () in
+        let rec _unit_54 = () in
+        let rec _unit_53 = () in
+        let rec _unit_52 = () in
+        broadcast_opt ()
+      | _ -> failwith "Error: Unmatched label"
+    in
+    broadcast_opt ())
+and domain_E =
+  Domain.spawn (fun _ ->
+    let rec _unit_64 = () in
+    let rec _unit_65 = () in
+    let rec _unit_66 = () in
+    let rec test_collatz inp : Z.t =
+      if Z.equal inp Z.one
+      then Z.zero
+      else (
+        let rec res1 = Z.div inp (Z.of_int 2) in
+        let rec res2 = Z.mul res1 (Z.of_int 2) in
+        if Z.equal inp res2
+        then (
+          let rec part_res = test_collatz res1 in
+          Z.add part_res Z.one)
+        else (
+          let rec res3_1 = Z.mul inp (Z.of_int 3) in
+          let rec res3 = Z.add res3_1 Z.one in
+          let rec res4 = test_collatz res3 in
+          Z.add Z.one res4))
+    in
+    let rec _unit_67 = () in
+    let rec _unit_68 = () in
+    let rec broadcast_opt freq =
+      match Domainslib.Chan.recv chan_A_E with
+      | "L4" ->
+        let rec _unit_80 = () in
+        let rec _unit_79 = () in
+        let rec _unit_78 = () in
+        let rec _unit_77 = () in
+        let rec _unit_76 = () in
+        let rec _unit_75 = () in
+        let rec result =
+          test_collatz
+            (Z.of_string
+               "94732572450997603775556936847938035540528090394916071460746082960854060587346733467063319153546453597289611352942163411272698324573616918250750755380282081463501762932175145385091248564928107792285266565921141993863517887475780158488747284896216575520451855533766637327467123751134453958128697637476055247680792995308454507563880302539802325183922435497051044340900998097933191235731523414795003400845277107381229514153564994781664181719384688247711296857444486724229868780132281902328026793023569279")
+        in
+        let rec _unit_74 =
+          let val_73 = result in
+          Domainslib.Chan.send chan_E_A (Marshal.to_string val_73 [])
+        in
+        let rec _unit_72 = () in
+        let rec _unit_71 = () in
+        let rec _unit_70 = () in
+        let rec _unit_69 = () in
+        broadcast_opt ()
+      | "R4" -> ()
+      | _ -> failwith "Error: Unmatched label"
+    in
+    broadcast_opt ())
+and domain_F =
+  Domain.spawn (fun _ ->
+    let rec _unit_81 = () in
+    let rec _unit_82 = () in
+    let rec _unit_83 = () in
+    let rec _unit_84 = () in
+    let rec test_collatz inp : Z.t =
+      if Z.equal inp Z.one
+      then Z.zero
+      else (
+        let rec res1 = Z.div inp (Z.of_int 2) in
+        let rec res2 = Z.mul res1 (Z.of_int 2) in
+        if Z.equal inp res2
+        then (
+          let rec part_res = test_collatz res1 in
+          Z.add part_res Z.one)
+        else (
+          let rec res3_1 = Z.mul inp (Z.of_int 3) in
+          let rec res3 = Z.add res3_1 Z.one in
+          let rec res4 = test_collatz res3 in
+          Z.add Z.one res4))
+    in
+    let rec _unit_85 = () in
+    let rec broadcast_opt freq =
+      match Domainslib.Chan.recv chan_A_F with
+      | "R5" -> ()
+      | "L5" ->
+        let rec _unit_97 = () in
+        let rec _unit_96 = () in
+        let rec _unit_95 = () in
+        let rec _unit_94 = () in
+        let rec _unit_93 = () in
+        let rec _unit_92 = () in
+        let rec _unit_91 = () in
+        let rec _unit_90 = () in
+        let rec result =
+          test_collatz
+            (Z.of_string
+               "94732572450997603775556936847938035540528090394916071460746082960854060587346733467063319153546453597289611352942163411272698324573616918250750755380282081463501762932175145385091248564928107792285266565921141993863517887475780158488747284896216575520451855533766637327467123751134453958128697637476055247680792995308454507563880302539802325183922435497051044340900998097933191235731523414795003400845277107381229514153564994781664181719384688247711296857444486724229868780132281902328026793023569279")
+        in
+        let rec _unit_89 =
+          let val_88 = result in
+          Domainslib.Chan.send chan_F_A (Marshal.to_string val_88 [])
+        in
+        let rec _unit_87 = () in
+        let rec _unit_86 = () in
+        broadcast_opt ()
+      | _ -> failwith "Error: Unmatched label"
+    in
+    broadcast_opt ())
+and domain_G =
+  Domain.spawn (fun _ ->
+    let rec _unit_98 = () in
+    let rec _unit_99 = () in
+    let rec _unit_100 = () in
+    let rec _unit_101 = () in
+    let rec _unit_102 = () in
+    let rec test_collatz inp : Z.t =
+      if Z.equal inp Z.one
+      then Z.zero
+      else (
+        let rec res1 = Z.div inp (Z.of_int 2) in
+        let rec res2 = Z.mul res1 (Z.of_int 2) in
+        if Z.equal inp res2
+        then (
+          let rec part_res = test_collatz res1 in
+          Z.add part_res Z.one)
+        else (
+          let rec res3_1 = Z.mul inp (Z.of_int 3) in
+          let rec res3 = Z.add res3_1 Z.one in
+          let rec res4 = test_collatz res3 in
+          Z.add Z.one res4))
+    in
+    let rec broadcast_opt freq =
+      match Domainslib.Chan.recv chan_A_G with
+      | "R6" -> ()
+      | "L6" ->
+        let rec _unit_114 = () in
+        let rec _unit_113 = () in
+        let rec _unit_112 = () in
+        let rec _unit_111 = () in
+        let rec _unit_110 = () in
+        let rec _unit_109 = () in
+        let rec _unit_108 = () in
+        let rec _unit_107 = () in
+        let rec _unit_106 = () in
+        let rec _unit_105 = () in
+        let rec result =
+          test_collatz
+            (Z.of_string
+               "94732572450997603775556936847938035540528090394916071460746082960854060587346733467063319153546453597289611352942163411272698324573616918250750755380282081463501762932175145385091248564928107792285266565921141993863517887475780158488747284896216575520451855533766637327467123751134453958128697637476055247680792995308454507563880302539802325183922435497051044340900998097933191235731523414795003400845277107381229514153564994781664181719384688247711296857444486724229868780132281902328026793023569279")
+        in
+        let rec _unit_104 =
+          let val_103 = result in
+          Domainslib.Chan.send chan_G_A (Marshal.to_string val_103 [])
+        in
+        broadcast_opt ()
+      | _ -> failwith "Error: Unmatched label"
+    in
+    broadcast_opt ())
+in
+Domain.join domain_A;
+Domain.join domain_B;
+Domain.join domain_C;
+Domain.join domain_D;
+Domain.join domain_E;
+Domain.join domain_F;
+Domain.join domain_G

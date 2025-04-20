@@ -207,7 +207,10 @@ and epp_choreo_expr (expr : 'a Choreo.expr) (loc : string) : 'a Net.expr =
     (match merge_net_expr (epp_choreo_expr e2 loc) (epp_choreo_expr e3 loc) with
      | Some e -> e
      | None ->
-       If (epp_choreo_expr e1 loc, epp_choreo_expr e2 loc, epp_choreo_expr e3 loc, _m))
+       let condition = epp_choreo_expr e1 loc in
+       (match condition with
+        | Unit _ -> Unit _m
+        | _ -> If (condition, epp_choreo_expr e2 loc, epp_choreo_expr e3 loc, _m)))
   | Match (match_e, cases, _) ->
     let merged_cases =
       match cases with

@@ -1,0 +1,76 @@
+let loc_to_rank =
+  function
+  | "A" -> 0
+  | "B" -> 1
+  | "C" -> 2
+  | "D" -> 3
+  | "E" -> 4
+  | "F" -> 5
+  | "G" -> 6
+  | _ -> failwith "Runtime Error: Unknown location"
+let _ = Mpi.barrier Mpi.comm_world
+let _ =
+  match Mpi.comm_rank Mpi.comm_world with
+  | 0 ->
+      let rec broadcast_opt freq =
+        if freq > 0
+        then
+          (Mpi.send "L1" (loc_to_rank "B") Mpi.any_tag Mpi.comm_world;
+           Mpi.send "L2" (loc_to_rank "C") Mpi.any_tag Mpi.comm_world;
+           Mpi.send "L3" (loc_to_rank "D") Mpi.any_tag Mpi.comm_world;
+           Mpi.send "L4" (loc_to_rank "E") Mpi.any_tag Mpi.comm_world;
+           Mpi.send "L5" (loc_to_rank "F") Mpi.any_tag Mpi.comm_world;
+           Mpi.send "L5" (loc_to_rank "G") Mpi.any_tag Mpi.comm_world;
+           broadcast_opt (freq - 1))
+        else
+          (Mpi.send "R1" (loc_to_rank "B") Mpi.any_tag Mpi.comm_world;
+           Mpi.send "R2" (loc_to_rank "C") Mpi.any_tag Mpi.comm_world;
+           Mpi.send "R3" (loc_to_rank "D") Mpi.any_tag Mpi.comm_world;
+           Mpi.send "R4" (loc_to_rank "E") Mpi.any_tag Mpi.comm_world;
+           Mpi.send "R5" (loc_to_rank "F") Mpi.any_tag Mpi.comm_world;
+           Mpi.send "R6" (loc_to_rank "G") Mpi.any_tag Mpi.comm_world;
+           ()) in
+      broadcast_opt 1000000
+  | 1 ->
+      let rec broadcast_opt freq =
+        match Mpi.receive (loc_to_rank "A") Mpi.any_tag Mpi.comm_world with
+        | "L1" -> let rec x = 10 in broadcast_opt ()
+        | "R1" -> let rec x = 9 in ()
+        | _ -> failwith "Runtime Error: Unmatched label" in
+      broadcast_opt ()
+  | 2 ->
+      let rec broadcast_opt freq =
+        match Mpi.receive (loc_to_rank "A") Mpi.any_tag Mpi.comm_world with
+        | "R2" -> let rec x = 9 in ()
+        | "L2" -> let rec x = 10 in broadcast_opt ()
+        | _ -> failwith "Runtime Error: Unmatched label" in
+      broadcast_opt ()
+  | 3 ->
+      let rec broadcast_opt freq =
+        match Mpi.receive (loc_to_rank "A") Mpi.any_tag Mpi.comm_world with
+        | "L3" -> let rec x = 10 in broadcast_opt ()
+        | "R3" -> let rec x = 9 in ()
+        | _ -> failwith "Runtime Error: Unmatched label" in
+      broadcast_opt ()
+  | 4 ->
+      let rec broadcast_opt freq =
+        match Mpi.receive (loc_to_rank "A") Mpi.any_tag Mpi.comm_world with
+        | "L4" -> let rec x = 10 in broadcast_opt ()
+        | "R4" -> let rec x = 9 in ()
+        | _ -> failwith "Runtime Error: Unmatched label" in
+      broadcast_opt ()
+  | 5 ->
+      let rec broadcast_opt freq =
+        match Mpi.receive (loc_to_rank "A") Mpi.any_tag Mpi.comm_world with
+        | "R5" -> let rec x = 9 in ()
+        | "L5" -> let rec x = 10 in broadcast_opt ()
+        | _ -> failwith "Runtime Error: Unmatched label" in
+      broadcast_opt ()
+  | 6 ->
+      let rec broadcast_opt freq =
+        match Mpi.receive (loc_to_rank "A") Mpi.any_tag Mpi.comm_world with
+        | "R6" -> let rec x = 9 in print_endline "Terminate"
+        | "L5" -> let rec x = 10 in broadcast_opt ()
+        | _ -> failwith "Runtime Error: Unmatched label" in
+      broadcast_opt ()
+  | _ -> failwith "Runtime Error: Unknown rank"

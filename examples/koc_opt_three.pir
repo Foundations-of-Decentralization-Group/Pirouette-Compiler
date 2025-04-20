@@ -1,0 +1,19 @@
+spread freq :=
+
+    if A.(freq > 0) then 
+		A[L1] ~> B;
+		B[L2] ~> C;
+
+
+		 	let B.x := B.10; in 
+			let C.x := C.10; in spread A.(freq - 1)
+
+	else	 
+		A[R1] ~> B;
+		B[R2] ~> C;
+
+
+			let B.x := B.11; in
+			let C.x := C.11; in C.print_endline C."Terminate";
+
+main := spread A.1000000;
