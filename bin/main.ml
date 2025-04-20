@@ -1,5 +1,6 @@
 let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json>]"
 let ast_dump_format = ref "pprint"
+let msg_backend = ref ""
 let file_ic = ref None
 let basename = ref ""
 
@@ -13,6 +14,9 @@ let speclist =
   ; ( "-ast-dump"
     , Arg.Symbol ([ "pprint"; "json" ], fun s -> ast_dump_format := s)
     , "Dump the AST in the specified format (pprint, json)" )
+  ; ( "-msg-backend"
+    , Arg.Symbol ([ "domain"; "mpi" ], fun s -> msg_backend := s)
+    , "Specify the backend for parallel execution (domain, mpi)" )
   ]
 ;;
 
@@ -29,20 +33,27 @@ let () =
    | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (!basename ^ ".ast")) program
    | _ -> invalid_arg "Invalid ast-dump format");
   let locs = Ast_utils.extract_locs program in
-  let netir_l = List.map (fun loc -> Netgen.epp_choreo_to_net program loc) locs in
+  let net_stmtblocks = List.map (fun loc -> Netgen.epp_choreo_to_net program loc) locs in
   List.iter2
-    (fun loc ir ->
-      match !ast_dump_format with
-      | "json" ->
-        Ast_utils.jsonify_net_ast (open_out (!basename ^ "." ^ loc ^ ".json")) ir
-      | "pprint" ->
-        Ast_utils.pprint_net_ast (open_out (!basename ^ "." ^ loc ^ ".ast")) ir
-      | _ -> invalid_arg "Invalid ast-dump format")
+    (fun loc stmtblock ->
+       match !ast_dump_format with
+       | "json" ->
+         Ast_utils.jsonify_net_ast (open_out (!basename ^ "." ^ loc ^ ".json")) stmtblock
+       | "pprint" ->
+         Ast_utils.pprint_net_ast (open_out (!basename ^ "." ^ loc ^ ".ast")) stmtblock
+       | _ -> invalid_arg "Invalid ast-dump format")
     locs
-    netir_l;
-  Codegen.Toplevel_shm.emit_toplevel_shm
-    (open_out (!basename ^ ".ml"))
-    (module Codegen.Msg_intf.Msg_chan_intf)
-    locs
-    netir_l
+    net_stmtblocks;
+  match !msg_backend with
+  | "domain" ->
+    Ocamlgen.Toplevel_domain.emit_toplevel_domain
+      (open_out (!basename ^ ".ml"))
+      locs
+      net_stmtblocks
+  | "mpi" ->
+    Ocamlgen.Toplevel_mpi.emit_toplevel_mpi
+      (open_out (!basename ^ ".ml"))
+      locs
+      net_stmtblocks
+  | _ -> invalid_arg "Invalid backend"
 ;;
