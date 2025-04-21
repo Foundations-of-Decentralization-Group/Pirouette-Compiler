@@ -11,5 +11,6 @@
 
 (library
  (name parsing)
- (private_modules  net_lexer lexer parser net_parser)
- (libraries ast_core))
+ (private_modules lexer parser)
+ (libraries ast_core)
+ (preprocess (pps bisect_ppx)))
