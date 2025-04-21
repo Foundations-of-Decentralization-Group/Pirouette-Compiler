@@ -314,7 +314,7 @@ and pprint_net_stmt ppf (stmt : 'a Net.stmt) =
 
 and pprint_net_expr ppf (expr : 'a Net.expr) =
   match expr with
-  | Unit _ -> fprintf ppf "@[<h>()@]"
+  | Unit _ -> fprintf ppf "@[<h>unit@]"
   | Var (VarId (id, _), _) -> fprintf ppf "@[<h>%s@]" id
   | Ret (e, _) -> fprintf ppf "@[<hv2>ret %a@]" pprint_local_expr e
   | Fst (e, _) -> fprintf ppf "@[<hv2>fst %a@]" pprint_net_expr e
