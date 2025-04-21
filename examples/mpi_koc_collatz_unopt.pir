@@ -101,22 +101,22 @@ broadcast_opt freq :=
     A[L5] ~> F;
     A[L6] ~> G;
 
-        let B.result  := B.test_collatz B.100000000; in 
+        let B.result  := B.test_collatz B.931386509544713451; in 
         let A.reply_B := [B] B.result ~> A; in
 
-        let C.result  := C.test_collatz C.100000000; in
+        let C.result  := C.test_collatz C.931386509544713451; in
         let A.reply_C := [C] C.result ~> A; in 
 
-        let D.result  := D.test_collatz D.100000000; in
+        let D.result  := D.test_collatz D.931386509544713451; in
         let A.reply_D := [D] D.result ~> A; in 
 
-        let E.result  := E.test_collatz E.100000000; in 
+        let E.result  := E.test_collatz E.931386509544713451; in 
         let A.reply_E := [E] E.result ~> A; in 
 
-        let F.result  := F.test_collatz F.100000000; in 
+        let F.result  := F.test_collatz F.931386509544713451; in 
         let A.reply_F := [F] F.result ~> A; in 
 
-        let G.result  := G.test_collatz G.100000000; in 
+        let G.result  := G.test_collatz G.931386509544713451; in 
         let A.reply_G := [G] G.result ~> A; in 
 
         broadcast_opt A.(freq - 1)
