@@ -21,19 +21,29 @@ let parse_net_with_error lexbuf =
     failwith (spf "Syntax error at %s: %s" (string_of_pos lexbuf.lex_start_p) msg)
   | Net_parser.Error -> 
     let token = Lexing.lexeme lexbuf in
-    let pos = string_of_pos lexbuf.lex_start_p in
-    let pos_cnum = lexbuf.lex_start_p.pos_cnum in
-    let input_str = lexbuf.lex_buffer in
-    
-    (* Get a context window around the error position *)
-    let context_start = max 0 (pos_cnum - 20) in
-    let context_end = min (Bytes.length input_str) (pos_cnum + 20) in
-    let context = Bytes.sub_string input_str context_start (context_end - context_start) in
-    
-    (* Add markers to show exactly where the error is *)
-    let error_marker = String.make (pos_cnum - context_start) ' ' ^ "^" in
-    
-    failwith (spf "Parse error at %s with token '%s'.\nContext: \"%s\"\nPosition: %s\nCurrent offset: %d\nBuffer start/end: %d/%d"
-                 pos token context error_marker 
-                 lexbuf.lex_curr_pos lexbuf.lex_start_pos lexbuf.lex_buffer_len)
+    let pos = lexbuf.lex_start_p in
+    let pos_str = string_of_pos pos in
+    let input_str = Bytes.to_string lexbuf.lex_buffer in
+    let line_num = pos.pos_lnum in
+    let col_num = pos.pos_cnum - pos.pos_bol in
+
+    (* Split input into lines *)
+    let lines = String.split_on_char '\n' input_str in
+    let line = if line_num - 1 < List.length lines then List.nth lines (line_num - 1) else "" in
+    let prev_line = if line_num - 2 >= 0 && line_num - 2 < List.length lines then List.nth lines (line_num - 2) else "" in
+    let next_line = if line_num < List.length lines then List.nth lines line_num else "" in
+
+    (* Build caret marker *)
+    let caret = String.make col_num ' ' ^ "^" in
+
+    let context =
+      String.concat "\n"
+        (List.filter (fun s -> s <> "")
+          [ if prev_line <> "" then "Previous: " ^ prev_line else "";
+            "Error:    " ^ line;
+            "          " ^ caret;
+            if next_line <> "" then "Next:     " ^ next_line else "" ])
+    in
+
+    failwith (spf "Parse error at %s with token '%s'.\n%s\n" pos_str token context)
 ;;

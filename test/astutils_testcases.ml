@@ -82,6 +82,8 @@ let lcl_pat_match_2 =
 ;;
 
 let foreign_decl = "foreign myFunc : unit -> unit := \"external_function\";\n"
+
+let simple_net = "y1 : unit;"
 let netir_ex3 = "
 y1 : unit;
 y1 := if ret (3 > 5)
