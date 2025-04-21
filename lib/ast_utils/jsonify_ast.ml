@@ -247,7 +247,7 @@ let[@inline] jsonify_choreo_stmt_block (stmts : 'a Choreo.stmt_block) =
 
 let rec jsonify_net_type = function
   | Net.TUnit _ -> `String "TUnit"
-  | Net.TLoc (t, _) -> `Assoc [ "TLoc", jsonify_local_type t ]
+  | Net.TLoc (Local.LocId (loc, _), t, _) -> `Assoc [ "TLoc", `Assoc [ "loc", `String loc; "local_type", jsonify_local_type t ] ]
   | Net.TMap (t1, t2, _) ->
     `Assoc [ "TMap", `List [ jsonify_net_type t1; jsonify_net_type t2 ] ]
   | Net.TProd (t1, t2, _) ->

@@ -284,7 +284,7 @@ and pprint_choreo_expr ppf (expr : 'a Choreo.expr) =
 let rec pprint_net_type ppf (typ : 'a Net.typ) =
   match typ with
   | TUnit _ -> fprintf ppf "@[<h>unit@]"
-  | TLoc (t, _) -> fprintf ppf "@[<h>%a@]" pprint_local_type t
+  | TLoc (Local.LocId (loc, _), t, _) -> fprintf ppf "@[<h>%s.%a@]" loc pprint_local_type t
   | TMap (t1, t2, _) ->
     fprintf ppf "@[<h>(%a) -> (%a)@]" pprint_net_type t1 pprint_net_type t2
   | TProd (t1, t2, _) ->

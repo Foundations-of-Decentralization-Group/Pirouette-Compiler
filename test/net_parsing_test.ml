@@ -59,7 +59,7 @@ let declaration_tests = "Declaration Tests" >::: [
   "test_parse_complex_types" >:: (fun _ ->
     let result = parse_net_string "x : client.int; y : unit -> unit; z : unit * unit; w : unit + unit;" in
     match result with
-    | [Net.M.Decl(Local.M.Var(Local.M.VarId("x", _), _), Net.M.TLoc(Local.M.TInt _, _), _);
+    | [Net.M.Decl(Local.M.Var(Local.M.VarId("x", _), _), Net.M.TLoc(Local.M.LocId("client", _), Local.M.TInt _, _), _);
        Net.M.Decl(Local.M.Var(Local.M.VarId("y", _), _), Net.M.TMap(Net.M.TUnit _, Net.M.TUnit _, _), _);
        Net.M.Decl(Local.M.Var(Local.M.VarId("z", _), _), Net.M.TProd(Net.M.TUnit _, Net.M.TUnit _, _), _);
        Net.M.Decl(Local.M.Var(Local.M.VarId("w", _), _), Net.M.TSum(Net.M.TUnit _, Net.M.TUnit _, _), _)] -> ()
@@ -535,7 +535,7 @@ let additional_token_tests = "Additional Token Tests" >::: [
   "test_parse_string_type_declaration" >:: (fun _ ->
     let result = parse_net_string "x : client.string;" in
     match result with
-    | [Net.M.Decl(Local.M.Var(Local.M.VarId("x", _), _), Net.M.TLoc(Local.M.TString _, _), _)] -> ()
+    | [Net.M.Decl(Local.M.Var(Local.M.VarId("x", _), _), Net.M.TLoc(Local.M.LocId("client", _), Local.M.TString _, _), _)] -> ()
     | _ -> assert_failure "Failed to parse string type declaration"
   );
 
@@ -543,7 +543,7 @@ let additional_token_tests = "Additional Token Tests" >::: [
   "test_parse_bool_type_declaration" >:: (fun _ ->
     let result = parse_net_string "x : client.bool;" in
     match result with
-    | [Net.M.Decl(Local.M.Var(Local.M.VarId("x", _), _), Net.M.TLoc(Local.M.TBool _, _), _)] -> ()
+    | [Net.M.Decl(Local.M.Var(Local.M.VarId("x", _), _), Net.M.TLoc(Local.M.LocId("client", _), Local.M.TBool _, _), _)] -> ()
     | _ -> assert_failure "Failed to parse bool type declaration"
   );
 

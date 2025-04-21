@@ -129,7 +129,8 @@ and merge_net_expr (expr : 'a Net.expr) (expr' : 'a Net.expr) : 'a Net.expr opti
 
 let rec epp_choreo_type (typ : 'a Choreo.typ) (loc : string) : 'a Net.typ =
   match typ with
-  | TLoc (LocId (loc1, _), t1, _) -> if loc1 = loc then TLoc (t1, _m) else TUnit _m
+  | TLoc (LocId (loc1, _) as locid, t1, _) ->
+    if loc1 = loc then TLoc (locid, t1, _m) else TUnit _m
   | TMap (t1, t2, _) -> TMap (epp_choreo_type t1 loc, epp_choreo_type t2 loc, _m)
   | TProd (t1, t2, _) -> TProd (epp_choreo_type t1 loc, epp_choreo_type t2 loc, _m)
   | TSum (t1, t2, _) -> TSum (epp_choreo_type t1 loc, epp_choreo_type t2 loc, _m)
