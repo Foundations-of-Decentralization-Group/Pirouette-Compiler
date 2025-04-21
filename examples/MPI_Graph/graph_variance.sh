@@ -8,7 +8,6 @@ set autoscale
 
 set title "MPI - 7 participants, Unopt vs Opt"
 set xlabel "Number of Iterations"
-set ylabel "Time taken in seconds"
 set yrange [0:70]
 
 set xtics ("1x10^6" 0.25, "2x10^6" 1.75, "1x10^7" 3.25)
