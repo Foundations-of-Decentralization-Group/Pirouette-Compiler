@@ -29,9 +29,7 @@ let generate_dune_file base_name locs backend =
     match backend with
     | "shm" ->
       let content = Printf.sprintf
-        {|(lang dune 3.7)
-
-(executable
+        {|(executable
  (name %s)
  (libraries %s domainslib))
 |}
@@ -46,9 +44,7 @@ let generate_dune_file base_name locs backend =
         |> String.concat " "
       in
       let content = Printf.sprintf
-        {|(lang dune 3.7)
-
-(executables
+        {|(executables
  (names %s)
  (libraries %s http_pirc lwt cohttp-lwt-unix yojson))
 |}
