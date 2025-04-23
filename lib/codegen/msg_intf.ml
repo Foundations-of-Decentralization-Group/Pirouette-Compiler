@@ -40,7 +40,36 @@ module Msg_chan_intf : M = struct
 end
 
 module Msg_http_intf : M = struct
-  let emit_toplevel_init _loc_ids = []
+  let emit_toplevel_init _loc_ids =
+    [
+      [%stri
+        let () =
+          let config_filename = "test/example.yaml" in
+          (* Printf.printf "Loading config from: %s\n" config_filename; *)
+          (* Printf.printf "Current working directory: %s\n" (Sys.getcwd ()); *)
+          match Lwt_main.run (Config_parser.load_config config_filename) with
+          | Some cfg ->
+            Send_receive.config := Some cfg;
+            (* Printf.printf
+                 "Config loaded successfully with %d locations\n"
+                 (List.length cfg.Config_parser.locations);
+               List.iter
+                 (fun loc ->
+                   Printf.printf
+                     "Location: %s, Address: %s\n"
+                     loc.Config_parser.location
+                     loc.Config_parser.http_address)
+                 cfg.Config_parser.locations; *)
+            ()
+          | None ->
+            failwith
+              (Printf.sprintf
+                 "Failed to load config from %s"
+                 config_filename)
+        ;;
+        ]
+    ]
+  ;;
 
   let emit_net_send ~src ~dst pexp =
     ignore src;

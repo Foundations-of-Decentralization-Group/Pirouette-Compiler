@@ -5,51 +5,6 @@ open Lwt.Infix
 (* Global config reference *)
 let config = ref None
 
-(* Initialize config from file *)
-let init () =
-  let config_filename = "test/example.yaml" in
-  Printf.printf "Loading config from: %s\n" config_filename;
-  Printf.printf "Current working directory: %s\n" (Sys.getcwd ());
-  Config_parser.load_config config_filename
-  >>= function
-  | Some cfg ->
-    config := Some cfg;
-    Printf.printf
-      "Config loaded successfully with %d locations\n"
-      (List.length cfg.Config_parser.locations);
-    List.iter
-      (fun loc ->
-        Printf.printf
-          "Location: %s, Address: %s\n"
-          loc.Config_parser.location
-          loc.Config_parser.http_address)
-      cfg.Config_parser.locations;
-    (* Try to initialize the server connection *)
-    (match
-       List.find_opt
-         (fun loc -> loc.Config_parser.location = "init")
-         cfg.Config_parser.locations
-     with
-     | Some init_config ->
-       Client.get (Uri.of_string init_config.http_address)
-       >>= fun (resp, body) ->
-       let status = resp |> Response.status |> Code.code_of_status in
-       Cohttp_lwt.Body.drain_body body
-       >>= fun () ->
-       if status = 200
-       then (
-         Printf.printf "Server initialized successfully\n";
-         Lwt.return_ok ())
-       else
-         Lwt.return_error ("Failed to initialize server, status: " ^ string_of_int status)
-     | None ->
-       Printf.printf "No init endpoint found in config\n";
-       Lwt.return_ok ())
-  | None ->
-    Printf.printf "Failed to load config file\n";
-    Lwt.return_error ("Failed to load config from " ^ config_filename)
-;;
-
 (* Helper to get location config *)
 let get_location_config location =
   match !config with
