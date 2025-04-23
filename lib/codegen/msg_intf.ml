@@ -45,21 +45,11 @@ module Msg_http_intf : M = struct
       [%stri
         let () =
           let config_filename = "test/example.yaml" in
-          (* Printf.printf "Loading config from: %s\n" config_filename; *)
-          (* Printf.printf "Current working directory: %s\n" (Sys.getcwd ()); *)
           match Lwt_main.run (Config_parser.load_config config_filename) with
           | Some cfg ->
             Send_receive.config := Some cfg;
-            (* Printf.printf
-                 "Config loaded successfully with %d locations\n"
-                 (List.length cfg.Config_parser.locations);
-               List.iter
-                 (fun loc ->
-                   Printf.printf
-                     "Location: %s, Address: %s\n"
-                     loc.Config_parser.location
-                     loc.Config_parser.http_address)
-                 cfg.Config_parser.locations; *)
+            (* Initialize HTTP servers for all locations *)
+            Send_receive.init_http_servers ();
             ()
           | None ->
             failwith

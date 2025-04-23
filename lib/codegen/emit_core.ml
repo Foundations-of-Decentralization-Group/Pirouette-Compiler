@@ -215,7 +215,9 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
     [%expr
       match [%e Msg.emit_net_recv ~src ~dst:self_id] with
       | Ok msg -> msg
-      | Error msg -> failwith ("Receive error: " ^ msg)]
+      | Error msg -> 
+          Printf.printf "Receive error in %s: %s\n" [%e Ast_builder.Default.estring ~loc self_id] msg;
+          failwith ("Receive error: " ^ msg)]
   | ChooseFor (LabelId (label, _), LocId (dst, _), e, _) ->
     Ast_builder.Default.esequence
       ~loc
