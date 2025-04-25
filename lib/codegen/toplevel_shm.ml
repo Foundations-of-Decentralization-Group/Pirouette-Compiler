@@ -6,10 +6,10 @@ let spf = Printf.sprintf
 let loc = { !Ast_helper.default_loc with loc_ghost = true }
 
 let emit_toplevel_shm
-  out_chan
-  (module Msg : Msg_intf.M)
-  (loc_ids : string list)
-  (net_stmtblock_l : 'a Net.stmt_block list)
+      out_chan
+      (module Msg : Msg_intf.M)
+      (loc_ids : string list)
+      (net_stmtblock_l : 'a Net.stmt_block list)
   =
   let emit_domain_stri (loc_id : string) (net_stmts : 'a Net.stmt_block) =
     let main_expr = ref (Ast_builder.Default.eunit ~loc) in
@@ -42,10 +42,10 @@ let emit_toplevel_shm
 ;;
 
 let emit_toplevel_http
-  out_chan
-  (module Msg : Msg_intf.M)
-  (loc_ids : string list)
-  (net_stmtblock_l : 'a Net.stmt_block list)
+      out_chan
+      (module Msg : Msg_intf.M)
+      (loc_ids : string list)
+      (net_stmtblock_l : 'a Net.stmt_block list)
   =
   let emit_domain_stri (loc_id : string) (net_stmts : 'a Net.stmt_block) =
     let main_expr = ref (Ast_builder.Default.eunit ~loc) in

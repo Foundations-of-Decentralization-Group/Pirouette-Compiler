@@ -18,10 +18,10 @@ module Msg_chan_intf : M = struct
     in
     List.map
       (fun (a, b) ->
-        [%stri
-          let [%p Ast_builder.Default.pvar ~loc (spf "chan_%s_%s" a b)] =
-            Domainslib.Chan.make_bounded 0
-          ;;])
+         [%stri
+           let [%p Ast_builder.Default.pvar ~loc (spf "chan_%s_%s" a b)] =
+             Domainslib.Chan.make_bounded 0
+           ;;])
       loc_pairs
   ;;
 

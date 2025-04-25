@@ -105,10 +105,10 @@ let init_http_servers ?(current_location = "") () =
     (* First collect all original addresses *)
     List.iter
       (fun loc_cfg ->
-        Hashtbl.add
-          loc_to_address
-          loc_cfg.Config_parser.location
-          loc_cfg.Config_parser.http_address)
+         Hashtbl.add
+           loc_to_address
+           loc_cfg.Config_parser.location
+           loc_cfg.Config_parser.http_address)
       cfg.Config_parser.locations;
     (* Filter locations to only include the current location if specified *)
     let locations_to_serve =
@@ -150,100 +150,102 @@ let init_http_servers ?(current_location = "") () =
     let server_promises =
       List.map
         (fun loc_cfg ->
-          let uri = Uri.of_string loc_cfg.Config_parser.http_address in
-          let path = Uri.path uri in
-          (* Extract port from URI or use a default *)
-          let port =
-            match Uri.port uri with
-            | Some p -> p (* Use original port *)
-            | None -> 8080 (* Default port *)
-          in
-          (* Create new address with offset port for client connections *)
-          let host = Uri.host uri |> Option.value ~default:"localhost" in
-          let new_address = Printf.sprintf "http://%s:%d%s" host port path in
-          (* Update our mapping with the new address *)
-          Hashtbl.replace loc_to_address loc_cfg.Config_parser.location new_address;
-          (* Start server and return a promise that resolves when server is ready *)
-          let promise, resolver = Lwt.task () in
-          Lwt.async (fun () ->
-            Lwt.catch
-              (fun () ->
-                let callback _conn _req body =
-                  let* body_string = Cohttp_lwt.Body.to_string body in
-                  if String.length body_string > 0
-                  then (
-                    (* Try to unmarshal and print the data for debugging *)
-                    (try
-                       let data = Marshal.from_string body_string 0 in
-                       Printf.printf
-                         "DATA RECEIVED at %s: %s\n"
-                         loc_cfg.Config_parser.location
-                         (match data with
-                          | _ when Obj.is_int (Obj.repr data) ->
-                            "INT: " ^ string_of_int (Obj.magic data)
-                          | _ when Obj.tag (Obj.repr data) = Obj.string_tag ->
-                            "STRING: " ^ Obj.magic data
-                          | _ ->
-                            (try
-                               if Obj.is_block (Obj.repr data)
-                                  && Obj.tag (Obj.repr data) = 0
-                               then (
-                                 match Obj.magic data with
-                                 | Ok v ->
-                                   if Obj.is_int (Obj.repr v)
-                                   then "Ok(" ^ string_of_int (Obj.magic v) ^ ")"
-                                   else if Obj.tag (Obj.repr v) = Obj.string_tag
-                                   then "Ok(\"" ^ Obj.magic v ^ "\")"
-                                   else "Ok(<value>)"
-                                 | Error msg -> "Error(\"" ^ msg ^ "\")")
-                               else "<complex data>"
-                             with
-                             | _ -> "<unprintable data>"));
-                       flush stdout
-                     with
-                     | _ -> ());
-                    (* Store message in queue *)
-                    Hashtbl.replace
-                      message_queues
-                      loc_cfg.Config_parser.location
-                      body_string;
-                    (* Signal waiting receivers *)
-                    Lwt_condition.broadcast message_condition ();
-                    (* Respond with success *)
-                    let resp_body = Cohttp_lwt.Body.of_string "" in
-                    Lwt.return (Response.make ~status:`OK (), resp_body))
-                  else (
-                    (* Empty body means this is a polling request, not actual data *)
-                    let data =
-                      try
-                        Some (Hashtbl.find message_queues loc_cfg.Config_parser.location)
-                      with
-                      | Not_found -> None
-                    in
-                    match data with
-                    | Some message ->
-                      (* Return the message and remove from queue *)
-                      Hashtbl.remove message_queues loc_cfg.Config_parser.location;
-                      let resp_body = Cohttp_lwt.Body.of_string message in
-                      Lwt.return (Response.make ~status:`OK (), resp_body)
-                    | None ->
-                      (* No message available *)
+           let uri = Uri.of_string loc_cfg.Config_parser.http_address in
+           let path = Uri.path uri in
+           (* Extract port from URI or use a default *)
+           let port =
+             match Uri.port uri with
+             | Some p -> p (* Use original port *)
+             | None -> 8080 (* Default port *)
+           in
+           (* Create new address with offset port for client connections *)
+           let host = Uri.host uri |> Option.value ~default:"localhost" in
+           let new_address = Printf.sprintf "http://%s:%d%s" host port path in
+           (* Update our mapping with the new address *)
+           Hashtbl.replace loc_to_address loc_cfg.Config_parser.location new_address;
+           (* Start server and return a promise that resolves when server is ready *)
+           let promise, resolver = Lwt.task () in
+           Lwt.async (fun () ->
+             Lwt.catch
+               (fun () ->
+                  let callback _conn _req body =
+                    let* body_string = Cohttp_lwt.Body.to_string body in
+                    if String.length body_string > 0
+                    then (
+                      (* Try to unmarshal and print the data for debugging *)
+                      (try
+                         let data = Marshal.from_string body_string 0 in
+                         Printf.printf
+                           "DATA RECEIVED at %s: %s\n"
+                           loc_cfg.Config_parser.location
+                           (match data with
+                            | _ when Obj.is_int (Obj.repr data) ->
+                              "INT: " ^ string_of_int (Obj.magic data)
+                            | _ when Obj.tag (Obj.repr data) = Obj.string_tag ->
+                              "STRING: " ^ Obj.magic data
+                            | _ ->
+                              (try
+                                 if
+                                   Obj.is_block (Obj.repr data)
+                                   && Obj.tag (Obj.repr data) = 0
+                                 then (
+                                   match Obj.magic data with
+                                   | Ok v ->
+                                     if Obj.is_int (Obj.repr v)
+                                     then "Ok(" ^ string_of_int (Obj.magic v) ^ ")"
+                                     else if Obj.tag (Obj.repr v) = Obj.string_tag
+                                     then "Ok(\"" ^ Obj.magic v ^ "\")"
+                                     else "Ok(<value>)"
+                                   | Error msg -> "Error(\"" ^ msg ^ "\")")
+                                 else "<complex data>"
+                               with
+                               | _ -> "<unprintable data>"));
+                         flush stdout
+                       with
+                       | _ -> ());
+                      (* Store message in queue *)
+                      Hashtbl.replace
+                        message_queues
+                        loc_cfg.Config_parser.location
+                        body_string;
+                      (* Signal waiting receivers *)
+                      Lwt_condition.broadcast message_condition ();
+                      (* Respond with success *)
                       let resp_body = Cohttp_lwt.Body.of_string "" in
                       Lwt.return (Response.make ~status:`OK (), resp_body))
-                in
-                let server =
-                  Server.create ~mode:(`TCP (`Port port)) (Server.make ~callback ())
-                in
-                (* Once we've started the server, resolve the promise *)
-                Lwt.wakeup resolver ();
-                (* Return the server promise *)
-                server)
-              (fun e ->
-                (* Only resolve if promise is still in Sleep state *)
-                if Lwt.state promise = Lwt.Sleep then Lwt.wakeup_exn resolver e;
-                Lwt.return_unit));
-          (* Return the promise *)
-          promise)
+                    else (
+                      (* Empty body means this is a polling request, not actual data *)
+                      let data =
+                        try
+                          Some
+                            (Hashtbl.find message_queues loc_cfg.Config_parser.location)
+                        with
+                        | Not_found -> None
+                      in
+                      match data with
+                      | Some message ->
+                        (* Return the message and remove from queue *)
+                        Hashtbl.remove message_queues loc_cfg.Config_parser.location;
+                        let resp_body = Cohttp_lwt.Body.of_string message in
+                        Lwt.return (Response.make ~status:`OK (), resp_body)
+                      | None ->
+                        (* No message available *)
+                        let resp_body = Cohttp_lwt.Body.of_string "" in
+                        Lwt.return (Response.make ~status:`OK (), resp_body))
+                  in
+                  let server =
+                    Server.create ~mode:(`TCP (`Port port)) (Server.make ~callback ())
+                  in
+                  (* Once we've started the server, resolve the promise *)
+                  Lwt.wakeup resolver ();
+                  (* Return the server promise *)
+                  server)
+               (fun e ->
+                  (* Only resolve if promise is still in Sleep state *)
+                  if Lwt.state promise = Lwt.Sleep then Lwt.wakeup_exn resolver e;
+                  Lwt.return_unit));
+           (* Return the promise *)
+           promise)
         locations_to_serve
     in
     (* Wait for all servers to be ready *)
@@ -253,10 +255,10 @@ let init_http_servers ?(current_location = "") () =
        let new_locations =
          List.map
            (fun loc_cfg ->
-             { loc_cfg with
-               Config_parser.http_address =
-                 Hashtbl.find loc_to_address loc_cfg.Config_parser.location
-             })
+              { loc_cfg with
+                Config_parser.http_address =
+                  Hashtbl.find loc_to_address loc_cfg.Config_parser.location
+              })
            cfg.Config_parser.locations
        in
        (* Update the config reference *)
@@ -287,8 +289,9 @@ let rec receive_message ~location =
             "STRING: " ^ Obj.magic unmarshaled_data
           | _ ->
             (try
-               if Obj.is_block (Obj.repr unmarshaled_data)
-                  && Obj.tag (Obj.repr unmarshaled_data) = 0
+               if
+                 Obj.is_block (Obj.repr unmarshaled_data)
+                 && Obj.tag (Obj.repr unmarshaled_data) = 0
                then (
                  match Obj.magic unmarshaled_data with
                  | Ok v ->
@@ -317,46 +320,46 @@ let rec receive_message ~location =
        flush stdout;
        Lwt.catch
          (fun () ->
-           (* Make HTTP request to poll for messages *)
-           let headers = Header.init_with "Content-Type" "application/octet-stream" in
-           let body = Cohttp_lwt.Body.of_string "" in
-           (* Empty body indicates polling *)
-           Client.post ~headers ~body (Uri.of_string loc_config.http_address)
-           >>= fun (resp, body) ->
-           let status = resp |> Response.status |> Code.code_of_status in
-           if status <> 200
-           then
-             Cohttp_lwt.Body.drain_body body
-             >>= fun () ->
-             Lwt.return_error
-               ("Failed to poll for message, status code: " ^ string_of_int status)
-           else
-             Cohttp_lwt.Body.to_string body
-             >>= fun body_str ->
-             if String.length body_str = 0
-             then
-               (* No message available, wait a bit and try again *)
-               let* () = Lwt_unix.sleep 0.5 in
-               receive_message ~location
-             else (
-               (* Try to unmarshal the received data *)
-               match unmarshal_data body_str with
-               | Ok unmarshaled_data ->
-                 Printf.printf
-                   "DATA RECEIVED FROM HTTP: %s\n"
-                   (match unmarshaled_data with
-                    | _ when Obj.is_int (Obj.repr unmarshaled_data) ->
-                      "INT: " ^ string_of_int (Obj.magic unmarshaled_data)
-                    | _ when Obj.tag (Obj.repr unmarshaled_data) = Obj.string_tag ->
-                      "STRING: " ^ Obj.magic unmarshaled_data
-                    | _ -> "<complex data>");
-                 flush stdout;
-                 Lwt.return_ok unmarshaled_data
-               | Error err -> Lwt.return_error err))
+            (* Make HTTP request to poll for messages *)
+            let headers = Header.init_with "Content-Type" "application/octet-stream" in
+            let body = Cohttp_lwt.Body.of_string "" in
+            (* Empty body indicates polling *)
+            Client.post ~headers ~body (Uri.of_string loc_config.http_address)
+            >>= fun (resp, body) ->
+            let status = resp |> Response.status |> Code.code_of_status in
+            if status <> 200
+            then
+              Cohttp_lwt.Body.drain_body body
+              >>= fun () ->
+              Lwt.return_error
+                ("Failed to poll for message, status code: " ^ string_of_int status)
+            else
+              Cohttp_lwt.Body.to_string body
+              >>= fun body_str ->
+              if String.length body_str = 0
+              then
+                (* No message available, wait a bit and try again *)
+                let* () = Lwt_unix.sleep 0.5 in
+                receive_message ~location
+              else (
+                (* Try to unmarshal the received data *)
+                match unmarshal_data body_str with
+                | Ok unmarshaled_data ->
+                  Printf.printf
+                    "DATA RECEIVED FROM HTTP: %s\n"
+                    (match unmarshaled_data with
+                     | _ when Obj.is_int (Obj.repr unmarshaled_data) ->
+                       "INT: " ^ string_of_int (Obj.magic unmarshaled_data)
+                     | _ when Obj.tag (Obj.repr unmarshaled_data) = Obj.string_tag ->
+                       "STRING: " ^ Obj.magic unmarshaled_data
+                     | _ -> "<complex data>");
+                  flush stdout;
+                  Lwt.return_ok unmarshaled_data
+                | Error err -> Lwt.return_error err))
          (fun e ->
-           Printf.printf "Error polling for message: %s\n" (Printexc.to_string e);
-           flush stdout;
-           (* Wait a bit and try again *)
-           let* () = Lwt_unix.sleep 1.0 in
-           receive_message ~location))
+            Printf.printf "Error polling for message: %s\n" (Printexc.to_string e);
+            flush stdout;
+            (* Wait a bit and try again *)
+            let* () = Lwt_unix.sleep 1.0 in
+            receive_message ~location))
 ;;

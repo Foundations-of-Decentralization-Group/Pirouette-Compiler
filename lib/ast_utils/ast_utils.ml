@@ -49,9 +49,9 @@ let stringify_dot_choreo_ast (string_of_info : 'a -> string) program =
 ;;
 
 let dot_choreo_ast
-  out_chan
-  (string_of_info : 'a -> string)
-  (stmt_block : 'a Choreo.stmt_block)
+      out_chan
+      (string_of_info : 'a -> string)
+      (stmt_block : 'a Choreo.stmt_block)
   =
   let dot_code = stringify_dot_choreo_ast string_of_info stmt_block in
   output_string out_chan dot_code;

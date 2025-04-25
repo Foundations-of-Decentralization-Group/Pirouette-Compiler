@@ -53,10 +53,10 @@ let rec pprint_local_pattern ppf (pat : 'a Local.pattern) =
       ppf
       "@[<h>%a@]"
       (fun ppf (v : 'a Local.value) ->
-        match v with
-        | Int (i, _) -> fprintf ppf "%d" i
-        | String (s, _) -> fprintf ppf "\"%s\"" s
-        | Bool (b, _) -> fprintf ppf "%b" b)
+         match v with
+         | Int (i, _) -> fprintf ppf "%d" i
+         | String (s, _) -> fprintf ppf "\"%s\"" s
+         | Bool (b, _) -> fprintf ppf "%b" b)
       v
   | Var (VarId (id, _), _) -> fprintf ppf "@[<h>%s@]" id
   | Pair (p1, p2, _) ->
@@ -79,10 +79,10 @@ let rec pprint_local_expr ppf (expr : 'a Local.expr) =
       ppf
       "@[<h>%a@]"
       (fun ppf (v : 'a Local.value) ->
-        match v with
-        | Int (i, _) -> fprintf ppf "%d" i
-        | String (s, _) -> fprintf ppf "\"%s\"" s
-        | Bool (b, _) -> fprintf ppf "%b" b)
+         match v with
+         | Int (i, _) -> fprintf ppf "%d" i
+         | String (s, _) -> fprintf ppf "\"%s\"" s
+         | Bool (b, _) -> fprintf ppf "%b" b)
       v
   | Var (VarId (id, _), _) -> fprintf ppf "@[<h>%s@]" id
   | UnOp (op, e, _) ->
@@ -284,7 +284,8 @@ and pprint_choreo_expr ppf (expr : 'a Choreo.expr) =
 let rec pprint_net_type ppf (typ : 'a Net.typ) =
   match typ with
   | TUnit _ -> fprintf ppf "@[<h>unit@]"
-  | TLoc (Local.LocId (loc, _), t, _) -> fprintf ppf "@[<h>%s.%a@]" loc pprint_local_type t
+  | TLoc (Local.LocId (loc, _), t, _) ->
+    fprintf ppf "@[<h>%s.%a@]" loc pprint_local_type t
   | TMap (t1, t2, _) ->
     fprintf ppf "@[<h>(%a) -> (%a)@]" pprint_net_type t1 pprint_net_type t2
   | TProd (t1, t2, _) ->
@@ -334,13 +335,7 @@ and pprint_net_expr ppf (expr : 'a Net.expr) =
       pprint_net_expr
       e3
   | Let (stmt_block, e, _) ->
-    fprintf
-      ppf
-      "@[<hv2>let %a in %a@]"
-      pprint_net_stmt_block
-      stmt_block
-      pprint_net_expr
-      e
+    fprintf ppf "@[<hv2>let %a in %a@]" pprint_net_stmt_block stmt_block pprint_net_expr e
   | FunDef (ps, e, _) ->
     fprintf
       ppf
@@ -351,8 +346,7 @@ and pprint_net_expr ppf (expr : 'a Net.expr) =
       e
   | FunApp (e1, e2, _) ->
     fprintf ppf "@[<hv>%a %a@]" pprint_net_expr e1 pprint_net_expr e2
-  | Pair (e1, e2, _) ->
-    fprintf ppf "@[<hv>%a, %a@]" pprint_net_expr e1 pprint_net_expr e2
+  | Pair (e1, e2, _) -> fprintf ppf "@[<hv>%a, %a@]" pprint_net_expr e1 pprint_net_expr e2
   | Match (e, cases, _) ->
     let[@inline] pprint_net_case ppf (p, e) =
       fprintf ppf "@[<hv2>%a -> %a@]" pprint_local_pattern p pprint_net_expr e

@@ -677,8 +677,8 @@ let net_binding_main_error _ =
   assert_raises
     (Main_expr (Ast_builder.Default.eint ~loc 1))
     (fun () ->
-      let _ = emit_net_binding ~self_id:"testing" (module Msg_http_intf) stmt in
-      ())
+       let _ = emit_net_binding ~self_id:"testing" (module Msg_http_intf) stmt in
+       ())
 ;;
 
 let net_binding_foreign_decl _ =

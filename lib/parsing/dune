@@ -13,4 +13,5 @@
  (name parsing)
  (private_modules lexer parser)
  (libraries ast_core)
- (preprocess (pps bisect_ppx)))
+ (preprocess
+  (pps bisect_ppx)))

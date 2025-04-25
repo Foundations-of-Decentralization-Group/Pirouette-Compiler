@@ -31,8 +31,8 @@ let speclist =
 let extract_ffi_libraries netir_l =
   List.fold_left
     (fun acc ir ->
-      let files = Ast_utils.collect_ffi_files ir in
-      List.fold_left (fun acc' file -> file :: acc') acc files)
+       let files = Ast_utils.collect_ffi_files ir in
+       List.fold_left (fun acc' file -> file :: acc') acc files)
     []
     netir_l
   |> List.sort_uniq String.compare
@@ -147,8 +147,8 @@ let generate_http_code basename locs netir_l =
   let ffi_libs =
     List.fold_left
       (fun acc ir ->
-        let files = Ast_utils.collect_ffi_files ir in
-        List.fold_left (fun acc' file -> file :: acc') acc files)
+         let files = Ast_utils.collect_ffi_files ir in
+         List.fold_left (fun acc' file -> file :: acc') acc files)
       []
       netir_l
     |> List.sort_uniq String.compare
@@ -157,15 +157,15 @@ let generate_http_code basename locs netir_l =
   let has_ffi_files = List.length ffi_libs > 0 in
   List.iter2
     (fun loc ir ->
-      let ml_filename = Printf.sprintf "%s_%s.ml" basename loc in
-      let out_path = Filename.concat examples_dir ml_filename in
-      let out_file = open_out out_path in
-      (* Add appropriate imports *)
-      if has_ffi_files
-      then output_string out_file "open Http_pirc\nopen Ffi_lib\n\n"
-      else output_string out_file "open Http_pirc\n\n";
-      Codegen.Toplevel_shm.emit_toplevel_http out_file msg_module [ loc ] [ ir ];
-      close_out out_file)
+       let ml_filename = Printf.sprintf "%s_%s.ml" basename loc in
+       let out_path = Filename.concat examples_dir ml_filename in
+       let out_file = open_out out_path in
+       (* Add appropriate imports *)
+       if has_ffi_files
+       then output_string out_file "open Http_pirc\nopen Ffi_lib\n\n"
+       else output_string out_file "open Http_pirc\n\n";
+       Codegen.Toplevel_shm.emit_toplevel_http out_file msg_module [ loc ] [ ir ];
+       close_out out_file)
     locs
     netir_l
 ;;
@@ -200,17 +200,17 @@ let () =
   (* Dump network ASTs *)
   List.iter2
     (fun loc ir ->
-      dump_net_ast
-        !ast_dump_format
-        (get_output_path
-           ("."
-            ^ loc
-            ^
-            match !ast_dump_format with
-            | "json" -> ".json"
-            | "pprint" -> ".ast"
-            | _ -> ""))
-        ir)
+       dump_net_ast
+         !ast_dump_format
+         (get_output_path
+            ("."
+             ^ loc
+             ^
+             match !ast_dump_format with
+             | "json" -> ".json"
+             | "pprint" -> ".ast"
+             | _ -> ""))
+         ir)
     locs
     netir_l;
   (* Generate code based on selected backend *)

@@ -6,13 +6,16 @@ let peq (s : string) =
   try
     let program = Parsing.Parse.parse_with_error (Lexing.from_string s) in
     let pprint_s = Ast_utils.stringify_pprint_choreo_ast program in
-    pprint_s_ref := pprint_s; (* Store potentially problematic pretty-printed string *)
+    pprint_s_ref := pprint_s;
+    (* Store potentially problematic pretty-printed string *)
     let program' = Parsing.Parse.parse_with_error (Lexing.from_string pprint_s) in
     let json_ast = Ast_utils.stringify_jsonify_choreo_ast program in
-    json_ast_ref := json_ast; (* Store original AST *)
+    json_ast_ref := json_ast;
+    (* Store original AST *)
     let json_ast' = Ast_utils.stringify_jsonify_choreo_ast program' in
     assert_equal json_ast json_ast'
-  with Failure msg ->
+  with
+  | Failure msg ->
     print_endline "\nError in choreography pretty printing:";
     print_endline ("Original: " ^ s);
     print_endline ("Pretty printed: " ^ !pprint_s_ref);
@@ -28,13 +31,16 @@ let net_peq (s : string) =
   try
     let program = Parsing.Parse.parse_net_with_error (Lexing.from_string s) in
     let pprint_s = Ast_utils.stringify_pprint_net_ast program in
-    pprint_s_ref := pprint_s; (* Store potentially problematic pretty-printed string *)
+    pprint_s_ref := pprint_s;
+    (* Store potentially problematic pretty-printed string *)
     let program' = Parsing.Parse.parse_net_with_error (Lexing.from_string pprint_s) in
     let json_ast = Ast_utils.stringify_jsonify_net_ast program in
-    json_ast_ref := json_ast; (* Store original AST *)
+    json_ast_ref := json_ast;
+    (* Store original AST *)
     let json_ast' = Ast_utils.stringify_jsonify_net_ast program' in
     assert_equal json_ast json_ast'
-  with Failure msg ->
+  with
+  | Failure msg ->
     print_endline "\nError in network pretty printing:";
     print_endline ("Original: " ^ s);
     print_endline ("Pretty printed: " ^ !pprint_s_ref);
@@ -66,9 +72,8 @@ let suite =
        ; "Foreign Declarations"
          >::: [ ("foreign_decl" >:: fun _ -> peq Astutils_testcases.foreign_decl) ]
        ; "Net IR"
-         >::: [
-               ("simple_net">:: fun _ -> net_peq Astutils_testcases.simple_net);
-               ("ex3_netir" >:: fun _ -> net_peq Astutils_testcases.netir_ex3)
+         >::: [ ("simple_net" >:: fun _ -> net_peq Astutils_testcases.simple_net)
+              ; ("ex3_netir" >:: fun _ -> net_peq Astutils_testcases.netir_ex3)
               ]
        ]
 ;;
