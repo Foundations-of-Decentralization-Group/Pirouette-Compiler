@@ -11,5 +11,5 @@
 
 (library
  (name parsing)
- (private_modules  net_lexer lexer parser net_parser)
+ (private_modules net_lexer lexer parser net_parser)
  (libraries ast_core))
