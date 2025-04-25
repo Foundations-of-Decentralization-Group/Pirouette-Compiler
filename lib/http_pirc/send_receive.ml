@@ -47,19 +47,11 @@ let unmarshal_data data_str =
 
 (* Internal Mapping Functions *)
 let map_send_location location =
-  let result = match location with
-  | "R" -> "S" (* Map "R" to "S" for sending *)
-  | other -> other
-  in
-  result
+  location
 ;;
 
 let map_receive_location location =
-  let result = match location with
-  | "S" -> "R" (* Map "S" to "R" for receiving *)
-  | other -> other
-  in
-  result
+  location
 ;;
 
 (* Function to send a message *)
@@ -108,7 +100,7 @@ let send_message ~location ~data =
 ;;
 
 (* Initialize HTTP servers for all locations *)
-let init_http_servers () =
+let init_http_servers ?(current_location = "") () =
   match !config with
   | None -> ()
   | Some cfg ->
@@ -122,6 +114,39 @@ let init_http_servers () =
           Hashtbl.add loc_to_address loc_cfg.Config_parser.location loc_cfg.Config_parser.http_address)
         cfg.Config_parser.locations;
       
+      (* Filter locations to only include the current location if specified *)
+      let locations_to_serve = 
+        if current_location <> "" then
+          List.filter 
+            (fun loc_cfg -> loc_cfg.Config_parser.location = current_location) 
+            cfg.Config_parser.locations
+        else
+          (* For backward compatibility, if no location is specified, 
+             we'll use the hostname to determine which server to start *)
+          let hostname = Unix.gethostname () in
+          Printf.printf "Current hostname: %s\n" hostname;
+          match String.lowercase_ascii hostname with
+          | "r" | "r-host" -> 
+              List.filter 
+                (fun loc_cfg -> loc_cfg.Config_parser.location = "R")
+                cfg.Config_parser.locations
+          | "s" | "s-host" -> 
+              List.filter 
+                (fun loc_cfg -> loc_cfg.Config_parser.location = "S")
+                cfg.Config_parser.locations
+          | "init" | "init-host" -> 
+              List.filter 
+                (fun loc_cfg -> loc_cfg.Config_parser.location = "init")
+                cfg.Config_parser.locations
+          | _ -> 
+              Printf.printf "WARNING: No current_location specified and couldn't determine from hostname.\n";
+              Printf.printf "Starting servers for all locations. This may cause message loopback issues.\n";
+              cfg.Config_parser.locations
+      in
+      
+      Printf.printf "Starting servers for locations: %s\n" 
+        (String.concat ", " (List.map (fun l -> l.Config_parser.location) locations_to_serve));
+      
       let server_promises = 
         List.map 
           (fun loc_cfg -> 
@@ -131,8 +156,8 @@ let init_http_servers () =
             (* Extract port from URI or use a default *)
             let port = 
               match Uri.port uri with
-                | Some p -> p + 1000  (* Add offset to avoid port conflicts *)
-                | None -> 8080 + 1000 (* Default with offset *)
+                | Some p -> p  (* Use original port *)
+                | None -> 8080 (* Default port *)
             in
             
             (* Create new address with offset port for client connections *)
@@ -155,7 +180,8 @@ let init_http_servers () =
                       (* Try to unmarshal and print the data for debugging *)
                       (try
                         let data = Marshal.from_string body_string 0 in
-                        Printf.printf "DATA RECEIVED: %s\n"
+                        Printf.printf "DATA RECEIVED at %s: %s\n" 
+                          loc_cfg.Config_parser.location
                           (match data with
                            | _ when Obj.is_int (Obj.repr data) -> "INT: " ^ string_of_int (Obj.magic data)
                            | _ when Obj.tag (Obj.repr data) = Obj.string_tag -> "STRING: " ^ (Obj.magic data)
@@ -163,8 +189,11 @@ let init_http_servers () =
                                try 
                                  if Obj.is_block (Obj.repr data) && Obj.tag (Obj.repr data) = 0 then
                                    (match (Obj.magic data) with
-                                    | Ok _ -> "Ok value"
-                                    | Error msg -> "Error: " ^ msg)
+                                    | Ok v -> 
+                                        if Obj.is_int (Obj.repr v) then "Ok(" ^ string_of_int (Obj.magic v) ^ ")"
+                                        else if Obj.tag (Obj.repr v) = Obj.string_tag then "Ok(\"" ^ (Obj.magic v) ^ "\")"
+                                        else "Ok(<value>)"
+                                    | Error msg -> "Error(\"" ^ msg ^ "\")")
                                  else "<complex data>"
                                with _ -> "<unprintable data>");
                         flush stdout;
@@ -219,7 +248,7 @@ let init_http_servers () =
             
             (* Return the promise *)
             promise)
-          cfg.Config_parser.locations
+          locations_to_serve
       in
       
       (* Wait for all servers to be ready *)
@@ -243,51 +272,88 @@ let init_http_servers () =
 ;;
 
 (* Function to receive a message *)
-let receive_message ~location =
+let rec receive_message ~location =
   let actual_location = map_receive_location location in
   
-  (* Recursive function to wait for and fetch a message *)
-  let rec wait_for_message () =
-    let queue_data = Hashtbl.find_opt message_queues actual_location in
-    match queue_data with
-    | Some data when String.length data > 0 ->
-        (* Message found in queue, remove it *)
-        Hashtbl.remove message_queues actual_location;
+  (* First check if we have a local message *)
+  let local_message = Hashtbl.find_opt message_queues actual_location in
+  match local_message with
+  | Some data when String.length data > 0 ->
+      (* Message found in queue, remove it *)
+      Hashtbl.remove message_queues actual_location;
+      
+      (* Try to unmarshal the data *)
+      (try
+        let unmarshaled_data = Marshal.from_string data 0 in
         
-        (* Try to unmarshal the data *)
-        (try
-          let unmarshaled_data = Marshal.from_string data 0 in
-          
-          (* Print the actual unmarshaled data in readable format *)
-          Printf.printf "DATA RECEIVED: %s\n"
-            (match unmarshaled_data with
-             | _ when Obj.is_int (Obj.repr unmarshaled_data) -> "INT: " ^ string_of_int (Obj.magic unmarshaled_data)
-             | _ when Obj.tag (Obj.repr unmarshaled_data) = Obj.string_tag -> "STRING: " ^ (Obj.magic unmarshaled_data)
-             | _ -> 
-                 try 
-                   if Obj.is_block (Obj.repr unmarshaled_data) && Obj.tag (Obj.repr unmarshaled_data) = 0 then
-                     (match (Obj.magic unmarshaled_data) with
-                      | Ok v -> 
-                          if Obj.is_int (Obj.repr v) then "Ok(" ^ string_of_int (Obj.magic v) ^ ")"
-                          else if Obj.tag (Obj.repr v) = Obj.string_tag then "Ok(\"" ^ (Obj.magic v) ^ "\")"
-                          else "Ok(<value>)"
-                      | Error msg -> "Error(\"" ^ msg ^ "\")")
-                   else "<complex data>"
-                 with _ -> "<unprintable data>");
+        (* Print the actual unmarshaled data in readable format *)
+        Printf.printf "DATA RECEIVED FROM QUEUE: %s\n"
+          (match unmarshaled_data with
+           | _ when Obj.is_int (Obj.repr unmarshaled_data) -> "INT: " ^ string_of_int (Obj.magic unmarshaled_data)
+           | _ when Obj.tag (Obj.repr unmarshaled_data) = Obj.string_tag -> "STRING: " ^ (Obj.magic unmarshaled_data)
+           | _ -> 
+               try 
+                 if Obj.is_block (Obj.repr unmarshaled_data) && Obj.tag (Obj.repr unmarshaled_data) = 0 then
+                   (match (Obj.magic unmarshaled_data) with
+                    | Ok v -> 
+                        if Obj.is_int (Obj.repr v) then "Ok(" ^ string_of_int (Obj.magic v) ^ ")"
+                        else if Obj.tag (Obj.repr v) = Obj.string_tag then "Ok(\"" ^ (Obj.magic v) ^ "\")"
+                        else "Ok(<value>)"
+                    | Error msg -> "Error(\"" ^ msg ^ "\")")
+                 else "<complex data>"
+               with _ -> "<unprintable data>");
+        flush stdout;
+        
+        Lwt.return_ok unmarshaled_data
+      with e ->
+        Lwt.return_error ("Unmarshal error: " ^ Printexc.to_string e))
+  
+  | _ ->
+      (* No local message, poll the remote server *)
+      match get_location_config actual_location with
+      | Error msg -> Lwt.return_error msg
+      | Ok loc_config ->
+          Printf.printf "Polling remote server for location %s at %s\n" 
+            actual_location loc_config.http_address;
           flush stdout;
           
-          Lwt.return_ok unmarshaled_data
-        with e ->
-          Lwt.return_error ("Unmarshal error: " ^ Printexc.to_string e))
-            
-    | Some _ | None ->
-        (* No valid message available, wait for notification *)
-        let* () = Lwt_condition.wait message_condition in
-        wait_for_message ()
-  in
-  
-  (* Start waiting for message *)
-  Lwt.catch
-    wait_for_message
-    (fun e ->
-      Lwt.return_error ("Receive error: " ^ Printexc.to_string e))
+          Lwt.catch
+            (fun () ->
+              (* Make HTTP request to poll for messages *)
+              let headers = Header.init_with "Content-Type" "application/octet-stream" in
+              let body = Cohttp_lwt.Body.of_string "" in  (* Empty body indicates polling *)
+              
+              Client.post ~headers ~body (Uri.of_string loc_config.http_address)
+              >>= fun (resp, body) ->
+              let status = resp |> Response.status |> Code.code_of_status in
+              
+              if status <> 200 then
+                Cohttp_lwt.Body.drain_body body
+                >>= fun () ->
+                Lwt.return_error ("Failed to poll for message, status code: " ^ string_of_int status)
+              else
+                Cohttp_lwt.Body.to_string body
+                >>= fun body_str ->
+                if String.length body_str = 0 then
+                  (* No message available, wait a bit and try again *)
+                  let* () = Lwt_unix.sleep 0.5 in
+                  receive_message ~location
+                else
+                  (* Try to unmarshal the received data *)
+                  match unmarshal_data body_str with
+                  | Ok unmarshaled_data ->
+                      Printf.printf "DATA RECEIVED FROM HTTP: %s\n"
+                        (match unmarshaled_data with
+                         | _ when Obj.is_int (Obj.repr unmarshaled_data) -> "INT: " ^ string_of_int (Obj.magic unmarshaled_data)
+                         | _ when Obj.tag (Obj.repr unmarshaled_data) = Obj.string_tag -> "STRING: " ^ (Obj.magic unmarshaled_data)
+                         | _ -> "<complex data>");
+                      flush stdout;
+                      Lwt.return_ok unmarshaled_data
+                  | Error err -> Lwt.return_error err)
+            (fun e ->
+              Printf.printf "Error polling for message: %s\n" (Printexc.to_string e);
+              flush stdout;
+              
+              (* Wait a bit and try again *)
+              let* () = Lwt_unix.sleep 1.0 in
+              receive_message ~location)

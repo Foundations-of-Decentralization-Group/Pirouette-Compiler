@@ -48,8 +48,7 @@ module Msg_http_intf : M = struct
           match Lwt_main.run (Config_parser.load_config config_filename) with
           | Some cfg ->
             Send_receive.config := Some cfg;
-            (* Initialize HTTP servers for all locations *)
-            Send_receive.init_http_servers ();
+            (* Each process initializes its HTTP server in its own execution context *)
             ()
           | None ->
             failwith

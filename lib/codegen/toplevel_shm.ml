@@ -68,6 +68,9 @@ let emit_toplevel_http
         Printf.printf
           "Starting process_%s...\n"
           [%e Ast_builder.Default.estring ~loc loc_id];
+        (* Set the current location explicitly for this process *)
+        Send_receive.init_http_servers 
+          ~current_location:[%e Ast_builder.Default.estring ~loc loc_id] ();
         let [%p Ast_builder.Default.pvar ~loc (spf "process_%s" loc_id)] =
           [%e emit_net_toplevel net_stmts]
         in
