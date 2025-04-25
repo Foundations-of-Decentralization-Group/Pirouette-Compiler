@@ -6,17 +6,5 @@
 (executables
  (names ex1_R ex1_S)
  (modules ex1_R ex1_S)
- (libraries
-  ast_core
-  parsing
-  codegen
-  ast_utils
-  netgen
-  ppxlib
-  ffi_lib
-  http_pirc
-  lwt
-  cohttp-lwt-unix
-  yojson)
- (flags
-  (:standard -w -26)))
+ (libraries ast_core parsing codegen ast_utils netgen ppxlib ffi_lib http_pirc lwt cohttp-lwt-unix yojson)
+ (flags (:standard -w -26)))

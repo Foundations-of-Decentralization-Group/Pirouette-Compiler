@@ -46,27 +46,10 @@ let generate_dune_file base_name locs backend netir_l =
   (* Extract FFI libraries *)
   let ffi_libs = extract_ffi_libraries netir_l in
   let common_libs = "ast_core parsing codegen ast_utils netgen ppxlib" in
-  (* Add FFI libraries if they exist *)
-  let library_deps =
-    if List.length ffi_libs > 0
-    then common_libs ^ " " ^ String.concat " " ffi_libs
-    else common_libs
-  in
   match backend with
   | "shm" ->
-    (* For SHM backend, create a new dune file in the root *)
-    let content =
-      Printf.sprintf
-        {|(executable
- (name %s)
- (libraries %s domainslib))
-|}
-        base_name
-        library_deps
-    in
-    let oc = open_out "dune" in
-    output_string oc content;
-    close_out oc
+    (* For SHM backend, skip dune file generation *)
+    ()
   | "http" ->
     (* For HTTP backend, create a new dune file in examples/ directory *)
     let dune_path = "examples/dune" in
@@ -145,7 +128,11 @@ let dump_net_ast format output_path ir =
 (* Generate code for shared memory backend *)
 let generate_shm_code basename locs netir_l =
   let msg_module = (module Codegen.Msg_intf.Msg_chan_intf : Codegen.Msg_intf.M) in
-  let out_path = basename ^ ".ml" in
+  let examples_dir = "examples" in
+  (* Ensure the examples directory exists *)
+  if not (Sys.file_exists examples_dir && Sys.is_directory examples_dir)
+  then Unix.mkdir examples_dir 0o755;
+  let out_path = Filename.concat examples_dir (basename ^ ".ml") in
   Codegen.Toplevel_shm.emit_toplevel_shm (open_out out_path) msg_module locs netir_l
 ;;
 
