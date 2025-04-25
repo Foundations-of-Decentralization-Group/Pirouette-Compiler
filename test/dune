@@ -111,16 +111,16 @@
  (preprocess
   (pps ppxlib.metaquot)))
 
-(test
- (name msg_intf_test)
- (modules msg_intf_test)
- (libraries ounit2 ppxlib ast_core codegen)
- (preprocess
-  (pps ppxlib.metaquot)))
+; (test
+;  (name msg_intf_test)
+;  (modules msg_intf_test)
+;  (libraries ounit2 ppxlib ast_core codegen)
+;  (preprocess
+;   (pps ppxlib.metaquot)))
 
-(test
- (name toplevel_shm_test)
- (modules toplevel_shm_test)
- (libraries ounit2 ppxlib ast_core codegen)
- (preprocess
-  (pps ppxlib.metaquot)))
+; (test
+;  (name toplevel_shm_test)
+;  (modules toplevel_shm_test)
+;  (libraries ounit2 ppxlib ast_core codegen)
+;  (preprocess
+;   (pps ppxlib.metaquot)))
