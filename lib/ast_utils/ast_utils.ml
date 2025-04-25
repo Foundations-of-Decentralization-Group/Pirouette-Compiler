@@ -10,7 +10,7 @@ let stringify_jsonify_choreo_ast (stmt_block : 'a Choreo.stmt_block) =
 ;;
 
 let stringify_jsonify_net_ast (stmt_block : 'a Net.stmt_block) =
-  Jsonify_ast.jsonify_net_stmt_block stmt_block |> Yojson.Basic.pretty_to_string
+  Jsonify_ast.jsonify_net_stmt_block stmt_block |> Yojson.Safe.pretty_to_string
 ;;
 
 let jsonify_choreo_ast out_chan (stmt_block : 'a Choreo.stmt_block) =
@@ -19,7 +19,7 @@ let jsonify_choreo_ast out_chan (stmt_block : 'a Choreo.stmt_block) =
 ;;
 
 let jsonify_net_ast out_chan (stmt_block : 'a Net.stmt_block) =
-  Jsonify_ast.jsonify_net_stmt_block stmt_block |> Yojson.Basic.pretty_to_channel out_chan
+  Jsonify_ast.jsonify_net_stmt_block stmt_block |> Yojson.Safe.pretty_to_channel out_chan
 ;;
 
 let stringify_pprint_choreo_ast (stmt_block : 'a Choreo.stmt_block) =
