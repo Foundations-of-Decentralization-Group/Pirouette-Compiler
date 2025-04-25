@@ -57,3 +57,38 @@ let dot_choreo_ast
   output_string out_chan dot_code;
   flush out_chan
 ;;
+
+(* FFI (Foreign Function Interface) utilities *)
+
+(* Extract the module file path from a foreign declaration string *)
+let extract_ffi_file external_name =
+  if String.starts_with ~prefix:"@" external_name then
+    match String.split_on_char ':' (String.sub external_name 1 (String.length external_name - 1)) with
+    | [file; _] when file <> "" -> Some file
+    | _ -> None
+  else
+    None
+;;
+
+(* Extract all unique FFI file references from a list of statements *)
+let collect_ffi_files stmts =
+  let rec collect acc = function
+    | [] -> acc
+    | Net.ForeignDecl (_, _, external_name, _) :: rest ->
+        let acc' = match extract_ffi_file external_name with
+          | Some file -> file :: acc
+          | None -> acc
+        in
+        collect acc' rest
+    | _ :: rest -> collect acc rest
+  in
+  collect [] stmts |> List.sort_uniq String.compare
+;;
+
+(* Generate dune libraries string from FFI files *)
+let generate_ffi_libraries stmts =
+  let files = collect_ffi_files stmts in
+  String.concat " " (List.map (fun file -> 
+    Filename.basename file |> Filename.remove_extension
+  ) files)
+;;

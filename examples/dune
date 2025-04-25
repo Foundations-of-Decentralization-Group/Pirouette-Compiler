@@ -1,0 +1,10 @@
+(library
+ (name ffi_lib)
+ (modules printer)
+ (libraries ast_core parsing codegen ast_utils netgen ppxlib))
+
+(executables
+ (names exprint_R exprint_S)
+ (modules exprint_R exprint_S)
+ (libraries ast_core parsing codegen ast_utils netgen ppxlib ffi_lib http_pirc lwt cohttp-lwt-unix yojson)
+ (flags (:standard -w -26)))

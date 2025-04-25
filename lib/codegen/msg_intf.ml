@@ -40,7 +40,25 @@ module Msg_chan_intf : M = struct
 end
 
 module Msg_http_intf : M = struct
-  let emit_toplevel_init _loc_ids = []
+  let emit_toplevel_init _loc_ids =
+    [
+      [%stri
+        let () =
+          let config_filename = "test/example.yaml" in
+          match Lwt_main.run (Config_parser.load_config config_filename) with
+          | Some cfg ->
+            Send_receive.config := Some cfg;
+            (* Each process initializes its HTTP server in its own execution context *)
+            ()
+          | None ->
+            failwith
+              (Printf.sprintf
+                 "Failed to load config from %s"
+                 config_filename)
+        ;;
+        ]
+    ]
+  ;;
 
   let emit_net_send ~src ~dst pexp =
     ignore src;
