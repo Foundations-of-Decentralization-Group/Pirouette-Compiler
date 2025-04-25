@@ -65,12 +65,12 @@ and merge_net_expr (expr : 'a Net.expr) (expr' : 'a Net.expr) : 'a Net.expr opti
         try
           List.fold_left2
             (fun acc s1 s2 ->
-              match acc with
-              | Some acc ->
-                (match merge_net_stmt s1 s2 with
-                 | Some s -> Some (s :: acc)
-                 | None -> raise Not_matched)
-              | None -> raise Not_matched)
+               match acc with
+               | Some acc ->
+                 (match merge_net_stmt s1 s2 with
+                  | Some s -> Some (s :: acc)
+                  | None -> raise Not_matched)
+               | None -> raise Not_matched)
             (Some [])
             stmts
             stmts'
@@ -90,12 +90,12 @@ and merge_net_expr (expr : 'a Net.expr) (expr' : 'a Net.expr) : 'a Net.expr opti
     (try
        List.iter
          (fun (p, e) ->
-           match Hashtbl.find_opt cases1_tbl p with
-           | Some e' ->
-             (match merge_net_expr e e' with
-              | Some e -> Hashtbl.replace cases1_tbl p e
-              | None -> raise Not_matched)
-           | None -> raise Not_matched)
+            match Hashtbl.find_opt cases1_tbl p with
+            | Some e' ->
+              (match merge_net_expr e e' with
+               | Some e -> Hashtbl.replace cases1_tbl p e
+               | None -> raise Not_matched)
+            | None -> raise Not_matched)
          cases';
        Some (Match (e, Hashtbl.fold (fun p e acc -> (p, e) :: acc) cases1_tbl [], _m))
      with
@@ -129,7 +129,7 @@ and merge_net_expr (expr : 'a Net.expr) (expr' : 'a Net.expr) : 'a Net.expr opti
 
 let rec epp_choreo_type (typ : 'a Choreo.typ) (loc : string) : 'a Net.typ =
   match typ with
-  | TLoc (LocId (loc1, _) as locid, t1, _) ->
+  | TLoc ((LocId (loc1, _) as locid), t1, _) ->
     if loc1 = loc then TLoc (locid, t1, _m) else TUnit _m
   | TMap (t1, t2, _) -> TMap (epp_choreo_type t1 loc, epp_choreo_type t2 loc, _m)
   | TProd (t1, t2, _) -> TProd (epp_choreo_type t1 loc, epp_choreo_type t2 loc, _m)
@@ -201,9 +201,9 @@ and epp_choreo_expr (expr : 'a Choreo.expr) (loc : string) : 'a Net.expr =
       | (_, case_e) :: rest ->
         List.fold_left
           (fun acc (_, e) ->
-            match acc with
-            | Some e' -> merge_net_expr e' (epp_choreo_expr e loc)
-            | None -> None)
+             match acc with
+             | Some e' -> merge_net_expr e' (epp_choreo_expr e loc)
+             | None -> None)
           (Some (epp_choreo_expr case_e loc))
           rest
     in

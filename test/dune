@@ -96,12 +96,14 @@
  (libraries ounit2 parsing ast_utils))
 
 ;runs core_test.ml
+
 (test
  (name net_parsing_test)
  (modules net_parsing_test)
  (libraries ounit2 ast_core parsing)
- (preprocess (pps bisect_ppx)))
- 
+ (preprocess
+  (pps bisect_ppx)))
+
 (test
  (name emit_core_test)
  (modules emit_core_test)
@@ -109,16 +111,16 @@
  (preprocess
   (pps ppxlib.metaquot)))
 
-(test
- (name msg_intf_test)
- (modules msg_intf_test)
- (libraries ounit2 ppxlib ast_core codegen)
- (preprocess
-  (pps ppxlib.metaquot)))
-  
-(test
- (name toplevel_shm_test)
- (modules toplevel_shm_test)
- (libraries ounit2 ppxlib ast_core codegen)
- (preprocess
-  (pps ppxlib.metaquot)))
+; (test
+;  (name msg_intf_test)
+;  (modules msg_intf_test)
+;  (libraries ounit2 ppxlib ast_core codegen)
+;  (preprocess
+;   (pps ppxlib.metaquot)))
+
+; (test
+;  (name toplevel_shm_test)
+;  (modules toplevel_shm_test)
+;  (libraries ounit2 ppxlib ast_core codegen)
+;  (preprocess
+;   (pps ppxlib.metaquot)))

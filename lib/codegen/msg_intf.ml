@@ -18,10 +18,10 @@ module Msg_chan_intf : M = struct
     in
     List.map
       (fun (a, b) ->
-        [%stri
-          let [%p Ast_builder.Default.pvar ~loc (spf "chan_%s_%s" a b)] =
-            Domainslib.Chan.make_bounded 0
-          ;;])
+         [%stri
+           let [%p Ast_builder.Default.pvar ~loc (spf "chan_%s_%s" a b)] =
+             Domainslib.Chan.make_bounded 0
+           ;;])
       loc_pairs
   ;;
 
@@ -41,8 +41,7 @@ end
 
 module Msg_http_intf : M = struct
   let emit_toplevel_init _loc_ids =
-    [
-      [%stri
+    [ [%stri
         let () =
           let config_filename = "test/example.yaml" in
           match Lwt_main.run (Config_parser.load_config config_filename) with
@@ -51,12 +50,8 @@ module Msg_http_intf : M = struct
             (* Each process initializes its HTTP server in its own execution context *)
             ()
           | None ->
-            failwith
-              (Printf.sprintf
-                 "Failed to load config from %s"
-                 config_filename)
-        ;;
-        ]
+            failwith (Printf.sprintf "Failed to load config from %s" config_filename)
+        ;;]
     ]
   ;;
 

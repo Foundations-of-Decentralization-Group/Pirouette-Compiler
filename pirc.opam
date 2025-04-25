@@ -18,6 +18,7 @@ depends: [
   "lwt"
   "menhir"
   "ounit2"
+  "bisect_ppx"
   "ppxlib"
   "yojson"
   "yaml"

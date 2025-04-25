@@ -6,10 +6,10 @@ let spf = Printf.sprintf
 let loc = { !Ast_helper.default_loc with loc_ghost = true }
 
 let emit_toplevel_shm
-  out_chan
-  (module Msg : Msg_intf.M)
-  (loc_ids : string list)
-  (net_stmtblock_l : 'a Net.stmt_block list)
+      out_chan
+      (module Msg : Msg_intf.M)
+      (loc_ids : string list)
+      (net_stmtblock_l : 'a Net.stmt_block list)
   =
   let emit_domain_stri (loc_id : string) (net_stmts : 'a Net.stmt_block) =
     let main_expr = ref (Ast_builder.Default.eunit ~loc) in
@@ -42,10 +42,10 @@ let emit_toplevel_shm
 ;;
 
 let emit_toplevel_http
-  out_chan
-  (module Msg : Msg_intf.M)
-  (loc_ids : string list)
-  (net_stmtblock_l : 'a Net.stmt_block list)
+      out_chan
+      (module Msg : Msg_intf.M)
+      (loc_ids : string list)
+      (net_stmtblock_l : 'a Net.stmt_block list)
   =
   let emit_domain_stri (loc_id : string) (net_stmts : 'a Net.stmt_block) =
     let main_expr = ref (Ast_builder.Default.eunit ~loc) in
@@ -69,8 +69,9 @@ let emit_toplevel_http
           "Starting process_%s...\n"
           [%e Ast_builder.Default.estring ~loc loc_id];
         (* Set the current location explicitly for this process *)
-        Send_receive.init_http_servers 
-          ~current_location:[%e Ast_builder.Default.estring ~loc loc_id] ();
+        Send_receive.init_http_servers
+          ~current_location:[%e Ast_builder.Default.estring ~loc loc_id]
+          ();
         let [%p Ast_builder.Default.pvar ~loc (spf "process_%s" loc_id)] =
           [%e emit_net_toplevel net_stmts]
         in
@@ -82,9 +83,12 @@ let emit_toplevel_http
   let warning_attr =
     Ast_helper.Str.attribute
       ~loc
-      { attr_name = { txt = "ocaml.warning"; loc }; attr_payload = PStr [ [%stri "-39"] ]; attr_loc = loc }
+      { attr_name = { txt = "ocaml.warning"; loc }
+      ; attr_payload = PStr [ [%stri "-39"] ]
+      ; attr_loc = loc
+      }
   in
   Pprintast.structure
     (Format.formatter_of_out_channel out_chan)
-    (warning_attr :: Msg.emit_toplevel_init loc_ids @ process_bindings)
+    ((warning_attr :: Msg.emit_toplevel_init loc_ids) @ process_bindings)
 ;;

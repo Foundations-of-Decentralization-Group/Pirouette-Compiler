@@ -28,6 +28,7 @@
   cohttp-lwt-unix logs lwt
   menhir
   ounit2
+  bisect_ppx
   ppxlib
   yojson yaml lwt_ppx)
  (allow_empty))
