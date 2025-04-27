@@ -66,10 +66,10 @@ let rec emit_local_pexp (expr : 'a Local.expr) =
     let cases =
       List.map
         (fun (p, e) ->
-          Ast_builder.Default.case
-            ~lhs:(emit_local_ppat p)
-            ~guard:None
-            ~rhs:(emit_local_pexp e))
+           Ast_builder.Default.case
+             ~lhs:(emit_local_ppat p)
+             ~guard:None
+             ~rhs:(emit_local_pexp e))
         cases
     in
     Ast_builder.Default.pexp_match ~loc (emit_local_pexp e) cases
@@ -87,10 +87,10 @@ and emit_local_ppat (pat : 'a Local.pattern) =
 ;;
 
 let rec emit_net_fun_body
-  ~(self_id : string)
-  (module Msg : Msg_intf)
-  (pats : 'a Local.pattern list)
-  (exp : 'a Net.expr)
+          ~(self_id : string)
+          (module Msg : Msg_intf)
+          (pats : 'a Local.pattern list)
+          (exp : 'a Net.expr)
   =
   match pats with
   | [] -> emit_net_pexp ~self_id (module Msg : Msg_intf) exp
@@ -184,7 +184,7 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
   | Pair (e1, e2, _) ->
     [%expr
       [%e emit_net_pexp ~self_id (module Msg) e1]
-      , [%e emit_net_pexp ~self_id (module Msg) e2]]
+    , [%e emit_net_pexp ~self_id (module Msg) e2]]
   | Fst (e, _) -> [%expr fst [%e emit_net_pexp ~self_id (module Msg) e]]
   | Snd (e, _) -> [%expr snd [%e emit_net_pexp ~self_id (module Msg) e]]
   | Left (e, _) -> [%expr Either.Left [%e emit_net_pexp ~self_id (module Msg) e]]
@@ -193,10 +193,10 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
     let cases =
       List.map
         (fun (p, e) ->
-          Ast_builder.Default.case
-            ~lhs:(emit_local_ppat p)
-            ~guard:None
-            ~rhs:(emit_net_pexp ~self_id (module Msg) e))
+           Ast_builder.Default.case
+             ~lhs:(emit_local_ppat p)
+             ~guard:None
+             ~rhs:(emit_net_pexp ~self_id (module Msg) e))
         cases
     in
     Ast_builder.Default.pexp_match ~loc (emit_net_pexp ~self_id (module Msg) e) cases
@@ -215,7 +215,12 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
     [%expr
       match [%e Msg.emit_net_recv ~src ~dst:self_id] with
       | Ok msg -> msg
-      | Error msg -> failwith ("Receive error: " ^ msg)]
+      | Error msg ->
+        Printf.printf
+          "Receive error in %s: %s\n"
+          [%e Ast_builder.Default.estring ~loc self_id]
+          msg;
+        failwith ("Receive error: " ^ msg)]
   | ChooseFor (LabelId (label, _), LocId (dst, _), e, _) ->
     Ast_builder.Default.esequence
       ~loc
@@ -226,10 +231,10 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
     let cases =
       List.map
         (fun (Local.LabelId (label, _), e) ->
-          Ast_builder.Default.case
-            ~lhs:(Ast_builder.Default.pstring ~loc label)
-            ~guard:None
-            ~rhs:(emit_net_pexp ~self_id (module Msg) e))
+           Ast_builder.Default.case
+             ~lhs:(Ast_builder.Default.pstring ~loc label)
+             ~guard:None
+             ~rhs:(emit_net_pexp ~self_id (module Msg) e))
         cases
     and default_case =
       Ast_builder.Default.case
