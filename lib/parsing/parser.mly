@@ -59,7 +59,7 @@
 %type <Parsed_ast.Local.loc_id> loc_id
 %type <Parsed_ast.Local.var_id> var_id
 %type <Parsed_ast.Local.typ_id> typ_id
-%type <Parsed_ast.Local.sync_label> sync_label
+/* %type <Parsed_ast.Local.sync_label> sync_label */
 
 %start prog
 
@@ -87,7 +87,7 @@ choreo_expr:
   | LEFT e=choreo_expr { Left (e, gen_pos $startpos $endpos) }
   | RIGHT e=choreo_expr { Right (e, gen_pos $startpos $endpos) }
   | MATCH e=choreo_expr WITH cases=nonempty_list(choreo_case) { Match (e, cases, gen_pos $startpos $endpos) }
-  | id1=loc_id LBRACKET l=sync_label RBRACKET TILDE_ARROW id2=loc_id SEMICOLON e=choreo_expr { Sync (id1, l, id2, e, gen_pos $startpos $endpos) }
+  /* | id1=loc_id LBRACKET l=sync_label RBRACKET TILDE_ARROW id2=loc_id SEMICOLON e=choreo_expr { Sync (id1, l, id2, e, gen_pos $startpos $endpos) } */
   | LBRACKET id1=loc_id RBRACKET e=choreo_expr TILDE_ARROW id2=loc_id { Send (id1, e, id2, gen_pos $startpos $endpos) }
   | LBRACKET id1=loc_id RBRACKET e1=choreo_expr TILDE_ARROW id2=loc_id DOT p=local_pattern SEMICOLON e2=choreo_expr
       { Let ([Assign ([LocPat (id2, p, gen_pos $startpos(id2) $endpos(p))], Send (id1, e1, id2, gen_pos $startpos($1) $endpos(id2)), gen_pos $startpos($1) $endpos(p))], e2, gen_pos $startpos $endpos) }
@@ -163,8 +163,8 @@ var_id:
 typ_id:
   | id=ID { TypId (id, gen_pos $startpos $endpos) }
 
-sync_label:
-  | id=ID { LabelId (id, gen_pos $startpos $endpos) }
+/* sync_label: */
+  /* | id=ID { LabelId (id, gen_pos $startpos $endpos) } */
 
 value:
   | i=INT { Int (i, gen_pos $startpos $endpos) }
