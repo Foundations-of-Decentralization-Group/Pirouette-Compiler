@@ -1,6 +1,11 @@
+(* This is an import for things from the Local module *)
 module Local = Local.M
 
+(* This is where the current module is defined *)
 module M = struct
+  (* These are called variant types/to be more specific polymorphic data types - because they can hold different types of data *)
+  (* What is the point of the 'a? - I guess metadata but for what - typechecking? *)
+  
   type 'a typ =
     | TUnit of 'a
     | TLoc of 'a Local.loc_id * 'a Local.typ * 'a
@@ -41,6 +46,7 @@ module M = struct
   and 'a stmt_block = 'a stmt list
 end
 
+(* This is for type information *)
 module With (Info : sig
     type t
   end) =
