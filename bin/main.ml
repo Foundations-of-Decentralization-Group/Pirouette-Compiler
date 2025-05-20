@@ -360,6 +360,334 @@ and get_pattern_list (p : 'a Choreo.pattern list) (holder : string list) =
     get_pattern_list tail holder1
 ;;
 
+let rec copy_local_expr (x : 'a Local.expr) (holder : string list) : 'a Local.expr =
+  match x with
+  | Unit a ->
+    print_endline "Hit a Local Unit AST Node";
+    Unit a
+  | Val (v, a) ->
+    print_endline "Hit a Local Val Ast Node";
+    Val (copy_local_val v, a)
+  | Var (v, a) ->
+    print_endline "Hit a Local Var Ast Node";
+    Var (copy_loc_var_id v, a)
+  | UnOp (u, e, a) ->
+    print_endline "Hit a Local Unop Ast Node";
+    UnOp (copy_local_unop u, copy_local_expr e holder, a)
+  | BinOp (e1, bop, e2, a) ->
+    print_endline "Hit a Local Binop Node";
+    BinOp (copy_local_expr e1 holder, copy_local_binop bop, copy_local_expr e2 holder, a)
+  | Let (v, e1, e2, a) ->
+    print_endline "Hit a Local Let AST node";
+    Let (copy_loc_var_id v, copy_local_expr e1 holder, copy_local_expr e2 holder, a)
+  | Pair (e1, e2, a) ->
+    print_endline "Hit a Local Pair AST node";
+    Pair (copy_local_expr e1 holder, copy_local_expr e2 holder, a)
+  | Fst (e, a) ->
+    print_endline "Hit a Local Fst AST node";
+    Fst (copy_local_expr e holder, a)
+  | Snd (e, a) ->
+    print_endline "Hit a Local Snd AST node";
+    Snd (copy_local_expr e holder, a)
+  | Left (e, a) ->
+    print_endline "Hit a Local Left AST node";
+    Left (copy_local_expr e holder, a)
+  | Right (e, a) ->
+    print_endline "Hit a Local Right AST node";
+    Right (copy_local_expr e holder, a)
+  | Match (e, l, a) ->
+    print_endline "Hit a Local Match AST node";
+    Match (copy_local_expr e holder, copy_local_case l holder, a)
+
+and copy_local_val (x : 'a Local.value) : 'a Local.value =
+  match x with
+  | Int (i, a) ->
+    print_endline "Hit a Local Int AST node";
+    Int (i, a)
+  | String (s, a) ->
+    print_endline "Hit a Local String AST node";
+    String (s, a)
+  | Bool (b, a) ->
+    print_endline "Encountered a Local Bool AST node";
+    Bool (b, a)
+
+and copy_loc_var_id (x : 'a Local.var_id) : 'a Local.var_id =
+  match x with
+  | VarId (s, a) ->
+    print_endline "Hit a local Var ID AST node";
+    VarId (s, a)
+
+and copy_local_unop (x : 'a Local.un_op) : 'a Local.un_op =
+  match x with
+  | Not a ->
+    print_endline "Hit a local Not Unop AST node";
+    Not a
+  | Neg a ->
+    print_endline "Hit a local Neg Unop AST node";
+    Neg a
+
+and copy_local_binop (x : 'a Local.bin_op) : 'a Local.bin_op =
+  match x with
+  | Plus a ->
+    print_endline "Hit a Local Binop Node of type plus";
+    Plus a
+  | Minus a ->
+    print_endline "Hit a Local Binop Node of type minus";
+    Minus a
+  | Times a ->
+    print_endline "Hit a Local Binop Node of type times";
+    Times a
+  | Div a ->
+    print_endline "Hit a Local Binop Node of type division";
+    Div a
+  | And a ->
+    print_endline "Hit a Local Binop Node of type and";
+    And a
+  | Or a ->
+    print_endline "Hit a Local Binop Node of type or";
+    Or a
+  | Eq a ->
+    print_endline "Hit a Local Binop Node of type eq";
+    Eq a
+  | Neq a ->
+    print_endline "Hit a Local Binop Node of type Neq";
+    Neq a
+  | Lt a ->
+    print_endline "Hit a Local Binop Node of type Lt";
+    Lt a
+  | Leq a ->
+    print_endline "Hit a Local Binop Node of type Leq";
+    Leq a
+  | Gt a ->
+    print_endline "Hit a Local Binop Node of type Gt";
+    Gt a
+  | Geq a ->
+    print_endline "Hit a Local Binop Node of type Geq";
+    Geq a
+
+and copy_local_case (x : ('a Local.pattern * 'a Local.expr) list) (holder : string list)
+  : ('a Local.pattern * 'a Local.expr) list
+  =
+  match x with
+  | [] ->
+    print_endline "Done with the list of cases";
+    []
+  | head :: tail -> copy_split_local_pat_expr head holder :: copy_local_case tail holder
+
+and copy_split_local_pat_expr
+      (x : 'a Local.pattern * 'a Local.expr)
+      (holder : string list)
+  : 'a Local.pattern * 'a Local.expr
+  =
+  match x with
+  | p, e -> copy_loc_pattern p holder, copy_local_expr e holder
+
+and copy_loc_pattern (x : 'a Local.pattern) (holder : string list) : 'a Local.pattern =
+  match x with
+  | Default a ->
+    print_endline "Hit a local Default pattern AST node";
+    Default a
+  | Val (v, a) ->
+    print_endline "Hit a local Val pattern AST node";
+    Val (copy_local_val v, a)
+  | Var (v, a) ->
+    print_endline "Hit a local Var pattern AST node";
+    Var (copy_loc_var_id v, a)
+  | Pair (p1, p2, a) ->
+    print_endline "Hit a local Pair pattern AST node";
+    Pair (copy_loc_pattern p1 holder, copy_loc_pattern p2 holder, a)
+  | Left (p, a) ->
+    print_endline "Hit a local Left pattern AST node";
+    Left (copy_loc_pattern p holder, a)
+  | Right (p, a) ->
+    print_endline "Hit a local Right pattern AST node";
+    Right (copy_loc_pattern p holder, a)
+;;
+
+let rec copy_get_stmt_block (p : 'a Choreo.stmt list) (holder : string list)
+  : 'a Choreo.stmt list
+  =
+  match p with
+  | [] ->
+    print_endline "Done with the statement list";
+    []
+  | head :: tail -> copy_matcher_stmt head holder :: copy_get_stmt_block tail holder
+
+and copy_matcher_stmt (x : 'a Choreo.stmt) (holder : string list) : 'a Choreo.stmt =
+  match x with
+  | Decl (p, t, a) ->
+    print_endline "Hit the Decl AST node";
+    Decl (copy_choreo_pattern p holder, copy_choreo_typ t holder, a)
+  | Assign (ps, e, a) ->
+    print_endline "Hit the Assign AST node";
+    Assign (copy_get_pattern_list ps holder, copy_choreo_expr e holder, a)
+  | TypeDecl (t1, t2, a) ->
+    print_endline "Hit the TypeDecl AST node";
+    TypeDecl (copy_loc_typ_id t1 holder, copy_choreo_typ t2 holder, a)
+
+and copy_choreo_expr (x : 'a Choreo.expr) (holder : string list) : 'a Choreo.expr =
+  match x with
+  | Unit a ->
+    print_endline "Hit the Unit AST node in Choreo";
+    Unit a
+  | Var (v, a) ->
+    print_endline "Hit the Var AST node in Choreo";
+    Var (copy_loc_var_id v, a)
+  | LocExpr (l, e, a) ->
+    print_endline "Hit the LocExpr AST node\n";
+    LocExpr (copy_loc_id l holder, copy_local_expr e holder, a)
+  | Send (l1, e, l2, a) ->
+    print_endline "Hit the Send Ast node\n";
+    Send (copy_loc_id l1 holder, copy_choreo_expr e holder, copy_loc_id l2 holder, a)
+  | Sync (l1, l2, l3, e, a) ->
+    print_endline "Hit the Sync Ast node";
+    Sync
+      ( copy_loc_id l1 holder
+      , copy_sync_label_id l2
+      , copy_loc_id l3 holder
+      , copy_choreo_expr e holder
+      , a )
+  | If (e1, e2, e3, a) ->
+    print_endline "Hit the If AST node";
+    If
+      ( copy_choreo_expr e1 holder
+      , copy_choreo_expr e2 holder
+      , copy_choreo_expr e3 holder
+      , a )
+  | Let (stmts, e, a) ->
+    print_endline "Hit the Let AST node";
+    Let (copy_get_stmt_block stmts holder, copy_choreo_expr e holder, a)
+  | FunDef (ps, e, a) ->
+    print_endline "Hit the FunDef AST node";
+    FunDef (copy_get_pattern_list ps holder, copy_choreo_expr e holder, a)
+  | FunApp (e1, e2, a) ->
+    print_endline "Hit the FunApp AST node";
+    FunApp (copy_choreo_expr e1 holder, copy_choreo_expr e2 holder, a)
+  | Pair (e1, e2, a) ->
+    print_endline "Hit the Pair AST node";
+    Pair (copy_choreo_expr e1 holder, copy_choreo_expr e2 holder, a)
+  | Fst (e, a) ->
+    print_endline "Hit the FST AST node";
+    Fst (copy_choreo_expr e holder, a)
+  | Snd (e, a) ->
+    print_endline "Hit the Snd AST node";
+    Snd (copy_choreo_expr e holder, a)
+  | Left (e, a) ->
+    print_endline "Hit the Left AST node";
+    Left (copy_choreo_expr e holder, a)
+  | Right (e, a) ->
+    print_endline "Hit the Right AST node";
+    Right (copy_choreo_expr e holder, a)
+  | Match (e, cases, a) ->
+    print_endline "Hit the Match AST node";
+    Match (copy_choreo_expr e holder, copy_choreo_case cases holder, a)
+
+and copy_choreo_typ (x : 'a Choreo.typ) (holder : string list) : 'a Choreo.typ =
+  match x with
+  | TUnit a ->
+    print_endline "Hit the Choreo typ's TUnit AST node";
+    TUnit a
+  | TLoc (t1, t2, a) ->
+    print_endline "Hit the Choreo typ's TLoc AST node";
+    TLoc (copy_loc_id t1 holder, copy_local_typ t2 holder, a)
+  | TMap (t1, t2, a) ->
+    print_endline "Hit the Choreo typ's TMap AST node";
+    TMap (copy_choreo_typ t1 holder, copy_choreo_typ t2 holder, a)
+  | TProd (t1, t2, a) ->
+    print_endline "Hit the Choreo typ's TProd AST node";
+    TProd (copy_choreo_typ t1 holder, copy_choreo_typ t2 holder, a)
+  | TSum (t1, t2, a) ->
+    print_endline "Hit the Choreo typ's TSum AST node";
+    TSum (copy_choreo_typ t1 holder, copy_choreo_typ t2 holder, a)
+
+and copy_local_typ (x : 'a Local.typ) (holder : string list) =
+  match x with
+  | TUnit a ->
+    print_endline "Hit the Local typ's TUnit AST node";
+    TUnit a
+  | TInt a ->
+    print_endline "Hit the Local typ's TInt AST node";
+    TInt a
+  | TString a ->
+    print_endline "Hit the Local typ's TString AST node";
+    TString a
+  | TBool a ->
+    print_endline "Hit the Local typ's TBool AST node";
+    TBool a
+  | TProd (t1, t2, a) ->
+    print_endline "Hit the Local typ's TProd AST node";
+    TProd (copy_local_typ t1 holder, copy_local_typ t2 holder, a)
+  | TSum (t1, t2, a) ->
+    print_endline "Hit the Local typ's TSum AST node";
+    TSum (copy_local_typ t1 holder, copy_local_typ t2 holder, a)
+
+and copy_loc_id (x : 'a Local.loc_id) (_holder : string list) : 'a Local.loc_id =
+  match x with
+  | LocId (id, a) ->
+    print_endline "Hit the Loc Id AST node";
+    LocId (id, a)
+
+and copy_loc_typ_id (x : 'a Local.typ_id) (_holder : string list) : 'a Local.typ_id =
+  match x with
+  | TypId (s, a) ->
+    print_endline "Hit the Typ ID Ast node";
+    TypId (s, a)
+
+and copy_sync_label_id (x : 'a Local.sync_label) : 'a Local.sync_label =
+  match x with
+  | LabelId (s, a) ->
+    print_endline "Hit the Sync Label Id AST node";
+    LabelId (s, a)
+
+and copy_choreo_case
+      (x : ('a Choreo.pattern * 'a Choreo.expr) list)
+      (holder : string list)
+  : ('a Choreo.pattern * 'a Choreo.expr) list
+  =
+  match x with
+  | [] ->
+    print_endline "Done with the list of cases";
+    []
+  | head :: tail -> copy_split_choreo_pat_expr head holder :: copy_choreo_case tail holder
+
+and copy_split_choreo_pat_expr
+      (x : 'a Choreo.pattern * 'a Choreo.expr)
+      (holder : string list)
+  =
+  match x with
+  | p, e -> copy_choreo_pattern p holder, copy_choreo_expr e holder
+
+(* Need a good return from this guy ; matcher_pattern is copy_choreo_pattern *)
+and copy_choreo_pattern (x : 'a Choreo.pattern) (holder : string list) : 'a Choreo.pattern
+  =
+  match x with
+  | Default a ->
+    print_endline "Hit a Default AST node";
+    Default a
+  | Var (v, a) ->
+    print_endline "Hit a Var AST node";
+    Var (copy_loc_var_id v, a)
+  | Pair (p1, p2, a) ->
+    print_endline "Hit a Pair AST node";
+    Pair (copy_choreo_pattern p1 holder, copy_choreo_pattern p2 holder, a)
+  | LocPat (l1, l2, a) ->
+    print_endline "Hit a LocalPattern AST node";
+    LocPat (copy_loc_id l1 holder, copy_loc_pattern l2 holder, a)
+  | Left (p, a) ->
+    print_endline "Hit a Left AST node";
+    Left (copy_choreo_pattern p holder, a)
+  | Right (p, a) ->
+    print_endline "Hit a Right AST node";
+    Right (copy_choreo_pattern p holder, a)
+
+and copy_get_pattern_list (p : 'a Choreo.pattern list) (holder : string list) =
+  match p with
+  | [] ->
+    print_endline "Done with the pattern list";
+    []
+  | head :: tail -> copy_choreo_pattern head holder :: copy_get_pattern_list tail holder
+;;
+
 let () =
   Arg.parse speclist anon_fun usage_msg;
   if !file_ic = None
@@ -375,6 +703,10 @@ let () =
   let location_holder = [] in
   let result_locations = get_stmt_block program location_holder in
   List.iter (fun x -> Printf.printf "Location String : %s\n" x) result_locations;
+  let location_holder_new = [] in
+  let copy_tree = copy_get_stmt_block program result_locations in
+  let result_locations_new = get_stmt_block copy_tree location_holder_new in
+  List.iter (fun x -> Printf.printf "Location String : %s\n" x) result_locations_new;
   let locs = Ast_utils.extract_locs program in
   let net_stmtblocks = List.map (fun loc -> Netgen.epp_choreo_to_net program loc) locs in
   List.iter2
