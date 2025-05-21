@@ -1,4 +1,4 @@
 main := if A.(3 < 5) then
-     let A.q := A.5; in A.()    
+     let B.q := B.5; in B.()    
      else
-     let A.z := A.6; in A.();
+     let B.z := B.6; in B.();

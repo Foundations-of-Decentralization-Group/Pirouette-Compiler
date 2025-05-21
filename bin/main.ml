@@ -1,5 +1,6 @@
 module Choreo = Ast_core.Choreo.M
 module Local = Ast_core.Local.M
+module Set = Set.Make (String)
 
 let spf = Printf.sprintf
 let usage_msg = "USAGE: pirc [options] <file>"
@@ -525,6 +526,53 @@ and copy_matcher_stmt (x : 'a Choreo.stmt) (holder : string list) : 'a Choreo.st
     print_endline "Hit the TypeDecl AST node";
     TypeDecl (copy_loc_typ_id t1 holder, copy_choreo_typ t2 holder, a)
 
+and get_guard_loc_copy_expr (x : 'a Choreo.expr) : string =
+  match x with
+  | LocExpr (l, _, _) ->
+    print_endline "Hit the LocExpr AST node\n";
+    get_copy_loc_id l
+  | _ -> String.empty
+
+and add_sync_copy_choreo_expr
+      (e : 'a Choreo.expr)
+      (holder : string list)
+      (label : string)
+      (s : string)
+      a
+  : 'a Choreo.expr
+  =
+  let l1 = s in
+  let l2 = label in
+  let rec deconstruct_list s holder a x : 'a Choreo.expr =
+    match holder with
+    | [] -> x
+    | head :: tail ->
+      if String.equal l1 head
+      then deconstruct_list s tail a x
+      else (
+        print_endline "Ran once";
+        let l3 = head in
+        (* Sync *)
+        (*   ( LocId (l1, a) *)
+        (*   , LabelId (l2, a) *)
+        (*   , LocId (l3, a) *)
+        (*   , Sync *)
+        (*       ( LocId (l1, a) *)
+        (*       , LabelId (l2, a) *)
+        (*       , LocId (l3, a) *)
+        (*       , deconstruct_list s tail a x *)
+        (*       , a ) *)
+        (*   , a )) *)
+        Sync
+          ( LocId (l1, a)
+          , LabelId (l2, a)
+          , LocId (l3, a)
+          , deconstruct_list s tail a x
+          , a ))
+          
+  in
+  deconstruct_list s holder a e
+
 and copy_choreo_expr (x : 'a Choreo.expr) (holder : string list) : 'a Choreo.expr =
   match x with
   | Unit a ->
@@ -549,11 +597,20 @@ and copy_choreo_expr (x : 'a Choreo.expr) (holder : string list) : 'a Choreo.exp
       , a )
   | If (e1, e2, e3, a) ->
     print_endline "Hit the If AST node";
+    let s = get_guard_loc_copy_expr e1 in
+    let left_label = "L" in
+    let right_label = "R" in
+    Printf.printf "############# This is the Loc ID %s ###########\n" s;
     If
-      ( copy_choreo_expr e1 holder
-      , copy_choreo_expr e2 holder
-      , copy_choreo_expr e3 holder
+      ( copy_choreo_expr e1 holder 
+      , add_sync_copy_choreo_expr e2 holder left_label s a
+      , add_sync_copy_choreo_expr e3 holder right_label s a
       , a )
+    (* If *)
+    (*   ( copy_choreo_expr e1 holder *)
+    (*   , copy_choreo_expr e2 holder *)
+    (*   , copy_choreo_expr e3 holder *)
+    (*   , a ) *)
   | Let (stmts, e, a) ->
     print_endline "Hit the Let AST node";
     Let (copy_get_stmt_block stmts holder, copy_choreo_expr e holder, a)
@@ -581,6 +638,64 @@ and copy_choreo_expr (x : 'a Choreo.expr) (holder : string list) : 'a Choreo.exp
   | Match (e, cases, a) ->
     print_endline "Hit the Match AST node";
     Match (copy_choreo_expr e holder, copy_choreo_case cases holder, a)
+
+(* This is a copy in case mistakes happen *)
+(* and copy_choreo_expr (x : 'a Choreo.expr) (holder : string list) : 'a Choreo.expr = *)
+(*   match x with *)
+(*   | Unit a -> *)
+(*     print_endline "Hit the Unit AST node in Choreo"; *)
+(*     Unit a *)
+(*   | Var (v, a) -> *)
+(*     print_endline "Hit the Var AST node in Choreo"; *)
+(*     Var (copy_loc_var_id v, a) *)
+(*   | LocExpr (l, e, a) -> *)
+(*     print_endline "Hit the LocExpr AST node\n"; *)
+(*     LocExpr (copy_loc_id l holder, copy_local_expr e holder, a) *)
+(*   | Send (l1, e, l2, a) -> *)
+(*     print_endline "Hit the Send Ast node\n"; *)
+(*     Send (copy_loc_id l1 holder, copy_choreo_expr e holder, copy_loc_id l2 holder, a) *)
+(*   | Sync (l1, l2, l3, e, a) -> *)
+(*     print_endline "Hit the Sync Ast node"; *)
+(*     Sync *)
+(*       ( copy_loc_id l1 holder *)
+(*       , copy_sync_label_id l2 *)
+(*       , copy_loc_id l3 holder *)
+(*       , copy_choreo_expr e holder *)
+(*       , a ) *)
+(*   | If (e1, e2, e3, a) -> *)
+(*     print_endline "Hit the If AST node"; *)
+(*     If *)
+(*       ( copy_choreo_expr e1 holder *)
+(*       , copy_choreo_expr e2 holder *)
+(*       , copy_choreo_expr e3 holder *)
+(*       , a ) *)
+(*   | Let (stmts, e, a) -> *)
+(*     print_endline "Hit the Let AST node"; *)
+(*     Let (copy_get_stmt_block stmts holder, copy_choreo_expr e holder, a) *)
+(*   | FunDef (ps, e, a) -> *)
+(*     print_endline "Hit the FunDef AST node"; *)
+(*     FunDef (copy_get_pattern_list ps holder, copy_choreo_expr e holder, a) *)
+(*   | FunApp (e1, e2, a) -> *)
+(*     print_endline "Hit the FunApp AST node"; *)
+(*     FunApp (copy_choreo_expr e1 holder, copy_choreo_expr e2 holder, a) *)
+(*   | Pair (e1, e2, a) -> *)
+(*     print_endline "Hit the Pair AST node"; *)
+(*     Pair (copy_choreo_expr e1 holder, copy_choreo_expr e2 holder, a) *)
+(*   | Fst (e, a) -> *)
+(*     print_endline "Hit the FST AST node"; *)
+(*     Fst (copy_choreo_expr e holder, a) *)
+(*   | Snd (e, a) -> *)
+(*     print_endline "Hit the Snd AST node"; *)
+(*     Snd (copy_choreo_expr e holder, a) *)
+(*   | Left (e, a) -> *)
+(*     print_endline "Hit the Left AST node"; *)
+(*     Left (copy_choreo_expr e holder, a) *)
+(*   | Right (e, a) -> *)
+(*     print_endline "Hit the Right AST node"; *)
+(*     Right (copy_choreo_expr e holder, a) *)
+(*   | Match (e, cases, a) -> *)
+(*     print_endline "Hit the Match AST node"; *)
+(*     Match (copy_choreo_expr e holder, copy_choreo_case cases holder, a) *)
 
 and copy_choreo_typ (x : 'a Choreo.typ) (holder : string list) : 'a Choreo.typ =
   match x with
@@ -626,6 +741,12 @@ and copy_loc_id (x : 'a Local.loc_id) (_holder : string list) : 'a Local.loc_id 
   | LocId (id, a) ->
     print_endline "Hit the Loc Id AST node";
     LocId (id, a)
+
+and get_copy_loc_id (x : 'a Local.loc_id) : string =
+  match x with
+  | LocId (id, _) ->
+    print_endline "Hit the Loc Id AST node";
+    id
 
 and copy_loc_typ_id (x : 'a Local.typ_id) (_holder : string list) : 'a Local.typ_id =
   match x with
@@ -702,11 +823,14 @@ let () =
    | _ -> invalid_arg "Invalid ast-dump format");
   let location_holder = [] in
   let result_locations = get_stmt_block program location_holder in
-  List.iter (fun x -> Printf.printf "Location String : %s\n" x) result_locations;
-  let location_holder_new = [] in
-  let copy_tree = copy_get_stmt_block program result_locations in
-  let result_locations_new = get_stmt_block copy_tree location_holder_new in
-  List.iter (fun x -> Printf.printf "Location String : %s\n" x) result_locations_new;
+  (* List.iter (fun x -> Printf.printf "Location String : %s\n" x) result_locations; *)
+  let result_set = Set.of_list result_locations in
+  let result_locations_two = Set.to_list result_set in
+  List.iter (fun x -> Printf.printf "Set location string : %s\n" x) result_locations_two;
+  let copy_tree = copy_get_stmt_block program result_locations_two in
+  let program = copy_tree in
+  (* let result_locations_new = get_stmt_block copy_tree location_holder_new in *)
+  (* List.iter (fun x -> Printf.printf "Location String : %s\n" x) result_locations_new; *)
   let locs = Ast_utils.extract_locs program in
   let net_stmtblocks = List.map (fun loc -> Netgen.epp_choreo_to_net program loc) locs in
   List.iter2
