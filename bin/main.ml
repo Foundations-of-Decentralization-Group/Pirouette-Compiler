@@ -596,6 +596,7 @@ and copy_choreo_expr (x : 'a Choreo.expr) (holder : string list) : 'a Choreo.exp
       , copy_choreo_expr e holder
       , a )
   | If (e1, e2, e3, a) ->
+    (* Have to add in a clause to take the normal If if the number of participants is 1 *)
     print_endline "Hit the If AST node";
     let s = get_guard_loc_copy_expr e1 in
     let left_label = "L" in
