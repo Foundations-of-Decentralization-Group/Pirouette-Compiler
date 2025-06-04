@@ -1,6 +1,16 @@
 module Choreo = Ast_core.Choreo.M
 module Net = Ast_core.Net.M
 
+let tree_walk (stmt_block : 'a Choreo.stmt list) (holder : string list) : string list =
+  Tree_walk.get_stmt_block stmt_block holder
+;;
+
+let infer_sync_expr (stmt_block : 'a Choreo.stmt list) (holder : string list)
+  : 'a Choreo.stmt list
+  =
+  Tree_walk.copy_get_stmt_block stmt_block holder
+;;
+
 let extract_locs (stmt_block : 'a Choreo.stmt_block) =
   Ast_locs.extract_stmt_block stmt_block |> Ast_locs.LocSet.elements
 ;;
