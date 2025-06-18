@@ -1,0 +1,37 @@
+(
+  (commstime
+    iterations
+    init_num) :=
+    (if
+       (ret ((iterations) > (0)))
+     then
+       (choose L for A;
+        choose L for B;
+        choose L for C;
+        choose L for D;
+        let
+          (
+            (_) := ((ret (init_num)) ~> B)
+          )
+        in
+          (let
+             (
+               (new_iterations) := (ret ((iterations) - (1)))
+             )
+           in
+             (let
+                (
+                  (new_init_num) := (<~ B)
+                )
+              in
+                (((ret (commstime)) (ret (new_iterations)))
+                 (ret (new_init_num))))))
+     else
+       (choose R for A;
+        choose R for B;
+        choose R for C;
+        choose R for D;
+        (ret (print_string))
+        (ret ("Communications Time completed successfully"))))
+  (main) := (((ret (commstime)) (ret (10))) (ret (0)))
+)

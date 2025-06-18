@@ -1,0 +1,20 @@
+(
+  (_) :=
+    (allow E choice
+     | R -> ()
+     | L ->
+         let
+           (
+             (delta) := (<~ B)
+           )
+         in
+           (let
+              (
+                (successor) := (ret ((delta) + (1)))
+              )
+            in
+              (let (
+                     (_) := ((ret (successor)) ~> A)
+                   ) in (()))))
+  (main) := (())
+)

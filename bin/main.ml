@@ -37,15 +37,15 @@ let () =
    | "json" -> Ast_utils.jsonify_choreo_ast (open_out (spf "%s.json" !basename)) program
    | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (spf "%s.ast" !basename)) program
    | _ -> invalid_arg "Invalid ast-dump format");
-  let location_holder = [] in
-  let result_locations = Ast_utils.tree_walk program location_holder in
-  (* List.iter (fun x -> Printf.printf "Location String : %s\n" x) result_locations; *)
-  let result_set = Set.of_list result_locations in
-  let result_locations_two = Set.to_list result_set in
-  List.iter (fun x -> Printf.printf "Set location string : %s\n" x) result_locations_two;
-  let copy_tree = Ast_utils.infer_sync_expr program result_locations_two in
-  let program = copy_tree in
-  (* let result_locations_new = get_stmt_block copy_tree location_holder_new in *)
+  (* let location_holder = [] in *)
+  (* let result_locations = Ast_utils.tree_walk program location_holder in *)
+  (* (\* List.iter (fun x -> Printf.printf "Location String : %s\n" x) result_locations; *\) *)
+  (* let result_set = Set.of_list result_locations in *)
+  (* let result_locations_two = Set.to_list result_set in *)
+  (* List.iter (fun x -> Printf.printf "Set location string : %s\n" x) result_locations_two; *)
+  (* let copy_tree = Ast_utils.infer_sync_expr program result_locations_two in *)
+  (* let program = copy_tree in *)
+  (* (\* let result_locations_new = get_stmt_block copy_tree location_holder_new in *\) *)
   (* List.iter (fun x -> Printf.printf "Location String : %s\n" x) result_locations_new; *)
   let locs = Ast_utils.extract_locs program in
   let net_stmtblocks = List.map (fun loc -> Netgen.epp_choreo_to_net program loc) locs in

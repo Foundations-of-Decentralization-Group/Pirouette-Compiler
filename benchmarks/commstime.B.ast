@@ -1,0 +1,30 @@
+(
+  (_) :=
+    (allow E choice
+     | L ->
+         let
+           (
+             (init_num) := (<~ E)
+           )
+         in
+           (let
+              (
+                (_) := ((ret (init_num)) ~> C)
+              )
+            in
+              (let
+                 (
+                   (_) := ((ret (init_num)) ~> D)
+                 )
+               in
+                 (let
+                    (
+                      (init_num) := (<~ A)
+                    )
+                  in
+                    (let (
+                           (_) := ((ret (init_num)) ~> E)
+                         ) in (())))))
+     | R -> ())
+  (main) := (())
+)

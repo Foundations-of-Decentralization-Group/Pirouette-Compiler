@@ -1,0 +1,15 @@
+(
+  (_) :=
+    (allow E choice
+     | R -> ()
+     | L ->
+         let
+           (
+             (successor) := (<~ C)
+           )
+         in
+           (let (
+                  (_) := ((ret (successor)) ~> B)
+                ) in (())))
+  (main) := (())
+)
