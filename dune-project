@@ -25,7 +25,7 @@
   (dune :build)
   (menhir :build)
   (ocaml (>= 5.0.0))
-  (ppxlib (and (>= 0.36.0):build))
+  (ppxlib (and (= 0.35.0):build))
   (yojson :build)
   (domainslib :with-test)
   (mpi :with-test)

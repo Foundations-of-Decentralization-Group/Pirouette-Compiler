@@ -67,7 +67,7 @@ let emit_toplevel_mpi
       loc_ids
   in
   let loc_to_rank_fun =
-    Builder.pexp_function_cases
+    Builder.pexp_function
       (loc_cases
        @ [ Builder.case
              ~guard:None
