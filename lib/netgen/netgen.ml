@@ -129,7 +129,8 @@ and merge_net_expr (expr : 'a Net.expr) (expr' : 'a Net.expr) : 'a Net.expr opti
 
 let rec epp_choreo_type (typ : 'a Choreo.typ) (loc : string) : 'a Net.typ =
   match typ with
-  | TLoc (LocId (loc1, _), t1, _) -> if loc1 = loc then TLoc (t1, _m) else TUnit _m
+  | TLoc ((LocId (loc1, _) as locid), t1, _) ->
+    if loc1 = loc then TLoc (locid, t1, _m) else TUnit _m
   | TMap (t1, t2, _) -> TMap (epp_choreo_type t1 loc, epp_choreo_type t2 loc, _m)
   | TProd (t1, t2, _) -> TProd (epp_choreo_type t1 loc, epp_choreo_type t2 loc, _m)
   | TSum (t1, t2, _) -> TSum (epp_choreo_type t1 loc, epp_choreo_type t2 loc, _m)
@@ -155,6 +156,7 @@ let rec epp_choreo_stmt (stmt : 'a Choreo.stmt) (loc : string) : 'a Net.stmt =
      | Default _m :: _ -> Assign ([ Default _m ], epp_choreo_expr e loc, _m)
      | _ -> Assign (epp_ps, epp_choreo_expr e loc, _m))
   | TypeDecl (id, t, _) -> TypeDecl (id, epp_choreo_type t loc, _m)
+  | ForeignDecl (id, t, s, _) -> ForeignDecl (id, epp_choreo_type t loc, s, _m)
 
 and epp_choreo_expr (expr : 'a Choreo.expr) (loc : string) : 'a Net.expr =
   match expr with
@@ -166,10 +168,11 @@ and epp_choreo_expr (expr : 'a Choreo.expr) (loc : string) : 'a Net.expr =
      | Default _m :: _ -> FunDef ([ Default _m ], epp_choreo_expr e loc, _m)
      | _ -> FunDef (epp_ps, epp_choreo_expr e loc, _m))
   | FunApp (e1, e2, _) ->
-    let epp_e1 = epp_choreo_expr e1 loc in
-    (match epp_e1 with
-     | Unit _m -> Unit _m
-     | _ -> FunApp (epp_e1, epp_choreo_expr e2 loc, _m))
+    let e1' = epp_choreo_expr e1 loc in
+    let e2' = epp_choreo_expr e2 loc in
+    (match e1', e2' with
+     | Unit _, _ | _, Unit _ -> Unit _m
+     | _ -> FunApp (e1', e2', _m))
   | Pair (e1, e2, _) -> Pair (epp_choreo_expr e1 loc, epp_choreo_expr e2 loc, _m)
   | Fst (e, _) -> Fst (epp_choreo_expr e loc, _m)
   | Snd (e, _) -> Snd (epp_choreo_expr e loc, _m)

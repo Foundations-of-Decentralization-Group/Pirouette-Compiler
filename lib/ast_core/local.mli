@@ -32,6 +32,7 @@ module M : sig
     | TInt of 'a
     | TString of 'a
     | TBool of 'a
+    | TVar of 'a typ_id * 'a
     | TProd of 'a typ * 'a typ * 'a
     | TSum of 'a typ * 'a typ * 'a
 
@@ -49,7 +50,7 @@ module M : sig
     | Var of 'a var_id * 'a
     | UnOp of 'a un_op * 'a expr * 'a
     | BinOp of 'a expr * 'a bin_op * 'a expr * 'a
-    | Let of 'a var_id * 'a expr * 'a expr * 'a
+    | Let of 'a var_id * 'a typ * 'a expr * 'a expr * 'a
     | Pair of 'a expr * 'a expr * 'a
     | Fst of 'a expr * 'a
     | Snd of 'a expr * 'a

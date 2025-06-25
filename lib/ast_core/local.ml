@@ -32,6 +32,7 @@ module M = struct
     | TInt of 'a
     | TString of 'a
     | TBool of 'a
+    | TVar of 'a typ_id * 'a
     | TProd of 'a typ * 'a typ * 'a
     | TSum of 'a typ * 'a typ * 'a
 
@@ -49,7 +50,7 @@ module M = struct
     | Var of 'a var_id * 'a
     | UnOp of 'a un_op * 'a expr * 'a
     | BinOp of 'a expr * 'a bin_op * 'a expr * 'a
-    | Let of 'a var_id * 'a expr * 'a expr * 'a
+    | Let of 'a var_id * 'a typ * 'a expr * 'a expr * 'a
     | Pair of 'a expr * 'a expr * 'a
     | Fst of 'a expr * 'a
     | Snd of 'a expr * 'a
@@ -116,6 +117,7 @@ struct
     | TInt i -> i
     | TString i -> i
     | TBool i -> i
+    | TVar (_, i) -> i
     | TProd (_, _, i) -> i
     | TSum (_, _, i) -> i
   ;;
@@ -135,7 +137,7 @@ struct
     | Var (_, i) -> i
     | UnOp (_, _, i) -> i
     | BinOp (_, _, _, i) -> i
-    | Let (_, _, _, i) -> i
+    | Let (_, _, _, _, i) -> i
     | Pair (_, _, i) -> i
     | Fst (_, i) -> i
     | Snd (_, i) -> i
@@ -194,6 +196,7 @@ struct
     | TInt _ -> TInt i
     | TString _ -> TString i
     | TBool _ -> TBool i
+    | TVar (t, _) -> TVar (t, i)
     | TProd (t1, t2, _) -> TProd (t1, t2, i)
     | TSum (t1, t2, _) -> TSum (t1, t2, i)
   ;;
@@ -215,7 +218,7 @@ struct
     | Var (x, _) -> Var (x, i)
     | UnOp (op, e, _) -> UnOp (op, e, i)
     | BinOp (e1, op, e2, _) -> BinOp (e1, op, e2, i)
-    | Let (x, e1, e2, _) -> Let (x, e1, e2, i)
+    | Let (x, t, e1, e2, _) -> Let (x, t, e1, e2, i)
     | Pair (e1, e2, _) -> Pair (e1, e2, i)
     | Fst (e, _) -> Fst (e, i)
     | Snd (e, _) -> Snd (e, i)

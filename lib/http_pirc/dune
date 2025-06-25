@@ -1,0 +1,11 @@
+(library
+ (name http_pirc)
+ (modules send_receive)
+ (libraries cohttp-lwt-unix lwt config_parser)
+ (preprocess
+  (pps lwt_ppx)))
+
+(executable
+ (name mock_server)
+ (modules mock_server)
+ (libraries cohttp cohttp-lwt-unix lwt))

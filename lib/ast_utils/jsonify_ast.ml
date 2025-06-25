@@ -27,6 +27,7 @@ let rec jsonify_local_type = function
   | Local.TInt _ -> `String "TInt"
   | Local.TString _ -> `String "TString"
   | Local.TBool _ -> `String "TBool"
+  | Local.TVar (TypId (id, _), _) -> `String id
   | Local.TProd (t1, t2, _) ->
     `Assoc [ "TProd", `List [ jsonify_local_type t1; jsonify_local_type t2 ] ]
   | Local.TSum (t1, t2, _) ->
@@ -78,11 +79,12 @@ let rec jsonify_local_expr = function
             ; "choreo_e2", jsonify_local_expr e2
             ] )
       ]
-  | Local.Let (VarId (id, _), e1, e2, _) ->
+  | Local.Let (VarId (id, _), t, e1, e2, _) ->
     `Assoc
       [ ( "Let"
         , `Assoc
             [ "id", `String id
+            ; "local_type", jsonify_local_type t
             ; "binding", jsonify_local_expr e1
             ; "body", jsonify_local_expr e2
             ] )
@@ -110,6 +112,7 @@ let rec jsonify_choreo_type = function
   | Choreo.TUnit _ -> `String "TUnit"
   | Choreo.TLoc (LocId (loc, _), t, _) ->
     `Assoc [ "TLoc", `Assoc [ "loc", `String loc; "local_type", jsonify_local_type t ] ]
+  | Choreo.TVar (Typ_Id (id, _), _) -> `String id
   | Choreo.TMap (t1, t2, _) ->
     `Assoc [ "TMap", `List [ jsonify_choreo_type t1; jsonify_choreo_type t2 ] ]
   | Choreo.TProd (t1, t2, _) ->
@@ -150,6 +153,15 @@ let rec jsonify_choreo_stmt = function
   | Choreo.TypeDecl (TypId (id, _), t, _) ->
     `Assoc
       [ "TypeDecl", `Assoc [ "id", `String id; "choreo_type", jsonify_choreo_type t ] ]
+  | Choreo.ForeignDecl (VarId (id, _), t, s, _) ->
+    `Assoc
+      [ ( "ForeignDecl"
+        , `Assoc
+            [ "id", `String id
+            ; "choreo_type", jsonify_choreo_type t
+            ; "foreign_name", `String s
+            ] )
+      ]
 
 and jsonify_choreo_expr = function
   | Choreo.Unit _ -> `String "Unit"
@@ -235,7 +247,8 @@ let[@inline] jsonify_choreo_stmt_block (stmts : 'a Choreo.stmt_block) =
 
 let rec jsonify_net_type = function
   | Net.TUnit _ -> `String "TUnit"
-  | Net.TLoc (t, _) -> `Assoc [ "TLoc", jsonify_local_type t ]
+  | Net.TLoc (Local.LocId (loc, _), t, _) ->
+    `Assoc [ "TLoc", `Assoc [ "loc", `String loc; "local_type", jsonify_local_type t ] ]
   | Net.TMap (t1, t2, _) ->
     `Assoc [ "TMap", `List [ jsonify_net_type t1; jsonify_net_type t2 ] ]
   | Net.TProd (t1, t2, _) ->
@@ -261,6 +274,15 @@ let rec jsonify_net_stmt = function
       ]
   | Net.TypeDecl (TypId (id, _), t, _) ->
     `Assoc [ "TypeDecl", `Assoc [ "id", `String id; "net_type", jsonify_net_type t ] ]
+  | Net.ForeignDecl (VarId (id, _), t, s, _) ->
+    `Assoc
+      [ ( "ForeignDecl"
+        , `Assoc
+            [ "id", `String id
+            ; "net_type", jsonify_net_type t
+            ; "foreign_name", `String s
+            ] )
+      ]
 
 and jsonify_net_expr = function
   | Net.Unit _ -> `String "Unit"

@@ -48,9 +48,9 @@ let rec emit_local_pexp (expr : 'a Local.expr) =
       | Geq _ -> ">="
     in
     Builder.eapply (Builder.evar op) [ emit_local_pexp e1; emit_local_pexp e2 ]
-  | Let (VarId (v, _), e1, e2, _) ->
+  | Let (VarId (v, _), _, e1, e2, _) ->
     Builder.pexp_let
-      Nonrecursive
+      Recursive
       [ Builder.value_binding ~pat:(Builder.pvar v) ~expr:(emit_local_pexp e1) ]
       (emit_local_pexp e2)
   | Pair (e1, e2, _) -> [%expr [%e emit_local_pexp e1], [%e emit_local_pexp e2]]
@@ -113,7 +113,36 @@ and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (stmt : 'a Net.
        Builder.value_binding
          ~pat:(emit_local_ppat f)
          ~expr:(emit_net_fun_body ~self_id (module Msg) ps e))
+  | ForeignDecl (VarId (id, _), typ, external_name, _) ->
+    emit_foreign_decl id typ external_name
   | _ -> Builder.value_binding ~pat:[%pat? _unit] ~expr:Builder.eunit
+
+and emit_foreign_decl id _typ external_name =
+  let open Ast_builder.Default in
+  let module_path, function_name =
+    if String.starts_with ~prefix:"@" external_name
+    then (
+      match
+        String.split_on_char
+          ':'
+          (String.sub external_name 1 (String.length external_name - 1))
+      with
+      | [ file; func ] when file <> "" && func <> "" -> file, func
+      | _ -> failwith "Invalid external function format. Expected @file:function")
+    else external_name, external_name
+  in
+  let module_name =
+    String.capitalize_ascii (Filename.basename (Filename.remove_extension module_path))
+  in
+  let fun_expr =
+    pexp_fun
+      ~loc
+      Nolabel
+      None
+      (pvar ~loc "arg")
+      [%expr [%e evar ~loc (module_name ^ "." ^ function_name)] [%e evar ~loc "arg"]]
+  in
+  value_binding ~loc ~pat:(pvar ~loc id) ~expr:fun_expr
 
 and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr) =
   match exp with
@@ -155,10 +184,6 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
     in
     Builder.pexp_match (emit_net_pexp ~self_id (module Msg) e) cases
   | Send (e, LocId (dst, _), _) ->
-    (* Msg.emit_net_send
-       ~src:self_id
-       ~dst
-       [%expr Marshal.to_string [%e emit_net_pexp ~self_id (module Msg) e] []] *)
     let val_id = Id.gen "val_" in
     [%expr
       let [%p Builder.pvar val_id] = [%e emit_net_pexp ~self_id (module Msg) e] in
@@ -166,9 +191,17 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
         Msg.emit_net_send
           ~src:self_id
           ~dst
-          [%expr Marshal.to_string [%e Builder.evar val_id] []]]]
+          [%expr Ok [%e Builder.evar val_id]]]]
   | Recv (LocId (src, _), _) ->
-    [%expr Marshal.from_string [%e Msg.emit_net_recv ~src ~dst:self_id] 0]
+    [%expr
+      match [%e Msg.emit_net_recv ~src ~dst:self_id] with
+      | Ok msg -> msg
+      | Error msg ->
+        Printf.printf
+          "Receive error in %s: %s\n"
+          [%e Ast_builder.Default.estring ~loc self_id]
+          msg;
+        failwith ("Receive error: " ^ msg)]
   | ChooseFor (LabelId (label, _), LocId (dst, _), e, _) ->
     Builder.esequence
       [ Msg.emit_net_send ~src:self_id ~dst (Builder.estring label)
