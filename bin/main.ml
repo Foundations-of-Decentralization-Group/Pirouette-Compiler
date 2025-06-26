@@ -134,7 +134,7 @@ let generate_domain_code basename locs netir_l =
   (* Ensure the examples directory exists *)
   if not (Sys.file_exists examples_dir && Sys.is_directory examples_dir)
   then Unix.mkdir examples_dir 0o755;
-  let out_path = Filename.concat examples_dir (basename ^ "domain.ml") in
+  let out_path = Filename.concat examples_dir (basename ^ ".domain.ml") in
   Ocamlgen.Toplevel_domain.emit_toplevel_domain (open_out out_path) locs netir_l
 ;;
 
@@ -158,7 +158,7 @@ let generate_http_code basename locs netir_l =
   let has_ffi_files = List.length ffi_libs > 0 in
   List.iter2
     (fun loc ir ->
-       let ml_filename = Printf.sprintf "%s_%s.http.ml" basename loc in
+       let ml_filename = Printf.sprintf "%s_%s.ml" basename loc in
        let out_path = Filename.concat examples_dir ml_filename in
        let out_file = open_out out_path in
        (* Add appropriate imports *)
