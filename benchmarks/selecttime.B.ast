@@ -1,0 +1,22 @@
+(
+  (_) := (())
+  (experiment
+    iterations) :=
+    (allow E choice
+     | L5 ->
+         allow E choice
+         | L1 -> (experiment) (())
+         | R1 ->
+             allow E choice
+             | L2 -> let (
+                           (result) := (<~ E)
+                         ) in ((experiment) (()))
+             | R2 ->
+                 allow E choice
+                 | R3 -> allow E choice
+                         | R4 -> ()
+                         | L4 -> (experiment) (())
+                 | L3 -> (experiment) (())
+     | R5 -> ())
+  (main) := ((experiment) (()))
+)
