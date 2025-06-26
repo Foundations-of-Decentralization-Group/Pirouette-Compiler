@@ -191,17 +191,9 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
         Msg.emit_net_send
           ~src:self_id
           ~dst
-          [%expr Ok [%e Builder.evar val_id]]]]
+          [%expr Marshal.to_string [%e Builder.evar val_id] []]]]
   | Recv (LocId (src, _), _) ->
-    [%expr
-      match [%e Msg.emit_net_recv ~src ~dst:self_id] with
-      | Ok msg -> msg
-      | Error msg ->
-        Printf.printf
-          "Receive error in %s: %s\n"
-          [%e Ast_builder.Default.estring ~loc self_id]
-          msg;
-        failwith ("Receive error: " ^ msg)]
+    [%expr Marshal.from_string [%e Msg.emit_net_recv ~src ~dst:self_id] 0]
   | ChooseFor (LabelId (label, _), LocId (dst, _), e, _) ->
     Builder.esequence
       [ Msg.emit_net_send ~src:self_id ~dst (Builder.estring label)
