@@ -47,8 +47,8 @@ let generate_dune_file base_name locs backend netir_l =
   let ffi_libs = extract_ffi_libraries netir_l in
   let common_libs = "ast_core parsing ocamlgen ast_utils netgen ppxlib" in
   match backend with
-  | "shm" ->
-    (* For SHM backend, skip dune file generation *)
+  | "domain" ->
+    (* For domains backend, skip dune file generation *)
     ()
   | "http" ->
     (* For HTTP backend, create a new dune file in examples/ directory *)
@@ -96,6 +96,9 @@ let generate_dune_file base_name locs backend netir_l =
     let oc = open_out dune_path in
     output_string oc final_content;
     close_out oc
+  | "mpi" ->
+    (* For mpi backend, skip dune file generation *)
+    ()
   | _ -> invalid_arg "Invalid backend for dune generation"
 ;;
 
