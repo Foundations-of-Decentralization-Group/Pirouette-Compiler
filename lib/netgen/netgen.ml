@@ -168,11 +168,15 @@ and epp_choreo_expr (expr : 'a Choreo.expr) (loc : string) : 'a Net.expr =
      | Default _m :: _ -> FunDef ([ Default _m ], epp_choreo_expr e loc, _m)
      | _ -> FunDef (epp_ps, epp_choreo_expr e loc, _m))
   | FunApp (e1, e2, _) ->
-    let e1' = epp_choreo_expr e1 loc in
-    let e2' = epp_choreo_expr e2 loc in
-    (match e1', e2' with
-     | Unit _, _ | _, Unit _ -> Unit _m
-     | _ -> FunApp (e1', e2', _m))
+    (* let e1' = epp_choreo_expr e1 loc in *)
+    (* let e2' = epp_choreo_expr e2 loc in *)
+    (* (match e1', e2' with *)
+    (*  | Unit _, _ | _, Unit _ -> Unit _m *)
+    (*  | _ -> FunApp (e1', e2', _m)) *)
+    let epp_e1 = epp_choreo_expr e1 loc in
+    (match epp_e1 with
+     | Unit _m -> Unit _m
+     | _ -> FunApp (epp_e1, epp_choreo_expr e2 loc, _m))
   | Pair (e1, e2, _) -> Pair (epp_choreo_expr e1 loc, epp_choreo_expr e2 loc, _m)
   | Fst (e, _) -> Fst (epp_choreo_expr e loc, _m)
   | Snd (e, _) -> Snd (epp_choreo_expr e loc, _m)
