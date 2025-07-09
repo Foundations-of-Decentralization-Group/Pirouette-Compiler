@@ -22,7 +22,7 @@
  (synopsis "Pirouette Compiler")
  (description "Higher-order typed functional choreographies")
  (depends
-  (cohttp-lwt-unit :build)
+  (cohttp-lwt-unix :build)
   (dune :build)
   (lwt :build)
   (lwt_ppx :build)
