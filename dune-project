@@ -18,6 +18,14 @@
 (documentation https://dl.acm.org/doi/10.1145/3498684)
 
 (package
+ (name http_pirc)
+ (depends
+  (lwt :build)
+  (cohttp-lwt-unix :build)
+  (cohttp :build))
+ (allow_empty))
+
+(package
  (name pirc)
  (synopsis "Pirouette Compiler")
  (description "Higher-order typed functional choreographies")
