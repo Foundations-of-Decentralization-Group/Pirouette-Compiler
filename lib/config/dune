@@ -1,7 +1,0 @@
-(library
- (name config_parser)
- (package http_pirc)
- (modules config_parser)
- (libraries lwt lwt.unix yaml ast_utils parsing netgen)
- (preprocess
-  (pps lwt_ppx)))

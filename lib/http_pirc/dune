@@ -1,8 +1,8 @@
 (library
  (name http_pirc)
  (public_name http_pirc)
- (modules send_receive)
- (libraries cohttp-lwt-unix lwt config_parser)
+ (modules send_receive config_parser)
+ (libraries cohttp-lwt-unix lwt lwt.unix yaml ast_utils parsing netgen)
  (preprocess
   (pps lwt_ppx)))
 
