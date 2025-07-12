@@ -92,6 +92,7 @@ let () =
   dump_choreo_ast
     !ast_dump_format
     (change_extension
+      !input_filename
        (match !ast_dump_format with
         | "json" -> ".json"
         | "pprint" -> ".ast"
@@ -107,6 +108,7 @@ let () =
        dump_net_ast
          !ast_dump_format
          (change_extension
+           !input_filename
             ("."
              ^ loc
              ^
