@@ -6,12 +6,10 @@ let ast_dump_format = ref "pprint"
 let msg_backend = ref "domain"
 let file_ic = ref None
 let input_filename = ref "" (* Original input filename with path *)
-let basename = ref "" (* Base name without directory/extension *)
 
 (* Process anonymous command line argument (input file) *)
 let process_input_file filename =
   input_filename := filename;
-  basename := Filename.basename (Filename.remove_extension filename);
   file_ic := Some (open_in filename)
 ;;
 
@@ -27,11 +25,8 @@ let speclist =
   ]
 ;;
 
-(* Create path for output files *)
-let create_output_path input_file base suffix =
-  let output_dir = Filename.dirname input_file in
-  Filename.concat output_dir (base ^ suffix)
-;;
+(* Change the extension of a filename *)
+let change_extension filename new_suffix = (Filename.remove_extension filename) ^ new_suffix ;;
 
 (* Dump AST in specified format *)
 let dump_choreo_ast format output_path program =
@@ -54,30 +49,21 @@ let dump_net_ast format output_path ir =
 ;;
 
 (* Generate code for domains backend *)
-let generate_domain_code basename locs netir_l =
-  let examples_dir = "examples" in
-  (* Ensure the examples directory exists *)
-  if not (Sys.file_exists examples_dir && Sys.is_directory examples_dir)
-  then Unix.mkdir examples_dir 0o755;
-  let out_path = Filename.concat examples_dir (basename ^ ".domain.ml") in
+let generate_domain_code filename locs netir_l =
+  let out_path = change_extension filename ".domain.ml" in
   Ocamlgen.Toplevel_domain.emit_toplevel_domain (open_out out_path) locs netir_l
 ;;
 
 (* Generate code for HTTP backend *)
-let generate_http_code basename locs netir_l =
-  let examples_dir = "examples" in
-  (* Ensure the examples directory exists *)
-  if not (Sys.file_exists examples_dir && Sys.is_directory examples_dir)
-  then Unix.mkdir examples_dir 0o755;
+let generate_http_code filename locs netir_l =
   (* Generate one file per location *)
   List.iter2
     (fun loc ir ->
-       let ml_filename = Printf.sprintf "%s_%s.ml" basename loc in
-       let out_path = Filename.concat examples_dir ml_filename in
+       let out_path = change_extension filename ("_" ^ loc ^ ".ml") in
        let out_file = open_out out_path in
        (* Add appropriate imports *)
        output_string out_file "open Http_pirc\n\n";
-       let config_file_path = Filename.remove_extension !input_filename ^ ".yaml" in
+       let config_file_path = change_extension filename ".yaml" in
        Ocamlgen.Toplevel_http.emit_toplevel_http out_file [ loc ] [ ir ] config_file_path;
        close_out out_file)
     locs
@@ -85,12 +71,8 @@ let generate_http_code basename locs netir_l =
 ;;
 
 (* Generate code for MPI backend *)
-let generate_mpi_code basename locs netir_l =
-  let examples_dir = "examples" in
-  (* Ensure the examples directory exists *)
-  if not (Sys.file_exists examples_dir && Sys.is_directory examples_dir)
-  then Unix.mkdir examples_dir 0o755;
-  let out_path = Filename.concat examples_dir (basename ^ ".mpi.ml") in
+let generate_mpi_code filename locs netir_l =
+  let out_path = change_extension filename ".mpi.ml" in
   Ocamlgen.Toplevel_mpi.emit_toplevel_mpi (open_out out_path) locs netir_l
 ;;
 
@@ -99,19 +81,17 @@ let () =
   (* Parse command line arguments *)
   Arg.parse speclist process_input_file usage_msg;
   (* Check if input file was provided *)
-  if !file_ic = None || !basename = ""
+  if !file_ic = None || !input_filename = ""
   then (
     prerr_endline (Sys.argv.(0) ^ ": No input file");
     exit 1);
-  (* Create helper for generating output paths *)
-  let get_output_path suffix = create_output_path !input_filename !basename suffix in
   (* Parse the input file *)
   let lexbuf = Lexing.from_channel (Option.get !file_ic) in
   let program = Parsing.Parse.parse_with_error lexbuf in
   (* Dump the choreography AST *)
   dump_choreo_ast
     !ast_dump_format
-    (get_output_path
+    (change_extension
        (match !ast_dump_format with
         | "json" -> ".json"
         | "pprint" -> ".ast"
@@ -126,7 +106,7 @@ let () =
     (fun loc ir ->
        dump_net_ast
          !ast_dump_format
-         (get_output_path
+         (change_extension
             ("."
              ^ loc
              ^
@@ -139,8 +119,8 @@ let () =
     netir_l;
   (* Generate code based on selected backend *)
   (match !msg_backend with
-   | "domain" -> generate_domain_code !basename locs netir_l
-   | "http" -> generate_http_code !basename locs netir_l
-   | "mpi" -> generate_mpi_code !basename locs netir_l
+   | "domain" -> generate_domain_code !input_filename locs netir_l
+   | "http" -> generate_http_code !input_filename locs netir_l
+   | "mpi" -> generate_mpi_code !input_filename locs netir_l
    | _ -> invalid_arg "Invalid backend")
 ;;
