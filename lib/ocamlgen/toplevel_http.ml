@@ -36,19 +36,19 @@ module Msg_http_intf : Msg_intf.M = struct
   ;;
 end
 
-let emit_toplevel_init loc_ids =
-  let loc_pairs =
-    List.concat_map
-      (fun a -> List.filter_map (fun b -> if a <> b then Some (a, b) else None) loc_ids)
-      loc_ids
-  in
-  List.map
-    (fun (a, b) ->
-       [%stri
-         let [%p Ast_builder.Default.pvar ~loc (spf "chan_%s_%s" a b)] =
-           Domainslib.Chan.make_bounded 0
-         ;;])
-    loc_pairs
+let emit_toplevel_init _loc_ids =
+  [ [%stri
+    let () =
+      let config_filename = "test/example.yaml" in
+      match Lwt_main.run (Config_parser.load_config config_filename) with
+      | Some cfg ->
+        Send_receive.config := Some cfg;
+        (* Each process initializes its HTTP server in its own execution context *)
+        ()
+      | None ->
+        failwith (Printf.sprintf "Failed to load config from %s" config_filename)
+    ;;]
+  ]
 ;;
 
 let emit_toplevel_http
