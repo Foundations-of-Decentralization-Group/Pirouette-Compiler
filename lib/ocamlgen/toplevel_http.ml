@@ -36,17 +36,17 @@ module Msg_http_intf : Msg_intf.M = struct
   ;;
 end
 
-let emit_toplevel_init _loc_ids =
+let emit_toplevel_init _loc_ids config_file_path =
   [ [%stri
     let () =
-      let config_filename = "test/example.yaml" in
-      match Lwt_main.run (Config_parser.load_config config_filename) with
+      let config_file_path : string = [%e Ast_builder.Default.estring ~loc config_file_path] in
+      match Lwt_main.run (Config_parser.load_config config_file_path) with
       | Some cfg ->
         Send_receive.config := Some cfg;
         (* Each process initializes its HTTP server in its own execution context *)
         ()
       | None ->
-        failwith (Printf.sprintf "Failed to load config from %s" config_filename)
+        failwith (Printf.sprintf "Failed to load config from %s" config_file_path)
     ;;]
   ]
 ;;
@@ -55,6 +55,7 @@ let emit_toplevel_http
       out_chan
       (loc_ids : string list)
       (net_stmtblock_l : 'a Net.stmt_block list)
+      (config_file_path : string)
   =
   let emit_domain_stri (loc_id : string) (net_stmts : 'a Net.stmt_block) =
     let main_expr = ref (Ast_builder.Default.eunit ~loc) in
@@ -99,5 +100,5 @@ let emit_toplevel_http
   in
   Pprintast.structure
     (Format.formatter_of_out_channel out_chan)
-    ((warning_attr :: emit_toplevel_init loc_ids) @ process_bindings)
+    ((warning_attr :: emit_toplevel_init loc_ids config_file_path) @ process_bindings)
 ;;

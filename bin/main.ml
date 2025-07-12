@@ -165,7 +165,8 @@ let generate_http_code basename locs netir_l =
        if has_ffi_files
        then output_string out_file "open Http_pirc\nopen Ffi_lib\n\n"
        else output_string out_file "open Http_pirc\n\n";
-       Ocamlgen.Toplevel_http.emit_toplevel_http out_file [ loc ] [ ir ];
+       let config_file_path = Filename.remove_extension !input_filename ^ ".yaml" in
+       Ocamlgen.Toplevel_http.emit_toplevel_http out_file [ loc ] [ ir ] config_file_path;
        close_out out_file)
     locs
     netir_l
