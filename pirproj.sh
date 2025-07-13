@@ -1,10 +1,13 @@
 #! /bin/sh
 
-while getopts "b:p:hr" opt
+while getopts "b:p:hrg" opt
 do
     case $opt in
         "r")
             run="true"
+            ;;
+        "g")
+            gflag=-g
             ;;
         "b")
             backend=${OPTARG}
@@ -22,6 +25,7 @@ do
             echo "  -p <process list>  : if the 'http' backend is selected then the list of processes that"
             echo "                       are involved, written with commas between each process name."
             echo "  -r                 : run the projected program(s)"
+            echo "  -g                 : compile projection(s) with the '-g' debug flag"
             echo "  -h                 : display this help message"
             exit 0
             ;;
@@ -63,14 +67,14 @@ base=`basename ${file} .pir`
 case $backend in
     "domain")
         dune exec -- pirc -msg-backend=domain $file &&
-            ocamlfind ocamlopt -o $dir/$base.domain.exe -linkpkg -package domainslib $dir/$base.domain.ml
+            ocamlfind ocamlopt $gflag -o $dir/$base.domain.exe -linkpkg -package domainslib $dir/$base.domain.ml
         if [ "$run" = "true" ]; then
             ./$dir/$base.domain.exe
         fi
         ;;
     "mpi")
         dune exec -- pirc -msg-backend=mpi $file &&
-            ocamlfind ocamlopt -o $dir/$base.mpi.exe -linkpkg -package mpi $dir/$base.mpi.ml
+            ocamlfind ocamlopt $gflag -o $dir/$base.mpi.exe -linkpkg -package mpi $dir/$base.mpi.ml
         if [ "$run" = "true" ]; then
             mpiexec --oversubscribe ./$dir/$base.mpi.exe
         fi
@@ -85,7 +89,7 @@ case $backend in
         fi
         dune exec -- pirc -msg-backend=http $file &&
             for process in $processes; do
-                OCAMLPATH=./_build/install/default/lib/ ocamlfind ocamlopt -o $dir/${base}_$process.exe -linkpkg -package http_pirc $dir/${base}_$process.ml
+                OCAMLPATH=./_build/install/default/lib/ ocamlfind ocamlopt $gflag -o $dir/${base}_$process.exe -linkpkg -package http_pirc $dir/${base}_$process.ml
             done &&
             if [ "$run" = "true" ]; then
                 dune exec mock_server &
