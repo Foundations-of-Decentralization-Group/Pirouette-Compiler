@@ -13,17 +13,21 @@ do
             backend=${OPTARG}
             ;;
         "p")
-            OLDIFS=$IFS
-            processes=`IFS=','; echo ${OPTARG}`
-            IFS=$OLDIFS
+            processes=`printf ${OPTARG} | awk '{print $0}' RS=',' ORS=' '`
+            num_processes=`printf ${OPTARG} | awk 'END {print NR}' RS=','`
+            num_procs_flag="-n ${num_processes}"
             ;;
         "h")
             echo "Usage: $0 -b <backend> [-p|-r|-h] <file>"
             echo ""
             echo "Flags:"
             echo "  -b <backend>       : select backend ('domain', 'http', or 'mpi')"
-            echo "  -p <process list>  : if the 'http' backend is selected then the list of processes that"
-            echo "                       are involved, written with commas between each process name."
+            echo "  -p <process list>  : The list of processes that are involved, written with commas between"
+            echo "                        each process name. For example: '-p Foo,Bar,Baz'".
+            echo "                       If the 'http' backend is selected then this option is required."
+            echo "                       If the 'mpi' backend is selected, this option is strongly recommended"
+            echo "                        (but not strictly required) since the number of processes listed"
+            echo "                        determines how many processes are spawned by the mpiexec command."
             echo "  -r                 : run the projected program(s)"
             echo "  -g                 : compile projection(s) with the '-g' debug flag"
             echo "  -h                 : display this help message"
@@ -76,7 +80,7 @@ case $backend in
         dune exec -- pirc -msg-backend=mpi $file &&
             ocamlfind ocamlopt $gflag -o $dir/$base.mpi.exe -linkpkg -package mpi $dir/$base.mpi.ml
         if [ "$run" = "true" ]; then
-            mpiexec --oversubscribe ./$dir/$base.mpi.exe
+            mpiexec --oversubscribe ${num_procs_flag} ./$dir/$base.mpi.exe
         fi
         ;;
     "http")
