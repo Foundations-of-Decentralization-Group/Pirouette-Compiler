@@ -92,7 +92,6 @@ case $backend in
                 OCAMLPATH=./_build/install/default/lib/ ocamlfind ocamlopt $gflag -o $dir/${base}_$process.exe -linkpkg -package http_pirc $dir/${base}_$process.ml
             done &&
             if [ "$run" = "true" ]; then
-                dune exec mock_server &
                 for process in $processes; do
                     $dir/${base}_$process.exe &
                 done
