@@ -1,0 +1,46 @@
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+test_collatz
+  inp := if ret inp = 1 then ret 0 else let res1 := ret inp / 2; in let 
+                                                                    res2 := 
+                                                                    ret 
+                                                                    res1 *
+                                                                    2; in 
+                                                                    if 
+                                                                    ret 
+                                                                    res2 =
+                                                                    inp then 
+                                                                    let 
+                                                                    part_res := 
+                                                                    ret 
+                                                                    test_collatz 
+                                                                    ret 
+                                                                    res1; in 
+                                                                    ret 
+                                                                    part_res +
+                                                                    1 else 
+                                                                    let 
+                                                                    res3 := 
+                                                                    ret 
+                                                                    3 * inp +
+                                                                    1; in 
+                                                                    let 
+                                                                    res4 := 
+                                                                    ret 
+                                                                    test_collatz 
+                                                                    ret 
+                                                                    res3; in 
+                                                                    ret 
+                                                                    1 +
+                                                                    res4;
+broadcast_opt
+  freq := allow choice from C with
+          | R6 -> unit
+          | L6 ->
+              let result := ret test_collatz ret 931386509544713451; in 
+                let _ := ret result ~> A; in broadcast_opt unit;
+main := broadcast_opt unit;
