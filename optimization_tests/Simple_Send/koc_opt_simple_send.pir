@@ -9,7 +9,8 @@ broadcast_opt freq :=
     B[L] ~> E;
     C[L] ~> F;
     C[L] ~> G;
-    
+
+        let B.x := B.10; in 
         let C.x := C.10; in 
         let D.x := D.10; in
         let E.x := E.10; in

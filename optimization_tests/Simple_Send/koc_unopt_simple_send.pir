@@ -4,12 +4,13 @@ broadcast_opt freq :=
 
     if A.(freq > 0) then
     A[L] ~> B;
+    A[L] ~> C;    
     A[L] ~> D;
     A[L] ~> E;
     A[L] ~> F;
     A[L] ~> G;
-    A[L] ~> C;
-    
+
+        let B.x := B.10; in 
         let C.x := C.10; in 
         let D.x := D.10; in
         let E.x := E.10; in
