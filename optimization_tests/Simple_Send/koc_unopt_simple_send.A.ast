@@ -1,0 +1,15 @@
+broadcast_opt
+  freq := if ret freq > 0 then choose L for B in choose L for D in choose L for E in 
+                                                                   choose L for F in 
+                                                                   choose L for G in 
+                                                                   choose L for C in 
+                                                                   broadcast_opt 
+                                                                   ret 
+                                                                    freq -
+                                                                    1 else 
+          choose R for B in choose R for C in choose R for D in choose R for E in 
+                                                                choose R for F in 
+                                                                choose R for G in 
+                                                                ret print_endline 
+                                                                ret "Terminate - Unoptimized";
+main := broadcast_opt ret 1000;

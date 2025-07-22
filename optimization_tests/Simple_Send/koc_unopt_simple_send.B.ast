@@ -1,0 +1,5 @@
+broadcast_opt
+  freq := allow choice from A with
+          | L -> broadcast_opt unit
+          | R -> let x := ret 9; in unit;
+main := broadcast_opt unit;
