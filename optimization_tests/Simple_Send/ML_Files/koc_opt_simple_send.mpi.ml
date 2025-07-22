@@ -1,4 +1,4 @@
-\let loc_to_rank = function
+let loc_to_rank = function
   | "A" -> 0
   | "B" -> 1
   | "C" -> 2
