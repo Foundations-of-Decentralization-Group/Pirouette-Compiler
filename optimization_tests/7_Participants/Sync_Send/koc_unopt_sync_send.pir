@@ -1,4 +1,4 @@
-broadcapst_unopt freq :=
+broadcast_unopt freq :=
 
     if A.(freq > 0) then
     A[L] ~> B;
