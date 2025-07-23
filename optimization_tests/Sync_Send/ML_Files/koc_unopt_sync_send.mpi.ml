@@ -79,7 +79,7 @@ let _ =
             let rec result_O =
               Marshal.from_string
                 (Mpi.receive (loc_to_rank "O") Mpi.any_tag Mpi.comm_world) 0 in
-            broadcast_opt (freq - 1)))
+            broadcast_unopt (freq - 1)))
         else
           (Mpi.send "R" (loc_to_rank "B") 0 Mpi.comm_world;
            Mpi.send "R" (loc_to_rank "C") 0 Mpi.comm_world;
@@ -148,7 +148,7 @@ let _ =
               let val_1 = x in
               Mpi.send (Marshal.to_string val_1 []) (loc_to_rank "A") 0
                 Mpi.comm_world in
-            broadcast_opt ()
+            broadcast_unopt ()
         | "R" ->
             let rec x = 9 in
             let rec _unit_4 =
@@ -167,7 +167,7 @@ let _ =
               let val_5 = x in
               Mpi.send (Marshal.to_string val_5 []) (loc_to_rank "A") 0
                 Mpi.comm_world in
-            broadcast_opt ()
+            broadcast_unopt ()
         | "R" ->
             let rec x = 9 in
             let rec _unit_8 =
@@ -193,7 +193,7 @@ let _ =
               let val_11 = x in
               Mpi.send (Marshal.to_string val_11 []) (loc_to_rank "A") 0
                 Mpi.comm_world in
-            broadcast_opt ()
+            broadcast_unopt ()
         | _ -> failwith "Runtime Error: Unmatched label" in
       broadcast_unopt ()
   | 4 ->
@@ -205,7 +205,7 @@ let _ =
               let val_13 = x in
               Mpi.send (Marshal.to_string val_13 []) (loc_to_rank "A") 0
                 Mpi.comm_world in
-            broadcast_opt ()
+            broadcast_unopt ()
         | "R" ->
             let rec x = 9 in
             let rec _unit_16 =
@@ -231,7 +231,7 @@ let _ =
               let val_19 = x in
               Mpi.send (Marshal.to_string val_19 []) (loc_to_rank "A") 0
                 Mpi.comm_world in
-            broadcast_opt ()
+            broadcast_unopt ()
         | _ -> failwith "Runtime Error: Unmatched label" in
       broadcast_unopt ()
   | 6 ->
@@ -243,7 +243,7 @@ let _ =
               let val_21 = x in
               Mpi.send (Marshal.to_string val_21 []) (loc_to_rank "A") 0
                 Mpi.comm_world in
-            broadcast_opt ()
+            broadcast_unopt ()
         | "R" ->
             let rec x = 9 in
             let rec _unit_24 =
@@ -262,7 +262,7 @@ let _ =
               let val_25 = x in
               Mpi.send (Marshal.to_string val_25 []) (loc_to_rank "A") 0
                 Mpi.comm_world in
-            broadcast_opt ()
+            broadcast_unopt ()
         | "R" ->
             let rec x = 9 in
             let rec _unit_28 =
@@ -281,7 +281,7 @@ let _ =
               let val_29 = x in
               Mpi.send (Marshal.to_string val_29 []) (loc_to_rank "A") 0
                 Mpi.comm_world in
-            broadcast_opt ()
+            broadcast_unopt ()
         | "R" ->
             let rec x = 9 in
             let rec _unit_32 =
@@ -300,7 +300,7 @@ let _ =
               let val_33 = x in
               Mpi.send (Marshal.to_string val_33 []) (loc_to_rank "A") 0
                 Mpi.comm_world in
-            broadcast_opt ()
+            broadcast_unopt ()
         | "R" ->
             let rec x = 9 in
             let rec _unit_36 =
@@ -319,7 +319,7 @@ let _ =
               let val_37 = x in
               Mpi.send (Marshal.to_string val_37 []) (loc_to_rank "A") 0
                 Mpi.comm_world in
-            broadcast_opt ()
+            broadcast_unopt ()
         | "R" ->
             let rec x = 9 in
             let rec _unit_40 =
@@ -338,7 +338,7 @@ let _ =
               let val_41 = x in
               Mpi.send (Marshal.to_string val_41 []) (loc_to_rank "A") 0
                 Mpi.comm_world in
-            broadcast_opt ()
+            broadcast_unopt ()
         | "R" ->
             let rec x = 9 in
             let rec _unit_44 =
@@ -364,7 +364,7 @@ let _ =
               let val_47 = x in
               Mpi.send (Marshal.to_string val_47 []) (loc_to_rank "A") 0
                 Mpi.comm_world in
-            broadcast_opt ()
+            broadcast_unopt ()
         | _ -> failwith "Runtime Error: Unmatched label" in
       broadcast_unopt ()
   | 13 ->
@@ -383,7 +383,7 @@ let _ =
               let val_51 = x in
               Mpi.send (Marshal.to_string val_51 []) (loc_to_rank "A") 0
                 Mpi.comm_world in
-            broadcast_opt ()
+            broadcast_unopt ()
         | _ -> failwith "Runtime Error: Unmatched label" in
       broadcast_unopt ()
   | 14 ->
@@ -395,7 +395,7 @@ let _ =
               let val_53 = x in
               Mpi.send (Marshal.to_string val_53 []) (loc_to_rank "A") 0
                 Mpi.comm_world in
-            broadcast_opt ()
+            broadcast_unopt ()
         | "R" ->
             let rec x = 9 in
             let rec _unit_56 =

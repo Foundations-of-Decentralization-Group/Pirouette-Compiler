@@ -44,7 +44,7 @@ broadcast_unopt freq :=
 	let A.result_N := [N] N.x ~> A; in 	
         let O.x := O.10; in
 	let A.result_O := [O] O.x ~> A; in 		
-	broadcast_opt A.(freq - 1)
+	broadcast_unopt A.(freq - 1)
 
     else 
     A[R] ~> B;
