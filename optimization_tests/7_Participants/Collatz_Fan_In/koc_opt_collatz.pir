@@ -108,41 +108,43 @@ broadcast_opt freq :=
     if A.(freq > 0) then
     A[L1] ~> B;
     A[L2] ~> C;
-    A[L3] ~> D;
-    A[L4] ~> E;
-    A[L5] ~> F;
-    A[L6] ~> G;
+    B[L3] ~> D;
+    B[L4] ~> E;
+    C[L5] ~> F;
+    C[L6] ~> G;
 
         let B.result  := B.test_collatz B.931386509544713451; in 
+
         let A.reply_B := [B] B.result ~> A; in
 
         let C.result  := C.test_collatz C.931386509544713451; in
         let A.reply_C := [C] C.result ~> A; in 
 
         let D.result  := D.test_collatz D.931386509544713451; in
-        let A.reply_D := [D] D.result ~> A; in 
+	let B.reply_D := [D] D.result ~> B; in
+        let A.reply_D := [B] B.reply_D ~> A; in 
 
-        let E.result  := E.test_collatz E.931386509544713451; in 
-        let A.reply_E := [E] E.result ~> A; in 
+        let E.result  := E.test_collatz E.931386509544713451; in
+	let B.reply_E := [E] E.result ~> B; in
+        let A.reply_E := [B] B.reply_E ~> A; in 
 
         let F.result  := F.test_collatz F.931386509544713451; in 
-        let A.reply_F := [F] F.result ~> A; in 
+        let C.reply_F := [F] F.result ~> C; in
+        let A.reply_F := [C] C.reply_F ~> A; in 	
 
-        let G.result  := G.test_collatz G.931386509544713451; in 
-        let A.reply_G := [G] G.result ~> A; in 
-
-        broadcast_opt A.(freq - 1)
-
+        let G.result  := G.test_collatz G.931386509544713451; in
+	let C.reply_G := [G] G.result ~> C; in
+	let A.reply_G := [C] C.reply_G ~> A; in broadcast_opt A.(freq - 1)
 
     else 
     A[R1] ~> B;
     A[R2] ~> C;
-    A[R3] ~> D;
-    A[R4] ~> E;
-    A[R5] ~> F;
-    A[R6] ~> G;
+    B[R3] ~> D;
+    B[R4] ~> E;
+    C[R5] ~> F;
+    C[R6] ~> G;
 
-        A.print_endline A."Done with all the computations - Unoptimized";
+        A.print_endline A."Done with all the computations - Optimized";
 
 
-main := broadcast_opt A.1000;
+main := broadcast_opt A.100000;

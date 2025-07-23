@@ -32,4 +32,4 @@ broadcast_opt freq :=
         let F.x := F.9; in
         let G.x := G.9; in A.print_endline A."Terminate - Unoptimized";
 
-main := broadcast_opt A.1000;
+main := broadcast_opt A.100000;
