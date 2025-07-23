@@ -44,7 +44,7 @@ broadcast_unopt freq :=
 	let A.result_N := [N] N.x ~> A; in 	
         let O.x := O.10; in
 	let A.result_O := [O] O.x ~> A; in 		
-	in broadcast_opt A.(freq - 1)
+	broadcast_opt A.(freq - 1)
 
     else 
     A[R] ~> B;
@@ -89,6 +89,6 @@ broadcast_unopt freq :=
 	let N.x := N.9; in
 	let A.result_N := [N] N.x ~> A; in 	
         let O.x := O.9; in
-	let A.result_O := [O] O.x ~> A; in A.print_endline A."Terminate - Unoptimized"
+	let A.result_O := [O] O.x ~> A; in A.print_endline A."Terminate - Unoptimized";
 
 main := broadcast_unopt A.1000;
