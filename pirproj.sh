@@ -1,6 +1,6 @@
 #! /bin/sh
 
-while getopts "b:p:hrg" opt
+while getopts "b:p:i:w:hrg" opt
 do
     case $opt in
         "r")
@@ -17,6 +17,12 @@ do
             num_processes=`printf ${OPTARG} | awk 'END {print NR}' RS=','`
             num_procs_flag="-n ${num_processes}"
             ;;
+        "i")
+            include_packages="-package ${OPTARG}"
+            ;;
+        "w")
+            warning_list="-w ${OPTARG}"
+            ;;
         "h")
             echo "Usage: $0 -b <backend> [-p|-r|-h] <file>"
             echo ""
@@ -28,6 +34,8 @@ do
             echo "                       If the 'mpi' backend is selected, this option is strongly recommended"
             echo "                        (but not strictly required) since the number of processes listed"
             echo "                        determines how many processes are spawned by the mpiexec command."
+            echo "  -i                 : a list of packages to include using ocamlfind"
+            echo "  -w                 : ocamlopt warning-list flag"
             echo "  -r                 : run the projected program(s)"
             echo "  -g                 : compile projection(s) with the '-g' debug flag"
             echo "  -h                 : display this help message"
@@ -71,14 +79,14 @@ base=`basename ${file} .pir`
 case $backend in
     "domain")
         dune exec -- pirc -msg-backend=domain $file &&
-            ocamlfind ocamlopt $gflag -o $dir/$base.domain.exe -linkpkg -package domainslib $dir/$base.domain.ml
+            ocamlfind ocamlopt $warning_list $gflag -o $dir/$base.domain.exe -linkpkg -package domainslib $include_packages $dir/$base.domain.ml
         if [ "$run" = "true" ]; then
             ./$dir/$base.domain.exe
         fi
         ;;
     "mpi")
         dune exec -- pirc -msg-backend=mpi $file &&
-            ocamlfind ocamlopt $gflag -o $dir/$base.mpi.exe -linkpkg -package mpi $dir/$base.mpi.ml
+            ocamlfind ocamlopt $warning_list $gflag -o $dir/$base.mpi.exe -linkpkg -package mpi $include_packages $dir/$base.mpi.ml
         if [ "$run" = "true" ]; then
             mpiexec --oversubscribe ${num_procs_flag} ./$dir/$base.mpi.exe
         fi
@@ -93,7 +101,7 @@ case $backend in
         fi
         dune exec -- pirc -msg-backend=http $file &&
             for process in $processes; do
-                OCAMLPATH=./_build/install/default/lib/ ocamlfind ocamlopt $gflag -o $dir/${base}_$process.exe -linkpkg -package http_pirc $dir/${base}_$process.ml
+                OCAMLPATH=./_build/install/default/lib/ ocamlfind ocamlopt $warning_list $gflag -o $dir/${base}_$process.exe -linkpkg -package http_pirc $include_packages $dir/${base}_$process.ml
             done &&
             if [ "$run" = "true" ]; then
                 for process in $processes; do
