@@ -1,0 +1,16 @@
+foreign gettimeofday : (unit) -> (unit) := "@Unix:gettimeofday";
+foreign print_float : (unit) -> (unit) := "@Stdlib:print_float";
+foreign sub_float : (unit) -> ((unit) -> (unit)) := "@Stdlib:(-.)";
+loop
+  iter := allow choice from p2 with
+          | R ->
+              choose R for p8 in choose R for p9 in let res_2 := <~ p9; in 
+                                                      let res_1 := <~ p8; in 
+                                                        let _ := ret 2 ~> p2; in 
+                                                          unit
+          | L ->
+              choose L for p8 in choose L for p9 in let res_2 := <~ p9; in 
+                                                      let res_1 := <~ p8; in 
+                                                        let _ := ret 2 ~> p2; in 
+                                                          loop unit;
+main := let _ := loop unit; in unit;

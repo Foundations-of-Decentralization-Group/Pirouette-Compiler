@@ -1,0 +1,22 @@
+foreign gettimeofday : (unit) -> (unit) := "@Unix:gettimeofday";
+foreign print_float : (unit) -> (unit) := "@Stdlib:print_float";
+foreign sub_float : (unit) -> ((unit) -> (unit)) := "@Stdlib:(-.)";
+loop
+  iter := if ret iter > 0 then choose L for p2 in choose L for p3 in 
+                                                  let res_2 := <~ p3; in 
+                                                    let res_1 := <~ p2; in 
+                                                      loop ret iter - 1 else 
+          choose R for p2 in choose R for p3 in let res_2 := <~ p3; in 
+                                                  let res_1 := <~ p2; in 
+                                                    ret ();
+main := let start_time := ret gettimeofday ret (); in let _ := loop ret 
+                                                                    1000000; in 
+                                                        let end_time := 
+                                                              ret gettimeofday 
+                                                              ret (); in 
+                                                          let time_diff := 
+                                                                ret sub_float 
+                                                                ret end_time 
+                                                                ret start_time; in 
+                                                            ret print_float 
+                                                            ret time_diff;
