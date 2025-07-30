@@ -1,0 +1,162 @@
+foreign gettimeofday : (unit) -> (unit) := "@Unix:gettimeofday";
+foreign print_float : (unit) -> (unit) := "@Stdlib:print_float";
+foreign sub_float : (unit) -> ((unit) -> (unit)) := "@Stdlib:(-.)";
+test_collatz
+  inp := if ret inp = 1 then ret 0 else let res1 := ret inp / 2; in let 
+                                                                    res2 := 
+                                                                    ret 
+                                                                    res1 *
+                                                                    2; in 
+                                                                    if 
+                                                                    ret 
+                                                                    res2 =
+                                                                    inp then 
+                                                                    let 
+                                                                    part_res := 
+                                                                    ret 
+                                                                    test_collatz 
+                                                                    ret 
+                                                                    res1; in 
+                                                                    ret 
+                                                                    part_res +
+                                                                    1 else 
+                                                                    let 
+                                                                    res3 := 
+                                                                    ret 
+                                                                    3 * inp +
+                                                                    1; in 
+                                                                    let 
+                                                                    res4 := 
+                                                                    ret 
+                                                                    test_collatz 
+                                                                    ret 
+                                                                    res3; in 
+                                                                    ret 
+                                                                    1 +
+                                                                    res4;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+loop
+  iter := if ret iter > 0 then choose L for P2 in choose L for P3 in 
+                                                  let reply_P2 := <~ P2; in 
+                                                    let reply_P3 := <~ P3; in 
+                                                      let reply_P4 := <~ P2; in 
+                                                        let reply_P5 := 
+                                                              <~ P2; in 
+                                                          let reply_P6 := 
+                                                                <~ P3; in 
+                                                            let reply_P7 := 
+                                                                  <~ P3; in 
+                                                              let reply_P8 := 
+                                                                    <~ P2; in 
+                                                                let reply_P9 := 
+                                                                    <~ P2; in 
+                                                                  let 
+                                                                    reply_P10 := 
+                                                                    <~ P2; in 
+                                                                    let 
+                                                                    reply_P11 := 
+                                                                    <~ P2; in 
+                                                                    let 
+                                                                    reply_P12 := 
+                                                                    <~ P3; in 
+                                                                    let 
+                                                                    reply_P13 := 
+                                                                    <~ P3; in 
+                                                                    let 
+                                                                    reply_P14 := 
+                                                                    <~ P3; in 
+                                                                    let 
+                                                                    reply_P15 := 
+                                                                    <~ P3; in 
+                                                                    let 
+                                                                    reply_P16 := 
+                                                                    <~ P2; in 
+                                                                    let 
+                                                                    reply_P17 := 
+                                                                    <~ P2; in 
+                                                                    let 
+                                                                    reply_P18 := 
+                                                                    <~ P2; in 
+                                                                    let 
+                                                                    reply_P19 := 
+                                                                    <~ P2; in 
+                                                                    let 
+                                                                    reply_P20 := 
+                                                                    <~ P2; in 
+                                                                    let 
+                                                                    reply_P21 := 
+                                                                    <~ P2; in 
+                                                                    let 
+                                                                    reply_P22 := 
+                                                                    <~ P2; in 
+                                                                    let 
+                                                                    reply_P23 := 
+                                                                    <~ P2; in 
+                                                                    let 
+                                                                    reply_P24 := 
+                                                                    <~ P3; in 
+                                                                    let 
+                                                                    reply_P25 := 
+                                                                    <~ P3; in 
+                                                                    let 
+                                                                    reply_P26 := 
+                                                                    <~ P3; in 
+                                                                    let 
+                                                                    reply_P27 := 
+                                                                    <~ P3; in 
+                                                                    let 
+                                                                    reply_P28 := 
+                                                                    <~ P3; in 
+                                                                    let 
+                                                                    reply_P29 := 
+                                                                    <~ P3; in 
+                                                                    let 
+                                                                    reply_P30 := 
+                                                                    <~ P3; in 
+                                                                    let 
+                                                                    reply_P31 := 
+                                                                    <~ P3; in 
+                                                                    loop 
+                                                                    ret 
+                                                                    iter -
+                                                                    1 else 
+          choose R for P2 in choose R for P3 in ret ();
+main := let start_time := ret gettimeofday ret (); in let _ := loop ret 100; in 
+                                                        let end_time := 
+                                                              ret gettimeofday 
+                                                              ret (); in 
+                                                          let time_diff := 
+                                                                ret sub_float 
+                                                                ret end_time 
+                                                                ret start_time; in 
+                                                            ret print_float 
+                                                            ret time_diff;

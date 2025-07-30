@@ -1,0 +1,88 @@
+foreign gettimeofday : (unit) -> (unit) := "@Unix:gettimeofday";
+foreign print_float : (unit) -> (unit) := "@Stdlib:print_float";
+foreign sub_float : (unit) -> ((unit) -> (unit)) := "@Stdlib:(-.)";
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+test_collatz
+  inp := if ret inp = 1 then ret 0 else let res1 := ret inp / 2; in let 
+                                                                    res2 := 
+                                                                    ret 
+                                                                    res1 *
+                                                                    2; in 
+                                                                    if 
+                                                                    ret 
+                                                                    res2 =
+                                                                    inp then 
+                                                                    let 
+                                                                    part_res := 
+                                                                    ret 
+                                                                    test_collatz 
+                                                                    ret 
+                                                                    res1; in 
+                                                                    ret 
+                                                                    part_res +
+                                                                    1 else 
+                                                                    let 
+                                                                    res3 := 
+                                                                    ret 
+                                                                    3 * inp +
+                                                                    1; in 
+                                                                    let 
+                                                                    res4 := 
+                                                                    ret 
+                                                                    test_collatz 
+                                                                    ret 
+                                                                    res3; in 
+                                                                    ret 
+                                                                    1 +
+                                                                    res4;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+_ := unit;
+loop
+  iter := allow choice from P7 with
+          | L ->
+              choose L for P30 in choose L for P31 in let result := ret 
+                                                                    test_collatz 
+                                                                    ret 
+                                                                    931386509544713451; in 
+                                                        let _ := ret result ~> P7; in 
+                                                          let reply_P30 := 
+                                                                <~ P30; in 
+                                                            let _ := 
+                                                                  ret 
+                                                                    reply_P30 ~> P7; in 
+                                                              let reply_P31 := 
+                                                                    <~ P31; in 
+                                                                let _ := 
+                                                                    ret 
+                                                                    reply_P31 ~> P7; in 
+                                                                  loop 
+                                                                  unit
+          | R -> choose R for P30 in choose R for P31 in unit;
+main := let _ := loop unit; in unit;
