@@ -82,8 +82,8 @@ export OMPI_MCA_pml='ucx'
 export OMPI_MCA_mtl='^ofi'
 
 printf "test_name,prog_type,time\n" > $info_dir/test_data.csv
-for i in {1..$NUM_RUNS}; do
-    printf "On Iteration: $i\n" > $info_dir/progress.txt
+for ((i=1; i<=$NUM_RUNS; ++i)); do
+    printf "On Run: $i\n" > $info_dir/progress.txt
     for p in progs/*.pir; do
         printf "On Program: $p\n" >> $info_dir/progress.txt
         mpiexec -n $(printf $p | grep -oE "[[:digit:]][[:digit:]]?") $(printf $p | cut -f1 -d'.').mpi.exe
