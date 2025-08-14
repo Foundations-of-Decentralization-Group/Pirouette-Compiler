@@ -26,6 +26,9 @@ printf "Recording system and test information\n"
 info_dir=${PWD}/tests/$(date +%Y-%m-%d__%H-%M-%S)__$SLURM_JOB_NAME
 mkdir -p $info_dir
 
+# Save the slurmscript used for this job
+cp $0 $info_dir
+
 # Record Test Settings
 
 printf \
