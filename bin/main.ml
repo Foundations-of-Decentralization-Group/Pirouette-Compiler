@@ -51,7 +51,8 @@ let () =
   let holder1 = [] in
   let holder2 = [] in
   let holder_3 = Ast_utils.optimize_sync_expr program holder1 holder2 in
-  List.iter (fun x -> Printf.printf "Strings : %s\n" x) holder_3;
+  (* let size = List.length holder_3 in Printf.printf "This is the size of the list %d" size; *)
+  List.iter (fun x -> Printf.printf "String to be used here : %s\n" x) holder_3;
   let locs = Ast_utils.extract_locs program in
   let net_stmtblocks = List.map (fun loc -> Netgen.epp_choreo_to_net program loc) locs in
   List.iter2
