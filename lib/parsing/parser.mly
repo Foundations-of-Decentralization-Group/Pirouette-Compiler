@@ -74,7 +74,7 @@ stmt_block:
 /* TODO: Removing the need for semicolons */
 stmt:
   | p=choreo_pattern COLON t=choreo_type SEMICOLON { print_endline "p statement" ; Decl (p, t, gen_pos $startpos $endpos) }
-  | ps=nonempty_list(choreo_pattern) COLONEQ e=choreo_expr SEMICOLON { print_endline "ps statement" ; Assign (ps, e, gen_pos $startpos $endpos) } 
+  | ps=nonempty_list(choreo_pattern) COLONEQ e=choreo_expr SEMICOLON { (*print_endline "ps statement";*) Assign (ps, e, gen_pos $startpos $endpos) } 
   | TYPE id=typ_id COLONEQ t=choreo_type SEMICOLON? { print_endline "type decl statement" ; TypeDecl (id, t, gen_pos $startpos $endpos) }
 
 /* Associativity increases from expr to expr3, with each precedence level falling through to the next. */
