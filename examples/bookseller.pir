@@ -1,4 +1,4 @@
-foreign printf : unit -> unit := "@Printf:printf";
+foreign printf : unit -> unit := "Printf.printf";
 
 main :=
   let Buyer.book_title := Buyer."Alice's Adventures in Wonderland"; in
