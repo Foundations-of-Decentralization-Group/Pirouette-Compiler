@@ -33,19 +33,19 @@ let check_no_start_end_commas s =
 (* Command line options specification *)
 let speclist =
   [ "-", Arg.Unit (fun () -> file_ic := Some stdin), "Read source from stdin"
-  ; ( "-ast-dump"
+  ; ( "--ast-dump"
     , Arg.Symbol ([ "pprint"; "json"; "dot" ], fun s -> ast_dump_format := Some s)
     , "Dump the AST in the specified format (pprint, json, dot)" )
-  ; ( "-msg-backend"
+  ; ( "--msg-backend"
     , Arg.Symbol ([ "domain"; "http"; "mpi" ], fun s -> msg_backend := s)
     , "Choose communication backend (domain: shared memory, http: HTTP, mpi: MPI)" )
-  ; ( "-package"
+  ; ( "--package"
     , Arg.String (fun s -> check_no_start_end_commas s; package_list := s)
     , "List of OCaml packages to link in")
-  ; ( "-projections-only"
+  ; ( "--projections-only"
     , Arg.Unit (fun () -> projections_only := true)
     , "Don't compile the resulting ml files")
-  ; ( "-ml-files"
+  ; ( "--ml-files"
     , Arg.String (fun s -> check_no_start_end_commas s; ml_files := s)
     , "Include extra ml files to compile with")
   ; ( "-w"
