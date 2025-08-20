@@ -42,7 +42,7 @@ let speclist =
   ; ( "--package"
     , Arg.String (fun s -> check_no_start_end_commas s; package_list := s)
     , "List of OCaml packages to link in")
-  ; ( "--projections-only"
+  ; ( "--no-binaries"
     , Arg.Unit (fun () -> projections_only := true)
     , "Don't compile the resulting ml files")
   ; ( "--ml-files"
