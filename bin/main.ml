@@ -191,7 +191,7 @@ let () =
   else
     (* Compile the resulting ml files *)
     List.iter (fun ml_file ->
-        let out_file_exe = change_extension ml_file (!msg_backend ^ ".exe") in
+        let out_file_exe = change_extension ml_file ".exe" in
         let packages =
           let package_list' =
             !package_list ^
