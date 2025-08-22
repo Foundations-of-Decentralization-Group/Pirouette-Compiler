@@ -53,6 +53,48 @@ let () =
   let holder_3 = Ast_utils.optimize_sync_expr program holder1 holder2 in
   (* let size = List.length holder_3 in Printf.printf "This is the size of the list %d" size; *)
   List.iter (fun x -> Printf.printf "String to be used here : %s\n" x) holder_3;
+  let optimization_flag =
+    let optimization_flag_to_convert = List.hd holder_3 in
+    Stdlib.bool_of_string optimization_flag_to_convert
+  in
+  if optimization_flag
+  then (
+    (* This is where we would do the optimization to reorder the control messages ; ie the call to appropriate function *)
+    (* Have to do some list processing here to generate the right sends and receives for Sync messages *)
+    print_endline "Optimization is possible";
+    let rec remove_duplicates_of_head input_list value_of_head =
+      match input_list with
+      | [] -> []
+      | head :: tail ->
+        if String.equal head value_of_head
+        then remove_duplicates_of_head tail value_of_head
+        else head :: remove_duplicates_of_head tail value_of_head
+    in
+    let holder_3 = List.tl holder_3 in
+    let head_val = List.hd holder_3 in
+    let final_list =
+      let result_list = remove_duplicates_of_head (List.tl holder_3) head_val in
+      List.cons head_val result_list
+    in
+    List.iter
+      (fun x -> Printf.printf "These are the strings inside the list: %s\n" x)
+      final_list;
+    let rec print_order (input_list : string list) (index : int) =
+      let sender = List.nth input_list index in
+      let index_calc = (index * 2) + 1 in
+      let receiver_one = List.nth input_list index_calc in
+      let receiver_two = List.nth input_list (index_calc + 1) in
+      Printf.printf
+        "This is the value of the sender and the receivers %s %s %s\n"
+        sender
+        receiver_one
+        receiver_two;
+      if (index_calc + 2 < List.length input_list)
+      then print_order final_list (index + 1)
+      else print_endline "Done generating"
+    in
+    print_order final_list 0)
+  else print_endline "Cannot do optimization";
   let locs = Ast_utils.extract_locs program in
   let net_stmtblocks = List.map (fun loc -> Netgen.epp_choreo_to_net program loc) locs in
   List.iter2
