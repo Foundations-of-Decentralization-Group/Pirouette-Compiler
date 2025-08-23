@@ -12,6 +12,11 @@ val optimize_sync_expr
   -> string list
   -> string list
 
+val add_sync_opt
+  :  'a Ast_core.Choreo.M.stmt list
+  -> string list
+  -> 'a Ast_core.Choreo.M.stmt list
+
 val jsonify_choreo_ast : out_channel -> 'a Ast_core.Choreo.M.stmt_block -> unit
 val jsonify_net_ast : out_channel -> 'a Ast_core.Net.M.stmt_block -> unit
 val pprint_choreo_ast : out_channel -> 'a Ast_core.Choreo.M.stmt_block -> unit
