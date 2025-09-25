@@ -69,7 +69,7 @@ let emit_toplevel_http
          | binding ->
            Ast_builder.Default.pexp_let
              ~loc
-             Nonrecursive
+             Recursive
              [ binding ]
              (emit_net_toplevel stmts))
     in
