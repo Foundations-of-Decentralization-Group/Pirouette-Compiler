@@ -1,20 +1,24 @@
-broadcast_unopt freq :=
+foreign gettimeofday : unit -> unit := "@Unix:gettimeofday";
+foreign print_float : unit -> unit := "@Stdlib:print_float";
+foreign sub_float : unit -> unit -> unit := "@Stdlib:(-.)";
+
+broadcast_opt freq :=
 
     if A.(freq > 0) then
     A[L] ~> B;
     A[L] ~> C;    
-    A[L] ~> D;
-    A[L] ~> E;
-    A[L] ~> F;
-    A[L] ~> G;
-    A[L] ~> H;
-    A[L] ~> I;    
-    A[L] ~> J;
-    A[L] ~> K;
-    A[L] ~> L;
-    A[L] ~> M;
-    A[L] ~> N;
-    A[L] ~> O;
+    B[L] ~> D;
+    B[L] ~> E;
+    C[L] ~> F;
+    C[L] ~> G;
+    D[L] ~> H;
+    D[L] ~> I;    
+    E[L] ~> J;
+    E[L] ~> K;
+    F[L] ~> L;
+    F[L] ~> M;
+    G[L] ~> N;
+    G[L] ~> O;
 
         let B.x := B.10; in
 	let A.result_B := [B] B.x ~> A; in 
@@ -44,23 +48,24 @@ broadcast_unopt freq :=
 	let A.result_N := [N] N.x ~> A; in 	
         let O.x := O.10; in
 	let A.result_O := [O] O.x ~> A; in 		
-	broadcast_unopt A.(freq - 1)
+	broadcast_opt A.(freq - 1)
 
-    else 
+    else
+    
     A[R] ~> B;
-    A[R] ~> C;
-    A[R] ~> D;
-    A[R] ~> E;
-    A[R] ~> F;
-    A[R] ~> G;
-    A[R] ~> H;
-    A[R] ~> I;    
-    A[R] ~> J;
-    A[R] ~> K;
-    A[R] ~> L;
-    A[R] ~> M;
-    A[R] ~> N;
-    A[R] ~> O;
+    A[R] ~> C;    
+    B[R] ~> D;
+    B[R] ~> E;
+    C[R] ~> F;
+    C[R] ~> G;
+    D[R] ~> H;
+    D[R] ~> I;    
+    E[R] ~> J;
+    E[R] ~> K;
+    F[R] ~> L;
+    F[R] ~> M;
+    G[R] ~> N;
+    G[R] ~> O;
 
         let B.x := B.9; in
 	let A.result_B := [B] B.x ~> A; in 
@@ -89,6 +94,12 @@ broadcast_unopt freq :=
 	let N.x := N.9; in
 	let A.result_N := [N] N.x ~> A; in 	
         let O.x := O.9; in
-	let A.result_O := [O] O.x ~> A; in A.print_endline A."Terminate - Unoptimized";
+	let A.result_O := [O] O.x ~> A; in A.print_endline A."Terminate - Optimized";
+	
+main :=
 
-main := broadcast_unopt A.1000;
+    let A.start_time := A.gettimeofday A.(); in
+    let A._ := loop A.1000; in
+    let A.end_time := A.gettimeofday A.(); in
+    let A.time_diff := A.sub_float A.end_time A.start_time; in
+    A.print_float A.time_diff;

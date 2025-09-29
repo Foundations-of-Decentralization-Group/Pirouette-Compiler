@@ -1,3 +1,7 @@
+foreign gettimeofday : unit -> unit := "@Unix:gettimeofday";
+foreign print_float : unit -> unit := "@Stdlib:print_float";
+foreign sub_float : unit -> unit -> unit := "@Stdlib:(-.)";
+
 broadcast_opt freq :=
 
     if A.(freq > 0) then
@@ -64,4 +68,10 @@ broadcast_opt freq :=
 	let N.x := N.9; in
         let O.x := O.9; in A.print_endline A."Terminate - Optimized";
 	
-main := broadcast_opt A.1000;
+main := 
+
+    let A.start_time := A.gettimeofday A.(); in
+    let A._ := loop A.1000; in
+    let A.end_time := A.gettimeofday A.(); in
+    let A.time_diff := A.sub_float A.end_time A.start_time; in
+    A.print_float A.time_diff;
