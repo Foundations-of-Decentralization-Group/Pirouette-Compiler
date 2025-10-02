@@ -1,0 +1,6 @@
+(library
+ (name stdlib)
+ (package stdlib)
+ (libraries ast_core)
+ (preprocess
+  (pps bisect_ppx)))

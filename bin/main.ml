@@ -127,6 +127,9 @@ let () =
   then (
     prerr_endline (Sys.argv.(0) ^ ": No stdlib");
     exit 1);
+  
+  (* How could we take the parsed AST and save that directly within this file?*)
+  
   let lexbuf_stdlib = Lexing.from_channel (Option.get !file_ic_stlid) in
   let program_stdlib = Parsing.Parse.parse_with_error lexbuf_stdlib in               
   (* Parse the input file *)
