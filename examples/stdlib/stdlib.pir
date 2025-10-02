@@ -1,0 +1,1 @@
+foreign print : unit -> unit := "print_string";

@@ -1,0 +1,1 @@
+main := A.print A."Hello";

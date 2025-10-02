@@ -11,6 +11,8 @@ let projections_only = ref false
 let ml_files = ref ""
 let ocamlopt_warn_flags = ref ""
 
+let file_ic_stlid = ref None
+
 (* Process anonymous command line argument (input file) *)
 let process_input_file filename =
   input_filename := filename;
@@ -119,9 +121,17 @@ let () =
   then (
     prerr_endline (Sys.argv.(0) ^ ": No input file");
     exit 1);
+  (*Parse stdlib*)
+  file_ic_stlid := Some (open_in "stdlib.pir") in
+  if !file_ic_stlid = None
+  then (
+    prerr_endline (Sys.argv.(0) ^ ": No stdlib");
+    exit 1);
+  let lexbuf_stdlib = Lexing.from_channel (Option.get !file_ic_stlid) in
+  let program_stdlib = Parsing.Parse.parse_with_error lexbuf_stdlib in               
   (* Parse the input file *)
   let lexbuf = Lexing.from_channel (Option.get !file_ic) in
-  let program = Parsing.Parse.parse_with_error lexbuf in
+  let program = program_stdlib @ (Parsing.Parse.parse_with_error lexbuf) in
   (* Dump the choreography AST *)
   match !ast_dump_format with
   | Some format -> begin
