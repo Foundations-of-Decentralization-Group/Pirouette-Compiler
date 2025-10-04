@@ -1,6 +1,6 @@
-foreign gettimeofday : unit -> unit := "@Unix:gettimeofday";
-foreign print_float : unit -> unit := "@Stdlib:print_float";
-foreign sub_float : unit -> unit -> unit := "@Stdlib:(-.)";
+foreign gettimeofday : unit -> unit := "Unix:gettimeofday";
+foreign print_float : unit -> unit := "Stdlib:print_float";
+foreign sub_float : unit -> unit -> unit := "Stdlib:(-.)";
 
 P1.test_collatz inp :=
 
@@ -291,11 +291,11 @@ loop iter :=
         P6[R] ~> P13;
         P7[R] ~> P14;
         P7[R] ~> P15;
-	let P1._ = P1.(); in P1.print_endline A."Terminate - Optimized";
+        P1.();
 
 main :=
     let P1.start_time := P1.gettimeofday P1.(); in
-    let P1._ := loop P1.1000000; in
+    let P1._ := loop P1.10000; in
     let P1.end_time := P1.gettimeofday P1.(); in
     let P1.time_diff := P1.sub_float P1.end_time P1.start_time; in
     P1.print_float P1.time_diff;

@@ -58,27 +58,27 @@ let send_message ~location ~data =
     (try
        let marshaled_data = marshal_data data in
        (* Print the data being sent *)
-       Printf.printf
-         "DATA BEING SENT: %s\n"
-         (match data with
-          | _ when Obj.is_int (Obj.repr data) -> "INT: " ^ string_of_int (Obj.magic data)
-          | _ when Obj.tag (Obj.repr data) = Obj.string_tag -> "STRING: " ^ Obj.magic data
-          | _ ->
-            (try
-               if Obj.is_block (Obj.repr data) && Obj.tag (Obj.repr data) = 0
-               then (
-                 match Obj.magic data with
-                 | Ok v ->
-                   if Obj.is_int (Obj.repr v)
-                   then "Ok(" ^ string_of_int (Obj.magic v) ^ ")"
-                   else if Obj.tag (Obj.repr v) = Obj.string_tag
-                   then "Ok(\"" ^ Obj.magic v ^ "\")"
-                   else "Ok(<value>)"
-                 | Error msg -> "Error(\"" ^ msg ^ "\")")
-               else "<complex data>"
-             with
-             | _ -> "<unprintable data>"));
-       flush stdout;
+       (*  Printf.printf *)
+       (*   "DATA BEING SENT: %s\n"  *)
+       (*   (match data with *)
+       (*    | _ when Obj.is_int (Obj.repr data) -> "INT: " ^ string_of_int (Obj.magic data) *)
+       (*    | _ when Obj.tag (Obj.repr data) = Obj.string_tag -> "STRING: " ^ Obj.magic data *)
+       (*    | _ -> *)
+       (*      (try *)
+       (*         if Obj.is_block (Obj.repr data) && Obj.tag (Obj.repr data) = 0 *)
+       (*         then ( *)
+       (*           match Obj.magic data with *)
+       (*           | Ok v -> *)
+       (*             if Obj.is_int (Obj.repr v) *)
+       (*             then "Ok(" ^ string_of_int (Obj.magic v) ^ ")" *)
+       (*             else if Obj.tag (Obj.repr v) = Obj.string_tag *)
+       (*             then "Ok(\"" ^ Obj.magic v ^ "\")" *)
+       (*             else "Ok(<value>)" *)
+       (*           | Error msg -> "Error(\"" ^ msg ^ "\")") *)
+       (*         else "<complex data>" *)
+       (*       with *)
+       (*       | _ -> "<unprintable data>")); *)
+       (* flush stdout; *)
        let headers = Header.init_with "Content-Type" "application/octet-stream" in
        let body = Cohttp_lwt.Body.of_string marshaled_data in
        (* No need to create URI variable since it's not used *)
@@ -147,36 +147,36 @@ let init_http_servers current_location () =
                     if String.length body_string > 0
                     then (
                       (* Try to unmarshal and print the data for debugging *)
-                      (try
-                         let data = Marshal.from_string body_string 0 in
-                         Printf.printf
-                           "DATA RECEIVED at %s: %s\n"
-                           loc_cfg.Config_parser.location
-                           (match data with
-                            | _ when Obj.is_int (Obj.repr data) ->
-                              "INT: " ^ string_of_int (Obj.magic data)
-                            | _ when Obj.tag (Obj.repr data) = Obj.string_tag ->
-                              "STRING: " ^ Obj.magic data
-                            | _ ->
-                              (try
-                                 if
-                                   Obj.is_block (Obj.repr data)
-                                   && Obj.tag (Obj.repr data) = 0
-                                 then (
-                                   match Obj.magic data with
-                                   | Ok v ->
-                                     if Obj.is_int (Obj.repr v)
-                                     then "Ok(" ^ string_of_int (Obj.magic v) ^ ")"
-                                     else if Obj.tag (Obj.repr v) = Obj.string_tag
-                                     then "Ok(\"" ^ Obj.magic v ^ "\")"
-                                     else "Ok(<value>)"
-                                   | Error msg -> "Error(\"" ^ msg ^ "\")")
-                                 else "<complex data>"
-                               with
-                               | _ -> "<unprintable data>"));
-                         flush stdout
-                       with
-                       | _ -> ());
+                      (* (try *)
+                      (*    let data = Marshal.from_string body_string 0 in *)
+                      (*      Printf.printf *)
+                      (*      "DATA RECEIVED at %s: %s\n" *)
+                      (*      loc_cfg.Config_parser.location *)
+                      (*      (match data with *)
+                      (*       | _ when Obj.is_int (Obj.repr data) -> *)
+                      (*         "INT: " ^ string_of_int (Obj.magic data) *)
+                      (*       | _ when Obj.tag (Obj.repr data) = Obj.string_tag -> *)
+                      (*         "STRING: " ^ Obj.magic data *)
+                      (*       | _ -> *)
+                      (*         (try *)
+                      (*            if *)
+                      (*              Obj.is_block (Obj.repr data) *)
+                      (*              && Obj.tag (Obj.repr data) = 0 *)
+                      (*            then ( *)
+                      (*              match Obj.magic data with *)
+                      (*              | Ok v -> *)
+                      (*                if Obj.is_int (Obj.repr v) *)
+                      (*                then "Ok(" ^ string_of_int (Obj.magic v) ^ ")" *)
+                      (*                else if Obj.tag (Obj.repr v) = Obj.string_tag *)
+                      (*                then "Ok(\"" ^ Obj.magic v ^ "\")" *)
+                      (*                else "Ok(<value>)" *)
+                      (*              | Error msg -> "Error(\"" ^ msg ^ "\")") *)
+                      (*            else "<complex data>" *)
+                      (*          with *)
+                      (*          | _ -> "<unprintable data>")); *)
+                      (*    flush stdout *)
+                      (*  with *)
+                      (*  | _ -> ()); *)
                       (* Store message in queue *)
                       Hashtbl.replace
                         message_queues
@@ -254,31 +254,31 @@ let rec receive_message ~location =
     (try
        let unmarshaled_data = Marshal.from_string data 0 in
        (* Print the actual unmarshaled data in readable format *)
-       Printf.printf
-         "DATA RECEIVED FROM QUEUE: %s\n"
-         (match unmarshaled_data with
-          | _ when Obj.is_int (Obj.repr unmarshaled_data) ->
-            "INT: " ^ string_of_int (Obj.magic unmarshaled_data)
-          | _ when Obj.tag (Obj.repr unmarshaled_data) = Obj.string_tag ->
-            "STRING: " ^ Obj.magic unmarshaled_data
-          | _ ->
-            (try
-               if
-                 Obj.is_block (Obj.repr unmarshaled_data)
-                 && Obj.tag (Obj.repr unmarshaled_data) = 0
-               then (
-                 match Obj.magic unmarshaled_data with
-                 | Ok v ->
-                   if Obj.is_int (Obj.repr v)
-                   then "Ok(" ^ string_of_int (Obj.magic v) ^ ")"
-                   else if Obj.tag (Obj.repr v) = Obj.string_tag
-                   then "Ok(\"" ^ Obj.magic v ^ "\")"
-                   else "Ok(<value>)"
-                 | Error msg -> "Error(\"" ^ msg ^ "\")")
-               else "<complex data>"
-             with
-             | _ -> "<unprintable data>"));
-       flush stdout;
+       (*  Printf.printf *)
+       (*   "DATA RECEIVED FROM QUEUE: %s\n" *)
+       (*   (match unmarshaled_data with *)
+       (*    | _ when Obj.is_int (Obj.repr unmarshaled_data) -> *)
+       (*      "INT: " ^ string_of_int (Obj.magic unmarshaled_data) *)
+       (*    | _ when Obj.tag (Obj.repr unmarshaled_data) = Obj.string_tag -> *)
+       (*      "STRING: " ^ Obj.magic unmarshaled_data *)
+       (*    | _ -> *)
+       (*      (try *)
+       (*         if *)
+       (*           Obj.is_block (Obj.repr unmarshaled_data) *)
+       (*           && Obj.tag (Obj.repr unmarshaled_data) = 0 *)
+       (*         then ( *)
+       (*           match Obj.magic unmarshaled_data with *)
+       (*           | Ok v -> *)
+       (*             if Obj.is_int (Obj.repr v) *)
+       (*             then "Ok(" ^ string_of_int (Obj.magic v) ^ ")" *)
+       (*             else if Obj.tag (Obj.repr v) = Obj.string_tag *)
+       (*             then "Ok(\"" ^ Obj.magic v ^ "\")" *)
+       (*             else "Ok(<value>)" *)
+       (*           | Error msg -> "Error(\"" ^ msg ^ "\")") *)
+       (*         else "<complex data>" *)
+       (*       with *)
+       (*       | _ -> "<unprintable data>")); *)
+       (* flush stdout; *)
        Lwt.return_ok unmarshaled_data
      with
      | e -> Lwt.return_error ("Unmarshal error: " ^ Printexc.to_string e))
@@ -286,12 +286,12 @@ let rec receive_message ~location =
     (* No local message, poll the remote server *)
     (match get_location_config actual_location with
      | Error msg -> Lwt.return_error msg
-     | Ok loc_config ->
-       Printf.printf
-         "Polling remote server for location %s at %s\n"
-         actual_location
-         loc_config.http_address;
-       flush stdout;
+     | Ok loc_config -> 
+       (* Printf.printf *)
+       (*   "Polling remote server for location %s at %s\n" *)
+       (*   actual_location *)
+       (*   loc_config.http_address; *)
+       (* flush stdout; *)
        Lwt.catch
          (fun () ->
             (* Make HTTP request to poll for messages *)
@@ -319,20 +319,20 @@ let rec receive_message ~location =
                 (* Try to unmarshal the received data *)
                 match unmarshal_data body_str with
                 | Ok unmarshaled_data ->
-                  Printf.printf
-                    "DATA RECEIVED FROM HTTP: %s\n"
-                    (match unmarshaled_data with
-                     | _ when Obj.is_int (Obj.repr unmarshaled_data) ->
-                       "INT: " ^ string_of_int (Obj.magic unmarshaled_data)
-                     | _ when Obj.tag (Obj.repr unmarshaled_data) = Obj.string_tag ->
-                       "STRING: " ^ Obj.magic unmarshaled_data
-                     | _ -> "<complex data>");
-                  flush stdout;
+                  (* Printf.printf *)
+                  (*   "DATA RECEIVED FROM HTTP: %s\n"  *)
+                  (*   (match unmarshaled_data with *)
+                  (*    | _ when Obj.is_int (Obj.repr unmarshaled_data) -> *)
+                  (*      "INT: " ^ string_of_int (Obj.magic unmarshaled_data) *)
+                  (*    | _ when Obj.tag (Obj.repr unmarshaled_data) = Obj.string_tag -> *)
+                  (*      "STRING: " ^ Obj.magic unmarshaled_data *)
+                  (*    | _ -> "<complex data>"); *)
+                  (* flush stdout; *)
                   Lwt.return_ok unmarshaled_data
                 | Error err -> Lwt.return_error err))
-         (fun e ->
-            Printf.printf "Error polling for message: %s\n" (Printexc.to_string e);
-            flush stdout;
+         (fun _e ->
+            (* Printf.printf "Error polling for message: %s\n" (Printexc.to_string e); *)
+            (* flush stdout; *)
             (* Wait a bit and try again *)
             let* () = Lwt_unix.sleep 1.0 in
             receive_message ~location))
