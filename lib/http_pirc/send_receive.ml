@@ -7,7 +7,7 @@ open Lwt.Syntax (* For let+ and let* syntax *)
 let config = ref None
 
 (* Message queues for each location *)
-let message_queues = Hashtbl.create 10
+let message_queues = Hashtbl.create 15
 let message_condition = Lwt_condition.create ()
 
 (* Helper to get location config *)
