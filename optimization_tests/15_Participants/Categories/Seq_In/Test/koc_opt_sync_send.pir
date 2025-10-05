@@ -6,22 +6,21 @@ broadcast_opt freq :=
 
     if A.(freq > 0) then
     A[L] ~> B;
-    A[L] ~> C;    
+    A[L] ~> C;
 
-        let B.x := B.10; in
+        let B.x := B."10"; in
 	let A.result_B := [B] B.x ~> A; in 
-        let C.x := C.10; in
+        let C.x := C."10"; in
 	let A.result_C := [C] C.x ~> A; in 	
 	broadcast_opt A.(freq - 1)
 
     else
-    
     A[R] ~> B;
     A[R] ~> C;    
 
-        let B.x := B.9; in
+        let B.x := B."9"; in
 	let A.result_B := [B] B.x ~> A; in 
-        let C.x := C.9; in
+        let C.x := C."9"; in
 	let A.result_C := [C] C.x ~> A; in A.();
 	
 main :=
