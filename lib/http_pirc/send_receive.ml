@@ -190,13 +190,13 @@ let init_http_servers current_location () =
                         if result
                         then print_endline "Stored in Hashtable"
                         else (
-                          let _ =
+                          let add_result =
                             Htbl.try_add
                               message_queues
                               loc_cfg.Config_parser.location
                               body_string
                           in
-                          ())
+                          print_endline (string_of_bool add_result))
                       in
                       (* let rec try_update queue = *)
                       (*   if Htbl.try_set queue loc_cfg.Config_parser.location body_string *)
