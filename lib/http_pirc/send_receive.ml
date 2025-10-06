@@ -189,7 +189,14 @@ let init_http_servers current_location () =
                       let _ =
                         if result
                         then print_endline "Stored in Hashtable"
-                        else print_endline "Failed storing in queue"
+                        else (
+                          let _ =
+                            Htbl.try_add
+                              message_queues
+                              loc_cfg.Config_parser.location
+                              body_string
+                          in
+                          ())
                       in
                       (* let rec try_update queue = *)
                       (*   if Htbl.try_set queue loc_cfg.Config_parser.location body_string *)
