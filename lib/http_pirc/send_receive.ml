@@ -2,12 +2,14 @@ open Cohttp
 open Cohttp_lwt_unix
 open Lwt.Infix
 open Lwt.Syntax (* For let+ and let* syntax *)
+open Saturn
 
 (* Global config reference *)
 let config = ref None
 
 (* Message queues for each location *)
-let message_queues = Hashtbl.create 10
+(* let message_queues = Hashtbl.create 10 *)
+let message_queues : (string, string) Htbl.t = Htbl.create ~hashed_type:(module String) ()
 let message_condition = Lwt_condition.create ()
 
 (* Helper to get location config *)
@@ -178,10 +180,11 @@ let init_http_servers current_location () =
                        with
                        | _ -> ());
                       (* Store message in queue *)
-                      Hashtbl.replace
-                        message_queues
-                        loc_cfg.Config_parser.location
-                        body_string;
+                      let rec try_update queue =
+                        if Htbl.try_set queue loc_cfg.Config_parser.location body_string then ()
+                        else try_update queue
+                      in
+                      try_update message_queues;
                       (* Signal waiting receivers *)
                       Lwt_condition.broadcast message_condition ();
                       (* Respond with success *)
@@ -189,19 +192,17 @@ let init_http_servers current_location () =
                       Lwt.return (Response.make ~status:`OK (), resp_body))
                     else (
                       (* Empty body means this is a polling request, not actual data *)
-                      let data =
-                        try
-                          Some
-                            (Hashtbl.find message_queues loc_cfg.Config_parser.location)
-                        with
-                        | Not_found -> None
-                      in
+                      let data = Htbl.find_opt message_queues loc_cfg.Config_parser.location in
                       match data with
                       | Some message ->
                         (* Return the message and remove from queue *)
-                        Hashtbl.remove message_queues loc_cfg.Config_parser.location;
-                        let resp_body = Cohttp_lwt.Body.of_string message in
-                        Lwt.return (Response.make ~status:`OK (), resp_body)
+                        let rec try_remove queue loc =
+                          if Htbl.try_remove message_queues loc then
+                            let resp_body = Cohttp_lwt.Body.of_string message in
+                            Lwt.return (Response.make ~status:`OK (), resp_body)
+                          else try_remove queue loc
+                        in
+                        try_remove message_queues loc_cfg.Config_parser.location
                       | None ->
                         (* No message available *)
                         let resp_body = Cohttp_lwt.Body.of_string "" in
@@ -245,11 +246,11 @@ let init_http_servers current_location () =
 let rec receive_message ~location =
   let actual_location = map_receive_location location in
   (* First check if we have a local message *)
-  let local_message = Hashtbl.find_opt message_queues actual_location in
+  let local_message = Htbl.find_opt message_queues actual_location in
   match local_message with
   | Some data when String.length data > 0 ->
     (* Message found in queue, remove it *)
-    Hashtbl.remove message_queues actual_location;
+      let _ = Htbl.try_remove message_queues actual_location in
     (* Try to unmarshal the data *)
     (try
        let unmarshaled_data = Marshal.from_string data 0 in
