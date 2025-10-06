@@ -180,12 +180,18 @@ let init_http_servers current_location () =
                        with
                        | _ -> ());
                       (* Store message in queue *)
-                      let rec try_update queue =
-                        if Htbl.try_set queue loc_cfg.Config_parser.location body_string
-                        then ()
-                        else try_update queue
+                      let _ =
+                        Htbl.try_set
+                          message_queues
+                          loc_cfg.Config_parser.location
+                          body_string
                       in
-                      try_update message_queues;
+                      (* let rec try_update queue = *)
+                      (*   if Htbl.try_set queue loc_cfg.Config_parser.location body_string *)
+                      (*   then () *)
+                      (*   else try_update queue *)
+                      (* in *)
+                      (* try_update message_queues; *)
                       (* Signal waiting receivers *)
                       Lwt_condition.broadcast message_condition ();
                       (* Respond with success *)
