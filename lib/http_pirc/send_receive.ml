@@ -193,9 +193,12 @@ let init_http_servers current_location () =
                       (* in *)
                       (* try_update message_queues; *)
                       (* Signal waiting receivers *)
+                      print_endline "Before broadcast";
                       Lwt_condition.broadcast message_condition ();
+                      print_endline "After broadcast";
                       (* Respond with success *)
                       let resp_body = Cohttp_lwt.Body.of_string "" in
+                      print_endline "Done making response body";
                       Lwt.return (Response.make ~status:`OK (), resp_body))
                     else (
                       (* Empty body means this is a polling request, not actual data *)
