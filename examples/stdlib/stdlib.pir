@@ -1,4 +1,4 @@
 foreign print : unit -> unit := "print_string";
 
-version: A.string_t;
-version: ret "0.0.1";
+version : A.string;
+version := A."0.0.1";

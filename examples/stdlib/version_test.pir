@@ -1,1 +1,1 @@
-main := A.print_string version; 
+main := A.print version;
