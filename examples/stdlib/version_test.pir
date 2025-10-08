@@ -1,1 +1,1 @@
-main := A.print version;
+main := A.print pirouette_stdlib_version;

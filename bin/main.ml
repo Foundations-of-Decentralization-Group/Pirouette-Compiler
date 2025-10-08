@@ -122,7 +122,13 @@ let () =
     prerr_endline (Sys.argv.(0) ^ ": No input file");
     exit 1);
   (*Parse stdlib*)
-  file_ic_stlid := Some (open_in "stdlib.pir") in
+  let (path_to_stdlib:string) = match Sys.getenv_opt "PIR_STDLIB" with
+  | Some p ->
+      p
+  | None ->
+      prerr_endline (Sys.argv.(0) ^ ": Path to Pirouette standard library not set in enviroment variables as \"PIR_STDLIB\"=[ABSOLUTE_PATH_TO_YOUR_STDLIB]\n"); exit 1
+  in
+  file_ic_stlid := Some (open_in path_to_stdlib) in
   if !file_ic_stlid = None
   then (
     prerr_endline (Sys.argv.(0) ^ ": No stdlib");
