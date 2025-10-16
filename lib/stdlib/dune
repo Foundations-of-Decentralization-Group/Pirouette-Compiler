@@ -1,0 +1,6 @@
+(library
+ (name stdlib)
+ (modules link_stdlib)
+ (libraries ast_utils parsing lwt)
+ (preprocess
+  (pps bisect_ppx)))

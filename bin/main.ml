@@ -11,8 +11,6 @@ let projections_only = ref false
 let ml_files = ref ""
 let ocamlopt_warn_flags = ref ""
 
-let file_ic_stlid = ref None
-
 (* Process anonymous command line argument (input file) *)
 let process_input_file filename =
   input_filename := filename;
@@ -112,6 +110,8 @@ let generate_mpi_code filename locs netir_l =
   out_path
 ;;
 
+
+
 (* Main entry point *)
 let () =
   (* Parse command line arguments *)
@@ -121,26 +121,10 @@ let () =
   then (
     prerr_endline (Sys.argv.(0) ^ ": No input file");
     exit 1);
-  (*Parse stdlib*)
-  let (path_to_stdlib:string) = match Sys.getenv_opt "PIR_STDLIB" with
-  | Some p ->
-      p
-  | None ->
-      prerr_endline (Sys.argv.(0) ^ ": Path to Pirouette standard library not set in enviroment variables as \"PIR_STDLIB\"=[ABSOLUTE_PATH_TO_YOUR_STDLIB]\n"); exit 1
-  in
-  file_ic_stlid := Some (open_in path_to_stdlib) in
-  if !file_ic_stlid = None
-  then (
-    prerr_endline (Sys.argv.(0) ^ ": No stdlib");
-    exit 1);
-  
-  (* How could we take the parsed AST and save that directly within this file?*)
-  
-  let lexbuf_stdlib = Lexing.from_channel (Option.get !file_ic_stlid) in
-  let program_stdlib = Parsing.Parse.parse_with_error lexbuf_stdlib in               
-  (* Parse the input file *)
+  (* Lex the input file *)
   let lexbuf = Lexing.from_channel (Option.get !file_ic) in
-  let program = program_stdlib @ (Parsing.Parse.parse_with_error lexbuf) in
+  (* Parse the input file and concatenate it to the stdlib AST *)
+  let program = (Stdlib.parse_stdlib ()) @ (Parsing.Parse.parse_with_error lexbuf) in
   (* Dump the choreography AST *)
   match !ast_dump_format with
   | Some format -> begin

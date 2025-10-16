@@ -60,6 +60,14 @@ bisect-all: cleanall
 	bisect-ppx-report html
 	open _coverage/index.html
 
+.SILENT: compile-info
+compile-info:
+	printf "================================\nPIROUETTE COMPILE OPTIONS\n================================\n\nTo compile normally:\n"
+	echo	"dune exec pirc <YOUR_FILE>"
+	printf "\nTo JSONify:\n"
+	echo	"dune exec pirc -- -ast-dump json <YOUR_FILE>"
+	printf	"\nTo pretty print the Pirouette Net Intermediary language:\n"
+	echo	"dune exec pirc -- -ast-dump pprint <YOUR_FILE>"
 
 cleandocs:
 	rm -rf $(shell find docs -name '*.aux' -o -name '*.log' -o -name '*.out' \
