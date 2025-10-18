@@ -110,8 +110,6 @@ let generate_mpi_code filename locs netir_l =
   out_path
 ;;
 
-
-
 (* Main entry point *)
 let () =
   (* Parse command line arguments *)
@@ -124,7 +122,7 @@ let () =
   (* Lex the input file *)
   let lexbuf = Lexing.from_channel (Option.get !file_ic) in
   (* Parse the input file and concatenate it to the stdlib AST *)
-  let program = (Stdlib.parse_stdlib ()) @ (Parsing.Parse.parse_with_error lexbuf) in
+  let program = (Stdlib_utils.Stdlib_linker.parse_stdlib ()) @ (Parsing.Parse.parse_with_error lexbuf) in
   (* Dump the choreography AST *)
   match !ast_dump_format with
   | Some format -> begin
