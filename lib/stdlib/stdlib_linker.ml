@@ -15,10 +15,10 @@ let parse_stdlib () : Parsing.Parsed_ast.Choreo.stmt_block =
     (if file_ic_stlid = None
     then (
       prerr_endline ("No stdlib");
-      exit 1));
+      exit 1)); 
   
       (* Lex the file *)
     let lexbuf_stdlib = Lexing.from_channel (Option.get file_ic_stlid) in
       (* Return the AST created from the parsed lex *)
-      (Parsing.Parse.parse_with_error (lexbuf_stdlib))
+      (Parsing.Parse.parse_with_error (path_to_stdlib) (lexbuf_stdlib))
 ;;

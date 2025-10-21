@@ -5,7 +5,7 @@ open Lexing (* this is not needed for running, I am not sure why it was added *)
 let parse_string input =
   let lexbuf = Lexing.from_string input in
   lexbuf.lex_curr_p <- { lexbuf.lex_curr_p with pos_fname = "test" };
-  Parse.parse_with_error lexbuf
+  Parse.parse_with_error "test" lexbuf
 ;;
 
 (*

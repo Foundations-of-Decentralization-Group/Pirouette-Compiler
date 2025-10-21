@@ -60,8 +60,8 @@ bisect-all: cleanall
 	bisect-ppx-report html
 	open _coverage/index.html
 
-.SILENT: compile-info
-compile-info:
+.SILENT: help
+help:
 	printf "================================\nPIROUETTE COMPILE OPTIONS\n================================\n\nTo compile normally:\n"
 	echo	"dune exec pirc <YOUR_FILE>"
 	printf "\nTo JSONify:\n"

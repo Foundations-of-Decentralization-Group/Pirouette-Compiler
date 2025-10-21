@@ -122,7 +122,7 @@ let () =
   (* Lex the input file *)
   let lexbuf = Lexing.from_channel (Option.get !file_ic) in
   (* Parse the input file and concatenate it to the stdlib AST *)
-  let program = (Stdlib_utils.Stdlib_linker.parse_stdlib ()) @ (Parsing.Parse.parse_with_error lexbuf) in
+  let program = (Stdlib_utils.Stdlib_linker.parse_stdlib ()) @ (Parsing.Parse.parse_with_error !input_filename lexbuf) in
   (* Dump the choreography AST *)
   match !ast_dump_format with
   | Some format -> begin

@@ -4,11 +4,11 @@ let peq (s : string) =
   let pprint_s_ref = ref "" in
   let json_ast_ref = ref "" in
   try
-    let program = Parsing.Parse.parse_with_error (Lexing.from_string s) in
+    let program = Parsing.Parse.parse_with_error "unit_test" (Lexing.from_string s) in
     let pprint_s = Ast_utils.stringify_pprint_choreo_ast program in
     pprint_s_ref := pprint_s;
     (* Store potentially problematic pretty-printed string *)
-    let program' = Parsing.Parse.parse_with_error (Lexing.from_string pprint_s) in
+    let program' = Parsing.Parse.parse_with_error "unit_test" (Lexing.from_string pprint_s) in
     let json_ast = Ast_utils.stringify_jsonify_choreo_ast program in
     json_ast_ref := json_ast;
     (* Store original AST *)
