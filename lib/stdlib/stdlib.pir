@@ -1,26 +1,38 @@
 {- Print to stdout functions -}
-foreign print_string_stdlib : unit -> unit := "print_string";
+foreign print_string_stdlib : A.string -> unit := "print_string";
 foreign print_char_stdlib : unit -> unit := "print_char";
-foreign print_endline_stdlib : unit -> unit := "print_endline";
+foreign print_endline_stdlib : A.string -> unit := "print_endline";
 foreign print_float_stdlib : unit -> unit := "print_float";
-foreign print_int_stdlib : unit -> unit := "print_int";
+foreign print_int_stdlib : A.int -> unit := "print_int";
 foreign print_newline_stdlib : unit -> unit := "print_newline";
-foreign printf_stdlib : unit -> unit -> unit := "Printf.printf";
+foreign printf_stdlib : A.string -> A.string -> unit := "Printf.printf";
 
 
 {- Print to stderr functions -}
-foreign prerr_string_stdlib : unit -> unit := "prerr_string";
-foreign prerr_char_stdlib : unit -> unit := "prerr_char";
-foreign prerr_endline_stdlib : unit -> unit := "prerr_endline";
+foreign prerr_string_stdlib : A.string -> unit := "prerr_string";
+foreign prerr_char_stdlib : unit-> unit := "prerr_char";
+foreign prerr_endline_stdlib : A.string -> unit := "prerr_endline";
 foreign prerr_float_stdlib : unit -> unit := "prerr_float";
-foreign prerr_int_stdlib : unit -> unit := "prerr_int";
+foreign prerr_int_stdlib : A.int -> unit := "prerr_int";
 foreign prerr_newline_stdlib : unit -> unit := "prerr_newline";
-foreign eprintf_stdlib : unit -> unit -> unit := "Printf.eprintf";
+foreign eprintf_stdlib : A.string -> A.string -> unit := "Printf.eprintf";
 
+
+
+{- String manipulation -}
+foreign sprintf_stdlib : unit -> unit -> unit := "Printf.sprintf";
+foreign ksprintf_stdlib : (unit -> unit) -> unit -> unit -> unit := "Printf.ksprintf";
+foreign string_cat_stdlib : A.string -> A.string -> unit := "String.cat";
+foreign cat_stdlib : A.string -> A.string -> unit := "String.cat";
+foreign string_of_int_stdlib : A.int -> A.string := "string_of_int";
+foreign string_of_bool_stdlib : A.bool -> A.string := "string_of_bool";
+foreign of_bytes_stdlib : unit -> A.string := "String.of_bytes";
+foreign to_bytes_stdlib : A.string -> unit := "String.to_bytes";
+foreign length_stdlib : A.string -> A.int := "String.length";
 
 
 {- In-channel functions -}
-foreign ic_open_in_stdlib : unit -> unit := "open_in";
+foreign ic_open_in_stdlib : A.string -> unit := "open_in";
 foreign ic_open_in_bin_stdlib : unit -> unit := "open_in_bin";
 foreign ic_with_open_bin_stdlib : unit -> (unit -> unit) -> unit := "In_channel.with_open_bin";
 foreign ic_with_open_text_stdlib : unit -> (unit -> unit) -> unit := "In_channel.with_open_text";
@@ -33,7 +45,7 @@ foreign ic_input_line_stdlib : unit -> unit := "input_line";
 foreign ic_input_char_stdlib : unit -> unit := "input_char";
 foreign ic_input_byte_stdlib : unit -> unit := "input_byte";
 foreign ic_input_stdlib : unit -> unit := "input";
-foreign ic_input_all_stdlib : unit -> unit := "In_channel.input_all";
+foreign ic_input_all_stdlib : unit -> A.string := "In_channel.input_all";
 foreign ic_input_lines_stdlib : unit -> unit := "In_channel.input_lines";
 foreign ic_in_channel_length_stdlib : unit -> unit := "in_channel_length";
 foreign ic_close_in_stdlib : unit -> unit := "close_in";
@@ -42,7 +54,19 @@ foreign ic_set_binary_mode_stdlib : unit -> unit -> unit := "set_binary_mode_in"
 foreign ic_is_binary_mode_stdlib : unit -> unit -> unit := "In_channel.is_binary_mode";
 foreign ic_is_atty_stdlib : unit -> unit -> unit := "In_channel.isatty";
 foreign ic_fold_lines : (unit -> unit -> unit) -> unit -> unit -> unit := "In_channel.fold_lines";
-
+ic_print_line_from_file := fun file -> 
+    (let ic := (ic_open_in_stdlib file); in
+    let line_from_file := ic_input_line_stdlib ic; in
+    let _ := A.print_endline_stdlib line_from_file; in
+    ic_close_in_stdlib ic);
+ic_print_file := fun file -> 
+    (let ic := (ic_open_in_stdlib file); in
+    let _ := A.print_endline_stdlib (ic_input_all_stdlib ic); in
+    ic_close_in_stdlib ic);
+ic_print_byte := fun file -> 
+    (let ic := (ic_open_in_stdlib file); in
+    let _ := A.print_endline_stdlib (string_of_int_stdlib (ic_input_byte_stdlib ic)); in
+    ic_close_in_stdlib ic);
 
 
 {- Out-channel functions -}
@@ -51,14 +75,13 @@ foreign oc_open_out_bin_stdlib : unit -> unit := "open_out_bin";
 foreign oc_get_stdout_stdlib : unit -> unit := "((fun () -> (stdout)))";
 foreign oc_get_stderr_stdlib : unit -> unit := "((fun () -> (stderr)))";
 foreign oc_seek_out_stdlib : unit -> unit -> unit := "seek_out";
-foreign oc_output_string_stdlib : unit -> unit -> unit := "output_string";
+foreign oc_output_string_stdlib : unit -> A.string -> unit := "output_string";
 foreign oc_output_bytes_stdlib : unit -> unit -> unit := "output_bytes";
-foreign oc_output_byte_stdlib : unit -> unit -> unit := "output_byte";
+foreign oc_output_byte_stdlib : unit -> A.int -> unit := "output_byte";
 foreign oc_output_binary_int_stdlib : unit -> unit -> unit := "output_binary_int";
 foreign oc_output_stdlib : unit -> unit -> unit -> unit -> unit := "output";
 foreign oc_output_substring_stdlib : unit -> unit -> unit -> unit -> unit := "output_substring";
 foreign oc_output_value_stdlib : unit -> unit -> unit -> unit -> unit := "output_value";
-foreign oc_print_to_file_stdlib : unit -> unit -> unit := "Printf.fprintf";
 foreign oc_fprintf_stdlib : unit -> unit -> unit := "Printf.fprintf";
 foreign oc_ifprintf_stdlib : unit -> unit -> unit := "Printf.ifprintf";
 foreign oc_kfprintf_stdlib : (unit -> unit) -> unit -> unit -> unit := "Printf.kfprintf";
@@ -74,7 +97,11 @@ foreign oc_is_buffered_stdlib : unit -> unit := "Out_channel.is_buffered";
 foreign oc_is_atty_stdlib : unit -> unit := "Out_channel.isatty";
 oc_write_string_to_file := fun file str -> 
     (let oc := (oc_open_out_stdlib file); in
-    let _ := oc_print_to_file_stdlib oc A."%s\n" str; in
+    let _ := oc_fprintf_stdlib oc A."%s\n" str; in
+    oc_close_out_stdlib oc);
+oc_write_byte_to_file := fun file byte -> 
+    (let oc := (oc_open_out_stdlib file); in
+    let _ := oc_output_byte_stdlib oc byte; in
     oc_close_out_stdlib oc);
 
 
@@ -122,10 +149,10 @@ foreign sys_make_dir_stdlib : unit -> unit -> unit := "Sys.mkdir";
 foreign sys_mkdir_stdlib : unit -> unit -> unit := "Sys.mkdir";
 foreign sys_rmdir_stdlib : unit -> unit := "Sys.rmdir";
 foreign sys_remove_empty_dir_stdlib : unit -> unit := "Sys.rmdir";
-foreign sys_get_cwd_stdlib : unit -> unit := "Sys.getcwd";
+foreign sys_get_cwd_stdlib : unit -> A.string := "Sys.getcwd";
 foreign sys_readdir_stdlib : unit -> unit := "Sys.readdir";
 foreign sys_ls_stdlib : unit -> unit := "Sys.readdir";
-foreign sys_get_os_type_stdlib : unit -> unit := "((fun () -> (Sys.os_type)))";
+foreign sys_get_os_type_stdlib : unit -> A.string := "((fun () -> (Sys.os_type)))";
 foreign sys_get_wordsize_stdlib : unit -> unit := "((fun () -> (Sys.word_size)))";
 foreign sys_get_ocaml_int_size_stdlib : unit -> unit := "((fun () -> (Sys.int_size)))";
 foreign sys_get_ocaml_max_string_length_stdlib : unit -> unit := "((fun () -> (Sys.max_string_length)))";
@@ -228,15 +255,8 @@ foreign rand_set_state_stdlib : unit -> unit := "Random.set_state";
 foreign rand_split_state_stdlib: unit -> unit := "Random.split";
 
 
-{- String manipulation -}
-foreign sprintf_stdlib : unit -> unit -> unit := "Printf.sprintf";
-foreign ksprintf_stdlib : (unit -> unit) -> unit -> unit -> unit := "Printf.ksprintf";
-foreign string_cat_stdlib : A.string -> A.string -> unit := "String.cat";
-foreign cat_stdlib : A.string -> A.string -> unit := "String.cat";
-
-
 {- Program termination -}
-foreign exit_stdlib : unit -> unit := "exit";
+foreign exit_stdlib : A.int -> unit := "exit";
 foreign exit_hook_stdlib : (unit -> unit) -> unit := "at_exit";
 
 
@@ -244,4 +264,4 @@ foreign exit_hook_stdlib : (unit -> unit) -> unit := "at_exit";
 pirouette_stdlib_version : A.string;
 pirouette_stdlib_version := A."0.0.2";
 
-pirouette_stdlib_info := fun _ -> (A.print_endline (string_cat_stdlib (string_cat_stdlib A."====================================\nPIROUETTE STANDARD LIBRARY INFO\n\nLibrary version: " pirouette_stdlib_version) A."\nLast modified: 10/21/2025\n\n====================================\n"));
+display_pirouette_stdlib_info := fun _ -> (A.print_endline (string_cat_stdlib (string_cat_stdlib A."====================================\nPIROUETTE STANDARD LIBRARY INFO\n\nLibrary version: " pirouette_stdlib_version) A."\nLast modified: 10/21/2025\n\n====================================\n"));
