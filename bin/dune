@@ -3,3 +3,12 @@
  (public_name pirc)
  (package pirc)
  (libraries ast_utils parsing netgen ocamlgen http_pirc lwt))
+
+(documentation
+ (package pirc)
+ (mld_files index))
+
+ (install
+ (section doc)
+ (package pirc)
+ (files ../odoc-config.sexp))

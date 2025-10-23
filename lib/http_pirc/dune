@@ -6,6 +6,10 @@
  (preprocess
   (pps lwt_ppx)))
 
+(documentation
+ (package http_pirc)
+ (mld_files index user_guide developer_guide))
+
 (executable
  (name mock_server)
  (public_name mock_server)
