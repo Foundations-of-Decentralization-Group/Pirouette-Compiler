@@ -10,17 +10,18 @@ let loc = Builder.loc
 let spf = Printf.sprintf
 
 module Msg_http_intf : Msg_intf.M = struct
-  let emit_net_send ~src ~dst pexp =
-    ignore src;
+  let emit_net_send ~src ~dst ?switch_handle ?client ~pexp () =
     [%expr
       match
-        Lwt_main.run
-          (Send_receive.send_message
-             ~location:[%e Ast_builder.Default.estring ~loc dst]
-             ~data:[%e pexp])
+        Send_receive.send_message
+          ~sender:[%e Ast_builder.Default.estring ~loc src]
+          ~receiver:[%e Ast_builder.Default.estring ~loc dst]
+          ~message:[%e pexp]
+          ~switch_handle:[%e Option.get switch_handle]
+          ~client:[%e Option.get client]
       with
-      | Ok () -> ()
-      | Error msg -> failwith ("Send error: " ^ msg)]
+      | Ok msg -> msg
+      | Error msg -> failwith ("Receive error: " ^ msg)]
   ;;
 
   let emit_net_recv ~src ~dst =
@@ -38,17 +39,19 @@ end
 
 let emit_toplevel_init _loc_ids config_file_path =
   [ [%stri
-    let () =
-      print_endline "In here for testing";
-      let config_file_path : string = [%e Ast_builder.Default.estring ~loc config_file_path] in
-      match Lwt_main.run (Config_parser.load_config config_file_path) with
-      | Some cfg ->
-        Send_receive.config := Some cfg;
-        (* Each process initializes its HTTP server in its own execution context *)
-        ()
-      | None ->
-        failwith (Printf.sprintf "Failed to load config from %s" config_file_path)
-    ;;]
+      let () =
+        print_endline "In here for testing";
+        let config_file_path : string =
+          [%e Ast_builder.Default.estring ~loc config_file_path]
+        in
+        match Lwt_main.run (Config_parser.load_config config_file_path) with
+        | Some cfg ->
+          Send_receive.config := Some cfg;
+          (* Each process initializes its HTTP server in its own execution context *)
+          ()
+        | None ->
+          failwith (Printf.sprintf "Failed to load config from %s" config_file_path)
+      ;;]
   ]
 ;;
 
@@ -76,15 +79,16 @@ let emit_toplevel_http
     in
     [%stri
       let () =
-        Eio.main.run @@ fun env ->
+        Eio.main.run
+        @@ fun env ->
         let client = Client.make ~https:None env#net in
-        Eio.Switch.run ~name:"run_switch" @@ fun sw -> 
+        Eio.Switch.run ~name:"run_switch"
+        @@ fun sw ->
         Printf.printf
           "Starting process_%s...\n"
           [%e Ast_builder.Default.estring ~loc loc_id];
         (* Set the current location explicitly for this process *)
-        Send_receive.init_http_servers [%e Ast_builder.Default.estring ~loc loc_id]
-          ();
+        Send_receive.init_http_servers [%e Ast_builder.Default.estring ~loc loc_id] ();
         let [%p Ast_builder.Default.pvar ~loc (spf "process_%s" loc_id)] =
           [%e emit_net_toplevel net_stmts]
         in

@@ -51,50 +51,87 @@ let unmarshal_data data_str =
 let map_send_location location = location
 let map_receive_location location = location
 
+let get_body string_to_send =
+  let body_to_send = Some (Body.of_string string_to_send) in
+  body_to_send
+;;
+
+let get_ip_address ~location =
+  match get_location_config location with
+  | Ok loc_config -> Uri.of_string loc_config.http_address
+  | _ -> Uri.empty
+;;
+
+let get_header ~src =
+  let new_header = Http.Header.init () in
+  let header_to_send = Http.Header.add new_header "Location" src in
+  header_to_send
+;;
+
+(* let send_message ~location ~data = *)
+(*   let actual_location = map_send_location location in *)
+(*   match get_location_config actual_location with *)
+(*   | Error msg -> Lwt.return_error msg *)
+(*   | Ok loc_config -> *)
+(*     (try *)
+(*        let marshaled_data = marshal_data data in *)
+(*        (\* Print the data being sent *\) *)
+(*        Printf.printf *)
+(*          "DATA BEING SENT: %s\n" *)
+(*          (match data with *)
+(*           | _ when Obj.is_int (Obj.repr data) -> "INT: " ^ string_of_int (Obj.magic data) *)
+(*           | _ when Obj.tag (Obj.repr data) = Obj.string_tag -> "STRING: " ^ Obj.magic data *)
+(*           | _ -> *)
+(*             (try *)
+(*                if Obj.is_block (Obj.repr data) && Obj.tag (Obj.repr data) = 0 *)
+(*                then ( *)
+(*                  match Obj.magic data with *)
+(*                  | Ok v -> *)
+(*                    if Obj.is_int (Obj.repr v) *)
+(*                    then "Ok(" ^ string_of_int (Obj.magic v) ^ ")" *)
+(*                    else if Obj.tag (Obj.repr v) = Obj.string_tag *)
+(*                    then "Ok(\"" ^ Obj.magic v ^ "\")" *)
+(*                    else "Ok(<value>)" *)
+(*                  | Error msg -> "Error(\"" ^ msg ^ "\")") *)
+(*                else "<complex data>" *)
+(*              with *)
+(*              | _ -> "<unprintable data>")); *)
+(*        flush stdout; *)
+(*        let headers = Header.init_with "Content-Type" "application/octet-stream" in *)
+(*        let body = Cohttp_lwt.Body.of_string marshaled_data in *)
+(*        (\* No need to create URI variable since it's not used *\) *)
+(*        Client.post ~headers ~body (Uri.of_string loc_config.http_address) *)
+(*        >>= fun (resp, body) -> *)
+(*        let status = resp |> Response.status |> Code.code_of_status in *)
+(*        Cohttp_lwt.Body.drain_body body *)
+(*        >>= fun () -> *)
+(*        if status = 200 *)
+(*        then Lwt.return_ok () *)
+(*        else *)
+(*          Lwt.return_error ("Failed to send message, status code: " ^ string_of_int status) *)
+(*      with *)
+(*      | e -> Lwt.return_error ("Send error: " ^ Printexc.to_string e)) *)
+(* ;; *)
+
 (* Function to send a message *)
-let send_message ~location ~data =
-  let actual_location = map_send_location location in
-  match get_location_config actual_location with
-  | Error msg -> Lwt.return_error msg
-  | Ok loc_config ->
-    (try
-       let marshaled_data = marshal_data data in
-       (* Print the data being sent *)
-       Printf.printf
-         "DATA BEING SENT: %s\n"
-         (match data with
-          | _ when Obj.is_int (Obj.repr data) -> "INT: " ^ string_of_int (Obj.magic data)
-          | _ when Obj.tag (Obj.repr data) = Obj.string_tag -> "STRING: " ^ Obj.magic data
-          | _ ->
-            (try
-               if Obj.is_block (Obj.repr data) && Obj.tag (Obj.repr data) = 0
-               then (
-                 match Obj.magic data with
-                 | Ok v ->
-                   if Obj.is_int (Obj.repr v)
-                   then "Ok(" ^ string_of_int (Obj.magic v) ^ ")"
-                   else if Obj.tag (Obj.repr v) = Obj.string_tag
-                   then "Ok(\"" ^ Obj.magic v ^ "\")"
-                   else "Ok(<value>)"
-                 | Error msg -> "Error(\"" ^ msg ^ "\")")
-               else "<complex data>"
-             with
-             | _ -> "<unprintable data>"));
-       flush stdout;
-       let headers = Header.init_with "Content-Type" "application/octet-stream" in
-       let body = Cohttp_lwt.Body.of_string marshaled_data in
-       (* No need to create URI variable since it's not used *)
-       Client.post ~headers ~body (Uri.of_string loc_config.http_address)
-       >>= fun (resp, body) ->
-       let status = resp |> Response.status |> Code.code_of_status in
-       Cohttp_lwt.Body.drain_body body
-       >>= fun () ->
-       if status = 200
-       then Lwt.return_ok ()
-       else
-         Lwt.return_error ("Failed to send message, status code: " ^ string_of_int status)
-     with
-     | e -> Lwt.return_error ("Send error: " ^ Printexc.to_string e))
+let send_message sender receiver message switch_handle client =
+    
+  let ip_address = get_ip_address ~location:receiver in 
+  let body_to_send = Some(Body.of_string message) in
+  let header_to_send = Http.Header.init () in
+  let header_to_send = Http.Header.add header_to_send "Location" sender in
+  let header_string = Http.Header.to_string header_to_send in
+  let header_to_send = Some header_to_send in
+  let resp, _body = 
+  Client.post
+    switch_handle
+    ?body:body_to_send
+    ?headers:header_to_send
+    client
+    ip_address in
+ if Http.Status.compare resp.status `OK = 0 then
+    Ok("Done")
+ else Error("Unsuccessful send")
 ;;
 
 (* Initialize HTTP servers for all locations *)
