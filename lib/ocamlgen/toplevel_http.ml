@@ -76,6 +76,9 @@ let emit_toplevel_http
     in
     [%stri
       let () =
+        Eio.main.run @@ fun env ->
+        let client = Client.make ~https:None env#net in
+        Eio.Switch.run ~name:"run_switch" @@ fun sw -> 
         Printf.printf
           "Starting process_%s...\n"
           [%e Ast_builder.Default.estring ~loc loc_id];
