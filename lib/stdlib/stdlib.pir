@@ -106,19 +106,19 @@ oc_write_byte_to_file := fun file byte ->
 
 
 {- File manipulation functions -}
-foreign filenm_get_current_dir_name_stdlib : unit -> unit := "((fun () -> (Filename.current_dir_name)))";
+foreign filenm_get_current_dir_name_stdlib : unit -> A.string := "((fun () -> (Filename.current_dir_name)))";
 foreign filenm_get_parent_dir_name_stdlib : unit -> unit := "((fun () -> (Filename.parent_dir_name)))";
 foreign filenm_get_dir_sep_stdlib : unit -> unit := "((fun () -> (Filename.dir_sep)))";
 foreign filenm_concat_path_stdlib : unit -> unit -> unit := "Filename.concat";
-foreign filenm_is_relative_filepath_stdlib : unit -> unit := "Filename.is_relative";
-foreign filenm_is_implicit_filepath_stdlib : unit -> unit := "Filename.is_implicit";
+foreign filenm_is_relative_filepath_stdlib : A.string -> A.bool := "Filename.is_relative";
+foreign filenm_is_implicit_filepath_stdlib : A.string -> A.bool := "Filename.is_implicit";
 foreign filenm_check_suffix_stdlib : unit -> unit -> unit := "Filename.check_suffix";
 foreign filenm_chop_suffix_stdlib : unit -> unit -> unit := "Filename.chop_suffix";
-foreign filenm_get_file_extension_stdlib : unit -> unit := "Filename.extension";
+foreign filenm_get_file_extension_stdlib : A.string -> A.string := "Filename.extension";
 foreign filenm_remove_file_extension_noerr_stdlib : unit -> unit := "Filename.remove_extension";
 foreign filenm_remove_file_extension_stdlib : unit -> unit := "Filename.chop_extension";
-foreign filenm_get_basename_from_path_stdlib : unit -> unit := "Filename.basename";
-foreign filenm_get_dirname_from_path_stdlib : unit -> unit := "Filename.dirname";
+foreign filenm_get_basename_from_path_stdlib : A.string -> A.string := "Filename.basename";
+foreign filenm_get_dirname_from_path_stdlib : A.string -> A.string := "Filename.dirname";
 foreign filenm_get_null_file_stdlib : unit -> unit := "((fun () -> (Filename.null)))";
 foreign filenm_create_temp_file_stdlib : unit -> unit -> unit := "Filename.temp_file";
 foreign filenm_create_and_open_temp_file_stdlib : unit -> unit -> unit := "Filename.open_temp_file";
@@ -134,13 +134,13 @@ foreign filenm_quote_commands_stdlib : unit -> unit -> unit := "Filename.quote_c
 foreign sys_get_argv_stdlib : unit -> unit := "((fun () -> (Sys.argv)))";
 foreign sys_get_argv_stdlib : unit -> unit := "((fun () -> (Sys.executable_name)))";
 foreign sys_is_file_stdlib : unit -> unit := "Sys.file_exists";
-foreign sys_is_directory_stdlib : unit -> unit := "Sys.is_directory";
+foreign sys_is_directory_stdlib : A.string -> A.bool := "Sys.is_directory";
 foreign sys_is_regular_file_stdlib : unit -> unit := "Sys.is_regular_file";
 foreign sys_remove_file_stdlib : unit -> unit := "Sys.remove";
 foreign sys_rename_file_stdlib : unit -> unit -> unit := "Sys.rename";
 foreign sys_move_file_stdlib : unit -> unit -> unit := "Sys.rename";
-foreign sys_get_env_stdlib : unit -> unit -> unit := "Sys.getenv";
-foreign sys_run_command_stdlib : unit -> unit := "Sys.command";
+foreign sys_get_env_stdlib : A.string -> A.string := "Sys.getenv";
+foreign sys_run_command_stdlib : A.string -> unit := "Sys.command";
 foreign sys_get_current_execution_time_stdlib : unit -> unit := "Sys.time";
 foreign sys_change_dir_stdlib : unit -> unit := "Sys.chdir";
 foreign sys_ch_dir_stdlib : unit -> unit := "Sys.chdir";
@@ -163,8 +163,8 @@ foreign sys_check_big_endian_stdlib : unit -> unit := "((fun () -> (Sys.big_endi
 
 
 {- Buffer handling functions -}
-foreign buffer_create_stdlib : unit -> unit := "Buffer.create";
-foreign buffer_copy_to_string_stdlib : unit -> unit := "Buffer.contents";
+foreign buffer_create_stdlib : A.int -> unit := "Buffer.create";
+foreign buffer_copy_to_string_stdlib : unit -> A.string := "Buffer.contents";
 foreign buffer_copy_to_bytes_stdlib : unit -> unit := "Buffer.to_bytes";
 foreign buffer_copy_portion_stdlib : unit -> unit -> unit -> unit := "Buffer.sub";
 foreign buffer_blit_stdlib : unit -> unit -> unit -> unit -> unit -> unit := "Buffer.blit";
@@ -264,4 +264,4 @@ foreign exit_hook_stdlib : (unit -> unit) -> unit := "at_exit";
 pirouette_stdlib_version : A.string;
 pirouette_stdlib_version := A."0.0.2";
 
-display_pirouette_stdlib_info := fun _ -> (A.print_endline (string_cat_stdlib (string_cat_stdlib A."====================================\nPIROUETTE STANDARD LIBRARY INFO\n\nLibrary version: " pirouette_stdlib_version) A."\nLast modified: 10/21/2025\n\n====================================\n"));
+display_pirouette_stdlib_info := fun _ -> (A.print_endline (string_cat_stdlib (string_cat_stdlib A."====================================\nPIROUETTE STANDARD LIBRARY INFO\n\nLibrary version: " pirouette_stdlib_version) A."\nLast modified: 10/23/2025\n\n====================================\n"));

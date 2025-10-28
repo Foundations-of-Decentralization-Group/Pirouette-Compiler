@@ -1,0 +1,1 @@
+_ := err_raise_stdlib (err_create_exception_failure_stdlib A."Maybe this may fail");

@@ -1,0 +1,1 @@
+_ := display_pirouette_stdlib_info ();

@@ -4,4 +4,5 @@ _ := A.prerr_endline_stdlib A."2";
 _ := A.prerr_int_stdlib A.3;
 _ := A.prerr_newline_stdlib A.();
 _ := A.eprintf_stdlib A."%s\n" A."4";
+_ := A.exit_hook_stdlib display_pirouette_stdlib_info;
 _ := A.exit_stdlib A.5;
