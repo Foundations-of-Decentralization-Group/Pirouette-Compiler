@@ -1,3 +1,4 @@
 (library
  (name stdlib_utils)
+ (modules stdlib_linker stdlib_ast stdlib_compiler)
  (libraries ast_utils parsing netgen ocamlgen http_pirc lwt))
