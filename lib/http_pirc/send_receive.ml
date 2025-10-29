@@ -161,7 +161,8 @@ let init_http_server current_location () =
     and () = Logs.Src.set_level Cohttp_eio.src (Some Debug) in
     let log_warning ex = Logs.warn (fun f -> f "%a" Eio.Exn.pp ex) in
     (* This runs the Eio event loop for the server *)
-    let _ =
+    let () =
+      print_endline "Just before the EIO main loop";
       let port = ref port_to_use in
       Arg.parse
         [ "-p", Arg.Set_int port, " Listening port number(8080 by default)" ]
@@ -169,8 +170,10 @@ let init_http_server current_location () =
         "An HTTP/1.1 server";
       Eio_main.run
       @@ fun env ->
+      print_endline "Inside the EIO main loop";      
       Eio.Switch.run
       @@ fun sw ->
+      print_endline "Inside the EIO switch run";            
       let socket =
         Eio.Net.listen
           env#net
@@ -178,10 +181,12 @@ let init_http_server current_location () =
           ~backlog:128
           ~reuse_addr:true
           (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port))
-      in
-      let server = Cohttp_eio.Server.make ~callback:handler () in
+      and server = Cohttp_eio.Server.make ~callback:handler () in
+      print_endline "After the and server part";            
       Cohttp_eio.Server.run socket server ~on_error:log_warning
+      print_endline "After the run socket part";                    
     in
+      print_endline "Finished";                
     ()
 ;;
 
