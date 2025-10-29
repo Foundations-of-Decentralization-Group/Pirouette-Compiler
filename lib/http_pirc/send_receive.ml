@@ -164,6 +164,7 @@ let init_http_server current_location () =
     let () =
       print_endline "Just before the EIO main loop";
       let port = ref port_to_use in
+      print_endline ("This is the port that is being used " ^ (string_of_int port_to_use));
       Arg.parse
         [ "-p", Arg.Set_int port, " Listening port number(8080 by default)" ]
         ignore
@@ -184,7 +185,6 @@ let init_http_server current_location () =
       and server = Cohttp_eio.Server.make ~callback:handler () in
       print_endline "After the and server part";            
       Cohttp_eio.Server.run socket server ~on_error:log_warning
-      print_endline "After the run socket part";                    
     in
       print_endline "Finished";                
     ()
