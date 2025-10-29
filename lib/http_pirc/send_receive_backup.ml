@@ -1,16 +1,17 @@
-open Cohttp_eio
-(* open Cohttp_lwt_unix *)
-(* open Lwt.Infix *)
-(* open Lwt.Syntax (\* For let+ and let* syntax *\) *)
-(* open Saturn *)
+open Cohttp
+open Cohttp_lwt_unix
+open Lwt.Infix
+open Lwt.Syntax (* For let+ and let* syntax *)
+open Saturn
 
 (* Global config reference *)
 let config = ref None
 
 (* Message queues for each location *)
 (* let message_queues = Hashtbl.create 10 *)
-let message_queues : (string, string Eio.Stream.t) Hashtbl.t = Hashtbl.create 10
-(* let message_condition = Lwt_condition.create () *)
+let message_queues : (string, string) Htbl.t = Htbl.create ~hashed_type:(module String) ()
+let message_condition = Lwt_condition.create ()
+
 
 (* Helper to get location config *)
 let get_location_config location =
@@ -67,7 +68,7 @@ let unmarshal_data data_str =
 (* Internal Mapping Functions *)
 let map_send_location location = location
 let map_receive_location location = location
-
+  
 (* This is the handler for incoming http requests *)
 let handler _socket request body =
   let x : Cohttp_eio.Body.t = body in
@@ -77,8 +78,7 @@ let handler _socket request body =
   match sender_location with
   | None -> Cohttp_eio.Server.respond_string ~status:`Not_found ~body:"" ()
   | Some unwrapped_sender_location ->
-    let indexed_queue = Hashtbl.find_opt
-        message_queues unwrapped_sender_location in
+    let indexed_queue = Hashtbl.find_opt message_queues unwrapped_sender_location in
     (match indexed_queue with
      | Some result_queue -> Eio.Stream.add result_queue sender_body
      | None ->
@@ -178,105 +178,98 @@ let init_http_server current_location () =
 ;;
 
 (* Function to receive a message *)
-(* let rec receive_message ~location = *)
-(*   let actual_location = map_receive_location location in *)
-(*   (\* First check if we have a local message *\) *)
-(*   let local_message = Htbl.find_opt message_queues actual_location in *)
-(*   match local_message with *)
-(*   | Some data when String.length data > 0 -> *)
-(*     (\* Message found in queue, remove it *\) *)
-(*     let _ = Htbl.try_remove message_queues actual_location in *)
-(*     (\* Try to unmarshal the data *\) *)
-(*     (try *)
-(*        let unmarshaled_data = Marshal.from_string data 0 in *)
-(*        (\* Print the actual unmarshaled data in readable format *\) *)
-(*        Printf.printf *)
-(*          "DATA RECEIVED FROM QUEUE: %s\n" *)
-(*          (match unmarshaled_data with *)
-(*           | _ when Obj.is_int (Obj.repr unmarshaled_data) -> *)
-(*             "INT: " ^ string_of_int (Obj.magic unmarshaled_data) *)
-(*           | _ when Obj.tag (Obj.repr unmarshaled_data) = Obj.string_tag -> *)
-(*             "STRING: " ^ Obj.magic unmarshaled_data *)
-(*           | _ -> *)
-(*             (try *)
-(*                if *)
-(*                  Obj.is_block (Obj.repr unmarshaled_data) *)
-(*                  && Obj.tag (Obj.repr unmarshaled_data) = 0 *)
-(*                then ( *)
-(*                  match Obj.magic unmarshaled_data with *)
-(*                  | Ok v -> *)
-(*                    if Obj.is_int (Obj.repr v) *)
-(*                    then "Ok(" ^ string_of_int (Obj.magic v) ^ ")" *)
-(*                    else if Obj.tag (Obj.repr v) = Obj.string_tag *)
-(*                    then "Ok(\"" ^ Obj.magic v ^ "\")" *)
-(*                    else "Ok(<value>)" *)
-(*                  | Error msg -> "Error(\"" ^ msg ^ "\")") *)
-(*                else "<complex data>" *)
-(*              with *)
-(*              | _ -> "<unprintable data>")); *)
-(*        flush stdout; *)
-(*        Lwt.return_ok unmarshaled_data *)
-(*      with *)
-(*      | e -> Lwt.return_error ("Unmarshal error: " ^ Printexc.to_string e)) *)
-(*   | _ -> *)
-(*     (\* No local message, poll the remote server *\) *)
-(*     (match get_location_config actual_location with *)
-(*      | Error msg -> Lwt.return_error msg *)
-(*      | Ok loc_config -> *)
-(*        Printf.printf *)
-(*          "Polling remote server for location %s at %s\n" *)
-(*          actual_location *)
-(*          loc_config.http_address; *)
-(*        flush stdout; *)
-(*        Lwt.catch *)
-(*          (fun () -> *)
-(*             (\* Make HTTP request to poll for messages *\) *)
-(*             let headers = Header.init_with "Content-Type" "application/octet-stream" in *)
-(*             let body = Cohttp_lwt.Body.of_string "" in *)
-(*             (\* Empty body indicates polling *\) *)
-(*             Client.post ~headers ~body (Uri.of_string loc_config.http_address) *)
-(*             >>= fun (resp, body) -> *)
-(*             let status = resp |> Response.status |> Code.code_of_status in *)
-(*             if status <> 200 *)
-(*             then *)
-(*               Cohttp_lwt.Body.drain_body body *)
-(*               >>= fun () -> *)
-(*               Lwt.return_error *)
-(*                 ("Failed to poll for message, status code: " ^ string_of_int status) *)
-(*             else *)
-(*               Cohttp_lwt.Body.to_string body *)
-(*               >>= fun body_str -> *)
-(*               if String.length body_str = 0 *)
-(*               then *)
-(*                 (\* No message available, wait a bit and try again *\) *)
-(*                 let* () = Lwt_unix.sleep 0.5 in *)
-(*                 receive_message ~location *)
-(*               else ( *)
-(*                 (\* Try to unmarshal the received data *\) *)
-(*                 match unmarshal_data body_str with *)
-(*                 | Ok unmarshaled_data -> *)
-(*                   Printf.printf *)
-(*                     "DATA RECEIVED FROM HTTP: %s\n" *)
-(*                     (match unmarshaled_data with *)
-(*                      | _ when Obj.is_int (Obj.repr unmarshaled_data) -> *)
-(*                        "INT: " ^ string_of_int (Obj.magic unmarshaled_data) *)
-(*                      | _ when Obj.tag (Obj.repr unmarshaled_data) = Obj.string_tag -> *)
-(*                        "STRING: " ^ Obj.magic unmarshaled_data *)
-(*                      | _ -> "<complex data>"); *)
-(*                   flush stdout; *)
-(*                   Lwt.return_ok unmarshaled_data *)
-(*                 | Error err -> Lwt.return_error err)) *)
-(*          (fun e -> *)
-(*             Printf.printf "Error polling for message: %s\n" (Printexc.to_string e); *)
-(*             flush stdout; *)
-(*             (\* Wait a bit and try again *\) *)
-(*             let* () = Lwt_unix.sleep 1.0 in *)
-(*             receive_message ~location)) *)
-(* ;; *)
-let receive_message ~location =
-  let key_for_table = location in
-  let stream_handle_option = Hashtbl.find_opt message_queues key_for_table in
-  match stream_handle_option with
-  | Some stream_associated_key -> Eio.Stream.take stream_associated_key
-  | None -> "Value does not exist"
+let rec receive_message ~location =
+  let actual_location = map_receive_location location in
+  (* First check if we have a local message *)
+  let local_message = Htbl.find_opt message_queues actual_location in
+  match local_message with
+  | Some data when String.length data > 0 ->
+    (* Message found in queue, remove it *)
+    let _ = Htbl.try_remove message_queues actual_location in
+    (* Try to unmarshal the data *)
+    (try
+       let unmarshaled_data = Marshal.from_string data 0 in
+       (* Print the actual unmarshaled data in readable format *)
+       Printf.printf
+         "DATA RECEIVED FROM QUEUE: %s\n"
+         (match unmarshaled_data with
+          | _ when Obj.is_int (Obj.repr unmarshaled_data) ->
+            "INT: " ^ string_of_int (Obj.magic unmarshaled_data)
+          | _ when Obj.tag (Obj.repr unmarshaled_data) = Obj.string_tag ->
+            "STRING: " ^ Obj.magic unmarshaled_data
+          | _ ->
+            (try
+               if
+                 Obj.is_block (Obj.repr unmarshaled_data)
+                 && Obj.tag (Obj.repr unmarshaled_data) = 0
+               then (
+                 match Obj.magic unmarshaled_data with
+                 | Ok v ->
+                   if Obj.is_int (Obj.repr v)
+                   then "Ok(" ^ string_of_int (Obj.magic v) ^ ")"
+                   else if Obj.tag (Obj.repr v) = Obj.string_tag
+                   then "Ok(\"" ^ Obj.magic v ^ "\")"
+                   else "Ok(<value>)"
+                 | Error msg -> "Error(\"" ^ msg ^ "\")")
+               else "<complex data>"
+             with
+             | _ -> "<unprintable data>"));
+       flush stdout;
+       Lwt.return_ok unmarshaled_data
+     with
+     | e -> Lwt.return_error ("Unmarshal error: " ^ Printexc.to_string e))
+  | _ ->
+    (* No local message, poll the remote server *)
+    (match get_location_config actual_location with
+     | Error msg -> Lwt.return_error msg
+     | Ok loc_config ->
+       Printf.printf
+         "Polling remote server for location %s at %s\n"
+         actual_location
+         loc_config.http_address;
+       flush stdout;
+       Lwt.catch
+         (fun () ->
+            (* Make HTTP request to poll for messages *)
+            let headers = Header.init_with "Content-Type" "application/octet-stream" in
+            let body = Cohttp_lwt.Body.of_string "" in
+            (* Empty body indicates polling *)
+            Client.post ~headers ~body (Uri.of_string loc_config.http_address)
+            >>= fun (resp, body) ->
+            let status = resp |> Response.status |> Code.code_of_status in
+            if status <> 200
+            then
+              Cohttp_lwt.Body.drain_body body
+              >>= fun () ->
+              Lwt.return_error
+                ("Failed to poll for message, status code: " ^ string_of_int status)
+            else
+              Cohttp_lwt.Body.to_string body
+              >>= fun body_str ->
+              if String.length body_str = 0
+              then
+                (* No message available, wait a bit and try again *)
+                let* () = Lwt_unix.sleep 0.5 in
+                receive_message ~location
+              else (
+                (* Try to unmarshal the received data *)
+                match unmarshal_data body_str with
+                | Ok unmarshaled_data ->
+                  Printf.printf
+                    "DATA RECEIVED FROM HTTP: %s\n"
+                    (match unmarshaled_data with
+                     | _ when Obj.is_int (Obj.repr unmarshaled_data) ->
+                       "INT: " ^ string_of_int (Obj.magic unmarshaled_data)
+                     | _ when Obj.tag (Obj.repr unmarshaled_data) = Obj.string_tag ->
+                       "STRING: " ^ Obj.magic unmarshaled_data
+                     | _ -> "<complex data>");
+                  flush stdout;
+                  Lwt.return_ok unmarshaled_data
+                | Error err -> Lwt.return_error err))
+         (fun e ->
+            Printf.printf "Error polling for message: %s\n" (Printexc.to_string e);
+            flush stdout;
+            (* Wait a bit and try again *)
+            let* () = Lwt_unix.sleep 1.0 in
+            receive_message ~location))
 ;;

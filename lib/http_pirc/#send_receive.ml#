@@ -1,16 +1,16 @@
-open Cohttp_eio
-(* open Cohttp_lwt_unix *)
-(* open Lwt.Infix *)
-(* open Lwt.Syntax (\* For let+ and let* syntax *\) *)
-(* open Saturn *)
+open Cohttp
+open Cohttp_lwt_unix
+open Lwt.Infix
+open Lwt.Syntax (* For let+ and let* syntax *)
+open Saturn
 
 (* Global config reference *)
 let config = ref None
 
 (* Message queues for each location *)
 (* let message_queues = Hashtbl.create 10 *)
-let message_queues : (string, string Eio.Stream.t) Hashtbl.t = Hashtbl.create 10
-(* let message_condition = Lwt_condition.create () *)
+
+
 
 (* Helper to get location config *)
 let get_location_config location =
@@ -77,8 +77,7 @@ let handler _socket request body =
   match sender_location with
   | None -> Cohttp_eio.Server.respond_string ~status:`Not_found ~body:"" ()
   | Some unwrapped_sender_location ->
-    let indexed_queue = Hashtbl.find_opt
-        message_queues unwrapped_sender_location in
+    let indexed_queue = Hashtbl.find_opt message_queues unwrapped_sender_location in
     (match indexed_queue with
      | Some result_queue -> Eio.Stream.add result_queue sender_body
      | None ->
@@ -273,10 +272,10 @@ let init_http_server current_location () =
 (*             let* () = Lwt_unix.sleep 1.0 in *)
 (*             receive_message ~location)) *)
 (* ;; *)
-let receive_message ~location =
+let rec receive_message ~location =
   let key_for_table = location in
   let stream_handle_option = Hashtbl.find_opt message_queues key_for_table in
   match stream_handle_option with
   | Some stream_associated_key -> Eio.Stream.take stream_associated_key
-  | None -> "Value does not exist"
+  | None -> print_endline "Value does not exist"
 ;;
