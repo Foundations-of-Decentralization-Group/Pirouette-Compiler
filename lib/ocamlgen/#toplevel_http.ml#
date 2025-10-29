@@ -6,8 +6,7 @@ module Builder = Ast_builder.Make (struct
     let loc = { !Ast_helper.default_loc with loc_ghost = true }
   end)
 
-
-et loc = Builder.loc
+let loc = Builder.loc
 let spf = Printf.sprintf
 
 module Msg_http_intf : Msg_intf.M = struct
@@ -39,6 +38,7 @@ end
 
 let emit_toplevel_init _loc_ids config_file_path =
   [ [%stri
+    
     let () =
       print_endline "In here for testing";
       let config_file_path : string = [%e Ast_builder.Default.estring ~loc config_file_path] in

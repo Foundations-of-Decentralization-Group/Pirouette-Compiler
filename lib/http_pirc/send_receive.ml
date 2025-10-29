@@ -132,25 +132,29 @@ let setup_config_file () =
 
 (* Initialize HTTP server for this location *)
 let init_http_server current_location () =
+  print_endline "Right before setup_config_file";
   let () = setup_config_file () in
+  print_endline "After setup_config_file";
   match get_location_config current_location with
   | Error msg ->
     failwith
       ("location config" ^ current_location ^ "not found inside init_http_location" ^ msg)
   | Ok loc_config ->
+    print_endline "We got a config debug statement";
     let uri = Uri.of_string loc_config.Config_parser.http_address in
-    let path = Uri.path uri in
-    (* Extract port from URI or use a default *)
+    (* let _path = Uri.path uri in *)
+    (* (\* Extract port from URI or use a default *\) *)
+    print_endline "Got the URI";
     let port_to_use : int =
       match Uri.port uri with
       | Some p -> p (* Use original port *)
       | None -> 8080
       (* Default port *)
     in
-    let host = Uri.host uri |> Option.value ~default:"localhost" in
-    let new_address = Printf.sprintf "http://%s:%d%s" host port_to_use path in
+    (* let host = Uri.host uri |> Option.value ~default:"localhost" in *)
+    (* let new_address = Printf.sprintf "http://%s:%d%s" host port_to_use path in *)
     (* Update our mapping with the new address *)
-    Hashtbl.replace loc_to_address loc_config.Config_parser.location new_address;
+    (* Hashtbl.replace loc_to_address loc_config.Config_parser.location new_address; *)
     Printf.printf "Starting an HTTP server for this specific node: %s\n" current_location;
     (* The following statement sets up logs for debugging *)
     let () = Logs.set_reporter (Logs_fmt.reporter ())
