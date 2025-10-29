@@ -12,6 +12,7 @@ let config = ref None
 let message_queues : (string, string) Htbl.t = Htbl.create ~hashed_type:(module String) ()
 let message_condition = Lwt_condition.create ()
 
+
 (* Helper to get location config *)
 let get_location_config location =
   match !config with
@@ -24,6 +25,23 @@ let get_location_config location =
      with
      | Some loc_config -> Ok loc_config
      | None -> Error ("Unknown location: " ^ location))
+;;
+
+let get_body string_to_send =
+  let body_to_send = Some (Body.of_string string_to_send) in
+  body_to_send
+;;
+
+let get_ip_address ~location =
+  match get_location_config location with
+  | Ok loc_config -> Uri.of_string loc_config.http_address
+  | _ -> Uri.empty
+;;
+
+let get_header ~location_name =
+  let new_header = Http.Header.init () in
+  let header_to_send = Http.Header.add new_header "Location" location_name in
+  header_to_send
 ;;
 
 (* Function to marshal data *)
