@@ -1,16 +1,11 @@
 open Cohttp_eio
-(* open Cohttp_lwt_unix *)
-(* open Lwt.Infix *)
-(* open Lwt.Syntax (\* For let+ and let* syntax *\) *)
-(* open Saturn *)
 
 (* Global config reference *)
 let config = ref None
 
 (* Message queues for each location *)
-(* let message_queues = Hashtbl.create 10 *)
+let loc_to_address = Hashtbl.create 10
 let message_queues : (string, string Eio.Stream.t) Hashtbl.t = Hashtbl.create 10
-(* let message_condition = Lwt_condition.create () *)
 
 (* Helper to get location config *)
 let get_location_config location =
@@ -64,10 +59,6 @@ let unmarshal_data data_str =
   | e -> Error ("Unmarshal error: " ^ Printexc.to_string e)
 ;;
 
-(* Internal Mapping Functions *)
-let map_send_location location = location
-let map_receive_location location = location
-
 (* This is the handler for incoming http requests *)
 let handler _socket request body =
   let x : Cohttp_eio.Body.t = body in
@@ -77,17 +68,13 @@ let handler _socket request body =
   match sender_location with
   | None -> Cohttp_eio.Server.respond_string ~status:`Not_found ~body:"" ()
   | Some unwrapped_sender_location ->
-    let indexed_queue = Hashtbl.find_opt
-        message_queues unwrapped_sender_location in
+    let indexed_queue = Hashtbl.find_opt message_queues unwrapped_sender_location in
     (match indexed_queue with
      | Some result_queue -> Eio.Stream.add result_queue sender_body
      | None ->
        Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create 10);
        let indexed_queue = Hashtbl.find message_queues unwrapped_sender_location in
        Eio.Stream.add indexed_queue sender_body);
-    (* (match header_string with *)
-    (*  | Some x -> Printf.printf "This is the value of the string %s\n" x *)
-    (*  | None -> print_endline "The header does not have a host location\n"); *)
     (match Http.Request.meth request with
      | `GET -> print_endline "The get method was called"
      | `POST ->
@@ -122,7 +109,6 @@ let setup_config_file () =
   match !config with
   | None -> ()
   | Some cfg ->
-    let loc_to_address = Hashtbl.create 10 in
     List.iter
       (fun loc_cfg ->
          Hashtbl.add
@@ -147,136 +133,58 @@ let setup_config_file () =
 (* Initialize HTTP server for this location *)
 let init_http_server current_location () =
   let () = setup_config_file () in
-  Printf.printf "Starting an HTTP server for this specific node: %s\n" current_location;
-  (* The following statement sets up logs for debugging *)
-  let () = Logs.set_reporter (Logs_fmt.reporter ())
-  and () = Logs.Src.set_level Cohttp_eio.src (Some Debug) in
-  let log_warning ex = Logs.warn (fun f -> f "%a" Eio.Exn.pp ex) in
-  (* This runs the Eio event loop for the server *)
-  let _ =
-    let port = ref 8080 in
-    Arg.parse
-      [ "-p", Arg.Set_int port, " Listening port number(8080 by default)" ]
-      ignore
-      "An HTTP/1.1 server";
-    Eio_main.run
-    @@ fun env ->
-    Eio.Switch.run
-    @@ fun sw ->
-    let socket =
-      Eio.Net.listen
-        env#net
-        ~sw
-        ~backlog:128
-        ~reuse_addr:true
-        (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port))
+  match get_location_config current_location with
+  | Error msg ->
+    failwith
+      ("location config" ^ current_location ^ "not found inside init_http_location" ^ msg)
+  | Ok loc_config ->
+    let uri = Uri.of_string loc_config.Config_parser.http_address in
+    let path = Uri.path uri in
+    (* Extract port from URI or use a default *)
+    let port_to_use : int =
+      match Uri.port uri with
+      | Some p -> p (* Use original port *)
+      | None -> 8080
+      (* Default port *)
     in
-    let server = Cohttp_eio.Server.make ~callback:handler () in
-    Cohttp_eio.Server.run socket server ~on_error:log_warning
-  in
-  ()
+    let host = Uri.host uri |> Option.value ~default:"localhost" in
+    let new_address = Printf.sprintf "http://%s:%d%s" host port_to_use path in
+    (* Update our mapping with the new address *)
+    Hashtbl.replace loc_to_address loc_config.Config_parser.location new_address;
+    Printf.printf "Starting an HTTP server for this specific node: %s\n" current_location;
+    (* The following statement sets up logs for debugging *)
+    let () = Logs.set_reporter (Logs_fmt.reporter ())
+    and () = Logs.Src.set_level Cohttp_eio.src (Some Debug) in
+    let log_warning ex = Logs.warn (fun f -> f "%a" Eio.Exn.pp ex) in
+    (* This runs the Eio event loop for the server *)
+    let _ =
+      let port = ref port_to_use in
+      Arg.parse
+        [ "-p", Arg.Set_int port, " Listening port number(8080 by default)" ]
+        ignore
+        "An HTTP/1.1 server";
+      Eio_main.run
+      @@ fun env ->
+      Eio.Switch.run
+      @@ fun sw ->
+      let socket =
+        Eio.Net.listen
+          env#net
+          ~sw
+          ~backlog:128
+          ~reuse_addr:true
+          (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port))
+      in
+      let server = Cohttp_eio.Server.make ~callback:handler () in
+      Cohttp_eio.Server.run socket server ~on_error:log_warning
+    in
+    ()
 ;;
 
-(* Function to receive a message *)
-(* let rec receive_message ~location = *)
-(*   let actual_location = map_receive_location location in *)
-(*   (\* First check if we have a local message *\) *)
-(*   let local_message = Htbl.find_opt message_queues actual_location in *)
-(*   match local_message with *)
-(*   | Some data when String.length data > 0 -> *)
-(*     (\* Message found in queue, remove it *\) *)
-(*     let _ = Htbl.try_remove message_queues actual_location in *)
-(*     (\* Try to unmarshal the data *\) *)
-(*     (try *)
-(*        let unmarshaled_data = Marshal.from_string data 0 in *)
-(*        (\* Print the actual unmarshaled data in readable format *\) *)
-(*        Printf.printf *)
-(*          "DATA RECEIVED FROM QUEUE: %s\n" *)
-(*          (match unmarshaled_data with *)
-(*           | _ when Obj.is_int (Obj.repr unmarshaled_data) -> *)
-(*             "INT: " ^ string_of_int (Obj.magic unmarshaled_data) *)
-(*           | _ when Obj.tag (Obj.repr unmarshaled_data) = Obj.string_tag -> *)
-(*             "STRING: " ^ Obj.magic unmarshaled_data *)
-(*           | _ -> *)
-(*             (try *)
-(*                if *)
-(*                  Obj.is_block (Obj.repr unmarshaled_data) *)
-(*                  && Obj.tag (Obj.repr unmarshaled_data) = 0 *)
-(*                then ( *)
-(*                  match Obj.magic unmarshaled_data with *)
-(*                  | Ok v -> *)
-(*                    if Obj.is_int (Obj.repr v) *)
-(*                    then "Ok(" ^ string_of_int (Obj.magic v) ^ ")" *)
-(*                    else if Obj.tag (Obj.repr v) = Obj.string_tag *)
-(*                    then "Ok(\"" ^ Obj.magic v ^ "\")" *)
-(*                    else "Ok(<value>)" *)
-(*                  | Error msg -> "Error(\"" ^ msg ^ "\")") *)
-(*                else "<complex data>" *)
-(*              with *)
-(*              | _ -> "<unprintable data>")); *)
-(*        flush stdout; *)
-(*        Lwt.return_ok unmarshaled_data *)
-(*      with *)
-(*      | e -> Lwt.return_error ("Unmarshal error: " ^ Printexc.to_string e)) *)
-(*   | _ -> *)
-(*     (\* No local message, poll the remote server *\) *)
-(*     (match get_location_config actual_location with *)
-(*      | Error msg -> Lwt.return_error msg *)
-(*      | Ok loc_config -> *)
-(*        Printf.printf *)
-(*          "Polling remote server for location %s at %s\n" *)
-(*          actual_location *)
-(*          loc_config.http_address; *)
-(*        flush stdout; *)
-(*        Lwt.catch *)
-(*          (fun () -> *)
-(*             (\* Make HTTP request to poll for messages *\) *)
-(*             let headers = Header.init_with "Content-Type" "application/octet-stream" in *)
-(*             let body = Cohttp_lwt.Body.of_string "" in *)
-(*             (\* Empty body indicates polling *\) *)
-(*             Client.post ~headers ~body (Uri.of_string loc_config.http_address) *)
-(*             >>= fun (resp, body) -> *)
-(*             let status = resp |> Response.status |> Code.code_of_status in *)
-(*             if status <> 200 *)
-(*             then *)
-(*               Cohttp_lwt.Body.drain_body body *)
-(*               >>= fun () -> *)
-(*               Lwt.return_error *)
-(*                 ("Failed to poll for message, status code: " ^ string_of_int status) *)
-(*             else *)
-(*               Cohttp_lwt.Body.to_string body *)
-(*               >>= fun body_str -> *)
-(*               if String.length body_str = 0 *)
-(*               then *)
-(*                 (\* No message available, wait a bit and try again *\) *)
-(*                 let* () = Lwt_unix.sleep 0.5 in *)
-(*                 receive_message ~location *)
-(*               else ( *)
-(*                 (\* Try to unmarshal the received data *\) *)
-(*                 match unmarshal_data body_str with *)
-(*                 | Ok unmarshaled_data -> *)
-(*                   Printf.printf *)
-(*                     "DATA RECEIVED FROM HTTP: %s\n" *)
-(*                     (match unmarshaled_data with *)
-(*                      | _ when Obj.is_int (Obj.repr unmarshaled_data) -> *)
-(*                        "INT: " ^ string_of_int (Obj.magic unmarshaled_data) *)
-(*                      | _ when Obj.tag (Obj.repr unmarshaled_data) = Obj.string_tag -> *)
-(*                        "STRING: " ^ Obj.magic unmarshaled_data *)
-(*                      | _ -> "<complex data>"); *)
-(*                   flush stdout; *)
-(*                   Lwt.return_ok unmarshaled_data *)
-(*                 | Error err -> Lwt.return_error err)) *)
-(*          (fun e -> *)
-(*             Printf.printf "Error polling for message: %s\n" (Printexc.to_string e); *)
-(*             flush stdout; *)
-(*             (\* Wait a bit and try again *\) *)
-(*             let* () = Lwt_unix.sleep 1.0 in *)
-(*             receive_message ~location)) *)
-(* ;; *)
 let receive_message ~location =
   let key_for_table = location in
   let stream_handle_option = Hashtbl.find_opt message_queues key_for_table in
   match stream_handle_option with
   | Some stream_associated_key -> Eio.Stream.take stream_associated_key
-  | None -> "Value does not exist"
+  | None -> failwith ("Unable to grab the required data from" ^ location)
 ;;
