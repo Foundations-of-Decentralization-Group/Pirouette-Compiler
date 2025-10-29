@@ -1,1 +1,1 @@
-_ := display_pirouette_stdlib_info ();
+_ := display_stdlib_info ();

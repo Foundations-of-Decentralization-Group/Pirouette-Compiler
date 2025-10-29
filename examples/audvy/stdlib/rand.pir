@@ -1,3 +1,3 @@
-_ := rand_self_init_stdlib A.();
-myRandInt := rand_int_stdlib A.101;
-_ := print_int_stdlib myRandInt;
+_ := rand_self_init A.();
+myRandInt := rand_int A.101;
+_ := print_int myRandInt;
