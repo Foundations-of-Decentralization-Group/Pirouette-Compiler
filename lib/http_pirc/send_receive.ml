@@ -155,7 +155,7 @@ let init_http_server current_location () =
     (* let new_address = Printf.sprintf "http://%s:%d%s" host port_to_use path in *)
     (* Update our mapping with the new address *)
     (* Hashtbl.replace loc_to_address loc_config.Config_parser.location new_address; *)
-    Printf.printf "Starting an HTTP server for this specific node: %s\n" current_location;
+    print_endline ("Starting an HTTP server for this specific node" ^ current_location);
     (* The following statement sets up logs for debugging *)
     let () = Logs.set_reporter (Logs_fmt.reporter ())
     and () = Logs.Src.set_level Cohttp_eio.src (Some Debug) in
