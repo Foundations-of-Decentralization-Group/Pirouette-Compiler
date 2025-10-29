@@ -117,7 +117,7 @@ and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (stmt : 'a Net.
     emit_foreign_decl id typ external_name
   | _ -> Builder.value_binding ~pat:[%pat? _unit] ~expr:Builder.eunit
 
-and emit_foreign_decl id _typ external_name =
+and emit_foreign_decl id typ external_name=
   let open Ast_builder.Default in
   let package_name, function_name, _ =
     Ast_utils.parse_external_name external_name
@@ -127,12 +127,39 @@ and emit_foreign_decl id _typ external_name =
     | Some pack -> pack ^ "."
     | None -> ""
   in
+  (* A function that takes in a Net type and pretty prints the type into Ocaml. Note, loc.types turn into just types*)
+  let rec find_type_sig : 'a Net.typ -> label = function
+    | TUnit _ -> "unit"
+    | TLoc (_, local_type, _) -> let rec find_local_type_sig : 'a Local.typ -> label = function  
+                                  | TUnit _ -> "unit"
+                                  | TInt _ -> "int"
+                                  | TString _ -> "string"
+                                  | TBool _ -> "bool"
+                                  | TVar (TypId (typ_id, _), _) -> typ_id
+                                  | TProd (typ1, typ2, _) -> (find_local_type_sig typ1) ^ " * " ^ (find_local_type_sig typ2)
+                                  | TSum (typ1, typ2, _) -> (find_local_type_sig typ1) ^ " + " ^ (find_local_type_sig typ2)
+                                in find_local_type_sig local_type
+    | TMap (typ1, typ2, _) -> (find_type_sig typ1) ^ " -> " ^ (find_type_sig typ2)
+    | TProd (typ1, typ2, _) -> (find_type_sig typ1) ^ " * " ^ (find_type_sig typ2)
+    | TSum (typ1, typ2, _) -> (find_type_sig typ1) ^ " + " ^ (find_type_sig typ2) in
+
+  (* The full type signature of a function. We can't use this since we can't apply the signature to the function as a whole when that function takes an arg, e.g. let print_x arg : int -> string = ... does not do what you think it does*)
+  let type_sig = find_type_sig typ in
+
+  (* List of all the 'type parts' of the function, so that we can split off the last part in order to type def on the arguement to the function *)
+  let types_list = String.split_on_char '>' type_sig in
+  (* Get the length of the list so that we can find the last index, representing the return type*)
+  let length_of_types_list = List.length types_list in
+  (* Grab the string representing the return type *)
+  let return_type_declaration = List.nth types_list (length_of_types_list - 1) in
+  (* Grab the portion of the full function type signature minus 1 (so that we stay within index bounds), minus length of return type decl (so that we cut off the return type and can applyall the other types to the arg), and minus 2 (to cut off an extra ' -' at the end) *)
+  let arg_type_sig = String.sub type_sig 0 ((String.length type_sig) - 1 - (String.length return_type_declaration) - 2) in
   let fun_expr =
     pexp_fun
       ~loc
       Nolabel
       None
-      (pvar ~loc "arg")
+      (pvar ~loc ("(arg : " ^ arg_type_sig ^ ")"))
       [%expr
         [%e evar ~loc (package_string ^ function_name)]
         [%e evar ~loc "arg"]]
