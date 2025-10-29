@@ -21,6 +21,9 @@
  (name http_pirc)
  (depends
   (lwt :build)
+  (cohttp-eio :build)
+  (eio_main :build)
+  (eio :build)    
   (cohttp-lwt-unix :build)
   (cohttp :build))
  (allow_empty))
@@ -31,6 +34,9 @@
  (description "Higher-order typed functional choreographies")
  (depends
   (cohttp-lwt-unix :build)
+  (cohttp-eio :build)
+  (eio_main :build)
+  (eio :build)      
   (dune :build)
   (lwt :build)
   (lwt_ppx :build)
