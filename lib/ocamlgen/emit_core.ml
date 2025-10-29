@@ -186,8 +186,6 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
         Msg.emit_net_send
           ~src:self_id
           ~dst
-          ?switch_handle
-          ?client
           [%expr Marshal.to_string [%e Builder.evar val_id] []]]]
   | Recv (LocId (src, _), _) ->
     [%expr Marshal.from_string [%e Msg.emit_net_recv ~src ~dst:self_id] 0]

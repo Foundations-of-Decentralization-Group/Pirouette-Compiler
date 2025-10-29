@@ -9,10 +9,8 @@ module Builder = Ast_builder.Make (struct
 let loc = Builder.loc
 
 module Msg_mpi_intf : Msg_intf.M = struct
-  let emit_net_send ~src ~dst ?switch_handle ?client ~pexp () =
+  let emit_net_send ~src ~dst pexp =
     ignore src;
-    ignore switch_handle;
-    ignore client;
     [%expr Mpi.send [%e pexp] (loc_to_rank [%e Builder.estring dst]) 0 Mpi.comm_world]
   ;;
 

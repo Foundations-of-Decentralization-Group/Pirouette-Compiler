@@ -62,9 +62,9 @@ let get_ip_address ~location =
   | _ -> Uri.empty
 ;;
 
-let get_header ~src =
+let get_header ~location_name =
   let new_header = Http.Header.init () in
-  let header_to_send = Http.Header.add new_header "Location" src in
+  let header_to_send = Http.Header.add new_header "Location" location_name in
   header_to_send
 ;;
 
@@ -114,25 +114,18 @@ let get_header ~src =
 (* ;; *)
 
 (* Function to send a message *)
-let send_message sender receiver message switch_handle client =
-    
-  let ip_address = get_ip_address ~location:receiver in 
-  let body_to_send = Some(Body.of_string message) in
-  let header_to_send = Http.Header.init () in
-  let header_to_send = Http.Header.add header_to_send "Location" sender in
-  let header_string = Http.Header.to_string header_to_send in
-  let header_to_send = Some header_to_send in
-  let resp, _body = 
-  Client.post
-    switch_handle
-    ?body:body_to_send
-    ?headers:header_to_send
-    client
-    ip_address in
- if Http.Status.compare resp.status `OK = 0 then
-    Ok("Done")
- else Error("Unsuccessful send")
-;;
+(* let send_message sender receiver message switch_handle client = *)
+(*   let ip_address = get_ip_address ~location:receiver in *)
+(*   let body_to_send = Some (Body.of_string message) in *)
+(*   let header_to_send = Http.Header.init () in *)
+(*   let header_to_send = Http.Header.add header_to_send "Location" sender in *)
+(*   let header_string = Http.Header.to_string header_to_send in *)
+(*   let header_to_send = Some header_to_send in *)
+(*   let resp, _body = *)
+(*     Client.post switch_handle ?body:body_to_send ?headers:header_to_send client ip_address *)
+(*   in *)
+(*   if Http.Status.compare resp.status `OK = 0 then Ok "Done" else Error "Unsuccessful send" *)
+(* ;; *)
 
 (* Initialize HTTP servers for all locations *)
 let init_http_servers current_location () =

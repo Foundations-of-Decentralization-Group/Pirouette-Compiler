@@ -10,9 +10,7 @@ let loc = Builder.loc
 let spf = Printf.sprintf
 
 module Msg_chan_intf : Msg_intf.M = struct
-  let emit_net_send ~src ~dst ?switch_handle ?client ~pexp () =
-    ignore switch_handle;
-    ignore client;
+  let emit_net_send ~src ~dst pexp =
     [%expr Domainslib.Chan.send [%e Builder.evar (spf "chan_%s_%s" src dst)] [%e pexp]]
   ;;
 
