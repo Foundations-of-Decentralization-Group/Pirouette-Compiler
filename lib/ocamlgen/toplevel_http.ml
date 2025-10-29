@@ -19,12 +19,11 @@ module Msg_http_intf : Msg_intf.M = struct
       let dst_ip =
         Send_receive.get_ip_address [%e Ast_builder.Default.estring ~loc dst]
       in
-      let dsp_ip_string : string = List.hd dst_ip in
       let body_to_send = Send_receive.get_body [%e pexp] in
       let resp, body_resp =
-        Client.post ~sw ?body:body_to_send ?header:header_to_send client dsp_ip_string
+        Client.post ~sw ?body:body_to_send ?chunked:None ?headers:(Some(header_to_send)) client dst_ip
       in
-      if Http.Status.compare resp1.status `OK = 0
+      if Http.Status.compare resp.status `OK = 0
       then print_string @@ Eio.Buf_read.(parse_exn take_all) body_resp ~max_size:max_int
       else Fmt.epr "Unexpected HTTP status: %a" Http.Status.pp resp.status]
   ;;
@@ -44,7 +43,7 @@ module Msg_http_intf : Msg_intf.M = struct
   let emit_net_recv ~src ~dst =
     ignore src;
     [%expr
-        (Send_receive.receive_message ~location:[%e Ast_builder.Default.estring ~loc dst])]
+      Send_receive.receive_message ~location:[%e Ast_builder.Default.estring ~loc dst]]
   ;;
 end
 
@@ -90,7 +89,7 @@ let emit_toplevel_http
     in
     [%stri
       let () =
-        Eio.main.run
+        Eio_main.run
         @@ fun env ->
         let client = Client.make ~https:None env#net in
         Eio.Switch.run ~name:"run_switch"
@@ -99,7 +98,7 @@ let emit_toplevel_http
           "Starting process_%s...\n"
           [%e Ast_builder.Default.estring ~loc loc_id];
         (* Set the current location explicitly for this process *)
-        Send_receive.init_http_servers [%e Ast_builder.Default.estring ~loc loc_id] ();
+        Send_receive.init_http_server [%e Ast_builder.Default.estring ~loc loc_id] ();
         let [%p Ast_builder.Default.pvar ~loc (spf "process_%s" loc_id)] =
           [%e emit_net_toplevel net_stmts]
         in
