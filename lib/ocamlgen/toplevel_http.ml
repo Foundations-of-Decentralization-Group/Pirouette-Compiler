@@ -13,23 +13,38 @@ module Msg_http_intf : Msg_intf.M = struct
   let emit_net_send ~src ~dst pexp =
     (* [%expr Domainslib.Chan.send [%e Builder.evar (spf "chan_%s_%s" src dst)] [%e pexp]]     *)
     [%expr
-      let header_to_send = Send_receive.get_header [%e Ast_builder.Default.estring ~loc src] in
-      let dst_ip = Send_receive.get_ip_address [%e Ast_builder.Default.estring ~loc dst] in
+      let header_to_send =
+        Send_receive.get_header [%e Ast_builder.Default.estring ~loc src]
+      in
+      let dst_ip =
+        Send_receive.get_ip_address [%e Ast_builder.Default.estring ~loc dst]
+      in
       let dsp_ip_string : string = List.hd dst_ip in
       let body_to_send = Send_receive.get_body [%e pexp] in
-      Client.post ~sw ?body:body_to_send ?header:header_to_send client dsp_ip_string]
+      let resp, body_resp =
+        Client.post ~sw ?body:body_to_send ?header:header_to_send client dsp_ip_string
+      in
+      if Http.Status.compare resp1.status `OK = 0
+      then print_string @@ Eio.Buf_read.(parse_exn take_all) body_resp ~max_size:max_int
+      else Fmt.epr "Unexpected HTTP status: %a" Http.Status.pp resp.status]
   ;;
+
+  (* let emit_net_recv ~src ~dst = *)
+  (*   ignore src; *)
+  (*   [%expr *)
+  (*     match *)
+  (*       Lwt_main.run *)
+  (*         (Send_receive.receive_message *)
+  (*            ~location:[%e Ast_builder.Default.estring ~loc dst]) *)
+  (*     with *)
+  (*     | Ok msg -> msg *)
+  (*     | Error msg -> failwith ("Receive error: " ^ msg)] *)
+  (* ;; *)
 
   let emit_net_recv ~src ~dst =
     ignore src;
     [%expr
-      match
-        Lwt_main.run
-          (Send_receive.receive_message
-             ~location:[%e Ast_builder.Default.estring ~loc dst])
-      with
-      | Ok msg -> msg
-      | Error msg -> failwith ("Receive error: " ^ msg)]
+        (Send_receive.receive_message ~location:[%e Ast_builder.Default.estring ~loc dst])]
   ;;
 end
 
