@@ -68,7 +68,7 @@ let handler _socket request body =
   match sender_location with
   | None ->
     Cohttp_eio.Server.respond_string
-      ~status:`Not_found
+      ~status:`Precondition_failed
       ~body:"Error message - Sender location not found"
       ()
   | Some unwrapped_sender_location ->
@@ -77,17 +77,14 @@ let handler _socket request body =
      | Some result_queue ->
        Eio.Stream.add result_queue sender_body;
        Cohttp_eio.Server.respond_string
-         ~status:`Not_found
+         ~status:`OK
          ~body:"Added to Htbl ; existing key"
          ()
      | None ->
        Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create 10);
        let indexed_queue = Hashtbl.find message_queues unwrapped_sender_location in
        Eio.Stream.add indexed_queue sender_body;
-       Cohttp_eio.Server.respond_string
-         ~status:`Not_found
-         ~body:"Added to Htbl ; new key"
-         ())
+       Cohttp_eio.Server.respond_string ~status:`OK ~body:"Added to Htbl ; new key" ())
 ;;
 
 (* (match Http.Request.meth request with *)
