@@ -83,10 +83,26 @@ let handler _socket request body =
      | None ->
        Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create 10);
        let indexed_queue = Hashtbl.find message_queues unwrapped_sender_location in
-       print_endline ("This value was put inside the queue : " ^ sender_body ^ " " ^ unwrapped_sender_location );
-       let string_to_print = Marshal.from_string sender_body 0 in 
+       print_endline
+         ("This value was put inside the queue : "
+          ^ sender_body
+          ^ " "
+          ^ unwrapped_sender_location);
+       let get_sender_body input_string =
+         match sender_body with
+         | "L" ->
+           let string_to_print = input_string in
+           string_to_print
+         | "R" ->
+           let string_to_print = input_string in
+           string_to_print
+         | _ ->
+           let string_to_print = Marshal.from_string input_string 0 in
+           string_to_print
+       in
+       let string_to_print = get_sender_body sender_body in
        Eio.traceln "%s" string_to_print;
-       Eio.traceln "%s" unwrapped_sender_location;       
+       Eio.traceln "%s" unwrapped_sender_location;
        Eio.Stream.add indexed_queue sender_body;
        Cohttp_eio.Server.respond_string
          ~status:`OK
@@ -214,5 +230,5 @@ let rec receive_message ~location =
   (* let received_message = Eio.Stream.take stream_for_message in received_message *)
   match stream_handle_option with
   | Some stream_associated_key -> Eio.Stream.take stream_associated_key
-  | None -> receive_message ~location:location
+  | None -> receive_message ~location
 ;;
