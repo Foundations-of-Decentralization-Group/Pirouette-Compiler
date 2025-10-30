@@ -59,7 +59,7 @@ let rec ast_choreo_pattern_rename : 'a Ast_core.Choreo.M.pattern -> 'a Ast_core.
 
 let rec ast_choreo_pattern_list_rename : 'a Ast_core.Choreo.M.pattern list -> 'a Ast_core.Choreo.M.pattern list = function
   | [] -> []
-  | h::d -> (ast_choreo_pattern_rename h ):: (ast_choreo_pattern_list_rename d)
+  | h::d -> (ast_choreo_pattern_rename h ) :: (ast_choreo_pattern_list_rename d)
 ;;
 
 let rec ast_list_alpha_rename : 'a Ast_core.Choreo.M.stmt_block -> 'a Ast_core.Choreo.M.stmt_block = function
