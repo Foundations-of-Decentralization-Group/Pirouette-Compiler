@@ -1,17 +1,32 @@
-(**test*)
+(** HTTP-based message passing for Pirouette choreographies.
+    
+    This module provides the runtime support for sending and receiving messages
+    between distributed endpoints using HTTP as the communication protocol.
+    
+    The message passing functions {!send_message} and {!receive_message} return 
+    Lwt promises (asynchronous operations). *)
+
 open Cohttp
 open Cohttp_lwt_unix
 open Lwt.Infix
 open Lwt.Syntax (* For let+ and let* syntax *)
 
-(* Global config reference *)
+(** Global config reference, initialized by the compiler generated code. *)
 let config = ref None
 
-(* Message queues for each location *)
+(** message_queues is storing received messages for each location, keyed by location name.
+    
+    The hash table is initialized with capacity for 10 locations and will grow 
+    automatically as needed. *)
 let message_queues = Hashtbl.create 10
+(** message_condition is the condition variable for signaling message arrival to waiting receivers. *)
 let message_condition = Lwt_condition.create ()
 
-(* Helper to get location config *)
+(** Helper to get location config; [get_location_config location] is [Ok config] containing the HTTP address
+    configuration for the [location] if [location] exists in the configuration,
+    and [Error msg] if the configuration is not initialized or [location] is unknown.
+    
+    Requires: Configuration must be initialized before calling this function.  *)
 let get_location_config location =
   match !config with
   | None -> Error "Config not initialized. Call init() first"
@@ -24,8 +39,12 @@ let get_location_config location =
      | Some loc_config -> Ok loc_config
      | None -> Error ("Unknown location: " ^ location))
 ;;
-
-(* Function to marshal data *)
+(* ASK ANDREW if he wants a quick explination of marshaling because i didnt know what 
+  it was meant marshalling data is taking ocaml values to/from binary representation *)
+(** [marshal_data data] is the marshaled string representation of [data].
+    
+    Requires: [data] must be a valid OCaml value that can be marshaled.
+    Raises: Exception if marshaling fails. *)
 let marshal_data data =
   try
     let result = Marshal.to_string data [] in
@@ -34,7 +53,11 @@ let marshal_data data =
   | e -> raise e
 ;;
 
-(* Function to unmarshal data *)
+(** [unmarshal_data data_str] is [Ok value] containing the unmarshaled OCaml value
+    if [data_str] is a valid marshaled string, and [Error msg] if [data_str] is
+    empty or unmarshaling fails.
+    
+    Requires: [data_str] must be a marshaled OCaml value. *)
 let unmarshal_data data_str =
   try
     if String.length data_str = 0
@@ -46,11 +69,24 @@ let unmarshal_data data_str =
   | e -> Error ("Unmarshal error: " ^ Printexc.to_string e)
 ;;
 
-(* Internal Mapping Functions *)
+(** Internal Mapping Function;[map_send_location location] is the actual location name to use for sending.
+    Currently returns [location] unchanged. *)
 let map_send_location location = location
+(** Internal Mapping Function;[map_receive_location location] is the actual location name to use for receiving.
+    Currently returns [location] unchanged,*)
 let map_receive_location location = location
 
-(* Function to send a message *)
+(** Function to send a message;  [send_message ~location ~data] is [Ok ()] if the message [data] is successfully
+    sent to [location], and [Error msg] if sending fails due to configuration errors,
+    network issues, or HTTP errors.
+    
+    The function marshals [data], sends it via HTTP POST to the configured address
+    for [location], and waits for acknowledgment.
+    
+    Requires: 
+    - Configuration must be initialized
+    - [location] must exist in the configuration
+    - [data] must be marshalable *) 
 let send_message ~location ~data =
   let actual_location = map_send_location location in
   match get_location_config actual_location with
@@ -96,7 +132,16 @@ let send_message ~location ~data =
      | e -> Lwt.return_error ("Send error: " ^ Printexc.to_string e))
 ;;
 
-(* Initialize HTTP servers for all locations *)
+(** Initialize HTTP servers for all locations; [init_http_servers current_location ()] initializes HTTP servers for [current_location].
+    
+    Starts an HTTP server that listens for incoming messages at the configured address
+    for [current_location]. Received messages are stored in the message queue and waiting
+    receivers are notified.
+    
+    Requires:
+    - Configuration must be initialized
+    - [current_location] must exist in the configuration
+    - The configured port must be available *)
 let init_http_servers current_location () =
   match !config with
   | None -> ()
@@ -242,7 +287,23 @@ let init_http_servers current_location () =
      | _ -> ())
 ;;
 
-(* Function to receive a message *)
+(** Function to receive a message; [receive_message ~location] is a promise that resolves to 
+[Ok data] containing the received message data if a message is available for [location], and 
+[Error msg] if receiving fails.
+    
+    The function first checks the local message queue. If no message is found,
+    it polls the HTTP server for [location] repeatedly until a message arrives.
+    This is a blocking operation that will retry indefinitely.
+    
+    Returns [Error msg] when:
+    - Configuration is not initialized
+    - [location] is unknown or not configured
+    - Unmarshaling the received data fails
+    - HTTP polling returns a non-200 status code
+    
+    Requires: 
+    - Configuration must be initialized
+    - [location] must exist in the configuration*)
 let rec receive_message ~location =
   let actual_location = map_receive_location location in
   (* First check if we have a local message *)
