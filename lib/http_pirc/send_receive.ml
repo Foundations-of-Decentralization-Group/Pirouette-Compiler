@@ -241,7 +241,7 @@ let init_http_server current_location () =
           (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port))
       and server = Cohttp_eio.Server.make ~callback:handler () in
       print_endline "After the and server part";
-      Cohttp_eio.Server.run socket server ~on_error:log_warning
+      Cohttp_eio.Server.run socket server ?max_connections:(Some(100)) ~on_error:log_warning
     in
     print_endline "Finished";
     ()
