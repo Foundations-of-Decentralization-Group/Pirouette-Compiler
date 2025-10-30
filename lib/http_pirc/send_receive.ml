@@ -100,7 +100,7 @@ let handler _socket request body =
          ~body:"Added to Htbl ; existing key"
          ()
      | None ->
-       Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create 10);
+       Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create max_int);
        let indexed_queue = Hashtbl.find message_queues unwrapped_sender_location in
        (* print_endline *)
        (*   ("This value was put inside the queue : " *)
