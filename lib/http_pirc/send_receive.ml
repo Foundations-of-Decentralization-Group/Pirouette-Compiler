@@ -92,7 +92,7 @@ let handler _socket request body =
            string_of_int (string_to_print)
        in
        let string_to_print = get_sender_body sender_body in
-       Eio.traceln "%d" string_to_print;
+       Eio.traceln "%s" string_to_print;
        Eio.traceln "%s" unwrapped_sender_location;
        Eio.Stream.add result_queue sender_body;
        Cohttp_eio.Server.respond_string
