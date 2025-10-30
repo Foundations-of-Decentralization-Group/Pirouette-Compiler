@@ -260,6 +260,9 @@ let rec receive_message ~location =
   | Some stream_associated_key ->
     Eio.traceln "Recv was successful";
     print_endline "Recv worked out";
-    Eio.Stream.take stream_associated_key
+    let value_from_stream = Eio.Stream.take stream_associated_key in
+      print_endline
+      ("This is the value of the string : " ^ value_from_stream);
+    value_from_stream
   | None -> receive_message ~location
 ;;
