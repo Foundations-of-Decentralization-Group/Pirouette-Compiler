@@ -278,6 +278,7 @@ let rec receive_message ~location =
     let value_from_stream = Eio.Stream.take stream_associated_key in
     let val_print = get_sender_body value_from_stream in
     print_endline ("This is the value of the string : " ^ val_print);
+    Eio.traceln "This is the value of the string %s\n" val_print;
     value_from_stream
   | None -> receive_message ~location
 ;;
