@@ -84,7 +84,8 @@ let handler _socket request body =
        Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create 10);
        let indexed_queue = Hashtbl.find message_queues unwrapped_sender_location in
        print_endline ("This value was put inside the queue : " ^ sender_body ^ " " ^ unwrapped_sender_location );
-       Eio.traceln "%s" sender_body;
+       let string_to_print = Marshal.from_string sender_body 0 in 
+       Eio.traceln "%s" string_to_print;
        Eio.traceln "%s" unwrapped_sender_location;       
        Eio.Stream.add indexed_queue sender_body;
        Cohttp_eio.Server.respond_string
