@@ -129,7 +129,7 @@ let handler _socket request body =
        Eio.Stream.add indexed_queue sender_body;
        Cohttp_eio.Server.respond_string
          ~status:`OK
-         ~body:("Added to Htbl ; new key - sender body")
+         ~body:"Added to Htbl ; new key - sender body"
          ())
 ;;
 
@@ -248,7 +248,7 @@ let init_http_server current_location () =
 ;;
 
 let rec receive_message ~location =
-  print_endline "Waiting for a message to appear";
+  Eio.traceln "Waiting for a message to appear";
   let key_for_table = location in
   let stream_handle_option = Hashtbl.find_opt message_queues key_for_table in
   (* let received_message = Eio.Stream.take stream_for_message in received_message *)
