@@ -260,9 +260,24 @@ let rec receive_message ~location =
   | Some stream_associated_key ->
     Eio.traceln "Recv was successful";
     print_endline "Recv worked out";
+    let get_sender_body input_string =
+      match input_string with
+      | "L" ->
+        print_endline "The L body was in the queue";
+        let string_to_print = input_string in
+        string_to_print
+      | "R" ->
+        print_endline "The R body was in the queue";
+        let string_to_print = input_string in
+        string_to_print
+      | _ ->
+        print_endline "Looks like we have something that had been marshalled";
+        let string_to_print = Marshal.from_string input_string 0 in
+        string_of_int string_to_print
+    in
     let value_from_stream = Eio.Stream.take stream_associated_key in
-      print_endline
-      ("This is the value of the string : " ^ value_from_stream);
+    let val_print = get_sender_body value_from_stream in
+    print_endline ("This is the value of the string : " ^ val_print);
     value_from_stream
   | None -> receive_message ~location
 ;;
