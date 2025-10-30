@@ -211,5 +211,6 @@ let receive_message ~location =
   let stream_handle_option = Hashtbl.find_opt message_queues key_for_table in
   match stream_handle_option with
   | Some stream_associated_key -> Eio.Stream.take stream_associated_key
-  | None -> failwith ("Unable to grab the required data from" ^ location)
+  | None -> "Nothing to see here"
+    (* failwith ("Unable to grab the required data from" ^ location) *)
 ;;
