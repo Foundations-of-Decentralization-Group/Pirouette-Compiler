@@ -89,7 +89,7 @@ let handler _socket request body =
          | _ ->
            print_endline "Looks like we have something that had been marshalled";
            let string_to_print = Marshal.from_string input_string 0 in
-           string_of_int string_to_print
+           string_to_print
        in
        let string_to_print = get_sender_body sender_body in
        Eio.traceln "%s" string_to_print;
@@ -121,7 +121,7 @@ let handler _socket request body =
          | _ ->
            print_endline "Looks like we have something that had been marshalled";
            let string_to_print = Marshal.from_string input_string 0 in
-           string_of_int string_to_print
+           string_to_print
        in
        let string_to_print = get_sender_body sender_body in
        Eio.traceln "%s" string_to_print;
@@ -273,7 +273,7 @@ let rec receive_message ~location =
       | _ ->
         print_endline "Looks like we have something that had been marshalled";
         let string_to_print = Marshal.from_string input_string 0 in
-        string_of_int string_to_print
+        string_to_print
     in
     let value_from_stream = Eio.Stream.take stream_associated_key in
     let val_print = get_sender_body value_from_stream in
