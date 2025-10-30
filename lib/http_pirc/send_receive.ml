@@ -129,7 +129,7 @@ let handler _socket request body =
        Eio.Stream.add indexed_queue sender_body;
        Cohttp_eio.Server.respond_string
          ~status:`OK
-         ~body:("Added to Htbl ; new key - sender body " ^ sender_body)
+         ~body:("Added to Htbl ; new key - sender body")
          ())
 ;;
 
