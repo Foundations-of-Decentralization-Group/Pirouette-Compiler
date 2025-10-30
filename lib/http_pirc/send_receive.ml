@@ -66,42 +66,56 @@ let handler _socket request body =
   let recv_headers = Http.Request.headers request in
   let sender_location = Http.Header.get recv_headers "Location" in
   match sender_location with
-  | None -> Cohttp_eio.Server.respond_string ~status:`Not_found ~body:"" ()
+  | None ->
+    Cohttp_eio.Server.respond_string
+      ~status:`Not_found
+      ~body:"Error message - Sender location not found"
+      ()
   | Some unwrapped_sender_location ->
     let indexed_queue = Hashtbl.find_opt message_queues unwrapped_sender_location in
     (match indexed_queue with
-     | Some result_queue -> Eio.Stream.add result_queue sender_body
+     | Some result_queue ->
+       Eio.Stream.add result_queue sender_body;
+       Cohttp_eio.Server.respond_string
+         ~status:`Not_found
+         ~body:"Added to Htbl ; existing key"
+         ()
      | None ->
        Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create 10);
        let indexed_queue = Hashtbl.find message_queues unwrapped_sender_location in
-       Eio.Stream.add indexed_queue sender_body);
-    (match Http.Request.meth request with
-     | `GET -> print_endline "The get method was called"
-     | `POST ->
-       let cond = Http.Request.has_body request in
-       (match cond with
-        | `No -> print_endline "There is no body"
-        | `Unknown -> print_endline "Unknown"
-        | `Yes -> print_endline "Yes ; there is a body good news")
-     | _ -> print_endline "Something else was called");
-    (match Http.Request.resource request with
-     | "/" -> Cohttp_eio.Server.respond_string ~status:`OK ~body:"" ()
-     | "/html" ->
-       (* Use a plain flow to test chunked encoding *)
-       let body = Eio.Flow.string_source "" in
-       Cohttp_eio.Server.respond
-         ()
-         ~status:`OK
-         ~headers:(Http.Header.of_list [ "content-type", "text/html" ])
-         ~body
-     | "/post" ->
-       print_endline "This is the post request from the client";
+       Eio.Stream.add indexed_queue sender_body;
        Cohttp_eio.Server.respond_string
-         ~status:`OK
-         ~body:"This is the post method being invoked"
-         ()
-     | _ -> Cohttp_eio.Server.respond_string ~status:`Not_found ~body:"" ())
+         ~status:`Not_found
+         ~body:"Added to Htbl ; new key"
+         ())
 ;;
+
+(* (match Http.Request.meth request with *)
+(*  | `GET -> print_endline "The get method was called" *)
+(*  | `POST -> *)
+(*    let cond = Http.Request.has_body request in *)
+(*    (match cond with *)
+(*     | `No -> print_endline "There is no body" *)
+(*     | `Unknown -> print_endline "Unknown" *)
+(*     | `Yes -> print_endline "Yes ; there is a body good news") *)
+(*  | _ -> print_endline "Something else was called"); *)
+(* (match Http.Request.resource request with *)
+(*  | "/" -> Cohttp_eio.Server.respond_string ~status:`OK ~body:"" () *)
+(*  | "/html" -> *)
+(*    (\* Use a plain flow to test chunked encoding *\) *)
+(*    let body = Eio.Flow.string_source "" in *)
+(*    Cohttp_eio.Server.respond *)
+(*      () *)
+(*      ~status:`OK *)
+(*      ~headers:(Http.Header.of_list [ "content-type", "text/html" ]) *)
+(*      ~body *)
+(*  | "/post" -> *)
+(*    print_endline "This is the post request from the client"; *)
+(*    Cohttp_eio.Server.respond_string *)
+(*      ~status:`OK *)
+(*      ~body:"This is the post method being invoked" *)
+(*      () *)
+(*  | _ -> Cohttp_eio.Server.respond_string ~status:`Not_found ~body:"" ()) *)
 
 (* This is to setup config ; ie update the reference and pull the values from that into a hashtable *)
 let setup_config_file () =
@@ -164,17 +178,17 @@ let init_http_server current_location () =
     let () =
       print_endline "Just before the EIO main loop";
       let port = ref port_to_use in
-      print_endline ("This is the port that is being used " ^ (string_of_int port_to_use));
+      print_endline ("This is the port that is being used " ^ string_of_int port_to_use);
       Arg.parse
         [ "-p", Arg.Set_int port, " Listening port number(8080 by default)" ]
         ignore
         "An HTTP/1.1 server";
       Eio_main.run
       @@ fun env ->
-      print_endline "Inside the EIO main loop";      
+      print_endline "Inside the EIO main loop";
       Eio.Switch.run
       @@ fun sw ->
-      print_endline "Inside the EIO switch run";            
+      print_endline "Inside the EIO switch run";
       let socket =
         Eio.Net.listen
           env#net
@@ -183,10 +197,10 @@ let init_http_server current_location () =
           ~reuse_addr:true
           (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port))
       and server = Cohttp_eio.Server.make ~callback:handler () in
-      print_endline "After the and server part";            
+      print_endline "After the and server part";
       Cohttp_eio.Server.run socket server ~on_error:log_warning
     in
-      print_endline "Finished";                
+    print_endline "Finished";
     ()
 ;;
 
