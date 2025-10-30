@@ -30,7 +30,7 @@ module Msg_http_intf : Msg_intf.M = struct
           dst_ip
       in
       if Http.Status.compare resp.status `OK = 0
-      then print_string @@ Eio.Buf_read.(parse_exn take_all) body_resp ~max_size:max_int
+      then print_endline @@ Eio.Buf_read.(parse_exn take_all) body_resp ~max_size:max_int
       else Fmt.epr "Unexpected HTTP status: %a" Http.Status.pp resp.status]
   ;;
 
@@ -47,9 +47,9 @@ module Msg_http_intf : Msg_intf.M = struct
   (* ;; *)
 
   let emit_net_recv ~src ~dst =
-    ignore src;
+    ignore dst;
     [%expr
-      Send_receive.receive_message ~location:[%e Ast_builder.Default.estring ~loc dst]]
+      Send_receive.receive_message ~location:[%e Ast_builder.Default.estring ~loc src]]
   ;;
 end
 
