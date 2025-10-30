@@ -91,12 +91,15 @@ let handler _socket request body =
        let get_sender_body input_string =
          match sender_body with
          | "L" ->
+           print_endline "The L branch was taken";
            let string_to_print = input_string in
            string_to_print
          | "R" ->
+           print_endline "The R branch was taken";           
            let string_to_print = input_string in
            string_to_print
          | _ ->
+           print_endline "Looks like we have something that had been marshalled";           
            let string_to_print = Marshal.from_string input_string 0 in
            string_to_print
        in
