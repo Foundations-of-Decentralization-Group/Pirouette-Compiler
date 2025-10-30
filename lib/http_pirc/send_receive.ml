@@ -258,8 +258,6 @@ let rec receive_message ~location =
   (* let received_message = Eio.Stream.take stream_for_message in received_message *)
   match stream_handle_option with
   | Some stream_associated_key ->
-    Eio.traceln "Recv was successful";
-    print_endline "Recv worked out";
     let get_sender_body input_string =
       match input_string with
       | "L" ->
@@ -276,6 +274,8 @@ let rec receive_message ~location =
         string_to_print
     in
     let value_from_stream = Eio.Stream.take stream_associated_key in
+    Eio.traceln "Recv was successful";
+    print_endline "Recv worked out";
     let val_print = get_sender_body value_from_stream in
     print_endline ("This is the value of the string : " ^ val_print);
     Eio.traceln "This is the value of the string %s\n" val_print;
