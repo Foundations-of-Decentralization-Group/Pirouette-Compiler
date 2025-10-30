@@ -248,6 +248,7 @@ let init_http_server current_location () =
 ;;
 
 let rec receive_message ~location =
+  print_endline "Waiting for a message to appear";
   let key_for_table = location in
   let stream_handle_option = Hashtbl.find_opt message_queues key_for_table in
   (* let received_message = Eio.Stream.take stream_for_message in received_message *)
