@@ -73,8 +73,27 @@ let handler _socket request body =
       ()
   | Some unwrapped_sender_location ->
     let indexed_queue = Hashtbl.find_opt message_queues unwrapped_sender_location in
+    print_endline "The key already exists";
     (match indexed_queue with
      | Some result_queue ->
+       let get_sender_body input_string =
+         match sender_body with
+         | "L" ->
+           print_endline "The L branch was taken";
+           let string_to_print = input_string in
+           string_to_print
+         | "R" ->
+           print_endline "The R branch was taken";
+           let string_to_print = input_string in
+           string_to_print
+         | _ ->
+           print_endline "Looks like we have something that had been marshalled";
+           let string_to_print = Marshal.from_string input_string 0 in
+           string_of_int (string_to_print)
+       in
+       let string_to_print = get_sender_body sender_body in
+       Eio.traceln "%d" string_to_print;
+       Eio.traceln "%s" unwrapped_sender_location;
        Eio.Stream.add result_queue sender_body;
        Cohttp_eio.Server.respond_string
          ~status:`OK
@@ -83,11 +102,12 @@ let handler _socket request body =
      | None ->
        Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create 10);
        let indexed_queue = Hashtbl.find message_queues unwrapped_sender_location in
-       print_endline
-         ("This value was put inside the queue : "
-          ^ sender_body
-          ^ " "
-          ^ unwrapped_sender_location);
+       (* print_endline *)
+       (*   ("This value was put inside the queue : " *)
+       (*    ^ sender_body *)
+       (*    ^ " " *)
+       (*    ^ unwrapped_sender_location); *)
+       print_endline "The key has to be made";
        let get_sender_body input_string =
          match sender_body with
          | "L" ->
@@ -95,11 +115,11 @@ let handler _socket request body =
            let string_to_print = input_string in
            string_to_print
          | "R" ->
-           print_endline "The R branch was taken";           
+           print_endline "The R branch was taken";
            let string_to_print = input_string in
            string_to_print
          | _ ->
-           print_endline "Looks like we have something that had been marshalled";           
+           print_endline "Looks like we have something that had been marshalled";
            let string_to_print = Marshal.from_string input_string 0 in
            string_to_print
        in
