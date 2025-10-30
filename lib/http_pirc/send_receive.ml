@@ -208,9 +208,10 @@ let init_http_server current_location () =
 
 let receive_message ~location =
   let key_for_table = location in
-  let stream_handle_option = Hashtbl.find_opt message_queues key_for_table in
-  match stream_handle_option with
-  | Some stream_associated_key -> Eio.Stream.take stream_associated_key
-  | None -> "Nothing to see here"
+  let stream_for_message = Hashtbl.find message_queues key_for_table in
+  let received_message = Eio.Stream.take stream_for_message in received_message
+  (* match stream_handle_option with *)
+  (* | Some stream_associated_key -> Eio.Stream.take stream_associated_key *)
+  (* | None -> "Nothing to see here" *)
     (* failwith ("Unable to grab the required data from" ^ location) *)
 ;;
