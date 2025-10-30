@@ -241,7 +241,11 @@ let init_http_server current_location () =
           (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port))
       and server = Cohttp_eio.Server.make ~callback:handler () in
       print_endline "After the and server part";
-      Cohttp_eio.Server.run socket server ?max_connections:(Some(100)) ~on_error:log_warning
+      Cohttp_eio.Server.run
+        socket
+        server
+        ?max_connections:(Some 100)
+        ~on_error:log_warning
     in
     print_endline "Finished";
     ()
@@ -253,6 +257,9 @@ let rec receive_message ~location =
   let stream_handle_option = Hashtbl.find_opt message_queues key_for_table in
   (* let received_message = Eio.Stream.take stream_for_message in received_message *)
   match stream_handle_option with
-  | Some stream_associated_key -> Eio.Stream.take stream_associated_key
+  | Some stream_associated_key ->
+    Eio.traceln "Recv was successful";
+    print_endline "Recv worked out";
+    Eio.Stream.take stream_associated_key
   | None -> receive_message ~location
 ;;
