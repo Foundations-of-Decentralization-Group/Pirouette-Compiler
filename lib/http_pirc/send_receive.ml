@@ -237,7 +237,7 @@ let init_http_server current_location () =
           env#net
           ~sw
           ~backlog:128
-          ~reuse_addr:true
+          ~reuse_addr:false
           (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port))
       and server = Cohttp_eio.Server.make ~callback:handler () in
       print_endline "After the and server part";
