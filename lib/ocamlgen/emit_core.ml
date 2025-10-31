@@ -159,7 +159,7 @@ and emit_foreign_decl id typ external_name=
       ~loc
       Nolabel
       None
-      (pvar ~loc ("(arg : " ^ arg_type_sig ^ ")"))
+      (pvar ~loc ("(arg : " ^ arg_type_sig ^ ") :" ^ return_type_declaration))
       [%expr
         [%e evar ~loc (package_string ^ function_name)]
         [%e evar ~loc "arg"]]

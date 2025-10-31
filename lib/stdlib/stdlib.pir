@@ -1,8 +1,8 @@
 {- Print to stdout functions -}
 foreign print_string : A.string -> unit := "print_string";
-foreign print_char : unit -> unit := "print_char";
+{-foreign print_char : unit -> unit := "print_char";-}
 foreign print_endline : A.string -> unit := "print_endline";
-foreign print_float : unit -> unit := "print_float";
+{-foreign print_float : unit -> unit := "print_float";-}
 foreign print_int : A.int -> unit := "print_int";
 foreign print_newline : unit -> unit := "print_newline";
 foreign printf : A.string -> A.string -> unit := "Printf.printf";
@@ -22,8 +22,8 @@ foreign eprintf : A.string -> A.string -> unit := "Printf.eprintf";
 {- String manipulation -}
 foreign sprintf : unit -> unit -> unit := "Printf.sprintf";
 foreign ksprintf : (unit -> unit) -> unit -> unit -> unit := "Printf.ksprintf";
-foreign string_cat : A.string -> A.string -> unit := "String.cat";
-foreign cat : A.string -> A.string -> unit := "String.cat";
+foreign string_cat : A.string -> A.string -> A.string := "String.cat";
+foreign cat : A.string -> A.string -> A.string := "String.cat";
 foreign string_of_int : A.int -> A.string := "string_of_int";
 foreign string_of_bool : A.bool -> A.string := "string_of_bool";
 foreign of_bytes : unit -> A.string := "String.of_bytes";
