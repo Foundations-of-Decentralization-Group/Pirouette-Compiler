@@ -258,27 +258,33 @@ let rec receive_message ~location =
   (* let received_message = Eio.Stream.take stream_for_message in received_message *)
   match stream_handle_option with
   | Some stream_associated_key ->
-    let get_sender_body input_string =
-      match input_string with
-      | "L" ->
-        print_endline "The L body was in the queue";
-        let string_to_print = input_string in
-        string_to_print
-      | "R" ->
-        print_endline "The R body was in the queue";
-        let string_to_print = input_string in
-        string_to_print
-      | _ ->
-        print_endline "Looks like we have something that had been marshalled";
-        let string_to_print = Marshal.from_string input_string 0 in
-        string_to_print
-    in
-    let value_from_stream = Eio.Stream.take stream_associated_key in
-    Eio.traceln "Recv was successful";
-    print_endline "Recv worked out";
-    let val_print = get_sender_body value_from_stream in
-    print_endline ("This is the value of the string : " ^ val_print);
-    Eio.traceln "This is the value of the string %s\n" val_print;
-    value_from_stream
+    let value_from_stream_handle = Eio.Stream.take_nonblocking stream_associated_key in
+    (match value_from_stream_handle with
+     | Some value_from_stream ->
+       let get_sender_body input_string =
+         match input_string with
+         | "L" ->
+           print_endline "The L body was in the queue";
+           let string_to_print = input_string in
+           string_to_print
+         | "R" ->
+           print_endline "The R body was in the queue";
+           let string_to_print = input_string in
+           string_to_print
+         | _ ->
+           print_endline "Looks like we have something that had been marshalled";
+           let string_to_print = Marshal.from_string input_string 0 in
+           string_to_print
+       in
+       Eio.traceln "Recv was successful";
+       print_endline "Recv worked out";
+       let val_print = get_sender_body value_from_stream in
+       print_endline ("This is the value of the string : " ^ val_print);
+       Eio.traceln "This is the value of the string %s\n" val_print;
+       value_from_stream
+     | None ->
+       print_endline "The queue is empty for this particular key";
+       Eio.traceln "The queue is empty for this particular key";
+       receive_message ~location)
   | None -> receive_message ~location
 ;;
