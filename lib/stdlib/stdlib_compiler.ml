@@ -19,6 +19,7 @@ let compile_stdlib () : unit =
   (* There must be a stdlib_ast.ml file in the same directory as your stdlib.pir pointed to by your PIR_STDLIB env var*)
   let stdlib_ast_file_oc = open_out ((Filename.dirname path_to_stdlib)^Filename.dir_sep^"stdlib_ast.ml") in
 
+
   (* We save the Marshalled AST of the stdlib to stdlib_ast.ml, but wrapped within OCaml code that allows us to reference that value *)
   output_string stdlib_ast_file_oc ("let ast={|"^ stdlib_ast_str ^ "|};;"); close_out stdlib_ast_file_oc;
 ;;

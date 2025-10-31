@@ -1,4 +1,4 @@
-let suffix = "_PIROUETTE_USR_ID"
+let suffix = "_PIROUETTE_ID"
 
 let rec ast_local_pattern_rename : 'a Ast_core.Local.M.pattern -> 'a Ast_core.Local.M.pattern = function
     | Default metadata -> Default metadata
