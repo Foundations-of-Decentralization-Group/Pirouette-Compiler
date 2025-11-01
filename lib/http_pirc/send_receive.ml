@@ -34,7 +34,7 @@ let get_ip_address ~location =
 
 let get_header ~location_name =
   let new_header = Http.Header.init () in
-  let header_to_send = Http.Header.add new_header "host" location_name in
+  let header_to_send = Http.Header.add new_header "Participant_Name" location_name in
   header_to_send
 ;;
 
@@ -64,7 +64,7 @@ let handler _socket request body =
   let x : Cohttp_eio.Body.t = body in
   let sender_body = Eio.Buf_read.(parse_exn take_all) ~max_size:max_int x in
   let recv_headers = Http.Request.headers request in
-  let sender_location = Http.Header.get recv_headers "host" in
+  let sender_location = Http.Header.get recv_headers "Participant_Name" in
   match sender_location with
   | None ->
     print_endline "Error message sender location not found";
