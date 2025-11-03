@@ -1,7 +1,7 @@
   locations:
     - location: "A"
-      http_address: "http://127.0.0.1:8080"
+      http_address: "http://127.0.0.1:8000"
     - location: "B"
-      http_address: "http://127.0.0.1:8081"
+      http_address: "http://127.0.0.1:8008"
     - location: "C"
-      http_address: "http://127.0.0.1:8082"
+      http_address: "http://127.0.0.1:8080"

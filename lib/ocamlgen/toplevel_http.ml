@@ -13,19 +13,19 @@ module Msg_http_intf : Msg_intf.M = struct
   let emit_net_send ~src ~dst pexp =
     (* [%expr Domainslib.Chan.send [%e Builder.evar (spf "chan_%s_%s" src dst)] [%e pexp]]     *)
     [%expr
-      let header_to_send =
-        Send_receive.get_header [%e Ast_builder.Default.estring ~loc src]
-      in
+      (* let header_to_send = *)
+      (*   Send_receive.get_header [%e Ast_builder.Default.estring ~loc src] *)
+      (* in *)
       let dst_ip =
         Send_receive.get_ip_address [%e Ast_builder.Default.estring ~loc dst]
       in
-      let body_to_send = Send_receive.get_body [%e pexp] in
+      let body_to_send = Send_receive.get_body [%e Ast_builder.Default.estring ~loc src] [%e pexp] in
       let resp, body_resp =
         Cohttp_eio.Client.post
           ~sw
           ?body:body_to_send
           ?chunked:None
-          ?headers:(Some header_to_send)
+          ?headers:None
           client
           dst_ip
       in

@@ -12,6 +12,9 @@ bug-reports:
   "https://github.com/Foundations-of-Decentralization-Group/Pirouette-Compiler/issues"
 depends: [
   "cohttp-lwt-unix" {build}
+  "cohttp-eio" {build}
+  "eio_main" {build}
+  "eio" {build}
   "dune" {>= "3.14" & build}
   "lwt" {build}
   "lwt_ppx" {build}
