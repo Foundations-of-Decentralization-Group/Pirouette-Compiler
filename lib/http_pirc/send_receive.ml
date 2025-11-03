@@ -21,8 +21,12 @@ let get_location_config location =
      | None -> Error ("Unknown location: " ^ location))
 ;;
 
-let get_body string_to_send =
-  let body_to_send = Some (Body.of_string string_to_send) in
+let get_body string_to_send participant_name_string =
+  let list_to_send : string list = [] in
+  let list_to_send = List.cons participant_name_string list_to_send in
+  let list_to_send = List.cons string_to_send list_to_send in
+  let final_string = String.concat ";" list_to_send in
+  let body_to_send = Some (Body.of_string final_string) in
   body_to_send
 ;;
 
@@ -60,15 +64,19 @@ let unmarshal_data data_str =
 ;;
 
 (* This is the handler for incoming http requests *)
-let handler _socket request body =
+let handler _socket _request body =
   let x : Cohttp_eio.Body.t = body in
   let sender_body = Eio.Buf_read.(parse_exn take_all) ~max_size:max_int x in
-  let recv_headers = Http.Request.headers request in
-  let sender_location = Http.Header.get recv_headers "Participant_Name" in
+  let sep = ':' in 
+  let recv_list = String.split_on_char sep sender_body in
+  let sender_location = List.nth_opt recv_list 0 in
+  let sender_body = List.nth recv_list 1 in 
+  (* let recv_headers = Http.Request.headers request in *)
+  (* let sender_location = Http.Header.get recv_headers "Participant_Name" in *)
   match sender_location with
   | None ->
     print_endline "Error message sender location not found";
-    Eio.traceln "Error message sender location not found";    
+    Eio.traceln "Error message sender location not found";
     Cohttp_eio.Server.respond_string
       ~status:`Precondition_failed
       ~body:"Error message - Sender location not found"
@@ -128,6 +136,7 @@ let handler _socket request body =
        let string_to_print = get_sender_body sender_body in
        Eio.traceln "%s" string_to_print;
        Eio.traceln "%s" unwrapped_sender_location;
+       let sender_body = Marshal.from_string string_to_print 0 in 
        Eio.Stream.add indexed_queue sender_body;
        Cohttp_eio.Server.respond_string
          ~status:`OK
