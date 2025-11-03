@@ -72,6 +72,10 @@ let handler _socket _request body =
   let recv_list = String.split_on_char sep sender_body in
   let sender_location = List.nth_opt recv_list 0 in
   let sender_body = List.nth recv_list 1 in
+  let sender_location_print = List.nth recv_list 0 in
+  let sender_body_print = List.nth recv_list 1 in
+  print_endline ("This is the value of sender location : " ^ sender_location_print);
+  print_endline ("This is the value of sender body : " ^ sender_body_print);
   (* let recv_headers = Http.Request.headers request in *)
   (* let sender_location = Http.Header.get recv_headers "Participant_Name" in *)
   match sender_location with
