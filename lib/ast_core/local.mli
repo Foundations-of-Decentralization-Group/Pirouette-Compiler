@@ -1,4 +1,11 @@
+(** Core local abstract syntax tree (AST) definitions: This module defines the local (endpoint) IR used within a single location.
+    It includes local types, patterns, expressions, and statements. Unlike the
+    choreography AST, no location qualifiers appear here; all values are local
+    by construction.
+*)
+
 module M : sig
+
   type 'a value =
     | Int of int * 'a
     | String of string * 'a

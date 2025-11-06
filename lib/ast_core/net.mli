@@ -1,3 +1,8 @@
+(** Net – network-level intermediate representation: Captures explicit communication, synchronization, and dataflow between
+    locations.  Forms the compiler’s bridge between choreographic ASTs and
+    backend code generation.
+*)
+
 module M : sig
   type 'a typ =
     | TUnit of 'a

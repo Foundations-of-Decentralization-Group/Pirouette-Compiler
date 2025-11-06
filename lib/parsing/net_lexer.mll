@@ -107,6 +107,7 @@ and read_string buf = parse
 
 (** [read_single_line_comment] processes single-line comments in the lexer. *)
 and read_single_line_comment = parse
+(** [read_single_line_comment] processes single-line comments in the lexer. *)
   | newline { next_line lexbuf; read lexbuf }
   | _       { read_single_line_comment lexbuf }
   | eof     { EOF }
