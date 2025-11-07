@@ -37,9 +37,9 @@ let get_ip_address ~location =
   | _ -> Uri.empty
 ;;
 
-let get_header ~conn_name =
+let get_header =
   let new_header = Http.Header.init () in
-  let header_to_send = Http.Header.add new_header "Connection" conn_name in
+  let header_to_send = Http.Header.add new_header "Connection" "close" in
   header_to_send
 ;;
 
