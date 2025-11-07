@@ -37,9 +37,9 @@ let get_ip_address ~location =
   | _ -> Uri.empty
 ;;
 
-let get_header ~location_name =
+let get_header ~conn_name =
   let new_header = Http.Header.init () in
-  let header_to_send = Http.Header.add new_header "Participant_Name" location_name in
+  let header_to_send = Http.Header.add new_header "Connection" conn_name in
   header_to_send
 ;;
 
@@ -149,33 +149,6 @@ let handler _socket _request body =
          ())
 ;;
 
-(* (match Http.Request.meth request with *)
-(*  | `GET -> print_endline "The get method was called" *)
-(*  | `POST -> *)
-(*    let cond = Http.Request.has_body request in *)
-(*    (match cond with *)
-(*     | `No -> print_endline "There is no body" *)
-(*     | `Unknown -> print_endline "Unknown" *)
-(*     | `Yes -> print_endline "Yes ; there is a body good news") *)
-(*  | _ -> print_endline "Something else was called"); *)
-(* (match Http.Request.resource request with *)
-(*  | "/" -> Cohttp_eio.Server.respond_string ~status:`OK ~body:"" () *)
-(*  | "/html" -> *)
-(*    (\* Use a plain flow to test chunked encoding *\) *)
-(*    let body = Eio.Flow.string_source "" in *)
-(*    Cohttp_eio.Server.respond *)
-(*      () *)
-(*      ~status:`OK *)
-(*      ~headers:(Http.Header.of_list [ "content-type", "text/html" ]) *)
-(*      ~body *)
-(*  | "/post" -> *)
-(*    print_endline "This is the post request from the client"; *)
-(*    Cohttp_eio.Server.respond_string *)
-(*      ~status:`OK *)
-(*      ~body:"This is the post method being invoked" *)
-(*      () *)
-(*  | _ -> Cohttp_eio.Server.respond_string ~status:`Not_found ~body:"" ()) *)
-
 (* This is to setup config ; ie update the reference and pull the values from that into a hashtable *)
 let setup_config_file () =
   (* First collect all original addresses *)
@@ -224,10 +197,6 @@ let init_http_server current_location () =
       | None -> 8080
       (* Default port *)
     in
-    (* let host = Uri.host uri |> Option.value ~default:"localhost" in *)
-    (* let new_address = Printf.sprintf "http://%s:%d%s" host port_to_use path in *)
-    (* Update our mapping with the new address *)
-    (* Hashtbl.replace loc_to_address loc_config.Config_parser.location new_address; *)
     print_endline ("Starting an HTTP server for this specific node" ^ current_location);
     (* The following statement sets up logs for debugging *)
     let () = Logs.set_reporter (Logs_fmt.reporter ())
