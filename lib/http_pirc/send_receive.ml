@@ -222,14 +222,15 @@ let init_http_server current_location () =
           env#net
           ~sw
           ~backlog:128
-          ~reuse_addr:false
+          ~reuse_port:true
+          ~reuse_addr:true
           (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port))
       and server = Cohttp_eio.Server.make ~callback:handler () in
       print_endline "After the and server part";
       Cohttp_eio.Server.run
         socket
         server
-        ?max_connections:(Some 100)
+        ?max_connections:(Some Int.max_int)
         ~on_error:log_warning
     in
     print_endline "Finished";
