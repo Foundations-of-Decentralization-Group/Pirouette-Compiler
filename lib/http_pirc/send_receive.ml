@@ -221,9 +221,9 @@ let init_http_server current_location () =
         Eio.Net.listen
           env#net
           ~sw
-          ~backlog:128
-          ~reuse_port:true
-          ~reuse_addr:true
+          ~backlog:Int.max_int
+          ~reuse_port:false
+          ~reuse_addr:false
           (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port))
       and server = Cohttp_eio.Server.make ~callback:handler () in
       print_endline "After the and server part";
