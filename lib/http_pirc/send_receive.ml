@@ -26,7 +26,7 @@ let get_body string_to_send participant_name_string =
   let list_to_send = List.cons participant_name_string list_to_send in
   let list_to_send = List.cons string_to_send list_to_send in
   let final_string = String.concat ";" list_to_send in
-  print_endline ("This is the string that we are sending:" ^ final_string);
+  (* print_endline ("This is the string that we are sending:" ^ final_string); *)
   let body_to_send = Some (Body.of_string final_string) in
   body_to_send
 ;;
@@ -72,23 +72,23 @@ let handler _socket _request body =
   let recv_list = String.split_on_char sep sender_body in
   let sender_location = List.nth_opt recv_list 0 in
   let sender_body = List.nth recv_list 1 in
-  let sender_location_print = List.nth recv_list 0 in
-  let sender_body_print = List.nth recv_list 1 in
-  print_endline ("This is the value of sender location : " ^ sender_location_print);
-  print_endline ("This is the value of sender body : " ^ sender_body_print);
+  (* let sender_location_print = List.nth recv_list 0 in *)
+  (* let sender_body_print = List.nth recv_list 1 in *)
+  (* print_endline ("This is the value of sender location : " ^ sender_location_print); *)
+  (* print_endline ("This is the value of sender body : " ^ sender_body_print); *)
   (* let recv_headers = Http.Request.headers request in *)
   (* let sender_location = Http.Header.get recv_headers "Participant_Name" in *)
   match sender_location with
   | None ->
-    print_endline "Error message sender location not found";
-    Eio.traceln "Error message sender location not found";
+    (* print_endline "Error message sender location not found"; *)
+    (* Eio.traceln "Error message sender location not found"; *)
     Cohttp_eio.Server.respond_string
       ~status:`Precondition_failed
       ~body:"Error message - Sender location not found"
       ()
   | Some unwrapped_sender_location ->
     let indexed_queue = Hashtbl.find_opt message_queues unwrapped_sender_location in
-    print_endline "The key already exists";
+    (* print_endline "The key already exists"; *)
     (match indexed_queue with
      | Some result_queue ->
        (* let get_sender_body input_string = *)
@@ -122,25 +122,25 @@ let handler _socket _request body =
        (*    ^ sender_body *)
        (*    ^ " " *)
        (*    ^ unwrapped_sender_location); *)
-       print_endline "The key has to be made";
-       let get_sender_body input_string =
-         match sender_body with
-         | "L" ->
-           print_endline "The L branch was taken";
-           let string_to_print = input_string in
-           string_to_print
-         | "R" ->
-           print_endline "The R branch was taken";
-           let string_to_print = input_string in
-           string_to_print
-         | _ ->
-           print_endline "Looks like we have something that had been marshalled";
-           let string_to_print = Marshal.from_string input_string 0 in
-           string_to_print
-       in
-       let string_to_print = get_sender_body sender_body in
-       Eio.traceln "%s" string_to_print;
-       Eio.traceln "%s" unwrapped_sender_location;
+       (* print_endline "The key has to be made"; *)
+       (* let get_sender_body input_string = *)
+       (*   match sender_body with *)
+       (*   | "L" -> *)
+       (*     print_endline "The L branch was taken"; *)
+       (*     let string_to_print = input_string in *)
+       (*     string_to_print *)
+       (*   | "R" -> *)
+       (*     print_endline "The R branch was taken"; *)
+       (*     let string_to_print = input_string in *)
+       (*     string_to_print *)
+       (*   | _ -> *)
+       (*     print_endline "Looks like we have something that had been marshalled"; *)
+       (*     let string_to_print = Marshal.from_string input_string 0 in *)
+       (*     string_to_print *)
+       (* in *)
+       (* let string_to_print = get_sender_body sender_body in *)
+       (* Eio.traceln "%s" string_to_print; *)
+       (* Eio.traceln "%s" unwrapped_sender_location; *)
        (* let sender_body = Marshal.from_string string_to_print 0 in *)
        Eio.Stream.add indexed_queue sender_body;
        Cohttp_eio.Server.respond_string
@@ -178,45 +178,45 @@ let setup_config_file () =
 
 (* Initialize HTTP server for this location *)
 let init_http_server current_location () =
-  print_endline "Right before setup_config_file";
+  (* print_endline "Right before setup_config_file"; *)
   let () = setup_config_file () in
-  print_endline "After setup_config_file";
+  (* print_endline "After setup_config_file"; *)
   match get_location_config current_location with
   | Error msg ->
     failwith
       ("location config" ^ current_location ^ "not found inside init_http_location" ^ msg)
   | Ok loc_config ->
-    print_endline "We got a config debug statement";
+    (* print_endline "We got a config debug statement"; *)
     let uri = Uri.of_string loc_config.Config_parser.http_address in
     (* let _path = Uri.path uri in *)
     (* (\* Extract port from URI or use a default *\) *)
-    print_endline "Got the URI";
+    (* print_endline "Got the URI"; *)
     let port_to_use : int =
       match Uri.port uri with
       | Some p -> p (* Use original port *)
       | None -> 8080
       (* Default port *)
     in
-    print_endline ("Starting an HTTP server for this specific node" ^ current_location);
+    (* print_endline ("Starting an HTTP server for this specific node" ^ current_location); *)
     (* The following statement sets up logs for debugging *)
     let () = Logs.set_reporter (Logs_fmt.reporter ())
     and () = Logs.Src.set_level Cohttp_eio.src (Some Debug) in
     let log_warning ex = Logs.warn (fun f -> f "%a" Eio.Exn.pp ex) in
     (* This runs the Eio event loop for the server *)
     let () =
-      print_endline "Just before the EIO main loop";
+      (* print_endline "Just before the EIO main loop"; *)
       let port = ref port_to_use in
-      print_endline ("This is the port that is being used " ^ string_of_int port_to_use);
+      (* print_endline ("This is the port that is being used " ^ string_of_int port_to_use); *)
       Arg.parse
         [ "-p", Arg.Set_int port, " Listening port number(8080 by default)" ]
         ignore
         "An HTTP/1.1 server";
       Eio_main.run
       @@ fun env ->
-      print_endline "Inside the EIO main loop";
+      (* print_endline "Inside the EIO main loop"; *)
       Eio.Switch.run
       @@ fun sw ->
-      print_endline "Inside the EIO switch run";
+      (* print_endline "Inside the EIO switch run"; *)
       let socket =
         Eio.Net.listen
           env#net
@@ -226,19 +226,19 @@ let init_http_server current_location () =
           ~reuse_addr:true
           (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port))
       and server = Cohttp_eio.Server.make ~callback:handler () in
-      print_endline "After the and server part";
+      (* print_endline "After the and server part"; *)
       Cohttp_eio.Server.run
         socket
         server
         ?max_connections:(Some Int.max_int)
         ~on_error:log_warning
     in
-    print_endline "Finished";
+    (* print_endline "Finished"; *)
     ()
 ;;
 
 let rec receive_message ~location =
-  Eio.traceln "Waiting for a message to appear";
+  (* Eio.traceln "Waiting for a message to appear"; *)
   let key_for_table = location in
   let stream_handle_option = Hashtbl.find_opt message_queues key_for_table in
   (* let received_message = Eio.Stream.take stream_for_message in received_message *)
@@ -269,8 +269,8 @@ let rec receive_message ~location =
        (* Eio.traceln "This is the value of the string %s\n" val_print; *)
        value_from_stream
      | None ->
-       print_endline "The queue is empty for this particular key";
-       Eio.traceln "The queue is empty for this particular key";
+       (* print_endline "The queue is empty for this particular key"; *)
+       (* Eio.traceln "The queue is empty for this particular key"; *)
        receive_message ~location)
   | None -> receive_message ~location
 ;;
