@@ -200,7 +200,7 @@ let init_http_server current_location () =
     (* print_endline ("Starting an HTTP server for this specific node" ^ current_location); *)
     (* The following statement sets up logs for debugging *)
     let () = Logs.set_reporter (Logs_fmt.reporter ())
-    and () = Logs.Src.set_level Cohttp_eio.src (Some Debug) in
+    and () = Logs.Src.set_level Cohttp_eio.src (None) in
     let log_warning ex = Logs.warn (fun f -> f "%a" Eio.Exn.pp ex) in
     (* This runs the Eio event loop for the server *)
     let () =
