@@ -91,22 +91,22 @@ let handler _socket _request body =
     print_endline "The key already exists";
     (match indexed_queue with
      | Some result_queue ->
-       let get_sender_body input_string =
-         match sender_body with
-         | "L" ->
-           print_endline "The L branch was taken";
-           let string_to_print = input_string in
-           string_to_print
-         | "R" ->
-           print_endline "The R branch was taken";
-           let string_to_print = input_string in
-           string_to_print
-         | _ ->
-           print_endline "Looks like we have something that had been marshalled";
-           let string_to_print = Marshal.from_string input_string 0 in
-           string_to_print
-       in
-       let _string_to_print = get_sender_body sender_body in
+       (* let get_sender_body input_string = *)
+       (*   match sender_body with *)
+       (*   | "L" -> *)
+       (*     print_endline "The L branch was taken"; *)
+       (*     let string_to_print = input_string in *)
+       (*     string_to_print *)
+       (*   | "R" -> *)
+       (*     print_endline "The R branch was taken"; *)
+       (*     let string_to_print = input_string in *)
+       (*     string_to_print *)
+       (*   | _ -> *)
+       (*     print_endline "Looks like we have something that had been marshalled"; *)
+       (*     let string_to_print = Marshal.from_string input_string 0 in *)
+       (*     string_to_print *)
+       (* in *)
+       (* let _string_to_print = get_sender_body sender_body in *)
        (* Eio.traceln "%s" string_to_print; *)
        (* Eio.traceln "%s" unwrapped_sender_location; *)
        Eio.Stream.add result_queue sender_body;
@@ -247,24 +247,24 @@ let rec receive_message ~location =
     let value_from_stream_handle = Eio.Stream.take_nonblocking stream_associated_key in
     (match value_from_stream_handle with
      | Some value_from_stream ->
-       let get_sender_body input_string =
-         match input_string with
-         | "L" ->
-           print_endline "The L body was in the queue";
-           let string_to_print = input_string in
-           string_to_print
-         | "R" ->
-           print_endline "The R body was in the queue";
-           let string_to_print = input_string in
-           string_to_print
-         | _ ->
-           print_endline "Looks like we have something that had been marshalled";
-           let string_to_print = Marshal.from_string input_string 0 in
-           string_to_print
-       in
-       Eio.traceln "Recv was successful";
-       print_endline "Recv worked out";
-       let _val_print = get_sender_body value_from_stream in
+       (* let get_sender_body input_string = *)
+       (*   match input_string with *)
+       (*   | "L" -> *)
+       (*     print_endline "The L body was in the queue"; *)
+       (*     let string_to_print = input_string in *)
+       (*     string_to_print *)
+       (*   | "R" -> *)
+       (*     print_endline "The R body was in the queue"; *)
+       (*     let string_to_print = input_string in *)
+       (*     string_to_print *)
+       (*   | _ -> *)
+       (*     print_endline "Looks like we have something that had been marshalled"; *)
+       (*     let string_to_print = Marshal.from_string input_string 0 in *)
+       (*     string_to_print *)
+       (* in *)
+       (* Eio.traceln "Recv was successful"; *)
+       (* print_endline "Recv worked out"; *)
+       (* let _val_print = get_sender_body value_from_stream in *)
        (* print_endline ("This is the value of the string : " ^ val_print); *)
        (* Eio.traceln "This is the value of the string %s\n" val_print; *)
        value_from_stream
