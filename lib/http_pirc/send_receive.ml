@@ -106,9 +106,9 @@ let handler _socket _request body =
            let string_to_print = Marshal.from_string input_string 0 in
            string_to_print
        in
-       let string_to_print = get_sender_body sender_body in
-       Eio.traceln "%s" string_to_print;
-       Eio.traceln "%s" unwrapped_sender_location;
+       let _string_to_print = get_sender_body sender_body in
+       (* Eio.traceln "%s" string_to_print; *)
+       (* Eio.traceln "%s" unwrapped_sender_location; *)
        Eio.Stream.add result_queue sender_body;
        Cohttp_eio.Server.respond_string
          ~status:`OK
@@ -264,9 +264,9 @@ let rec receive_message ~location =
        in
        Eio.traceln "Recv was successful";
        print_endline "Recv worked out";
-       let val_print = get_sender_body value_from_stream in
-       print_endline ("This is the value of the string : " ^ val_print);
-       Eio.traceln "This is the value of the string %s\n" val_print;
+       let _val_print = get_sender_body value_from_stream in
+       (* print_endline ("This is the value of the string : " ^ val_print); *)
+       (* Eio.traceln "This is the value of the string %s\n" val_print; *)
        value_from_stream
      | None ->
        print_endline "The queue is empty for this particular key";
