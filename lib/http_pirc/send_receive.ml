@@ -127,8 +127,8 @@ let handler _socket _request body =
          ~body:"Added to Htbl ; existing key"
          ()
      | None ->
-       Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create 100);
-       let indexed_queue = Hashtbl.find message_queues unwrapped_sender_location in
+       (* Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create 100); *)
+       (* let indexed_queue = Hashtbl.find message_queues unwrapped_sender_location in *)
        (* print_endline *)
        (*   ("This value was put inside the queue : " *)
        (*    ^ sender_body *)
@@ -154,11 +154,11 @@ let handler _socket _request body =
        (* Eio.traceln "%s" string_to_print; *)
        (* Eio.traceln "%s" unwrapped_sender_location; *)
        (* let sender_body = Marshal.from_string string_to_print 0 in *)
-       Eio.Stream.add indexed_queue sender_body;
+       (* Eio.Stream.add indexed_queue sender_body; *)
        Cohttp_eio.Server.respond_string
-         ~status:`OK
-         ~body:"Added to Htbl ; new key - sender body"
-         ())
+       ~status:`Precondition_failed
+       ~body:"This should not happen"
+       ())
 ;;
 
 (* This is the handler for incoming http requests *)
@@ -335,7 +335,7 @@ let rec receive_message ~location =
        (* Eio.traceln "This is the value of the string %s\n" val_print; *)
        value_from_stream
      | None ->
-       Eio.traceln "Did not grab any value from queue\n";       
+       Eio.traceln "Did not grab any value from queue\n";
        (* print_endline "The queue is empty for this particular key"; *)
        (* Eio.traceln "The queue is empty for this particular key"; *)
        receive_message ~location)
