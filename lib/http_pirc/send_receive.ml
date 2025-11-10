@@ -210,8 +210,6 @@ let setup_config_file () =
       (fun loc_cfg ->
          Hashtbl.add message_queues loc_cfg.Config_parser.location (Eio.Stream.create 100))
       cfg.Config_parser.locations;
-    (* Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create 100);     *)
-    (* Now create a new config with the updated addresses *)
     let new_locations =
       List.map
         (fun loc_cfg ->
@@ -310,6 +308,7 @@ let rec receive_message ~location =
   (* let received_message = Eio.Stream.take stream_for_message in received_message *)
   match stream_handle_option with
   | Some stream_associated_key ->
+    Eio.traceln "Found the correct key\n";
     let value_from_stream_handle = Eio.Stream.take_nonblocking stream_associated_key in
     (match value_from_stream_handle with
      | Some value_from_stream ->
@@ -338,5 +337,7 @@ let rec receive_message ~location =
        (* print_endline "The queue is empty for this particular key"; *)
        (* Eio.traceln "The queue is empty for this particular key"; *)
        receive_message ~location)
-  | None -> receive_message ~location
+  | None ->
+    Eio.traceln "Did not find the correct key\n";
+    receive_message ~location
 ;;
