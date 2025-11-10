@@ -156,9 +156,9 @@ let handler _socket _request body =
        (* let sender_body = Marshal.from_string string_to_print 0 in *)
        (* Eio.Stream.add indexed_queue sender_body; *)
        Cohttp_eio.Server.respond_string
-       ~status:`Precondition_failed
-       ~body:"This should not happen"
-       ())
+         ~status:`Precondition_failed
+         ~body:"This should not happen"
+         ())
 ;;
 
 (* This is the handler for incoming http requests *)
@@ -282,11 +282,12 @@ let init_http_server current_location () =
         (* (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port)) *)
       in
       let server = Cohttp_eio.Server.make ~callback:handler () in
-      (* let dom_mgr = Eio.Stdenv.domain_mgr env in  *)
+      let dom_mgr = Eio.Stdenv.domain_mgr env in
       (* print_endline "After the and server part"; *)
       Cohttp_eio.Server.run
         socket
-        server (* ?additional_domains: (Some(dom_mgr,3)) *)
+        server
+        ?additional_domains:(Some (dom_mgr, Domain.recommended_domain_count ()))
         ?max_connections:(Some 30000)
         ~on_error:log_warning
     in
@@ -308,11 +309,11 @@ let rec receive_message ~location =
   (* let received_message = Eio.Stream.take stream_for_message in received_message *)
   match stream_handle_option with
   | Some stream_associated_key ->
-    Eio.traceln "Found the correct key\n";
+    (* Eio.traceln "Found the correct key\n"; *)
     let value_from_stream_handle = Eio.Stream.take_nonblocking stream_associated_key in
     (match value_from_stream_handle with
      | Some value_from_stream ->
-       Eio.traceln "Found the right value from the queue\n";
+       (* Eio.traceln "Found the right value from the queue\n"; *)
        (* let get_sender_body input_string = *)
        (*   match input_string with *)
        (*   | "L" -> *)
@@ -335,11 +336,11 @@ let rec receive_message ~location =
        (* Eio.traceln "This is the value of the string %s\n" val_print; *)
        value_from_stream
      | None ->
-       Eio.traceln "Did not grab any value from queue\n";
+       (* Eio.traceln "Did not grab any value from queue\n"; *)
        (* print_endline "The queue is empty for this particular key"; *)
        (* Eio.traceln "The queue is empty for this particular key"; *)
        receive_message ~location)
   | None ->
-    Eio.traceln "Did not find the correct key\n";
+    (* Eio.traceln "Did not find the correct key\n"; *)
     receive_message ~location
 ;;
