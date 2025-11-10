@@ -272,12 +272,14 @@ let init_http_server current_location () =
           ~reuse_port:true
           ~reuse_addr:true
           (`Tcp (address_to_run_server, !port))
-      (* (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port)) *)
-      and server = Cohttp_eio.Server.make ~callback:handler () in
+      (* (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port)) *) in 
+      let server = Cohttp_eio.Server.make ~callback:handler () in
+      let dom_mgr = Eio.Stdenv.domain_mgr env in 
       (* print_endline "After the and server part"; *)
       Cohttp_eio.Server.run
         socket
         server
+        ?additional_domains: (Some(dom_mgr,3))
         ?max_connections:(Some 30000)
         ~on_error:log_warning
     in
