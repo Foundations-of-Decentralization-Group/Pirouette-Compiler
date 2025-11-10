@@ -21,10 +21,14 @@ let get_location_config location =
      | None -> Error ("Unknown location: " ^ location))
 ;;
 
-(* let print_locations () = *)
+(* let print_locations = *)
 (*   match !config with *)
 (*   | None -> Error "Config not initialized. Call init() first" *)
 (*   | Some cfg -> *)
+(*     let () = *)
+(*       List.iter *)
+(*         (fun loc -> print_endline ("This is the value" ^ loc.Config_parser.location)) *)
+(*         cfg.Config_parser.locations in Ok  *)
 
 (* ;; *)
 
@@ -202,6 +206,11 @@ let setup_config_file () =
            loc_cfg.Config_parser.location
            loc_cfg.Config_parser.http_address)
       cfg.Config_parser.locations;
+    List.iter
+      (fun loc_cfg ->
+         Hashtbl.add message_queues loc_cfg.Config_parser.location (Eio.Stream.create 100))
+      cfg.Config_parser.locations;
+    (* Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create 100);     *)
     (* Now create a new config with the updated addresses *)
     let new_locations =
       List.map
@@ -272,14 +281,14 @@ let init_http_server current_location () =
           ~reuse_port:true
           ~reuse_addr:true
           (`Tcp (address_to_run_server, !port))
-      (* (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port)) *) in 
+        (* (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port)) *)
+      in
       let server = Cohttp_eio.Server.make ~callback:handler () in
       (* let dom_mgr = Eio.Stdenv.domain_mgr env in  *)
       (* print_endline "After the and server part"; *)
       Cohttp_eio.Server.run
         socket
-        server
-        (* ?additional_domains: (Some(dom_mgr,3)) *)
+        server (* ?additional_domains: (Some(dom_mgr,3)) *)
         ?max_connections:(Some 30000)
         ~on_error:log_warning
     in
