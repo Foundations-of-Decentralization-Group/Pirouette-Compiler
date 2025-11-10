@@ -193,7 +193,8 @@ let init_http_server current_location () =
       | Some string_value -> string_value
       | None -> failwith "No value for uri host"
     in
-    let address_to_run_server = Eio.Net.Ipaddr.of_raw uri_host in
+    let unix_inet_addr = Unix.inet_addr_of_string uri_host in
+    let address_to_run_server = Eio_unix.Net.Ipaddr.of_unix unix_inet_addr in
     (* let _path = Uri.path uri in *)
     (* (\* Extract port from URI or use a default *\) *)
     (* print_endline "Got the URI"; *)
