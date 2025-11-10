@@ -228,7 +228,7 @@ let () =
          in
          let cmd =
            Format.sprintf
-             "OCAMLPATH='%s' ocamlfind ocamlopt -w '%s' -o %s -linkpkg -package '%s' %s \
+             "OCAMLPATH='%s' ocamlfind ocamlopt -g -w '%s' -o %s -linkpkg -package '%s' %s \
               %s"
              search_paths
              !ocamlopt_warn_flags

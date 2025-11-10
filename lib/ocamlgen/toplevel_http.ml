@@ -19,18 +19,20 @@ module Msg_http_intf : Msg_intf.M = struct
       let dst_ip =
         Send_receive.get_ip_address [%e Ast_builder.Default.estring ~loc dst]
       in
-      let body_to_send = Send_receive.get_body [%e Ast_builder.Default.estring ~loc src] [%e pexp] in
+      let body_to_send =
+        Send_receive.get_body [%e Ast_builder.Default.estring ~loc src] [%e pexp]
+      in
       let resp, body_resp =
         Cohttp_eio.Client.post
           ~sw
           ?body:body_to_send
           ?chunked:None
-          ?headers:header_to_send
+          ?headers:(Some header_to_send)
           client
           dst_ip
       in
       if Http.Status.compare resp.status `OK = 0
-      then print_endline @@ Eio.Buf_read.(parse_exn take_all) body_resp ~max_size:max_int
+      then ()
       else Fmt.epr "Unexpected HTTP status: %a" Http.Status.pp resp.status]
   ;;
 
@@ -92,27 +94,21 @@ let emit_toplevel_http
     in
     [%stri
       let () =
+        Domain.spawn
+          (Send_receive.init_http_server [%e Ast_builder.Default.estring ~loc loc_id]);
+        (* Unix.sleep 5; *)
         Eio_main.run
         @@ fun env ->
-        let dom_mgr = Eio.Stdenv.domain_mgr env in
-        Eio.Fiber.all
-          [ (fun () ->
-              Eio.Domain_manager.run_raw
-                dom_mgr
-                (Send_receive.init_http_server
-                   [%e Ast_builder.Default.estring ~loc loc_id]))
-          ; (fun () ->
-              let client = Cohttp_eio.Client.make ~https:None env#net in
-              Eio.Switch.run ~name:"run_switch"
-              @@ fun sw ->
-              print_endline
-                ("Starting process_%s...\n" ^ [%e Ast_builder.Default.estring ~loc loc_id]);
-              (* Set the current location explicitly for this process *)
-              let [%p Ast_builder.Default.pvar ~loc (spf "process_%s" loc_id)] =
-                [%e emit_net_toplevel net_stmts]
-              in
-              ignore [%e Ast_builder.Default.evar ~loc (spf "process_%s" loc_id)])
-          ]
+        let client = Cohttp_eio.Client.make ~https:None env#net in
+        Eio.Switch.run ~name:"run_switch"
+        @@ fun sw ->
+        (* print_endline *)
+        (*   ("Starting process_%s...\n" ^ [%e Ast_builder.Default.estring ~loc loc_id]); *)
+        (* Set the current location explicitly for this process *)
+        let [%p Ast_builder.Default.pvar ~loc (spf "process_%s" loc_id)] =
+          [%e emit_net_toplevel net_stmts]
+        in
+        ignore [%e Ast_builder.Default.evar ~loc (spf "process_%s" loc_id)]
       ;;]
   in
   let process_bindings = List.map2 emit_domain_stri loc_ids net_stmtblock_l in
