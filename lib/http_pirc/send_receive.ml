@@ -268,7 +268,7 @@ let init_http_server current_location () =
         Eio.Net.listen
           env#net
           ~sw
-          ~backlog:Int.max_int
+          ~backlog:128
           ~reuse_port:true
           ~reuse_addr:true
           (`Tcp (address_to_run_server, !port))
@@ -278,7 +278,7 @@ let init_http_server current_location () =
       Cohttp_eio.Server.run
         socket
         server
-        ?max_connections:(Some Int.max_int)
+        ?max_connections:(Some 30000)
         ~on_error:log_warning
     in
     (* print_endline "Finished"; *)
