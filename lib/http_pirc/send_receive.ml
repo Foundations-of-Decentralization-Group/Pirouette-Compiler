@@ -312,6 +312,7 @@ let rec receive_message ~location =
     let value_from_stream_handle = Eio.Stream.take_nonblocking stream_associated_key in
     (match value_from_stream_handle with
      | Some value_from_stream ->
+       Eio.traceln "Found the right value from the queue\n";
        (* let get_sender_body input_string = *)
        (*   match input_string with *)
        (*   | "L" -> *)
@@ -334,6 +335,7 @@ let rec receive_message ~location =
        (* Eio.traceln "This is the value of the string %s\n" val_print; *)
        value_from_stream
      | None ->
+       Eio.traceln "Did not grab any value from queue\n";       
        (* print_endline "The queue is empty for this particular key"; *)
        (* Eio.traceln "The queue is empty for this particular key"; *)
        receive_message ~location)
