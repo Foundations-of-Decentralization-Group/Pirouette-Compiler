@@ -6,14 +6,6 @@ let config = ref None
 (* Message queues for each location *)
 let loc_to_address = Hashtbl.create 10
 let message_queues : (string, string Eio.Stream.t) Hashtbl.t = Hashtbl.create 10
-(* let mutable_queues : string Queue.t = Queue.create () *)
-
-(* let () = *)
-(*   for i = 1 to 1000 do *)
-(*     Queue.add "L" mutable_queues *)
-(*   done; *)
-(*   Queue.add "R" mutable_queues *)
-(* ;; *)
 
 (* Helper to get location config *)
 let get_location_config location =
@@ -28,6 +20,13 @@ let get_location_config location =
      | Some loc_config -> Ok loc_config
      | None -> Error ("Unknown location: " ^ location))
 ;;
+
+(* let print_locations () = *)
+(*   match !config with *)
+(*   | None -> Error "Config not initialized. Call init() first" *)
+(*   | Some cfg -> *)
+
+(* ;; *)
 
 let get_body string_to_send participant_name_string =
   let list_to_send : string list = [] in
@@ -124,7 +123,7 @@ let handler _socket _request body =
          ~body:"Added to Htbl ; existing key"
          ()
      | None ->
-       Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create max_int);
+       Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create 100);
        let indexed_queue = Hashtbl.find message_queues unwrapped_sender_location in
        (* print_endline *)
        (*   ("This value was put inside the queue : " *)
