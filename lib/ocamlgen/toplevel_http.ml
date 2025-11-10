@@ -39,7 +39,7 @@ end
 let emit_toplevel_init _loc_ids config_file_path =
   [ [%stri
     let () =
-      print_endline "In here for testing";
+      (* print_endline "In here for testing"; *)
       let config_file_path : string = [%e Ast_builder.Default.estring ~loc config_file_path] in
       match Lwt_main.run (Config_parser.load_config config_file_path) with
       | Some cfg ->

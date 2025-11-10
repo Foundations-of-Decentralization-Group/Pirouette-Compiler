@@ -188,6 +188,12 @@ let init_http_server current_location () =
   | Ok loc_config ->
     (* print_endline "We got a config debug statement"; *)
     let uri = Uri.of_string loc_config.Config_parser.http_address in
+    let uri_host =
+      match Uri.host uri with
+      | Some string_value -> string_value
+      | None -> failwith "No value for uri host"
+    in
+    let address_to_run_server = Eio.Net.Ipaddr.of_raw uri_host in
     (* let _path = Uri.path uri in *)
     (* (\* Extract port from URI or use a default *\) *)
     (* print_endline "Got the URI"; *)
@@ -200,7 +206,7 @@ let init_http_server current_location () =
     (* print_endline ("Starting an HTTP server for this specific node" ^ current_location); *)
     (* The following statement sets up logs for debugging *)
     let () = Logs.set_reporter (Logs_fmt.reporter ())
-    and () = Logs.Src.set_level Cohttp_eio.src (None) in
+    and () = Logs.Src.set_level Cohttp_eio.src None in
     let log_warning ex = Logs.warn (fun f -> f "%a" Eio.Exn.pp ex) in
     (* This runs the Eio event loop for the server *)
     let () =
@@ -224,7 +230,8 @@ let init_http_server current_location () =
           ~backlog:Int.max_int
           ~reuse_port:true
           ~reuse_addr:true
-          (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port))
+          (`Tcp (address_to_run_server, !port))
+      (* (`Tcp (Eio.Net.Ipaddr.V4.loopback, !port)) *)
       and server = Cohttp_eio.Server.make ~callback:handler () in
       (* print_endline "After the and server part"; *)
       Cohttp_eio.Server.run
