@@ -64,6 +64,93 @@ let unmarshal_data data_str =
   | e -> Error ("Unmarshal error: " ^ Printexc.to_string e)
 ;;
 
+(* DO NOT DELETE THIS IS A BACKUP *)
+(* This is the handler for incoming http requests *)
+(* let handler _socket _request body = *)
+(*   let x : Cohttp_eio.Body.t = body in *)
+(*   let sender_body = Eio.Buf_read.(parse_exn take_all) ~max_size:max_int x in *)
+(*   let sep = ';' in *)
+(*   let recv_list = String.split_on_char sep sender_body in *)
+(*   let sender_location = List.nth_opt recv_list 0 in *)
+(*   let sender_body = List.nth recv_list 1 in *)
+(*   (\* let sender_location_print = List.nth recv_list 0 in *\) *)
+(*   (\* let sender_body_print = List.nth recv_list 1 in *\) *)
+(*   (\* print_endline ("This is the value of sender location : " ^ sender_location_print); *\) *)
+(*   (\* print_endline ("This is the value of sender body : " ^ sender_body_print); *\) *)
+(*   (\* let recv_headers = Http.Request.headers request in *\) *)
+(*   (\* let sender_location = Http.Header.get recv_headers "Participant_Name" in *\) *)
+(*   match sender_location with *)
+(*   | None -> *)
+(*     (\* print_endline "Error message sender location not found"; *\) *)
+(*     (\* Eio.traceln "Error message sender location not found"; *\) *)
+(*     Cohttp_eio.Server.respond_string *)
+(*       ~status:`Precondition_failed *)
+(*       ~body:"Error message - Sender location not found" *)
+(*       () *)
+(*   | Some unwrapped_sender_location -> *)
+(*     let indexed_queue = Hashtbl.find_opt message_queues unwrapped_sender_location in *)
+(*     (\* print_endline "The key already exists"; *\) *)
+(*     (match indexed_queue with *)
+(*      | Some result_queue -> *)
+(*        (\* let get_sender_body input_string = *\) *)
+(*        (\*   match sender_body with *\) *)
+(*        (\*   | "L" -> *\) *)
+(*        (\*     print_endline "The L branch was taken"; *\) *)
+(*        (\*     let string_to_print = input_string in *\) *)
+(*        (\*     string_to_print *\) *)
+(*        (\*   | "R" -> *\) *)
+(*        (\*     print_endline "The R branch was taken"; *\) *)
+(*        (\*     let string_to_print = input_string in *\) *)
+(*        (\*     string_to_print *\) *)
+(*        (\*   | _ -> *\) *)
+(*        (\*     print_endline "Looks like we have something that had been marshalled"; *\) *)
+(*        (\*     let string_to_print = Marshal.from_string input_string 0 in *\) *)
+(*        (\*     string_to_print *\) *)
+(*        (\* in *\) *)
+(*        (\* let _string_to_print = get_sender_body sender_body in *\) *)
+(*        (\* Eio.traceln "%s" string_to_print; *\) *)
+(*        (\* Eio.traceln "%s" unwrapped_sender_location; *\) *)
+(*        Eio.Stream.add result_queue sender_body; *)
+(*        Cohttp_eio.Server.respond_string *)
+(*          ~status:`OK *)
+(*          ~body:"Added to Htbl ; existing key" *)
+(*          () *)
+(*      | None -> *)
+(*        Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create max_int); *)
+(*        let indexed_queue = Hashtbl.find message_queues unwrapped_sender_location in *)
+(*        (\* print_endline *\) *)
+(*        (\*   ("This value was put inside the queue : " *\) *)
+(*        (\*    ^ sender_body *\) *)
+(*        (\*    ^ " " *\) *)
+(*        (\*    ^ unwrapped_sender_location); *\) *)
+(*        (\* print_endline "The key has to be made"; *\) *)
+(*        (\* let get_sender_body input_string = *\) *)
+(*        (\*   match sender_body with *\) *)
+(*        (\*   | "L" -> *\) *)
+(*        (\*     print_endline "The L branch was taken"; *\) *)
+(*        (\*     let string_to_print = input_string in *\) *)
+(*        (\*     string_to_print *\) *)
+(*        (\*   | "R" -> *\) *)
+(*        (\*     print_endline "The R branch was taken"; *\) *)
+(*        (\*     let string_to_print = input_string in *\) *)
+(*        (\*     string_to_print *\) *)
+(*        (\*   | _ -> *\) *)
+(*        (\*     print_endline "Looks like we have something that had been marshalled"; *\) *)
+(*        (\*     let string_to_print = Marshal.from_string input_string 0 in *\) *)
+(*        (\*     string_to_print *\) *)
+(*        (\* in *\) *)
+(*        (\* let string_to_print = get_sender_body sender_body in *\) *)
+(*        (\* Eio.traceln "%s" string_to_print; *\) *)
+(*        (\* Eio.traceln "%s" unwrapped_sender_location; *\) *)
+(*        (\* let sender_body = Marshal.from_string string_to_print 0 in *\) *)
+(*        Eio.Stream.add indexed_queue sender_body; *)
+(*        Cohttp_eio.Server.respond_string *)
+(*          ~status:`OK *)
+(*          ~body:"Added to Htbl ; new key - sender body" *)
+(*          ()) *)
+(* ;; *)
+
+(* DO NOT DELETE THIS IS A BACKUP *)
 (* This is the handler for incoming http requests *)
 let handler _socket _request body =
   let x : Cohttp_eio.Body.t = body in
@@ -71,83 +158,30 @@ let handler _socket _request body =
   let sep = ';' in
   let recv_list = String.split_on_char sep sender_body in
   let sender_location = List.nth_opt recv_list 0 in
-  let sender_body = List.nth recv_list 1 in
-  (* let sender_location_print = List.nth recv_list 0 in *)
-  (* let sender_body_print = List.nth recv_list 1 in *)
-  (* print_endline ("This is the value of sender location : " ^ sender_location_print); *)
-  (* print_endline ("This is the value of sender body : " ^ sender_body_print); *)
-  (* let recv_headers = Http.Request.headers request in *)
-  (* let sender_location = Http.Header.get recv_headers "Participant_Name" in *)
+  let _sender_body = List.nth recv_list 1 in
   match sender_location with
   | None ->
-    (* print_endline "Error message sender location not found"; *)
-    (* Eio.traceln "Error message sender location not found"; *)
     Cohttp_eio.Server.respond_string
       ~status:`Precondition_failed
       ~body:"Error message - Sender location not found"
       ()
-  | Some unwrapped_sender_location ->
-    let indexed_queue = Hashtbl.find_opt message_queues unwrapped_sender_location in
-    (* print_endline "The key already exists"; *)
-    (match indexed_queue with
-     | Some result_queue ->
-       (* let get_sender_body input_string = *)
-       (*   match sender_body with *)
-       (*   | "L" -> *)
-       (*     print_endline "The L branch was taken"; *)
-       (*     let string_to_print = input_string in *)
-       (*     string_to_print *)
-       (*   | "R" -> *)
-       (*     print_endline "The R branch was taken"; *)
-       (*     let string_to_print = input_string in *)
-       (*     string_to_print *)
-       (*   | _ -> *)
-       (*     print_endline "Looks like we have something that had been marshalled"; *)
-       (*     let string_to_print = Marshal.from_string input_string 0 in *)
-       (*     string_to_print *)
-       (* in *)
-       (* let _string_to_print = get_sender_body sender_body in *)
-       (* Eio.traceln "%s" string_to_print; *)
-       (* Eio.traceln "%s" unwrapped_sender_location; *)
-       Eio.Stream.add result_queue sender_body;
-       Cohttp_eio.Server.respond_string
-         ~status:`OK
-         ~body:"Added to Htbl ; existing key"
-         ()
-     | None ->
-       Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create max_int);
-       let indexed_queue = Hashtbl.find message_queues unwrapped_sender_location in
-       (* print_endline *)
-       (*   ("This value was put inside the queue : " *)
-       (*    ^ sender_body *)
-       (*    ^ " " *)
-       (*    ^ unwrapped_sender_location); *)
-       (* print_endline "The key has to be made"; *)
-       (* let get_sender_body input_string = *)
-       (*   match sender_body with *)
-       (*   | "L" -> *)
-       (*     print_endline "The L branch was taken"; *)
-       (*     let string_to_print = input_string in *)
-       (*     string_to_print *)
-       (*   | "R" -> *)
-       (*     print_endline "The R branch was taken"; *)
-       (*     let string_to_print = input_string in *)
-       (*     string_to_print *)
-       (*   | _ -> *)
-       (*     print_endline "Looks like we have something that had been marshalled"; *)
-       (*     let string_to_print = Marshal.from_string input_string 0 in *)
-       (*     string_to_print *)
-       (* in *)
-       (* let string_to_print = get_sender_body sender_body in *)
-       (* Eio.traceln "%s" string_to_print; *)
-       (* Eio.traceln "%s" unwrapped_sender_location; *)
-       (* let sender_body = Marshal.from_string string_to_print 0 in *)
-       Eio.Stream.add indexed_queue sender_body;
-       Cohttp_eio.Server.respond_string
-         ~status:`OK
-         ~body:"Added to Htbl ; new key - sender body"
-         ())
+  | Some _ ->
+    (* let indexed_queue = Hashtbl.find_opt message_queues unwrapped_sender_location in *)
+    (* (\* print_endline "The key already exists"; *\) *)
+    (* (match indexed_queue with *)
+    (*  | Some result_queue -> *)
+    (*    Eio.Stream.add result_queue sender_body; *)
+    Cohttp_eio.Server.respond_string ~status:`OK ~body:"Everything is ok" ()
 ;;
+
+(* | None -> *)
+(*   (\* Hashtbl.add message_queues unwrapped_sender_location (Eio.Stream.create max_int); *\) *)
+(*   (\* let indexed_queue = Hashtbl.find message_queues unwrapped_sender_location in *\) *)
+(*   (\* Eio.Stream.add indexed_queue sender_body; *\) *)
+(*   Cohttp_eio.Server.respond_string *)
+(*     ~status:`OK *)
+(*     ~body:"Added to Htbl ; new key - sender body" *)
+(*     ()) *)
 
 (* This is to setup config ; ie update the reference and pull the values from that into a hashtable *)
 let setup_config_file () =
@@ -245,40 +279,45 @@ let init_http_server current_location () =
     ()
 ;;
 
-let rec receive_message ~location =
-  (* Eio.traceln "Waiting for a message to appear"; *)
-  let key_for_table = location in
-  let stream_handle_option = Hashtbl.find_opt message_queues key_for_table in
-  (* let received_message = Eio.Stream.take stream_for_message in received_message *)
-  match stream_handle_option with
-  | Some stream_associated_key ->
-    let value_from_stream_handle = Eio.Stream.take_nonblocking stream_associated_key in
-    (match value_from_stream_handle with
-     | Some value_from_stream ->
-       (* let get_sender_body input_string = *)
-       (*   match input_string with *)
-       (*   | "L" -> *)
-       (*     print_endline "The L body was in the queue"; *)
-       (*     let string_to_print = input_string in *)
-       (*     string_to_print *)
-       (*   | "R" -> *)
-       (*     print_endline "The R body was in the queue"; *)
-       (*     let string_to_print = input_string in *)
-       (*     string_to_print *)
-       (*   | _ -> *)
-       (*     print_endline "Looks like we have something that had been marshalled"; *)
-       (*     let string_to_print = Marshal.from_string input_string 0 in *)
-       (*     string_to_print *)
-       (* in *)
-       (* Eio.traceln "Recv was successful"; *)
-       (* print_endline "Recv worked out"; *)
-       (* let _val_print = get_sender_body value_from_stream in *)
-       (* print_endline ("This is the value of the string : " ^ val_print); *)
-       (* Eio.traceln "This is the value of the string %s\n" val_print; *)
-       value_from_stream
-     | None ->
-       (* print_endline "The queue is empty for this particular key"; *)
-       (* Eio.traceln "The queue is empty for this particular key"; *)
-       receive_message ~location)
-  | None -> receive_message ~location
+let receive_message ~location =
+  ignore location;
+  "Random String"
 ;;
+
+(* ######################### THIS FUNCTION IS A BACKUP DO NOT DELETE #########################*)
+(* let rec receive_message ~location = *)
+(*   (\* Eio.traceln "Waiting for a message to appear"; *\) *)
+(*   let key_for_table = location in *)
+(*   let stream_handle_option = Hashtbl.find_opt message_queues key_for_table in *)
+(*   (\* let received_message = Eio.Stream.take stream_for_message in received_message *\) *)
+(*   match stream_handle_option with *)
+(*   | Some stream_associated_key -> *)
+(*     let value_from_stream_handle = Eio.Stream.take_nonblocking stream_associated_key in *)
+(*     (match value_from_stream_handle with *)
+(*      | Some value_from_stream -> *)
+(*        (\* let get_sender_body input_string = *\) *)
+(*        (\*   match input_string with *\) *)
+(*        (\*   | "L" -> *\) *)
+(*        (\*     print_endline "The L body was in the queue"; *\) *)
+(*        (\*     let string_to_print = input_string in *\) *)
+(*        (\*     string_to_print *\) *)
+(*        (\*   | "R" -> *\) *)
+(*        (\*     print_endline "The R body was in the queue"; *\) *)
+(*        (\*     let string_to_print = input_string in *\) *)
+(*        (\*     string_to_print *\) *)
+(*        (\*   | _ -> *\) *)
+(*        (\*     print_endline "Looks like we have something that had been marshalled"; *\) *)
+(*        (\*     let string_to_print = Marshal.from_string input_string 0 in *\) *)
+(*        (\*     string_to_print *\) *)
+(*        (\* in *\) *)
+(*        (\* Eio.traceln "Recv was successful"; *\) *)
+(*        (\* print_endline "Recv worked out"; *\) *)
+(*        (\* let _val_print = get_sender_body value_from_stream in *\) *)
+(*        (\* print_endline ("This is the value of the string : " ^ val_print); *\) *)
+(*        (\* Eio.traceln "This is the value of the string %s\n" val_print; *\) *)
+(*        value_from_stream *)
+(*      | None -> *)
+(*        (\* print_endline "The queue is empty for this particular key"; *\) *)
+(*        (\* Eio.traceln "The queue is empty for this particular key"; *\) *)
+(*        receive_message ~location) *)
+(*   | None -> receive_message ~location *)
