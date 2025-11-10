@@ -95,7 +95,7 @@ let handler _socket _request body =
     (* print_endline "Error message sender location not found"; *)
     (* Eio.traceln "Error message sender location not found"; *)
     Cohttp_eio.Server.respond_string
-      ~status:`Precondition_failed
+      ~status:`OK
       ~body:"Error message - Sender location not found"
       ()
   | Some unwrapped_sender_location ->
