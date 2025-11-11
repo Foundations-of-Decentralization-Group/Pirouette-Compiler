@@ -155,10 +155,7 @@ let handler _socket _request body =
        (* Eio.traceln "%s" unwrapped_sender_location; *)
        (* let sender_body = Marshal.from_string string_to_print 0 in *)
        (* Eio.Stream.add indexed_queue sender_body; *)
-       Cohttp_eio.Server.respond_string
-         ~status:`OK
-         ~body:"This should not happen"
-         ())
+       Cohttp_eio.Server.respond_string ~status:`OK ~body:"This should not happen" ())
 ;;
 
 (* This is the handler for incoming http requests *)
@@ -255,9 +252,10 @@ let init_http_server current_location () =
     (* The following statement sets up logs for debugging *)
     let () = Logs.set_reporter (Logs_fmt.reporter ())
     and () =
-      if String.compare "A" current_location = 0
-      then Logs.Src.set_level Cohttp_eio.src (Some Debug)
-      else Logs.Src.set_level Cohttp_eio.src None
+      (* if String.compare "A" current_location = 0 *)
+      (* then Logs.Src.set_level Cohttp_eio.src (Some Debug) *)
+      (* else Logs.Src.set_level Cohttp_eio.src None *)
+      Logs.Src.set_level Cohttp_eio.src None
     in
     let log_warning ex = Logs.warn (fun f -> f "%a" Eio.Exn.pp ex) in
     (* This runs the Eio event loop for the server *)
