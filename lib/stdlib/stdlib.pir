@@ -1,39 +1,39 @@
 {- Print to stdout functions -}
-foreign print_string : A.string -> unit := "print_string";
+foreign print_string : PIRSTDLIBLOC.string -> unit := "print_string";
 {-foreign print_char : unit -> unit := "print_char";-}
-foreign print_endline : A.string -> unit := "print_endline";
+foreign print_endline : PIRSTDLIBLOC.string -> unit := "print_endline";
 {-foreign print_float : unit -> unit := "print_float";-}
-foreign print_int : A.int -> unit := "print_int";
+foreign print_int : PIRSTDLIBLOC.int -> unit := "print_int";
 foreign print_newline : unit -> unit := "print_newline";
-{-foreign printf : A.string -> A.string -> unit := "Printf.printf";-}
+{-foreign printf : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> unit := "Printf.printf";-}
 
 
 {- Print to stderr functions -}
-foreign prerr_string : A.string -> unit := "prerr_string";
+foreign prerr_string : PIRSTDLIBLOC.string -> unit := "prerr_string";
 {-foreign prerr_char : unit-> unit := "prerr_char"; -}
-foreign prerr_endline : A.string -> unit := "prerr_endline";
+foreign prerr_endline : PIRSTDLIBLOC.string -> unit := "prerr_endline";
 {-foreign prerr_float : unit -> unit := "prerr_float";-}
-foreign prerr_int : A.int -> unit := "prerr_int";
+foreign prerr_int : PIRSTDLIBLOC.int -> unit := "prerr_int";
 foreign prerr_newline : unit -> unit := "prerr_newline";
-{-foreign eprintf : A.string -> A.string -> unit := "Printf.eprintf";-}
+{-foreign eprintf : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> unit := "Printf.eprintf";-}
 
 
 
 {- String manipulation -}
 {-foreign sprintf : unit -> unit -> unit := "Printf.sprintf";-}
 {-foreign ksprintf : (unit -> unit) -> unit -> unit -> unit := "Printf.ksprintf";-}
-foreign string_cat : A.string -> A.string -> A.string := "String.cat";
-foreign cat : A.string -> A.string -> A.string := "String.cat";
-foreign string_of_int : A.int -> A.string := "string_of_int";
-foreign string_of_bool : A.bool -> A.string := "string_of_bool";
-{-foreign of_bytes : unit -> A.string := "String.of_bytes";-}
-{-foreign to_bytes : A.string -> unit := "String.to_bytes";-}
-foreign length : A.string -> A.int := "String.length";
+foreign string_cat : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "String.cat";
+foreign cat : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "String.cat";
+foreign string_of_int : PIRSTDLIBLOC.int -> PIRSTDLIBLOC.string := "string_of_int";
+foreign string_of_bool : PIRSTDLIBLOC.bool -> PIRSTDLIBLOC.string := "string_of_bool";
+{-foreign of_bytes : unit -> PIRSTDLIBLOC.string := "String.of_bytes";-}
+{-foreign to_bytes : PIRSTDLIBLOC.string -> unit := "String.to_bytes";-}
+foreign length : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.int := "String.length";
 
 
 {- In-channel functions -}
 {- This section has been fully commented out since Pirouette currently does not support in_channel types-}
-{-foreign ic_open_in : A.string -> unit := "open_in";-}
+{-foreign ic_open_in : PIRSTDLIBLOC.string -> unit := "open_in";-}
 {-foreign ic_open_in_bin : unit -> unit := "open_in_bin";-}
 {-foreign ic_with_open_bin : unit -> (unit -> unit) -> unit := "In_channel.with_open_bin";-}
 {-foreign ic_with_open_text : unit -> (unit -> unit) -> unit := "In_channel.with_open_text";-}
@@ -46,7 +46,7 @@ foreign length : A.string -> A.int := "String.length";
 {-foreign ic_input_char : unit -> unit := "input_char";-}
 {-foreign ic_input_byte : unit -> unit := "input_byte";-}
 {-foreign ic_input : unit -> unit := "input";-}
-{-foreign ic_input_all : unit -> A.string := "In_channel.input_all";-}
+{-foreign ic_input_all : unit -> PIRSTDLIBLOC.string := "In_channel.input_all";-}
 {-foreign ic_input_lines : unit -> unit := "In_channel.input_lines";-}
 {-foreign ic_in_channel_length : unit -> unit := "in_channel_length";-}
 {-foreign ic_close_in : unit -> unit := "close_in";-}
@@ -64,9 +64,9 @@ foreign length : A.string -> A.int := "String.length";
 {-foreign oc_get_stdout : unit -> unit := "((fun () -> (stdout)))";-}
 {-foreign oc_get_stderr : unit -> unit := "((fun () -> (stderr)))";-}
 {-foreign oc_seek_out : unit -> unit -> unit := "seek_out";-}
-{-foreign oc_output_string : unit -> A.string -> unit := "output_string";-}
+{-foreign oc_output_string : unit -> PIRSTDLIBLOC.string -> unit := "output_string";-}
 {-foreign oc_output_bytes : unit -> unit -> unit := "output_bytes";-}
-{-foreign oc_output_byte : unit -> A.int -> unit := "output_byte";-}
+{-foreign oc_output_byte : unit -> PIRSTDLIBLOC.int -> unit := "output_byte";-}
 {-foreign oc_output_binary_int : unit -> unit -> unit := "output_binary_int";-}
 {-foreign oc_output : unit -> unit -> unit -> unit -> unit := "output";-}
 {-foreign oc_output_substring : unit -> unit -> unit -> unit -> unit := "output_substring";-}
@@ -87,66 +87,66 @@ foreign length : A.string -> A.int := "String.length";
 
 
 {- File manipulation functions -}
-foreign filenm_get_current_dir_name : unit -> A.string := "((fun () -> (Filename.current_dir_name)))";
-foreign filenm_get_parent_dir_name : unit -> A.string := "((fun () -> (Filename.parent_dir_name)))";
-foreign filenm_get_dir_sep : unit -> A.string := "((fun () -> (Filename.dir_sep)))";
-foreign filenm_concat_path : A.string -> A.string -> A.string := "Filename.concat";
-foreign filenm_is_relative_filepath : A.string -> A.bool := "Filename.is_relative";
-foreign filenm_is_implicit_filepath : A.string -> A.bool := "Filename.is_implicit";
-foreign filenm_check_suffix : A.string -> A.string -> A.bool := "Filename.check_suffix";
-foreign filenm_chop_suffix : A.string -> A.string -> A.string := "Filename.chop_suffix";
-foreign filenm_get_file_extension : A.string -> A.string := "Filename.extension";
-foreign filenm_remove_file_extension_noerr : A.string -> A.string := "Filename.remove_extension";
-foreign filenm_remove_file_extension : A.string -> A.string := "Filename.chop_extension";
-foreign filenm_get_basename_from_path : A.string -> A.string := "Filename.basename";
-foreign filenm_get_dirname_from_path : A.string -> A.string := "Filename.dirname";
-foreign filenm_get_null_file : unit -> A.string := "((fun () -> (Filename.null)))";
-foreign filenm_create_temp_file : A.string -> A.string -> A.string := "Filename.temp_file";
-{-foreign filenm_create_and_open_temp_file : A.string -> A.string -> A.string := "Filename.open_temp_file";-}
-foreign filenm_get_temp_dir : A.string -> A.string -> A.string := "Filename.temp_dir";
-foreign filenm_get_temp_dir_name : A.unit -> A.string := "Filename.get_temp_dir_name";
-foreign filenm_set_temp_dir_name : A.string -> unit := "Filename.set_temp_dir_name";
-foreign filenm_quote_filename : A.string -> A.string := "Filename.quote";
+foreign filenm_get_current_dir_name : unit -> PIRSTDLIBLOC.string := "((fun () -> (Filename.current_dir_name)))";
+foreign filenm_get_parent_dir_name : unit -> PIRSTDLIBLOC.string := "((fun () -> (Filename.parent_dir_name)))";
+foreign filenm_get_dir_sep : unit -> PIRSTDLIBLOC.string := "((fun () -> (Filename.dir_sep)))";
+foreign filenm_concat_path : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Filename.concat";
+foreign filenm_is_relative_filepath : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.bool := "Filename.is_relative";
+foreign filenm_is_implicit_filepath : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.bool := "Filename.is_implicit";
+foreign filenm_check_suffix : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> PIRSTDLIBLOC.bool := "Filename.check_suffix";
+foreign filenm_chop_suffix : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Filename.chop_suffix";
+foreign filenm_get_file_extension : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Filename.extension";
+foreign filenm_remove_file_extension_noerr : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Filename.remove_extension";
+foreign filenm_remove_file_extension : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Filename.chop_extension";
+foreign filenm_get_basename_from_path : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Filename.basename";
+foreign filenm_get_dirname_from_path : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Filename.dirname";
+foreign filenm_get_null_file : unit -> PIRSTDLIBLOC.string := "((fun () -> (Filename.null)))";
+foreign filenm_create_temp_file : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Filename.temp_file";
+{-foreign filenm_create_and_open_temp_file : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Filename.open_temp_file";-}
+foreign filenm_get_temp_dir : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Filename.temp_dir";
+foreign filenm_get_temp_dir_name : PIRSTDLIBLOC.unit -> PIRSTDLIBLOC.string := "Filename.get_temp_dir_name";
+foreign filenm_set_temp_dir_name : PIRSTDLIBLOC.string -> unit := "Filename.set_temp_dir_name";
+foreign filenm_quote_filename : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Filename.quote";
 {-foreign filenm_quote_commands : unit -> unit -> unit := "Filename.quote_command";-}
 
 
 
 {- System call functions -}
 {-foreign sys_get_argv : unit -> unit := "((fun () -> (Sys.argv)))";-}
-foreign sys_get_argv : unit -> A.string := "((fun () -> (Sys.executable_name)))";
-foreign sys_is_file : A.string -> A.bool := "Sys.file_exists";
-foreign sys_is_directory : A.string -> A.bool := "Sys.is_directory";
-foreign sys_is_regular_file : A.string -> A.bool := "Sys.is_regular_file";
-foreign sys_remove_file : A.string -> unit := "Sys.remove";
-foreign sys_rename_file : A.string -> A.string -> unit := "Sys.rename";
-foreign sys_move_file : A.string -> A.string -> unit := "Sys.rename";
-foreign sys_get_env : A.string -> A.string := "Sys.getenv";
-foreign sys_run_command : A.string -> A.int := "Sys.command";
+foreign sys_get_argv : unit -> PIRSTDLIBLOC.string := "((fun () -> (Sys.executable_name)))";
+foreign sys_is_file : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.bool := "Sys.file_exists";
+foreign sys_is_directory : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.bool := "Sys.is_directory";
+foreign sys_is_regular_file : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.bool := "Sys.is_regular_file";
+foreign sys_remove_file : PIRSTDLIBLOC.string -> unit := "Sys.remove";
+foreign sys_rename_file : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> unit := "Sys.rename";
+foreign sys_move_file : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> unit := "Sys.rename";
+foreign sys_get_env : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Sys.getenv";
+foreign sys_run_command : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.int := "Sys.command";
 {-foreign sys_get_current_execution_time : unit -> unit := "Sys.time";-}
-foreign sys_change_dir : A.string -> unit := "Sys.chdir";
-foreign sys_ch_dir : A.string -> unit := "Sys.chdir";
-foreign sys_cd : A.string -> unit := "Sys.chdir";
-foreign sys_make_dir : A.string -> A.int -> unit := "Sys.mkdir";
-foreign sys_mkdir : A.string -> A.int -> unit := "Sys.mkdir";
-foreign sys_rmdir : A.string -> unit := "Sys.rmdir";
-foreign sys_remove_empty_dir : A.string -> unit := "Sys.rmdir";
-foreign sys_get_cwd : unit -> A.string := "Sys.getcwd";
+foreign sys_change_dir : PIRSTDLIBLOC.string -> unit := "Sys.chdir";
+foreign sys_ch_dir : PIRSTDLIBLOC.string -> unit := "Sys.chdir";
+foreign sys_cd : PIRSTDLIBLOC.string -> unit := "Sys.chdir";
+foreign sys_make_dir : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.int -> unit := "Sys.mkdir";
+foreign sys_mkdir : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.int -> unit := "Sys.mkdir";
+foreign sys_rmdir : PIRSTDLIBLOC.string -> unit := "Sys.rmdir";
+foreign sys_remove_empty_dir : PIRSTDLIBLOC.string -> unit := "Sys.rmdir";
+foreign sys_get_cwd : unit -> PIRSTDLIBLOC.string := "Sys.getcwd";
 {-foreign sys_readdir : unit -> unit := "Sys.readdir";-}
 {-foreign sys_ls : unit -> unit := "Sys.readdir";-}
-foreign sys_get_os_type : unit -> A.string := "((fun () -> (Sys.os_type)))";
-foreign sys_get_wordsize : unit -> A.int := "((fun () -> (Sys.word_size)))";
-foreign sys_get_ocaml_int_size : unit -> A.int := "((fun () -> (Sys.int_size)))";
-foreign sys_get_ocaml_max_string_length : unit -> A.int := "((fun () -> (Sys.max_string_length)))";
-foreign sys_get_ocaml_max_array_length : unit -> A.int := "((fun () -> (Sys.max_array_length)))";
-foreign sys_get_ocaml_max_floatarray_length : unit -> A.int := "((fun () -> (Sys.max_floatarray_length)))";
-foreign sys_check_big_endian : unit -> A.bool := "((fun () -> (Sys.big_endian)))";
+foreign sys_get_os_type : unit -> PIRSTDLIBLOC.string := "((fun () -> (Sys.os_type)))";
+foreign sys_get_wordsize : unit -> PIRSTDLIBLOC.int := "((fun () -> (Sys.word_size)))";
+foreign sys_get_ocaml_int_size : unit -> PIRSTDLIBLOC.int := "((fun () -> (Sys.int_size)))";
+foreign sys_get_ocaml_max_string_length : unit -> PIRSTDLIBLOC.int := "((fun () -> (Sys.max_string_length)))";
+foreign sys_get_ocaml_max_array_length : unit -> PIRSTDLIBLOC.int := "((fun () -> (Sys.max_array_length)))";
+foreign sys_get_ocaml_max_floatarray_length : unit -> PIRSTDLIBLOC.int := "((fun () -> (Sys.max_floatarray_length)))";
+foreign sys_check_big_endian : unit -> PIRSTDLIBLOC.bool := "((fun () -> (Sys.big_endian)))";
 
 
 
 {- Buffer handling functions -}
 {- This section has been fully commented out since Pirouette currently does not support buffer types-}
-{-foreign buffer_create : A.int -> unit := "Buffer.create";-}
-{-foreign buffer_copy_to_string : unit -> A.string := "Buffer.contents";-}
+{-foreign buffer_create : PIRSTDLIBLOC.int -> unit := "Buffer.create";-}
+{-foreign buffer_copy_to_string : unit -> PIRSTDLIBLOC.string := "Buffer.contents";-}
 {-foreign buffer_copy_to_bytes : unit -> unit := "Buffer.to_bytes";-}
 {-foreign buffer_copy_portion : unit -> unit -> unit -> unit := "Buffer.sub";-}
 {-foreign buffer_blit : unit -> unit -> unit -> unit -> unit -> unit := "Buffer.blit";-}
@@ -184,16 +184,16 @@ foreign sys_check_big_endian : unit -> A.bool := "((fun () -> (Sys.big_endian)))
 {-foreign err_create_exception_failure : unit -> unit := "Failure";-}
 {-foreign err_create_exception_division_by_zero : unit -> unit := "((fun () -> (Division_by_zero)))";-}
 {-foreign err_raise : unit -> unit := "raise";-}
-{-foreign err_exc_to_string : unit -> A.string := "Printexc.to_string";-}
-{-foreign err_exc_to_string_default : unit -> A.string := "Printexc.to_string_default";-}
+{-foreign err_exc_to_string : unit -> PIRSTDLIBLOC.string := "Printexc.to_string";-}
+{-foreign err_exc_to_string_default : unit -> PIRSTDLIBLOC.string := "Printexc.to_string_default";-}
 {-foreign err_print  : (unit -> unit) -> unit -> unit := "Printexc.print";-}
 {-foreign err_print_backtrace  : unit -> unit := "Printexc.print_backtrace";-}
-foreign err_get_backtrace : unit -> A.string := "Printexc.get_backtrace";
-foreign err_record_backtrace  : A.bool -> unit := "Printexc.record_backtrace";
-foreign err_get_backtrace_status  : unit -> A.bool := "Printexc.backtrace_status";
+foreign err_get_backtrace : unit -> PIRSTDLIBLOC.string := "Printexc.get_backtrace";
+foreign err_record_backtrace  : PIRSTDLIBLOC.bool -> unit := "Printexc.record_backtrace";
+foreign err_get_backtrace_status  : unit -> PIRSTDLIBLOC.bool := "Printexc.backtrace_status";
 {-foreign err_get_raw_backtrace  : unit -> unit := "Printexc.get_raw_backtrace";-}
 {-foreign err_print_raw_backtrace  : unit -> unit -> unit := "Printexc.print_raw_backtrace";-}
-{-foreign err_raw_backtrace_to_string  : unit -> A.string := "Printexc.raw_backtrace_to_string";-}
+{-foreign err_raw_backtrace_to_string  : unit -> PIRSTDLIBLOC.string := "Printexc.raw_backtrace_to_string";-}
 {-foreign err_raise_with_backtrace  : unit -> unit -> unit := "Printexc.raise_with_backtrace";-}
 {-foreign err_get_callstack  : unit -> unit := "Printexc.get_callstack";-}
 {-foreign err_default_uncaught_exception_handler  : unit -> unit -> unit := "Printexc.default_uncaught_exception_handler";-}
@@ -201,51 +201,51 @@ foreign err_get_backtrace_status  : unit -> A.bool := "Printexc.backtrace_status
 {-foreign err_backtrace_slots  : unit -> unit := "Printexc.backtrace_slots";-}
 {-foreign err_backtrace_slots_of_raw_entry : unit -> unit := "Printexc.backtrace_slots_of_raw_entry";-}
 {-foreign err_raw_backtrace_length : unit -> unit := "Printexc.raw_backtrace_length";-}
-{-foreign err_get_raw_backtrace_slot : unit -> A.int -> unit := "Printexc.get_raw_backtrace_slot";-}
+{-foreign err_get_raw_backtrace_slot : unit -> PIRSTDLIBLOC.int -> unit := "Printexc.get_raw_backtrace_slot";-}
 {-foreign err_convert_raw_backtrace_slot : unit -> unit := "Printexc.convert_raw_backtrace_slot";-}
 {-foreign err_get_raw_backtrace_next_slot : unit -> unit := "Printexc.get_raw_backtrace_next_slot";-}
-{-foreign err_exn_slot_id : unit -> A.int := "Printexc.exn_slot_id";-}
-{-foreign err_exn_slot_name : unit -> A.string := "Printexc.exn_slot_name";-}
+{-foreign err_exn_slot_id : unit -> PIRSTDLIBLOC.int := "Printexc.exn_slot_id";-}
+{-foreign err_exn_slot_name : unit -> PIRSTDLIBLOC.string := "Printexc.exn_slot_name";-}
 
 
 
 {- Hashing functions -}
-foreign digest_compare : A.string -> A.string -> A.int := "Digest.compare";
-foreign digest_is_equal : A.string -> A.string -> A.bool := "Digest.equal";
-foreign digest_string : A.string -> A.string := "Digest.string";
+foreign digest_compare : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> PIRSTDLIBLOC.int := "Digest.compare";
+foreign digest_is_equal : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> PIRSTDLIBLOC.bool := "Digest.equal";
+foreign digest_string : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Digest.string";
 {-foreign digest_bytes : unit -> unit := "Digest.bytes";-}
-foreign digest_substring : A.string -> A.int -> A.int -> A.string := "Digest.substring";
+foreign digest_substring : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.int -> PIRSTDLIBLOC.int -> PIRSTDLIBLOC.string := "Digest.substring";
 {-foreign digest_subbytes : unit -> unit -> unit -> unit := "Digest.subbytes";-}
-foreign digest_file : A.string -> A.string := "Digest.file";
+foreign digest_file : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Digest.file";
 {-foreign diesgt_write_to_output_channel : unit -> unit -> unit := "Digest.output";-}
 {-foreign digest_read_from_input_channel : unit -> unit := "Digest.input";-}
 {-foreign digest_channel_portion : unit -> unit -> unit := "Digest.channel";-}
-foreign digest_convert_to_hex_string : A.string -> A.string := "Digest.to_hex";
-foreign digest_convert_hex_string_to_digest : A.string -> A.string := "Digest.of_hex";
+foreign digest_convert_to_hex_string : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Digest.to_hex";
+foreign digest_convert_hex_string_to_digest : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "Digest.of_hex";
 
 
 
 {- Psuedo-Random Number Generator Functions -}
-foreign rand_init : A.int -> unit := "Random.init";
+foreign rand_init : PIRSTDLIBLOC.int -> unit := "Random.init";
 {-foreign rand_full_init : unit -> unit := "Random.full_init";-}
 foreign rand_self_init : unit -> unit := "Random.self_init";
-foreign rand_bits : unit -> A.int := "Random.bits";
-foreign rand_int : A.int -> A.int := "Random.int";
-foreign rand_full_int : A.int -> A.int := "Random.full_int";
-foreign rand_bool : unit -> A.bool := "Random.bool";
+foreign rand_bits : unit -> PIRSTDLIBLOC.int := "Random.bits";
+foreign rand_int : PIRSTDLIBLOC.int -> PIRSTDLIBLOC.int := "Random.int";
+foreign rand_full_int : PIRSTDLIBLOC.int -> PIRSTDLIBLOC.int := "Random.full_int";
+foreign rand_bool : unit -> PIRSTDLIBLOC.bool := "Random.bool";
 {-foreign rand_get_state : unit -> unit := "Random.get_state";-}
 {-foreign rand_set_state : unit -> unit := "Random.set_state";-}
 {-foreign rand_split_state: unit -> unit := "Random.split";-}
 
 
 {- Program termination -}
-{- Even though exit returns an alpha, in practice that value will usually never be relevant, so this function is being left in the stdlib as a A.int -> unit -}
-foreign exit : A.int -> unit := "exit";
+{- Even though exit returns an alpha, in practice that value will usually never be relevant, so this function is being left in the stdlib as a PIRSTDLIBLOC.int -> unit -}
+foreign exit : PIRSTDLIBLOC.int -> unit := "exit";
 foreign exit_hook : (unit -> unit) -> unit := "at_exit";
 
 
 {- Standard library metavalues -}
-stdlib_version : A.string;
-stdlib_version := A."0.0.2";
+stdlib_version : PIRSTDLIBLOC.string;
+stdlib_version := PIRSTDLIBLOC."0.0.2";
 
-display_stdlib_info := fun _ -> (A.print_endline (string_cat (string_cat A."====================================\nPIROUETTE STANDARD LIBRARY INFO\n\nLibrary version: " stdlib_version) A."\nLast modified: 10/31/2025\n\n====================================\n"));
+display_stdlib_info := fun _ -> (PIRSTDLIBLOC.print_endline (string_cat (string_cat PIRSTDLIBLOC."====================================\nPIROUETTE STANDARD LIBRARY INFO\n\nLibrary version: " stdlib_version) PIRSTDLIBLOC."\nLast modified: 10/31/2025\n\n====================================\n"));

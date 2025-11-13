@@ -1,31 +1,15 @@
-  (* Check if there exists a PIR_STDLIB environment variable on the user's system. If not, print on stderr and exit *)
-let compile_stdlib () : unit =
-  let (path_to_stdlib:string) = match Sys.getenv_opt "PIR_STDLIB" with
-    | Some p ->
-        p
-    | None ->
-        prerr_endline ("Path to Pirouette standard library not set in enviroment variables as \"PIR_STDLIB\"=[ABSOLUTE_PATH_TO_YOUR_STDLIB]\n"); exit 1
-  in  
-
-  (* Create an OCaml file representation -via opening the file for reading as an in channel- of the path to the standard library file *)
-  let file_ic_stlid = open_in path_to_stdlib in
-  
-  (* Lex the file *)
-  let lexbuf_stdlib = Lexing.from_channel file_ic_stlid in
-    (* Return the AST created from the parsed lex *)
-  let ast_stdlib = Parsing.Parse.parse_with_error (path_to_stdlib) (lexbuf_stdlib) in 
-
-  let stdlib_ast_str = Marshal.to_string ast_stdlib [] in
-  (* There must be a stdlib_ast.ml file in the same directory as your stdlib.pir pointed to by your PIR_STDLIB env var*)
-  let stdlib_ast_file_oc = open_out ((Filename.dirname path_to_stdlib)^Filename.dir_sep^"stdlib_ast.ml") in
-
-(*  Ocamlgen.Toplevel_mpi.emit_toplevel_mpi (open_out out_path) locs netir_l;
-*)
-
-  (*module Local = Ast_core.Local.M
+module Local = Ast_core.Local.M
 module Net = Ast_core.Net.M
+module type Msg_intf = Ocamlgen.Msg_intf.M
 
-module type Msg_intf = Msg_intf.M
+open Ppxlib
+
+module Builder = Ast_builder.Make (struct
+    let loc = { !Ast_helper.default_loc with loc_ghost = true }
+  end)
+
+
+
 
 module Id = struct
   let i = ref 0
@@ -35,12 +19,6 @@ module Id = struct
     Printf.sprintf "%s%d" name !i
   ;;
 end
-
-open Ppxlib
-
-module Builder = Ast_builder.Make (struct
-    let loc = { !Ast_helper.default_loc with loc_ghost = true }
-  end)
 
 let loc = Builder.loc
 
@@ -255,20 +233,13 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
     in
     Builder.pexp_match (Msg.emit_net_recv ~src ~dst:self_id) (cases @ [ default_case ])
 ;;
-*)
 
-  (*module Local = Ast_core.Local.M
-module Net = Ast_core.Net.M
-open Ppxlib
 
-module Builder = Ast_builder.Make (struct
-    let loc = { !Ast_helper.default_loc with loc_ghost = true }
-  end)
 
 let loc = Builder.loc
 let spf = Printf.sprintf
 
-module Msg_chan_intf : Msg_intf.M = struct
+module Msg_chan_intf : Msg_intf = struct
   let emit_net_send ~src ~dst pexp =
     [%expr Domainslib.Chan.send [%e Builder.evar (spf "chan_%s_%s" src dst)] [%e pexp]]
   ;;
@@ -290,8 +261,8 @@ let emit_toplevel_domain
       match stmts with
       | [] -> !main_expr
       | stmt :: stmts ->
-        (match Emit_core.emit_net_binding ~self_id:loc_id (module Msg_chan_intf) stmt with
-         | exception Emit_core.Main_expr e ->
+        (match emit_net_binding ~self_id:loc_id (module Msg_chan_intf) stmt with
+         | exception Main_expr e ->
            main_expr := e;
            emit_net_toplevel loc_id stmts
          | binding ->
@@ -341,9 +312,32 @@ let emit_toplevel_domain
            []
        ]);
   Format.pp_print_newline ppf ()
-;;*)
-  
+;; 
 
-  (* We save the Marshalled AST of the stdlib to stdlib_ast.ml, but wrapped within OCaml code that allows us to reference that value *)
-  output_string stdlib_ast_file_oc ("let ast={|"^ stdlib_ast_str ^ "|};;"); close_out stdlib_ast_file_oc;
+
+(* Check if there exists a PIR_STDLIB environment variable on the user's system. If not, print on stderr and exit *)
+let compile_stdlib () : unit =
+  let (path_to_stdlib:string) = match Sys.getenv_opt "PIR_STDLIB" with
+    | Some p ->
+        p
+    | None ->
+        prerr_endline ("Path to Pirouette standard library not set in enviroment variables as \"PIR_STDLIB\"=[ABSOLUTE_PATH_TO_YOUR_STDLIB]\n"); exit 1
+  in  
+
+  (* Create an OCaml file representation -via opening the file for reading as an in channel- of the path to the standard library file *)
+  let file_ic_stlid = open_in path_to_stdlib in
+  
+  (* Lex the file *)
+  let lexbuf_stdlib = Lexing.from_channel file_ic_stlid in
+    (* Return the AST created from the parsed lex *)
+  let stdlib_ast = A_rname.Rename.ast_list_alpha_rename (Parsing.Parse.parse_with_error (path_to_stdlib) (lexbuf_stdlib)) in 
+
+  let stdlib_locs = Ast_utils.extract_locs stdlib_ast in
+
+  let stdlib_netir_l = List.map (fun loc -> Netgen.epp_choreo_to_net stdlib_ast loc) stdlib_locs in
+
+  (* There must be a stdlib_ast.ml file in the same directory as your stdlib.pir pointed to by your PIR_STDLIB env var*)
+  let stdlib_out_path = (Filename.dirname path_to_stdlib)^Filename.dir_sep^"stdlib.gen.ml" in
+
+  emit_toplevel_domain (open_out stdlib_out_path) stdlib_locs stdlib_netir_l;;
 ;;

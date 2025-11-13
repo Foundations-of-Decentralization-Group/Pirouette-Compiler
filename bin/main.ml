@@ -122,7 +122,8 @@ let () =
   (* Lex the input file *)
   let lexbuf = Lexing.from_channel (Option.get !file_ic) in
   (* Parse the input file and concatenate it to the stdlib AST *)
-  let program = A_rname.Rename.ast_list_alpha_rename ((Stdlib_utils.Stdlib_linker.get_stdlib_ast ~recompile:true ()) @ (Parsing.Parse.parse_with_error !input_filename lexbuf)) in
+  let _ = Stdlib_utils.Stdlib_linker.get_stdlib_ast ~recompile:true () in
+  let program = A_rname.Rename.ast_list_alpha_rename ((Parsing.Parse.parse_with_error !input_filename lexbuf)) in
   (* Dump the choreography AST *)
   match !ast_dump_format with
   | Some format -> begin

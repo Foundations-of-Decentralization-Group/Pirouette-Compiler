@@ -1,6 +1,6 @@
 # Notes on our Standard Library
 
-By default, the `stdlib_linker ()` function (invoked by `main.ml`) will return the Abstract Syntax Tree saved within `stdlib_ast.ml`
+By default, the `stdlib_linker ()` function (invoked by `main.ml`) will return the Abstract Syntax Tree saved within `stdlib_ast.ml`. `stdlib_compiler.ml` will generate three standard libraries (one for each interface ie. domain/mgi/etc), and `stdlib_linker.ml` will link the correct stdlib based on which is needed at runtime / Pirouette-program compile-time.
 
 However, the behavior of `stdlib_linker ()` can be configured to recompile the standard library.
 
