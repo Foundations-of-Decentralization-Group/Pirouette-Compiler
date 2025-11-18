@@ -1,3 +1,12 @@
+(** Location set operations and AST location extraction utilities.
+    
+    This module provides utilities for managing sets of location identifiers
+    and extracting location information from AST nodes. Location sets are 
+    used throughout the compiler to track which endpoints participate in 
+    choreographic operations. *)
+
+(** {1 Location Sets} *)
+
 module LocSet : sig
   type elt = string
   type t = Set.Make(String).t
