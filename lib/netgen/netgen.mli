@@ -6,9 +6,9 @@
     EPP generates the local program that location should execute.
     
     Endpoint projection transforms:
-    - Choreographic [send] operations → [Send] and [Recv] primitives
-    - Choreographic [select] operations → [ChooseFor] and [AllowChoice] primitives
-    - Location-qualified expressions → local computations
+    - Location-qualified expressions: local computations (removing qualifiers)
+    - Choreographic [send] operations: [Send] and [Recv] primitives (data transfer)
+    - Choreographic [select] operation: [ChooseFor] and [AllowChoice] primitives
     
     This transformation ensures that distributed programs maintain the 
     communication patterns and safety properties specified in the choreography. *)
@@ -31,7 +31,45 @@ val epp_choreo_to_net
       Returns the network IR statement list for the specified location, with
       choreographic constructs transformed into explicit communication primitives.
       
-      {b Input (Pirouette choreography):}
+      {1 {b Local Computations Example}}
+      
+      Input (Pirouette):
+      {[
+        x : Alice.int;
+        x := [Alice] 5 + 3;
+        y : Bob.int;
+        y := [Bob] 10 * 2
+      ]}
+      
+      OCaml:
+      {[
+        let alice_stmts = epp_choreo_to_net choreo_stmts "Alice" in
+        let bob_stmts = epp_choreo_to_net choreo_stmts "Bob" in
+      ]}
+      
+      Alice's projected code:
+      {[
+        x : int;
+        x := Ret(5 + 3)
+        (* Note: [Alice] qualifier removed, becomes local computation *)
+        (* Bob's computation doesn't appear in Alice's code *)
+      ]}
+      
+      Bob's projected code:
+      {[
+        y : int;
+        y := Ret(10 * 2)
+        (* Note: [Bob] qualifier removed, becomes local computation *)
+        (* Alice's computation doesn't appear in Bob's code *)
+      ]}
+      
+      {b Note:} Location qualifiers like [Alice] are removed during projection.
+      Each endpoint only gets the computations qualified with their own location.
+      No communication occurs - these are purely local operations.
+
+      {1 Data Transfer Example : Send/Recv}
+
+      Input (Pirouette):
       {[
         x : Alice.int;
         x := [Alice] 5;
@@ -40,7 +78,7 @@ val epp_choreo_to_net
         y := [Bob] x + 1
       ]}
       
-      {b OCaml:}
+      OCaml:
       {[
         (* Project for Alice *)
         let alice_stmts = epp_choreo_to_net choreo_stmts "Alice" in
@@ -55,14 +93,14 @@ val epp_choreo_to_net
         pprint_net_ast stdout bob_stmts
       ]}
       
-      {b Expected (Alice's projected code):}
+      Alice's projected code:
       {[
         x : int;
         x := Ret(5);
         Send(Ret(x), Bob)
       ]}
       
-      {b Expected (Bob's projected code):}
+      Bob's projected code:
       {[
         x : int;
         x := Recv(Alice);
@@ -70,10 +108,54 @@ val epp_choreo_to_net
         y := Ret(x + 1)
       ]}
       
-      {b Note:} Endpoint projection preserves the semantics of the choreography:
-      - Alice computes [x] locally and sends it
-      - Bob receives [x] and uses it to compute [y]
-      - Communication is made explicit via [Send] and [Recv]
+      {b Note:} [Send] and [Recv] transfer data values between endpoints.
+      
+      {1 Decision Coordination Example: ChooseFor/AllowChoice}
+
+      Input (Pirouette):
+      {[
+        x : Alice.int;
+        x := [Alice] readInput();
+        if [Alice] x > 10 then
+          select Alice High -> Bob;
+          send Alice x -> Bob
+        else
+          select Alice Low -> Bob;
+          send Alice 0 -> Bob
+      ]}
+      
+      OCaml:
+      {[
+        let alice_stmts = epp_choreo_to_net choreo_stmts "Alice" in
+        let bob_stmts = epp_choreo_to_net choreo_stmts "Bob" in
+      ]}
+      
+      Alice's projected code:
+      {[
+        x : int;
+        x := Ret(readInput());
+        if Ret(x > 10) then
+          ChooseFor(High, Bob, Send(Ret(x), Bob))
+        else
+          ChooseFor(Low, Bob, Send(Ret(0), Bob))
+      ]}
+      
+      Bob's projected code:
+      {[
+        AllowChoice(Alice, [
+          (High, x := Recv(Alice));
+          (Low, x := Recv(Alice))
+        ])
+      ]}
+      
+      {b Note:} The difference between communication primitives:
+      - [Send]/[Recv]: Transfer data values ("send the number 42")
+      - [ChooseFor]/[AllowChoice]: Coordinate control flow decisions ("I chose 
+        branch High, follow that path")
+      
+      Alice makes a local decision based on [x > 10], tells Bob which branch 
+      she chose ([High] or [Low]), and Bob waits to hear which label Alice 
+      picked before proceeding.
       
       {b Raises:} May raise projection errors if the choreography cannot be 
       safely projected (e.g., location appears in conflicting branches). *)
