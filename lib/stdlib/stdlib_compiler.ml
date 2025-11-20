@@ -26,57 +26,59 @@ exception Main_expr of expression
 
 let rec emit_local_pexp (expr : 'a Local.expr) =
   match expr with
-  | Unit _ -> "Unit ()"
-  | Val (Int (i, _), _) -> "Val (Int (" ^ (string_of_int (i)) ^ ", ()), ())"
-  | Val (String (s, _), _) -> "Val (String (" ^ s ^ ", ()), ())"
-  | Val (Bool (b, _), _) -> "Val (Bool (" ^ (string_of_bool (b)) ^ ", ()), ())"
-  | Var (VarId (v, _), _) -> "Val (VarId (" ^ v ^ ", ()), ())"
-  | UnOp (Not _, e, _) -> "UnOp (Not (), )" ^ emit_local_pexp e ^ ", ())"
-  | UnOp (Neg _, e, _) -> "UnOp (Neg (), )" ^ emit_local_pexp e ^ ", ())"
+  | Unit _ -> Builder.eunit
+  | Val (Int (i, _), _) -> Builder.eint i
+  | Val (String (s, _), _) -> Builder.estring s
+  | Val (Bool (b, _), _) -> Builder.ebool b
+  | Var (VarId (v, _), _) -> Builder.evar v
+  | UnOp (Not _, e, _) -> [%expr not [%e emit_local_pexp e]]
+  | UnOp (Neg _, e, _) -> [%expr -[%e emit_local_pexp e]]
   | BinOp (e1, op, e2, _) ->
     let op =
       match op with
-      | Plus _ -> "Plus ()"
-      | Minus _ -> "Minus ()"
-      | Times _ -> "Times ()"
-      | Div _ -> "Div ()"
-      | And _ -> "And ()"
-      | Or _ -> "Or ()"
-      | Eq _ -> "Eq ()"
-      | Neq _ -> "Neq ()"
-      | Lt _ -> "Lt ()"
-      | Leq _ -> "Leq ()"
-      | Gt _ -> "Gt ()"
-      | Geq _ -> "Geq ()"
+      | Plus _ -> "+"
+      | Minus _ -> "-"
+      | Times _ -> "*"
+      | Div _ -> "/"
+      | And _ -> "&&"
+      | Or _ -> "||"
+      | Eq _ -> "="
+      | Neq _ -> "<>"
+      | Lt _ -> "<"
+      | Leq _ -> "<="
+      | Gt _ -> ">"
+      | Geq _ -> ">="
     in
-    "BinOp (" ^ (emit_local_pexp e1) ^ ", " ^ op ^ ", " ^ (emit_local_pexp e2) ^ ", ())"
-    (* Dropping type info (2nd '_') since the STDLIB and be assumed to be well-typed*)
-  | Let (VarId (v, _), _, e1, e2, _) -> "Let (VarId (" ^ v ^ ", ()), (), " ^ emit_local_pexp e1 ^ ", " ^ emit_local_pexp e2 ^ ", ())"
-  | Pair (e1, e2, _) -> "Pair (" ^ emit_local_pexp e1 ^ ", " ^ emit_local_pexp e2 ^ ", ())"
-  | Fst (e, _) -> "Fst (" ^ emit_local_pexp e ^ ", ())"
-  | Snd (e, _) -> "Snd (" ^ emit_local_pexp e ^ ", ())"
-  | Left (e, _) -> "Left (" ^ emit_local_pexp e ^ ", ())"
-  | Right (e, _) -> "Right (" ^ emit_local_pexp e ^ ", ())"
+    Builder.eapply (Builder.evar op) [ emit_local_pexp e1; emit_local_pexp e2 ]
+  | Let (VarId (v, _), _, e1, e2, _) ->
+    Builder.pexp_let
+      Recursive
+      [ Builder.value_binding ~pat:(Builder.pvar v) ~expr:(emit_local_pexp e1) ]
+      (emit_local_pexp e2)
+  | Pair (e1, e2, _) -> [%expr [%e emit_local_pexp e1], [%e emit_local_pexp e2]]
+  | Fst (e, _) -> [%expr fst [%e emit_local_pexp e]]
+  | Snd (e, _) -> [%expr snd [%e emit_local_pexp e]]
+  | Left (e, _) -> [%expr Either.Left [%e emit_local_pexp e]]
+  | Right (e, _) -> [%expr Either.Right [%e emit_local_pexp e]]
   | Match (e, cases, _) ->
-    let str_cases =
-(      List.fold_left
-        (fun acc (pattern, expr) -> acc ^ "(" ^ emit_local_ppat pattern ^ ", " ^ emit_local_pexp expr ^ "); ")
-         "[" cases)
-
-         ^ "]" 
+    let cases =
+      List.map
+        (fun (p, e) ->
+           Builder.case ~lhs:(emit_local_ppat p) ~guard:None ~rhs:(emit_local_pexp e))
+        cases
     in
-    "Match (" ^ emit_local_pexp e ^ ", " ^ str_cases ^ ", ())"
+    Builder.pexp_match (emit_local_pexp e) cases
 
 and emit_local_ppat (pat : 'a Local.pattern) =
   match pat with
-  | Default _ -> "Default ()"
-  | Val (Int (i, _), _) -> "Val (Int (" ^ (string_of_int i) ^ ", ()), ())"
-  | Val (String (s, _), _) -> "Val (String (" ^ s ^ ", ()), ())"
-  | Val (Bool (b, _), _) -> "Val (Bool (" ^ (string_of_bool b) ^ ", ()), ())"
-  | Var (VarId (v, _), _) -> "Val (VarId (" ^ v ^ ", ()), ())"
-  | Pair (p1, p2, _) -> "Pair (" ^ (emit_local_ppat p1) ^ ", " ^ (emit_local_ppat p2) ^ ", ())"
-  | Left (p, _) -> "Left (" ^ (emit_local_ppat p) ^ ", ())"
-  | Right (p, _) -> "Right (" ^ (emit_local_ppat p) ^ ", ())"
+  | Default _ -> Builder.ppat_any
+  | Val (Int (i, _), _) -> Builder.pint i
+  | Val (String (s, _), _) -> Builder.pstring s
+  | Val (Bool (b, _), _) -> Builder.pbool b
+  | Var (VarId (v, _), _) -> Builder.pvar v
+  | Pair (p1, p2, _) -> [%pat? [%p emit_local_ppat p1], [%p emit_local_ppat p2]]
+  | Left (p, _) -> [%pat? Either.Left [%p emit_local_ppat p]]
+  | Right (p, _) -> [%pat? Either.Right [%p emit_local_ppat p]]
 ;;
 
 let rec emit_net_fun_body
@@ -113,7 +115,8 @@ and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (stmt : 'a Net.
        Builder.value_binding
          ~pat:(emit_local_ppat f)
          ~expr:(emit_net_fun_body ~self_id (module Msg) ps e))
-  | ForeignDecl (VarId (id, _), typ, external_name, _) -> ""
+  | ForeignDecl (VarId (id, _), typ, external_name, _) ->
+    emit_foreign_decl id typ external_name
   | _ -> Builder.value_binding ~pat:[%pat? _unit] ~expr:Builder.eunit
 
 and emit_foreign_decl id typ external_name=
@@ -126,14 +129,33 @@ and emit_foreign_decl id typ external_name=
     | Some pack -> pack ^ "."
     | None -> ""
   in
+  (* A function that takes in a Net type and pretty prints the type into Ocaml. Note, loc.types turn into just types*)
+  let rec find_type_sig : 'a Net.typ -> label = function
+    | TUnit _ -> "unit"
+    | TLoc (_, local_type, _) -> let rec find_local_type_sig : 'a Local.typ -> label = function  
+                                  | TUnit _ -> "unit"
+                                  | TInt _ -> "int"
+                                  | TString _ -> "string"
+                                  | TBool _ -> "bool"
+                                  | TVar (TypId (typ_id, _), _) -> typ_id
+                                  | TProd (typ1, typ2, _) -> (find_local_type_sig typ1) ^ " * " ^ (find_local_type_sig typ2)
+                                  | TSum (typ1, typ2, _) -> (find_local_type_sig typ1) ^ " + " ^ (find_local_type_sig typ2)
+                                in find_local_type_sig local_type
+    | TMap (typ1, typ2, _) -> "(" ^ (find_type_sig typ1) ^ " -> " ^ (find_type_sig typ2) ^ ")"
+    | TProd (typ1, typ2, _) -> (find_type_sig typ1) ^ " * " ^ (find_type_sig typ2)
+    | TSum (typ1, typ2, _) -> (find_type_sig typ1) ^ " + " ^ (find_type_sig typ2) in
+
+  (* The full type signature of a function. We apply this type signature to the identifier, then we set the value of the identifier to be equal to 'fun arg ->[ffi]]'. This works because of currying. *)
+  let type_sig = find_type_sig typ in
 
   let fun_expr =
     pexp_fun
       ~loc
       Nolabel
       None
-      (pvar ~loc ("="))
+      (pvar ~loc (": " ^ type_sig))
       [%expr
+        [%e evar ~loc "fun arg ->"]
         [%e evar ~loc (package_string ^ function_name)]
         [%e evar ~loc "arg"]]
   in
@@ -278,8 +300,6 @@ let emit_toplevel_domain
       loc_pairs
   in
   Printf.fprintf out_chan "%s\n" {|[@@@warning "-26"]|};
-  Printf.fprintf out_chan "%s" "let ast = ";
-
   let ppf = Format.formatter_of_out_channel out_chan in
   Pprintast.structure
     ppf
@@ -291,7 +311,7 @@ let emit_toplevel_domain
               (emit_domain_join_seq loc_ids))
            []
        ]);
-  Format.pp_print_newline ppf ()
+  Format.pp_print_newline ppf ();
 ;;
 
 
@@ -319,9 +339,5 @@ let compile_stdlib () : unit =
   (* There must be a stdlib_ast.ml file in the same directory as your stdlib.pir pointed to by your PIR_STDLIB env var*)
   let stdlib_out_path = (Filename.dirname path_to_stdlib)^Filename.dir_sep^"stdlib.gen.ml" in
 
-  (* emit_toplevel_domain (open_out stdlib_out_path) stdlib_locs stdlib_netir_l;; *)
-
-  let stdlib_out_channel = Out_channel.open_bin stdlib_out_path in
-  let ppf = Format.formatter_of_out_channel stdlib_out_channel in
-  Pprintast.expression ppf stdlib_netir_l; Out_channel;;
+  emit_toplevel_domain (open_out stdlib_out_path) stdlib_locs stdlib_netir_l;;
 ;;
