@@ -134,7 +134,8 @@ let compile_stdlib () : unit =
 
   (* Lex the file *)
   let lexbuf_stdlib = Lexing.from_channel file_ic_stlid in
-    (* Return the AST created from the parsed lex *)
+
+  (* Return the AST created from the parsed lex *)
   let stdlib_ast = A_rname.Rename.ast_list_alpha_rename (Parsing.Parse.parse_with_error (path_to_stdlib) (lexbuf_stdlib)) in
 
 
@@ -143,5 +144,5 @@ let compile_stdlib () : unit =
   let stdlib_ast_file_oc = open_out ((Filename.dirname path_to_stdlib)^Filename.dir_sep^"stdlib_ast.ml") in
 
   (* We save the Marshalled AST of the stdlib to stdlib_ast.ml, but wrapped within OCaml code that allows us to reference that value *)
-  output_string stdlib_ast_file_oc ("open Ast_core.Choreo.M\nopen Ast_core.Local.M\nopen Ast_core.Local.M\n\nlet ast : 'a stmt_block ="^ stdlib_ast_str ^ "\n\n;;"); close_out stdlib_ast_file_oc;
+  output_string stdlib_ast_file_oc ("open Ast_core.Choreo.M\nopen Ast_core.Local.M\n\nlet ast : 'a Parsing.Parsed_ast.Choreo.stmt_block ="^ stdlib_ast_str ^ "\n\n;;"); close_out stdlib_ast_file_oc;
 ;;
