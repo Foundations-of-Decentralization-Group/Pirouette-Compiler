@@ -14,7 +14,7 @@
     This transformation ensures that distributed programs maintain the 
     communication patterns and safety properties specified in the choreography. *)
 
-(**{2 End Point Porjection}*)
+(**{2 End Point Projection}*)
 
 val epp_choreo_to_net
   :  'a Ast_core.Choreo.M.stmt list
