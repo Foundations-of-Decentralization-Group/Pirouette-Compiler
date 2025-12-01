@@ -617,7 +617,8 @@ module M : sig
 
 end
 
-(**{b With:} This module uses a functor for creating network AST types with concrete metadata.
+(**{b With:} This module uses a functor for creating network AST types 
+with concrete metadata.
     
     Instantiates the polymorphic network AST with a specific metadata type. *)
 module With : functor

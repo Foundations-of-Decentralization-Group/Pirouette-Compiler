@@ -27,7 +27,7 @@ The lexer is defined in {!Parsing.Lexer} and handles:
 - Identifiers and literals
 - Special characters
 
-2. {b {!Parsing}) - AST construction}
+2. {b {!Parsing} - AST construction}
 
 The parser takes these tokens and builds them into a structured format called an Abstract Syntax Tree (AST). 
 Think of it like taking those individual words and understanding that "The cat sat" is a sentence with a subject (cat), verb (sat), and article (the).

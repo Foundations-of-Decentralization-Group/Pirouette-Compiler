@@ -1,5 +1,6 @@
 (** Network code generation via endpoint projection.
-    
+  
+{2 Overview}
     This module implements endpoint projection (EPP), the core transformation 
     that converts choreographic programs into executable network code for 
     individual endpoints. Given a global choreography and a target location, 
@@ -12,6 +13,8 @@
     
     This transformation ensures that distributed programs maintain the 
     communication patterns and safety properties specified in the choreography. *)
+
+(**{2 End Point Porjection}*)
 
 val epp_choreo_to_net
   :  'a Ast_core.Choreo.M.stmt list
@@ -31,7 +34,11 @@ val epp_choreo_to_net
       Returns the network IR statement list for the specified location, with
       choreographic constructs transformed into explicit communication primitives.
       
-      {1 {b Local Computations Example}}
+      {b Raises:} May raise projection errors if the choreography cannot be 
+      safely projected (e.g., location appears in conflicting branches). *)
+      
+      (**
+      {2 Local Computations Example}
       
       Input (Pirouette):
       {[
@@ -65,9 +72,10 @@ val epp_choreo_to_net
       
       {b Note:} Location qualifiers like [Alice] are removed during projection.
       Each endpoint only gets the computations qualified with their own location.
-      No communication occurs - these are purely local operations.
+      No communication occurs - these are purely local operations.*)
 
-      {1 Data Transfer Example : Send/Recv}
+      (**
+      {2 Data Transfer Example : Send/Recv}
 
       Input (Pirouette):
       {[
@@ -108,9 +116,10 @@ val epp_choreo_to_net
         y := Ret(x + 1)
       ]}
       
-      {b Note:} [Send] and [Recv] transfer data values between endpoints.
+      {b Note:} [Send] and [Recv] transfer data values between endpoints.*)
       
-      {1 Decision Coordination Example: ChooseFor/AllowChoice}
+      (**
+      {2 Decision Coordination Example: ChooseFor/AllowChoice}
 
       Input (Pirouette):
       {[
@@ -156,6 +165,4 @@ val epp_choreo_to_net
       Alice makes a local decision based on [x > 10], tells Bob which branch 
       she chose ([High] or [Low]), and Bob waits to hear which label Alice 
       picked before proceeding.
-      
-      {b Raises:} May raise projection errors if the choreography cannot be 
-      safely projected (e.g., location appears in conflicting branches). *)
+      *)
