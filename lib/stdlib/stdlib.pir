@@ -22,7 +22,7 @@ foreign prerr_newline : unit -> unit := "prerr_newline";
 {- String manipulation -}
 {-foreign sprintf : unit -> unit -> unit := "Printf.sprintf";-}
 {-foreign ksprintf : (unit -> unit) -> unit -> unit -> unit := "Printf.ksprintf";-}
-foreign string_cat : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "String.cat";
+foreign string_cat : PIRSTDLIBLOC.string -> PIRSTDLIBLoc_getOC.string -> PIRSTDLIBLOC.string := "String.cat";
 foreign cat : PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string -> PIRSTDLIBLOC.string := "String.cat";
 foreign string_of_int : PIRSTDLIBLOC.int -> PIRSTDLIBLOC.string := "string_of_int";
 foreign string_of_bool : PIRSTDLIBLOC.bool -> PIRSTDLIBLOC.string := "string_of_bool";

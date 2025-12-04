@@ -126,9 +126,13 @@ let () =
     perform alpha renaming to ensure IDs are non-conflicting with OCaml, 
     then swap out all info attributes (Hardcoded to be unit when specifically Stdlib is compiled) with Obj.magic 
     so that the types can be compatible with the program AST when we concat the ASTs *)
-  let stdlib_ast = Ast_utils.ast_list_info_map (fun _ -> Obj.magic ()) (A_rname.Rename.ast_list_alpha_rename (Stdlib_utils.Stdlib_linker.get_stdlib_ast ~recompile:true ())) in
   (* Parse the input file, rename IDs, and concatenate it to the stdlib AST *)
-  let program = stdlib_ast @ (A_rname.Rename.ast_list_alpha_rename ((Parsing.Parse.parse_with_error !input_filename lexbuf))) in
+  let user_program = (A_rname.Rename.ast_list_alpha_rename ((Parsing.Parse.parse_with_error !input_filename lexbuf))) in
+  
+  let locs = Ast_utils.extract_locs user_program in
+  let stdlib_ast = Ast_utils.ast_list_info_map (fun _ -> Obj.magic ()) ((Stdlib_utils.Stdlib_linker.get_stdlib_ast ~recompile:true locs)) in
+  let program = stdlib_ast @ user_program in
+
   (* Dump the choreography AST *)
   match !ast_dump_format with
   | Some format -> begin
@@ -145,7 +149,6 @@ let () =
     end
   | None -> ();
   (* Extract locations, ffi information, and generate network IR *)
-  let locs = Ast_utils.extract_locs program in
   let ffi_info = Ast_utils.collect_ffi_info program in
   let package_names =
     List.fold_left (fun package_names (package_name, _, _) ->

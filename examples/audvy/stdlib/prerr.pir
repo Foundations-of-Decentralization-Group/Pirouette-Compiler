@@ -1,4 +1,4 @@
-_ := A.prerr_string A."1";
+_ := B.prerr_string B."1";
 _ := A.prerr_newline A.();
 _ := A.prerr_endline A."2";
 _ := A.prerr_int A.3;

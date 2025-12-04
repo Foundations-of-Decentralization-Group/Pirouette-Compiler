@@ -144,5 +144,5 @@ let compile_stdlib () : unit =
   let stdlib_ast_file_oc = open_out ((Filename.dirname path_to_stdlib)^Filename.dir_sep^"stdlib_ast.ml") in
 
   (* We save the Marshalled AST of the stdlib to stdlib_ast.ml, but wrapped within OCaml code that allows us to reference that value *)
-  output_string stdlib_ast_file_oc ("open Ast_core.Choreo.M\nopen Ast_core.Local.M\n\nlet ast : 'a Parsing.Parsed_ast.Choreo.stmt_block ="^ stdlib_ast_str ^ "\n\n;;"); close_out stdlib_ast_file_oc;
+  output_string stdlib_ast_file_oc ("open Ast_core.Choreo.M\nopen Ast_core.Local.M\n\nlet ast : 'a Ast_core.Choreo.M.stmt_block = "^ stdlib_ast_str ^ "\n\n;;"); close_out stdlib_ast_file_oc;
 ;;

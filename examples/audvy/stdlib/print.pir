@@ -1,5 +1,5 @@
-_ := A.print_string A."1";
-_ := A.print_newline ();
+_ := B.print_string A."1";
+_ := B.print_newline ();
 _ := A.print_endline A."2";
 _ := A.print_int A.3;
 _ := A.print_newline ();
