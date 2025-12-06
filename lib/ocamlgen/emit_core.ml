@@ -115,7 +115,6 @@ and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (stmt : 'a Net.
          ~expr:(emit_net_fun_body ~self_id (module Msg) ps e))
   | ForeignDecl (VarId (id, _), typ, external_name, _) ->
     emit_foreign_decl id typ external_name
-  | TypeDecl ()
   | _ -> Builder.value_binding ~pat:[%pat? _unit] ~expr:Builder.eunit
 
 and emit_foreign_decl id typ external_name=
