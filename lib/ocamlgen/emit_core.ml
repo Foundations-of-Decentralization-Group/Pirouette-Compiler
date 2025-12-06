@@ -145,7 +145,7 @@ and emit_foreign_decl id typ external_name=
 
   (* The full type signature of a function. We apply this type signature to the identifier, then we set the value of the identifier to be equal to 'fun arg ->[ffi]]'. This works because of currying. *)
   let type_sig = find_type_sig typ in
-                                String.
+  
   let fun_expr =
     pexp_fun
       ~loc
