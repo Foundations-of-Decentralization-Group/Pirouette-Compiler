@@ -124,12 +124,10 @@ let () =
 
   (* Fetch the standard libary (recompile if needed through use of optional flag), 
     perform alpha renaming to ensure IDs are non-conflicting with OCaml, 
-    then swap out all info attributes (Hardcoded to be unit when specifically Stdlib is compiled) with Obj.magic 
+    then swap out all info attributes (Hardcoded to be UNIT when Stdlib is compiled) with Obj.magic 
     so that the types can be compatible with the program AST when we concat the ASTs *)
   (* Parse the input file, rename IDs, and concatenate it to the stdlib AST *)
   let user_program = (A_rname.Rename.ast_list_alpha_rename ((Parsing.Parse.parse_with_error !input_filename lexbuf))) in
-  
-  let locs = Ast_utils.extract_locs user_program in
   let stdlib_ast = Ast_utils.ast_list_info_map (fun _ -> Obj.magic ()) ((Stdlib_utils.Stdlib_linker.get_stdlib_ast ~recompile:true ())) in
   let program = stdlib_ast @ user_program in
 
@@ -148,7 +146,8 @@ let () =
         program;
     end
   | None -> ();
-  (* Extract locations, ffi information, and generate network IR *)
+  (* Extract locs, ffi information, and generate network IR *)
+  let locs = Ast_utils.extract_locs user_program in
   let ffi_info = Ast_utils.collect_ffi_info program in
   let package_names =
     List.fold_left (fun package_names (package_name, _, _) ->
@@ -222,6 +221,7 @@ let () =
           | "mpi" -> "mpi"
           | _ -> invalid_arg "Invalid backend"
         in
+        print_string ("PACKAGES: " ^ packages);
         let cmd =
           Format.sprintf
             "OCAMLPATH='%s' ocamlfind ocamlopt -w '%s' -o %s -linkpkg -package '%s' %s %s"

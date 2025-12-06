@@ -161,10 +161,14 @@ local_pattern:
 choreo_type:
   | UNIT_T { TUnit (gen_pos $startpos $endpos) }
   | id=loc_id DOT t=local_type { TLoc (id, t, gen_pos $startpos $endpos) }
+  | id=choreo_type_id { TVar (id, gen_pos $startpos $endpos) }
   | t1=choreo_type ARROW t2=choreo_type { TMap (t1, t2, gen_pos $startpos $endpos) }
   | t1=choreo_type TIMES t2=choreo_type { TProd (t1, t2, gen_pos $startpos $endpos) }
   | t1=choreo_type PLUS t2=choreo_type { TSum (t1, t2, gen_pos $startpos $endpos) }
   | LPAREN t=choreo_type RPAREN { Choreo.set_info_typ (gen_pos $startpos $endpos) t }
+
+choreo_type_id:
+  | id=ID { Typ_Id (id, gen_pos $startpos $endpos) }
 
 (** [local_type] parses local types and constructs corresponding AST nodes.
 
@@ -181,6 +185,7 @@ local_type:
   
 loc_id:
   | id=ID { LocId (id, gen_pos $startpos $endpos) }
+
 
 (** [var_id] parses an identifier for a variable and constructs a corresponding AST node.
 
