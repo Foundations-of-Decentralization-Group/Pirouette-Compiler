@@ -172,6 +172,9 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
   | Let (stmts, e, _) ->
     Builder.pexp_let
       Recursive (*FIXME: how to handle tuples?*)
+      (* -From Audvy: We could create a function that taktes in stmts and outputs their Net Type, and then match on that, and only apply the Recursive flag on TMaps
+      OR
+      We create a function that takes in stmts and outputs the amount of identifiers on the left hand side. It anything more than 1 (exluding args), than it cannot be a func, so use the Nonrecursive flag*)
       (List.map (emit_net_binding ~self_id (module Msg)) stmts)
       (emit_net_pexp ~self_id (module Msg) e)
   | FunDef (ps, e, _) -> emit_net_fun_body ~self_id (module Msg) ps e
