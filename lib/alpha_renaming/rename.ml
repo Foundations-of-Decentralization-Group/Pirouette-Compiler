@@ -44,7 +44,7 @@ and ast_local_expr_alpha_rename : 'a Ast_core.Local.M.expr -> 'a Ast_core.Local.
 let rec ast_choreo_type_alpha_rename : 'a Ast_core.Choreo.M.typ -> 'a Ast_core.Choreo.M.typ = function
   | TUnit metadata ->  TUnit metadata
   | TLoc (loc_id, local_typ, metadata) ->  TLoc (ast_local_loc_id loc_id, ast_local_type_alpha_rename local_typ, metadata)
-  | TVar (Typ_Id (type_name, type_metadata), metadata) ->  TVar (Typ_Id (type_name^suffix, type_metadata), metadata)
+  | TVar (Choreo_Typ_Id (type_name, type_metadata), metadata) ->  TVar (Choreo_Typ_Id (type_name^suffix, type_metadata), metadata)
   | TMap (typ1, typ2, metadata) ->  TMap (ast_choreo_type_alpha_rename typ1, ast_choreo_type_alpha_rename typ2, metadata)
   | TProd (typ1, typ2, metadata) ->  TProd (ast_choreo_type_alpha_rename typ1, ast_choreo_type_alpha_rename typ2, metadata)
   | TSum (typ1, typ2, metadata) -> TSum (ast_choreo_type_alpha_rename typ1, ast_choreo_type_alpha_rename typ2, metadata)

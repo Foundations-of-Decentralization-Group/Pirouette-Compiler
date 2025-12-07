@@ -68,7 +68,7 @@ and ast_local_expr_stringify : 'a Ast_core.Local.M.expr -> string = function
 let rec ast_choreo_type_stringify : 'a Ast_core.Choreo.M.typ -> string = function
   | TUnit _ ->  "(TUnit ())"
   | TLoc (loc_id, local_typ, _) ->  "(TLoc (" ^ ast_local_loc_id loc_id ^ ", " ^ ast_local_type_stringify local_typ ^ ", ()))"
-  | TVar (Typ_Id (type_name, _), _) ->  "(TVar (Typ_Id (\"" ^ type_name ^ "\", ()), ()))"
+  | TVar (Choreo_Typ_Id (type_name, _), _) ->  "(TVar (Choreo_Typ_Id (\"" ^ type_name ^ "\", ()), ()))"
   | TMap (typ1, typ2, _) ->  "(TMap (" ^ ast_choreo_type_stringify typ1 ^ ", " ^ ast_choreo_type_stringify typ2 ^ ", ()))"
   | TProd (typ1, typ2, _) ->  "(TProd (" ^ ast_choreo_type_stringify typ1 ^", " ^ ast_choreo_type_stringify typ2 ^" , ()))"
   | TSum (typ1, typ2, _) -> "(TSum (" ^ ast_choreo_type_stringify typ1 ^ ", " ^ ast_choreo_type_stringify typ2 ^ ", ()))"

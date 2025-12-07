@@ -271,7 +271,7 @@ let rec dot_choreo_type (string_of_info : 'a -> string) (typ : 'a Choreo.typ)
     let c, n = dot_local_type string_of_info typ in
     let edge = spf "%s -> %s;\n" node_name n in
     locid_node ^ edge ^ c, node_name
-  | TVar (Typ_Id (id, _), info) ->
+  | TVar (Choreo_Typ_Id (id, _), info) ->
     spf "%s [label=\"TVar %s %s\"];\n" node_name id (string_of_info info), node_name
   | TMap (typ1, typ2, info) ->
     let c1, n1 = dot_choreo_type string_of_info typ1 in

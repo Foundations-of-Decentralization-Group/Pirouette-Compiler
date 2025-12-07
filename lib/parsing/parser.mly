@@ -55,6 +55,7 @@
 %type <Parsed_ast.Choreo.expr> choreo_expr
 %type <Parsed_ast.Choreo.pattern> choreo_pattern
 %type <Parsed_ast.Choreo.typ> choreo_type
+%type <Parsed_ast.Choreo.choreo_typ_id> choreo_typ_id
 %type <Parsed_ast.Local.expr> local_expr
 %type <Parsed_ast.Local.pattern> local_pattern
 %type <Parsed_ast.Local.typ> local_type
@@ -62,7 +63,7 @@
 %type <Parsed_ast.Local.value> value
 %type <Parsed_ast.Local.loc_id> loc_id
 %type <Parsed_ast.Local.var_id> var_id
-%type <Parsed_ast.Local.typ_id> typ_id
+%type <Parsed_ast.Local.local_typ_id> local_typ_id
 %type <Parsed_ast.Local.sync_label> sync_label
 %type <Parsed_ast.Choreo.stmt> foreign_decl
 
@@ -86,7 +87,7 @@ stmt_block:
 stmt:
   | p=choreo_pattern COLON t=choreo_type SEMICOLON { Decl (p, t, gen_pos $startpos $endpos) }
   | ps=nonempty_list(choreo_pattern) COLONEQ e=choreo_expr SEMICOLON { Assign (ps, e, gen_pos $startpos $endpos) }
-  | TYPE id=typ_id COLONEQ t=choreo_type SEMICOLON? { TypeDecl (id, t, gen_pos $startpos $endpos) }
+  | TYPE id=choreo_typ_id COLONEQ t=choreo_type SEMICOLON? { TypeDecl (id, t, gen_pos $startpos $endpos) }
   | f=foreign_decl { f }
 
 /* Associativity increases from expr to expr3, with each precedence level falling through to the next. */
@@ -161,10 +162,14 @@ local_pattern:
 choreo_type:
   | UNIT_T { TUnit (gen_pos $startpos $endpos) }
   | id=loc_id DOT t=local_type { TLoc (id, t, gen_pos $startpos $endpos) }
+  | id=choreo_typ_id { TVar (id, gen_pos $startpos $endpos) }
   | t1=choreo_type ARROW t2=choreo_type { TMap (t1, t2, gen_pos $startpos $endpos) }
   | t1=choreo_type TIMES t2=choreo_type { TProd (t1, t2, gen_pos $startpos $endpos) }
   | t1=choreo_type PLUS t2=choreo_type { TSum (t1, t2, gen_pos $startpos $endpos) }
   | LPAREN t=choreo_type RPAREN { Choreo.set_info_typ (gen_pos $startpos $endpos) t }
+
+choreo_typ_id:
+  | id=ID { Choreo_Typ_Id (id, gen_pos $startpos $endpos) }
 
 (** [local_type] parses local types and constructs corresponding AST nodes.
 
@@ -182,6 +187,7 @@ local_type:
 loc_id:
   | id=ID { LocId (id, gen_pos $startpos $endpos) }
 
+
 (** [var_id] parses an identifier for a variable and constructs a corresponding AST node.
 
     - Returns: A `VarId` node containing the identifier and its metadata.
@@ -190,8 +196,8 @@ loc_id:
 var_id:
   | id=ID { VarId (id, gen_pos $startpos $endpos) }
 
-typ_id:
-  | id=ID { TypId (id, gen_pos $startpos $endpos) }
+local_typ_id:
+  | id=ID { Local_Typ_Id (id, gen_pos $startpos $endpos) }
 
 sync_label:
   | id=ID { LabelId (id, gen_pos $startpos $endpos) }

@@ -44,9 +44,9 @@ and unify_choreo t1 t2 : choreo_subst =
     if loc1 = loc2
     then get_choreo_subst (unify_local t1 t2) loc1
     else failwith "Location mismatch"
-  | Choreo.TVar (Choreo.Typ_Id (var_name, _), _), t
-  | t, Choreo.TVar (Choreo.Typ_Id (var_name, _), _) ->
-    if t = Choreo.TVar (Choreo.Typ_Id (var_name, m), m)
+  | Choreo.TVar (Choreo.Choreo_Typ_Id (var_name, _), _), t
+  | t, Choreo.TVar (Choreo.Choreo_Typ_Id (var_name, _), _) ->
+    if t = Choreo.TVar (Choreo.Choreo_Typ_Id (var_name, m), m)
     then []
     else if occurs_in_choreo var_name t
     then failwith "Occurs check failed"
@@ -74,7 +74,7 @@ and occurs_in_choreo var_name t2 =
   match t2 with
   | Choreo.TUnit _ -> false
   | Choreo.TLoc (_, t, _) -> occurs_in_local var_name t
-  | Choreo.TVar (Choreo.Typ_Id (var_name', _), _) -> var_name = var_name'
+  | Choreo.TVar (Choreo.Choreo_Typ_Id (var_name', _), _) -> var_name = var_name'
   | Choreo.TMap (t1, t2, _) | Choreo.TProd (t1, t2, _) | Choreo.TSum (t1, t2, _) ->
     occurs_in_choreo var_name t1 || occurs_in_choreo var_name t2
 
@@ -97,7 +97,7 @@ and apply_subst_typ_choreo s t =
   | Choreo.TUnit _ -> t
   | Choreo.TLoc (loc, t, _) ->
     Choreo.TLoc (loc, apply_subst_typ_local (get_local_subst s loc) t, m)
-  | Choreo.TVar (Choreo.Typ_Id (var_name, _), _) ->
+  | Choreo.TVar (Choreo.Choreo_Typ_Id (var_name, _), _) ->
     (match List.assoc_opt var_name s with
      | Some t' -> t'
      | None -> t)
@@ -488,7 +488,7 @@ and infer_choreo_expr choreo_ctx (global_ctx : global_ctx) = function
        ( s
        , Choreo.TSum
            ( Choreo.TLoc (loc, inner_t, m)
-           , Choreo.TVar (Choreo.Typ_Id (gen_ftv (), m), m)
+           , Choreo.TVar (Choreo.Choreo_Typ_Id (gen_ftv (), m), m)
            , m ) )
      | _ -> failwith "Expected location type in Left")
   | Choreo.Right (e, _) ->
@@ -498,7 +498,7 @@ and infer_choreo_expr choreo_ctx (global_ctx : global_ctx) = function
      | Choreo.TLoc (loc, inner_t, _) ->
        ( s
        , Choreo.TSum
-           ( Choreo.TVar (Choreo.Typ_Id (gen_ftv (), m), m)
+           ( Choreo.TVar (Choreo.Choreo_Typ_Id (gen_ftv (), m), m)
            , Choreo.TLoc (loc, inner_t, m)
            , m ) )
      | _ -> failwith "Expected location type in Right")
@@ -554,7 +554,7 @@ and infer_choreo_expr choreo_ctx (global_ctx : global_ctx) = function
 and infer_choreo_pattern choreo_ctx global_ctx = function
   | Choreo.Default _ -> [], Choreo.TUnit m, []
   | Choreo.Var (Local.VarId (var_name, _), _) ->
-    let typ_v = Choreo.TVar (Choreo.Typ_Id (gen_ftv (), m), m) in
+    let typ_v = Choreo.TVar (Choreo.Choreo_Typ_Id (gen_ftv (), m), m) in
     [], typ_v, [ var_name, typ_v ]
   | Choreo.Pair (p1, p2, _) ->
     let s1, t1, ctx1 = infer_choreo_pattern choreo_ctx global_ctx p1 in
@@ -582,7 +582,7 @@ and infer_choreo_pattern choreo_ctx global_ctx = function
         Choreo.TLoc
           (Local.LocId ("dummy", m), Local.TVar (Local.TypId (gen_ftv (), m), m), m)
     in
-    s, Choreo.TSum (t_wrapped, Choreo.TVar (Choreo.Typ_Id (gen_ftv (), m), m), m), ctx
+    s, Choreo.TSum (t_wrapped, Choreo.TVar (Choreo.Choreo_Typ_Id (gen_ftv (), m), m), m), ctx
   | Choreo.Right (p, _) ->
     let s, t, ctx = infer_choreo_pattern choreo_ctx global_ctx p in
     let t_wrapped =
@@ -592,5 +592,5 @@ and infer_choreo_pattern choreo_ctx global_ctx = function
         Choreo.TLoc
           (Local.LocId ("dummy", m), Local.TVar (Local.TypId (gen_ftv (), m), m), m)
     in
-    s, Choreo.TSum (Choreo.TVar (Choreo.Typ_Id (gen_ftv (), m), m), t_wrapped, m), ctx
+    s, Choreo.TSum (Choreo.TVar (Choreo.Choreo_Typ_Id (gen_ftv (), m), m), t_wrapped, m), ctx
 ;;
