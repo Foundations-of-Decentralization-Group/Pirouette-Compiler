@@ -587,7 +587,7 @@ let choreo_const_suite =
        ; ("Correct infer function definition"
           >:: fun _ ->
           Choreo.TMap
-            ( Choreo.TVar (Choreo.Choreo_Typ_Id ("T0", m), m)
+            ( Choreo.TVar (Choreo.Typ_Id ("T0", m), m)
             , Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
             , m )
           |> choreo_expr_typ_eq correct_choreo_fundef)
@@ -614,13 +614,13 @@ let choreo_const_suite =
           >:: fun _ ->
           Choreo.TSum
             ( Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
-            , Choreo.TVar (Choreo.Choreo_Typ_Id ("T0", m), m)
+            , Choreo.TVar (Choreo.Typ_Id ("T0", m), m)
             , m )
           |> choreo_expr_typ_eq correct_left)
        ; ("Correct infer right"
           >:: fun _ ->
           Choreo.TSum
-            ( Choreo.TVar (Choreo.Choreo_Typ_Id ("T0", m), m)
+            ( Choreo.TVar (Choreo.Typ_Id ("T0", m), m)
             , Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
             , m )
           |> choreo_expr_typ_eq correct_right)
@@ -672,10 +672,10 @@ let correct_choreo_pattern_suite =
           >:: fun _ -> Choreo.TUnit m |> choreo_pattern_typ_eq choreo_def_p [])
        ; ("Correct infer var pattern"
           >:: fun _ ->
-          Choreo.TVar (Choreo.Choreo_Typ_Id ("T0", m), m)
+          Choreo.TVar (Choreo.Typ_Id ("T0", m), m)
           |> choreo_pattern_typ_eq
                choreo_var_p
-               [ "foo", Choreo.TVar (Choreo.Choreo_Typ_Id ("T0", m), m) ])
+               [ "foo", Choreo.TVar (Choreo.Typ_Id ("T0", m), m) ])
        ; ("Correct infer location int pattern"
           >:: fun _ ->
           Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
@@ -683,17 +683,17 @@ let correct_choreo_pattern_suite =
        ; ("Correct infer pair pattern"
           >:: fun _ ->
           Choreo.TProd
-            ( Choreo.TVar (Choreo.Choreo_Typ_Id ("T0", m), m)
+            ( Choreo.TVar (Choreo.Typ_Id ("T0", m), m)
             , Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
             , m )
           |> choreo_pattern_typ_eq
                choreo_pair_p
-               [ "foo", Choreo.TVar (Choreo.Choreo_Typ_Id ("T0", m), m) ])
+               [ "foo", Choreo.TVar (Choreo.Typ_Id ("T0", m), m) ])
        ; ("Correct infer left pattern"
           >:: fun _ ->
           Choreo.TSum
             ( Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
-            , Choreo.TVar (Choreo.Choreo_Typ_Id ("T0", m), m)
+            , Choreo.TVar (Choreo.Typ_Id ("T0", m), m)
             , m )
           |> choreo_pattern_typ_eq choreo_left_loc_p [])
        ; ("Correct pattern match"
@@ -705,13 +705,13 @@ let correct_choreo_pattern_suite =
           Choreo.TSum
             ( Choreo.TLoc
                 (Local.LocId ("dummy", m), Local.TVar (Local.TypId ("T0", m), m), m)
-            , Choreo.TVar (Choreo.Choreo_Typ_Id ("T1", m), m)
+            , Choreo.TVar (Choreo.Typ_Id ("T1", m), m)
             , m )
           |> choreo_pattern_typ_eq choreo_left_def_p [])
        ; ("Correct right pattern with TLoc type"
           >:: fun _ ->
           Choreo.TSum
-            ( Choreo.TVar (Choreo.Choreo_Typ_Id ("T0", m), m)
+            ( Choreo.TVar (Choreo.Typ_Id ("T0", m), m)
             , Choreo.TLoc (Local.LocId ("Alice", m), Local.TInt m, m)
             , m )
           |> choreo_pattern_typ_eq choreo_right_loc_p [])
@@ -913,18 +913,18 @@ let unification_suite =
             "Location mismatch")
        ; ("Incorrect unify_choreo var"
           >:: fun _ ->
-          let tvar = Choreo.TVar (Choreo.Choreo_Typ_Id ("X", m), m) in
+          let tvar = Choreo.TVar (Choreo.Typ_Id ("X", m), m) in
           unify_choreo_failure
             tvar
             (Choreo.TProd (tvar, Choreo.TUnit m, m))
             "Occurs check failed")
        ; ("Correct unify_choreo var right side"
           >:: fun _ ->
-          let tvar = Choreo.TVar (Choreo.Choreo_Typ_Id ("X", m), m) in
+          let tvar = Choreo.TVar (Choreo.Typ_Id ("X", m), m) in
           unify_choreo_success (Choreo.TUnit m) tvar [ "X", Choreo.TUnit m ])
        ; ("Correct unify_choreo same var"
           >:: fun _ ->
-          let tvar = Choreo.TVar (Choreo.Choreo_Typ_Id ("X", m), m) in
+          let tvar = Choreo.TVar (Choreo.Typ_Id ("X", m), m) in
           unify_choreo_success tvar tvar [])
        ; ("Correct unify_choreo map"
           >:: fun _ ->
@@ -1005,7 +1005,7 @@ let helper_suite =
           assert_equal true (local_typ_eq result (Local.TInt m)))
        ; ("apply choreo substitution to TVar"
           >:: fun _ ->
-          let tvar = Choreo.TVar (Choreo.Choreo_Typ_Id ("X", m), m) in
+          let tvar = Choreo.TVar (Choreo.Typ_Id ("X", m), m) in
           let subst = [ "X", Choreo.TUnit m ] in
           let result = apply_subst_typ_choreo subst tvar in
           assert_equal true (chreo_typ_eq result (Choreo.TUnit m)))

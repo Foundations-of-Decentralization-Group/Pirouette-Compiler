@@ -6,7 +6,7 @@ module M = struct
 
   type 'a loc_id = LocId of string * 'a
   type 'a var_id = VarId of string * 'a
-  type 'a local_typ_id = Local_Typ_Id of string * 'a
+  type 'a typ_id = TypId of string * 'a
   type 'a sync_label = LabelId of string * 'a
 
   type 'a un_op =
@@ -32,7 +32,7 @@ module M = struct
     | TInt of 'a
     | TString of 'a
     | TBool of 'a
-    | TVar of 'a local_typ_id * 'a
+    | TVar of 'a typ_id * 'a
     | TProd of 'a typ * 'a typ * 'a
     | TSum of 'a typ * 'a typ * 'a
 
@@ -66,7 +66,7 @@ struct
   type nonrec value = Info.t M.value
   type nonrec loc_id = Info.t M.loc_id
   type nonrec var_id = Info.t M.var_id
-  type nonrec typ_id = Info.t M.local_typ_id
+  type nonrec typ_id = Info.t M.typ_id
   type nonrec sync_label = Info.t M.sync_label
   type nonrec un_op = Info.t M.un_op
   type nonrec bin_op = Info.t M.bin_op
@@ -89,7 +89,7 @@ struct
   ;;
 
   let get_info_typid : typ_id -> Info.t = function
-    | Local_Typ_Id (_, i) -> i
+    | TypId (_, i) -> i
   ;;
 
   let get_info_unop : un_op -> Info.t = function
@@ -165,7 +165,7 @@ struct
 
   let set_info_typid : Info.t -> typ_id -> typ_id =
     fun i -> function
-    | Local_Typ_Id (s, _) -> Local_Typ_Id (s, i)
+    | TypId (s, _) -> TypId (s, i)
   ;;
 
   let set_info_unop : Info.t -> un_op -> un_op =

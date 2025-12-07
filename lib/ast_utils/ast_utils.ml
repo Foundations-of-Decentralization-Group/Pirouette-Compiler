@@ -187,7 +187,7 @@ let rec ast_choreo_type_info_map : ('a -> 'b) -> 'a Ast_core.Choreo.M.typ -> 'b 
   fun map -> function
   | TUnit metadata ->  TUnit (map metadata)
   | TLoc (loc_id, local_typ, metadata) ->  TLoc (ast_local_loc_id map loc_id, ast_local_type_info_map map local_typ, map metadata)
-  | TVar (Choreo_Typ_Id (type_name, type_metadata), metadata) ->  TVar (Choreo_Typ_Id (type_name, map type_metadata), map metadata)
+  | TVar (Typ_Id (type_name, type_metadata), metadata) ->  TVar (Typ_Id (type_name, map type_metadata), map metadata)
   | TMap (typ1, typ2, metadata) ->  TMap (ast_choreo_type_info_map map typ1, ast_choreo_type_info_map map typ2, map metadata)
   | TProd (typ1, typ2, metadata) ->  TProd (ast_choreo_type_info_map map typ1, ast_choreo_type_info_map map typ2, map metadata)
   | TSum (typ1, typ2, metadata) -> TSum (ast_choreo_type_info_map map typ1, ast_choreo_type_info_map map typ2, map metadata)

@@ -71,7 +71,7 @@ let test_pattern_left_CH (old_meta : int) (new_meta : int) =
 (* CH Get Info Typ Tests *)
 (*-----------------------------------------------------------*)
 let test_get_info_typid_CH (input : int) =
-  let typ_var = Choreo.M.Choreo_Typ_Id ("new_meta", input) in
+  let typ_var = Choreo.M.Typ_Id ("new_meta", input) in
   assert_equal input (ChoreoAst.get_info_typid typ_var)
 ;;
 
@@ -88,33 +88,33 @@ let test_get_info_tloc_CH (meta : int) =
 ;;
 
 let test_get_info_tvar_CH (meta : int) =
-  let val_id = Choreo.M.Choreo_Typ_Id ("meta", meta) in
+  let val_id = Choreo.M.Typ_Id ("meta", meta) in
   let typ_var = Choreo.M.TVar (val_id, meta) in
   assert_equal meta (ChoreoAst.get_info_typ typ_var)
 ;;
 
 let test_get_info_tmap_CH (meta1 : int) (meta2 : int) =
-  let m1 = Choreo.M.Choreo_Typ_Id ("m1", meta1) in
+  let m1 = Choreo.M.Typ_Id ("m1", meta1) in
   let val1 = Choreo.M.TVar (m1, meta1) in
-  let m2 = Choreo.M.Choreo_Typ_Id ("m2", meta2) in
+  let m2 = Choreo.M.Typ_Id ("m2", meta2) in
   let val2 = Choreo.M.TVar (m2, meta2) in
   let typ_var = Choreo.M.TMap (val1, val2, meta1) in
   assert_equal (ChoreoAst.get_info_typ typ_var) meta1
 ;;
 
 let test_get_info_tprod_CH (meta1 : int) (meta2 : int) =
-  let m1 = Choreo.M.Choreo_Typ_Id ("m1", meta1) in
+  let m1 = Choreo.M.Typ_Id ("m1", meta1) in
   let val1 = Choreo.M.TVar (m1, meta1) in
-  let m2 = Choreo.M.Choreo_Typ_Id ("m2", meta2) in
+  let m2 = Choreo.M.Typ_Id ("m2", meta2) in
   let val2 = Choreo.M.TVar (m2, meta2) in
   let typ_var = Choreo.M.TProd (val1, val2, meta1) in
   assert_equal (ChoreoAst.get_info_typ typ_var) meta1
 ;;
 
 let test_get_info_tsum_CH (meta1 : int) (meta2 : int) =
-  let m1 = Choreo.M.Choreo_Typ_Id ("m1", meta1) in
+  let m1 = Choreo.M.Typ_Id ("m1", meta1) in
   let val1 = Choreo.M.TVar (m1, meta1) in
-  let m2 = Choreo.M.Choreo_Typ_Id ("m2", meta2) in
+  let m2 = Choreo.M.Typ_Id ("m2", meta2) in
   let val2 = Choreo.M.TVar (m2, meta2) in
   let typ_var = Choreo.M.TSum (val1, val2, meta1) in
   assert_equal (ChoreoAst.get_info_typ typ_var) meta1
@@ -242,7 +242,7 @@ let test_get_info_match_CH (meta1 : int) (meta2 : int) =
 (* CH Set Info Typ Tests *)
 (*-----------------------------------------------------------*)
 let test_set_info_typid_CH (old_meta : int) (new_meta : int) =
-  let old_typ_var = Choreo.M.Choreo_Typ_Id ("old_meta", old_meta) in
+  let old_typ_var = Choreo.M.Typ_Id ("old_meta", old_meta) in
   let new_typ_var = ChoreoAst.set_info_typid new_meta old_typ_var in
   assert_equal (ChoreoAst.get_info_typid new_typ_var) new_meta
 ;;
@@ -262,16 +262,16 @@ let test_set_info_tloc_CH (old_meta : int) (new_meta : int) =
 ;;
 
 let test_set_info_tvar_CH (old_meta : int) (new_meta : int) =
-  let val_id = Choreo.M.Choreo_Typ_Id ("old_meta", old_meta) in
+  let val_id = Choreo.M.Typ_Id ("old_meta", old_meta) in
   let old_typ_var = Choreo.M.TVar (val_id, old_meta) in
   let new_typ_var = ChoreoAst.set_info_typ new_meta old_typ_var in
   assert_equal new_meta (ChoreoAst.get_info_typ new_typ_var)
 ;;
 
 let test_set_info_tmap_CH (old_meta1 : int) (old_meta2 : int) (new_meta : int) =
-  let m1 = Choreo.M.Choreo_Typ_Id ("m1", old_meta1) in
+  let m1 = Choreo.M.Typ_Id ("m1", old_meta1) in
   let val1 = Choreo.M.TVar (m1, old_meta1) in
-  let m2 = Choreo.M.Choreo_Typ_Id ("m2", old_meta2) in
+  let m2 = Choreo.M.Typ_Id ("m2", old_meta2) in
   let val2 = Choreo.M.TVar (m2, old_meta2) in
   let old_typ_var = Choreo.M.TMap (val1, val2, old_meta1) in
   let new_typ_var = ChoreoAst.set_info_typ new_meta old_typ_var in
@@ -279,9 +279,9 @@ let test_set_info_tmap_CH (old_meta1 : int) (old_meta2 : int) (new_meta : int) =
 ;;
 
 let test_set_info_tprod_CH (old_meta1 : int) (old_meta2 : int) (new_meta : int) =
-  let m1 = Choreo.M.Choreo_Typ_Id ("m1", old_meta1) in
+  let m1 = Choreo.M.Typ_Id ("m1", old_meta1) in
   let val1 = Choreo.M.TVar (m1, old_meta1) in
-  let m2 = Choreo.M.Choreo_Typ_Id ("m2", old_meta2) in
+  let m2 = Choreo.M.Typ_Id ("m2", old_meta2) in
   let val2 = Choreo.M.TVar (m2, old_meta2) in
   let old_typ_var = Choreo.M.TProd (val1, val2, old_meta1) in
   let new_typ_var = ChoreoAst.set_info_typ new_meta old_typ_var in
@@ -289,9 +289,9 @@ let test_set_info_tprod_CH (old_meta1 : int) (old_meta2 : int) (new_meta : int) 
 ;;
 
 let test_set_info_tsum_CH (old_meta1 : int) (old_meta2 : int) (new_meta : int) =
-  let m1 = Choreo.M.Choreo_Typ_Id ("m1", old_meta1) in
+  let m1 = Choreo.M.Typ_Id ("m1", old_meta1) in
   let val1 = Choreo.M.TVar (m1, old_meta1) in
-  let m2 = Choreo.M.Choreo_Typ_Id ("m2", old_meta2) in
+  let m2 = Choreo.M.Typ_Id ("m2", old_meta2) in
   let val2 = Choreo.M.TVar (m2, old_meta2) in
   let old_typ_var = Choreo.M.TSum (val1, val2, old_meta1) in
   let new_typ_var = ChoreoAst.set_info_typ new_meta old_typ_var in

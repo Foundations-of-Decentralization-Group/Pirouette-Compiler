@@ -1,14 +1,12 @@
 module Local = Local.M
 
-
-
 module M = struct
-  type 'a choreo_typ_id = Choreo_Typ_Id of string * 'a
+  type 'a typ_id = Typ_Id of string * 'a
 
   type 'a typ =
     | TUnit of 'a
     | TLoc of 'a Local.loc_id * 'a Local.typ * 'a
-    | TVar of 'a choreo_typ_id * 'a
+    | TVar of 'a typ_id * 'a
     | TMap of 'a typ * 'a typ * 'a
     | TProd of 'a typ * 'a typ * 'a
     | TSum of 'a typ * 'a typ * 'a
@@ -41,7 +39,7 @@ module M = struct
   and 'a stmt =
     | Decl of 'a pattern * 'a typ * 'a
     | Assign of 'a pattern list * 'a expr * 'a (* list is only for F P1 P2 ... Pn := C *)
-    | TypeDecl of 'a choreo_typ_id * 'a typ * 'a
+    | TypeDecl of 'a Local.typ_id * 'a typ * 'a
     | ForeignDecl of 'a Local.var_id * 'a typ * string * 'a
 
   and 'a stmt_block = 'a stmt list
@@ -51,7 +49,7 @@ module With (Info : sig
     type t
   end) =
 struct
-  type nonrec typ_id = Info.t M.choreo_typ_id
+  type nonrec typ_id = Info.t M.typ_id
   type nonrec typ = Info.t M.typ
   type nonrec pattern = Info.t M.pattern
   type nonrec expr = Info.t M.expr
@@ -59,7 +57,7 @@ struct
   type nonrec stmt_block = stmt list
 
   let get_info_typid : typ_id -> Info.t = function
-    | Choreo_Typ_Id (_, i) -> i
+    | Typ_Id (_, i) -> i
   ;;
 
   let get_info_typ : typ -> Info.t = function
@@ -107,7 +105,7 @@ struct
 
   let set_info_typid : Info.t -> typ_id -> typ_id =
     fun i -> function
-    | Choreo_Typ_Id (s, _) -> Choreo_Typ_Id (s, i)
+    | Typ_Id (s, _) -> Typ_Id (s, i)
   ;;
 
   let set_info_typ : Info.t -> typ -> typ =

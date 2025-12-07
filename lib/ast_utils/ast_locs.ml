@@ -11,12 +11,7 @@ let rec extract_pattern : 'a Choreo.pattern -> LocSet.t = function
 let rec extract_type : 'a Choreo.typ -> LocSet.t = function
   | TUnit _ -> LocSet.empty
   | TLoc (LocId (id, _), _, _) -> LocSet.singleton id
-  (* Hi, Audvy here. The following pattern used to return "LocSet.singleton id" (From a Choreo_Typ_Id (id, _) pattern), however, I didn't think that was quite right, so I change it to LocSet.empty. 
-  I did this because an id from a Choreo_Typ_Id represents the name of the type, rather than the location.
-  I STAND TO BE CORRECTED.
-  This was just my understanding of how the information from this type relates to the location information this function is trying to extract.
-  I MAY PROBABLY BE WRONG. PLEASE CHANGE IF YOU SEE AN ISSUE *)
-  | TVar (Choreo_Typ_Id (_, _), _) -> LocSet.empty
+  | TVar (Typ_Id (id, _), _) -> LocSet.singleton id
   | TMap (t1, t2, _) | TProd (t1, t2, _) | TSum (t1, t2, _) ->
     LocSet.union (extract_type t1) (extract_type t2)
 ;;
