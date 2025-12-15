@@ -108,8 +108,6 @@ val extract_locs : 'a Ast_core.Choreo.M.stmt_block -> string list
       }
     ]}
     
-    {b Requires:} Optional: [jq] command-line tool for pretty-printing JSON.
-    
     {b Raises:} Functions writing to channels may raise [Sys_error] if file 
     operations fail. *)
 
@@ -254,9 +252,6 @@ val pprint_net_ast : out_channel -> 'a Ast_core.Net.M.stmt_block -> unit
         x Alice TInt
       v}
     
-    {b Requires:} Graphviz tools ([dot], [neato], etc.) must be installed 
-    to process DOT files into image formats.
-    
     {b Raises:} Functions writing to channels may raise [Sys_error] if file 
     operations fail.*)
 
@@ -269,8 +264,7 @@ val stringify_dot_choreo_ast : ('a -> string) -> 'a Ast_core.Choreo.M.stmt_block
         node labels
       - [stmts]: the statement block to visualize
       
-      Returns a DOT format string that can be processed by Graphviz tools
-      (dot, neato, etc.) to produce visual diagrams of the AST structure.*)
+      Returns a DOT format string to produce visual diagrams of the AST structure.*)
 
 val dot_choreo_ast
   :  out_channel
