@@ -1,7 +1,10 @@
 (* Pirouette Compiler (pirc) main entry point *)
 
 (* Command line configuration *)
-let usage_msg = "USAGE: pirc <file> [-ast-dump <pprint|json|dot>] [-msg-backend <domain|http|mpi>]"
+let usage_msg =
+  "USAGE: pirc <file> [-ast-dump <pprint|json|dot>] [-msg-backend <domain|http|mpi>]"
+;;
+
 let ast_dump_format = ref None
 let msg_backend = ref "domain"
 let file_ic = ref None
@@ -20,15 +23,16 @@ let process_input_file filename =
 (* Check that (String.trim s) does not start or end with commas *)
 let check_no_start_end_commas s =
   let s = String.trim s in
-  if String.length s = 0 then
-    ()
-  else
+  if String.length s = 0
+  then ()
+  else (
     let first = String.get s 0 in
     let last = String.get s (-1 + String.length s) in
     match first, last with
     | ',', _ | _, ',' ->
       failwith "List provided to flag must not start or end with comma!"
-    | _,_ -> ()
+    | _, _ -> ())
+;;
 
 (* Command line options specification *)
 let speclist =
@@ -40,22 +44,31 @@ let speclist =
     , Arg.Symbol ([ "domain"; "http"; "mpi" ], fun s -> msg_backend := s)
     , "Choose communication backend (domain: shared memory, http: HTTP, mpi: MPI)" )
   ; ( "--package"
-    , Arg.String (fun s -> check_no_start_end_commas s; package_list := s)
-    , "List of OCaml packages to link in")
+    , Arg.String
+        (fun s ->
+          check_no_start_end_commas s;
+          package_list := s)
+    , "List of OCaml packages to link in" )
   ; ( "--no-binaries"
     , Arg.Unit (fun () -> projections_only := true)
-    , "Don't compile the resulting ml files")
+    , "Don't compile the resulting ml files" )
   ; ( "--ml-files"
-    , Arg.String (fun s -> check_no_start_end_commas s; ml_files := s)
-    , "Include extra ml files to compile with")
+    , Arg.String
+        (fun s ->
+          check_no_start_end_commas s;
+          ml_files := s)
+    , "Include extra ml files to compile with" )
   ; ( "-w"
-    , Arg.String (fun s -> check_no_start_end_commas s; ocamlopt_warn_flags := s)
-    , "Enable/disable ocamlopt warning flags")
+    , Arg.String
+        (fun s ->
+          check_no_start_end_commas s;
+          ocamlopt_warn_flags := s)
+    , "Enable/disable ocamlopt warning flags" )
   ]
 ;;
 
 (* Change the extension of a filename *)
-let change_extension filename new_suffix = (Filename.remove_extension filename) ^ new_suffix ;;
+let change_extension filename new_suffix = Filename.remove_extension filename ^ new_suffix
 
 (* Dump AST in specified format *)
 let dump_choreo_ast format output_path program =
@@ -96,8 +109,7 @@ let generate_http_code filename locs netir_l =
        let config_file_path = change_extension filename ".yaml" in
        Ocamlgen.Toplevel_http.emit_toplevel_http out_file [ loc ] [ ir ] config_file_path;
        close_out out_file;
-       out_path :: acc
-    )
+       out_path :: acc)
     []
     locs
     netir_l
@@ -134,60 +146,60 @@ let () =
   let program = stdlib_ast @ user_program in
 
   (* Dump the choreography AST *)
-  match !ast_dump_format with
-  | Some format -> begin
-      dump_choreo_ast
-        format
-        (change_extension
-           !input_filename
-           (match format with
-            | "json" -> ".json"
-            | "pprint" -> ".ast"
-            | "dot" -> ".dot"
-            | _ -> invalid_arg "Invalid ast-dump format"))
-        program;
-    end
-  | None -> ();
+  (match !ast_dump_format with
+   | None -> ()
+   | Some format ->
+     dump_choreo_ast
+       format
+       (change_extension
+          !input_filename
+          (match format with
+           | "json" -> ".json"
+           | "pprint" -> ".ast"
+           | "dot" -> ".dot"
+           | _ -> invalid_arg "Invalid ast-dump format"))
+       program);
   (* Extract locations, ffi information, and generate network IR *)
   let ffi_info = Ast_utils.collect_ffi_info program in
   let package_names =
-    List.fold_left (fun package_names (package_name, _, _) ->
-        match package_name with
-        | Some name -> String.lowercase_ascii name ^ "," ^ package_names
-        | None -> package_names)
+    List.fold_left
+      (fun package_names (package_name, _, _) ->
+         match package_name with
+         | Some name -> String.lowercase_ascii name ^ "," ^ package_names
+         | None -> package_names)
       ""
       ffi_info
   in
   let search_paths =
-    List.fold_left (fun search_paths (_, _, search_path) ->
-        match search_path with
-        | Some path -> path ^ ":" ^ search_paths
-        | None -> search_paths)
+    List.fold_left
+      (fun search_paths (_, _, search_path) ->
+         match search_path with
+         | Some path -> path ^ ":" ^ search_paths
+         | None -> search_paths)
       ""
       ffi_info
   in
   let netir_l = List.map (fun loc -> Netgen.epp_choreo_to_net program loc) locs in
   (* Dump network ASTs *)
-  match !ast_dump_format with
-  | Some format -> begin
-      List.iter2
-        (fun loc ir ->
-           dump_net_ast
-             format
-             (change_extension
-                !input_filename
-                ("."
-                 ^ loc
-                 ^
-                 match format with
-                 | "json" -> ".json"
-                 | "pprint" -> ".ast"
-                 | _ -> ""))
-             ir)
-        locs
-        netir_l;
-    end
-  | None -> ();
+  (match !ast_dump_format with
+   | Some format ->
+     List.iter2
+       (fun loc ir ->
+          dump_net_ast
+            format
+            (change_extension
+               !input_filename
+               ("."
+                ^ loc
+                ^
+                match format with
+                | "json" -> ".json"
+                | "pprint" -> ".ast"
+                | _ -> ""))
+            ir)
+       locs
+       netir_l
+   | None -> ());
   (* Generate code based on selected backend *)
   let gen_ml_files =
     match !msg_backend with
@@ -196,42 +208,46 @@ let () =
     | "mpi" -> [ generate_mpi_code !input_filename locs netir_l ]
     | _ -> invalid_arg "Invalid backend"
   in
-  if !projections_only then
-    ()
+  if !projections_only
+  then ()
   else
     (* Compile the resulting ml files *)
-    List.iter (fun ml_file ->
-        let out_file_exe = change_extension ml_file ".exe" in
-        let packages =
-          let package_list' =
-            !package_list ^
-            if String.trim !package_list <> "" then "," else ""
-          in
-          (* Invariants:
+    List.iter
+      (fun ml_file ->
+         let out_file_exe = change_extension ml_file ".exe" in
+         let packages =
+           let package_list' =
+             !package_list ^ if String.trim !package_list <> "" then "," else ""
+           in
+           (* Invariants:
              String.trim package_names :
                - is the empty string, or
                - does not start with a comma and ends with a comma
              String.trim package_list' :
                - is the empty string, or
                - does not start with a comma and ends with a comma
-          *)
-          String.trim package_names ^ String.trim package_list' ^
-          match !msg_backend with
-          | "domain" -> "domainslib"
-          | "http" -> "http_pirc"
-          | "mpi" -> "mpi"
-          | _ -> invalid_arg "Invalid backend"
-        in
-        let cmd =
-          Format.sprintf
-            "OCAMLPATH='%s' ocamlfind ocamlopt -w '%s' -o %s -linkpkg -package '%s' %s %s"
-            search_paths
-            !ocamlopt_warn_flags
-            out_file_exe
-            packages
-            !ml_files
-            ml_file
-        in
-        let _ = Sys.command cmd in ())
+           *)
+           String.trim package_names
+           ^ String.trim package_list'
+           ^
+           match !msg_backend with
+           | "domain" -> "domainslib"
+           | "http" -> "http_pirc"
+           | "mpi" -> "mpi"
+           | _ -> invalid_arg "Invalid backend"
+         in
+         let cmd =
+           Format.sprintf
+             "OCAMLPATH='%s' ocamlfind ocamlopt -w '%s' -o %s -linkpkg -package '%s' %s \
+              %s"
+             search_paths
+             !ocamlopt_warn_flags
+             out_file_exe
+             packages
+             !ml_files
+             ml_file
+         in
+         let _ = Sys.command cmd in
+         ())
       gen_ml_files
 ;;
