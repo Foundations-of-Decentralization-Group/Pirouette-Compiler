@@ -21,6 +21,8 @@
  (name http_pirc)
  (depends
   (lwt :build)
+  (eio_main :build)
+  (cohttp-eio :build)
   (cohttp-lwt-unix :build)
   (cohttp :build))
  (allow_empty))
@@ -30,6 +32,8 @@
  (synopsis "Pirouette Compiler")
  (description "Higher-order typed functional choreographies")
  (depends
+  (eio_main :build)
+  (cohttp-eio :build)
   (cohttp-lwt-unix :build)
   (dune :build)
   (lwt :build)
