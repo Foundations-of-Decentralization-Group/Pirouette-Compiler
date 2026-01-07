@@ -33,8 +33,8 @@
  (synopsis "Pirouette Compiler")
  (description "Higher-order typed functional choreographies")
  (depends
-  (cohttp-eio :build)
   (eio_main :build)
+  (cohttp-eio :build)
   (cohttp-lwt-unix :build)
   (dune :build)
   (lwt :build)
