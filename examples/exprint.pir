@@ -1,11 +1,9 @@
-foreign print : unit -> unit := "Printer.print_string_unit";
-
 main := let R.x := [S] S.3 ~> R; in 
   if R.(x>5) 
   then R[L] ~> S;
-       S.print S."Hello"
+       S.print_endline S."Hello"
   else R[R] ~> S;
-       S.print S."Bye";
+       S.print_endline S."Bye";
 
 {-
 NetIR:

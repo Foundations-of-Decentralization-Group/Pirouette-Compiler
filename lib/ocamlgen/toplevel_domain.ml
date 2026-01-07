@@ -69,6 +69,7 @@ let emit_toplevel_domain
            ;;])
       loc_pairs
   in
+  Printf.fprintf out_chan "%s\n" {|[@@@warning "-26"]|};
   let ppf = Format.formatter_of_out_channel out_chan in
   Pprintast.structure
     ppf

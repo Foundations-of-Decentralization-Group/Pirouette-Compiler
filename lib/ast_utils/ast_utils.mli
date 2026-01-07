@@ -18,3 +18,4 @@ val dot_choreo_ast
 (* FFI extraction utilities *)
 val parse_external_name : string -> (string option * string * string option)
 val collect_ffi_info : 'a Ast_core.Choreo.M.stmt list -> (string option * string * string option) list
+val ast_list_info_map : ('a -> 'b) -> 'a Ast_core.Choreo.M.stmt_block -> 'b Ast_core.Choreo.M.stmt_block
