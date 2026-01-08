@@ -37,7 +37,7 @@
 
 (test
  (name stdlib_test)
- (modules stdlib_test stdlib_test_testcases)
+ (modules stdlib_test)
  (libraries stdlib_utils))
 
 ;(test
