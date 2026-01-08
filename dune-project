@@ -19,6 +19,7 @@
 
 (package
  (name http_pirc)
+ (synopsis "Pirouette Compiler (HTTP)")
  (depends
   (lwt :build)
   (eio_main :build)

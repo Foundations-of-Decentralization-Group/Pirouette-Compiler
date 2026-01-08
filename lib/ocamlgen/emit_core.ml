@@ -117,7 +117,7 @@ and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (stmt : 'a Net.
     emit_foreign_decl id typ external_name
   | _ -> Builder.value_binding ~pat:[%pat? _unit] ~expr:Builder.eunit
 
-and emit_foreign_decl id _typ external_name =
+and emit_foreign_decl id typ external_name=
   let open Ast_builder.Default in
   let package_name, function_name, _ =
     Ast_utils.parse_external_name external_name
@@ -127,13 +127,33 @@ and emit_foreign_decl id _typ external_name =
     | Some pack -> pack ^ "."
     | None -> ""
   in
+  (* A function that takes in a Net type and pretty prints the type into Ocaml. Note, loc.types turn into just types*)
+  let rec find_type_sig : 'a Net.typ -> label = function
+    | TUnit _ -> "(unit)"
+    | TLoc (_, local_type, _) -> let rec find_local_type_sig : 'a Local.typ -> label = function  
+                                  | TUnit _ -> "(unit)"
+                                  | TInt _ -> "(int)"
+                                  | TString _ -> "(string)"
+                                  | TBool _ -> "(bool)"
+                                  | TVar (TypId (typ_id, _), _) -> "(" ^ typ_id ^ ")"
+                                  | TProd (typ1, typ2, _) -> "(" ^ (find_local_type_sig typ1) ^ " * " ^ (find_local_type_sig typ2) ^ ")"
+                                  | TSum (typ1, typ2, _) -> "(" ^ (find_local_type_sig typ1) ^ " + " ^ (find_local_type_sig typ2) ^ ")"
+                                in find_local_type_sig local_type
+    | TMap (typ1, typ2, _) -> "(" ^ (find_type_sig typ1) ^ " -> " ^ (find_type_sig typ2) ^ ")"
+    | TProd (typ1, typ2, _) -> "(" ^ (find_type_sig typ1) ^ " * " ^ (find_type_sig typ2) ^ ")"
+    | TSum (typ1, typ2, _) -> "(" ^ (find_type_sig typ1) ^ " + " ^ (find_type_sig typ2) ^ ")" in
+
+  (* The full type signature of a function. We apply this type signature to the identifier, then we set the value of the identifier to be equal to 'fun arg ->[ffi]]'. This works because of currying. *)
+  let type_sig = find_type_sig typ in
+  
   let fun_expr =
     pexp_fun
       ~loc
       Nolabel
       None
-      (pvar ~loc "arg")
+      (pvar ~loc (": " ^ type_sig))
       [%expr
+        [%e evar ~loc "fun arg ->"]
         [%e evar ~loc (package_string ^ function_name)]
         [%e evar ~loc "arg"]]
   in
@@ -152,6 +172,9 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
   | Let (stmts, e, _) ->
     Builder.pexp_let
       Recursive (*FIXME: how to handle tuples?*)
+      (* -From Audvy: We could create a function that taktes in stmts and outputs their Net Type, and then match on that, and only apply the Recursive flag on TMaps
+      OR
+      We create a function that takes in stmts and outputs the amount of identifiers on the left hand side. It anything more than 1 (exluding args), than it cannot be a func, so use the Nonrecursive flag*)
       (List.map (emit_net_binding ~self_id (module Msg)) stmts)
       (emit_net_pexp ~self_id (module Msg) e)
   | FunDef (ps, e, _) -> emit_net_fun_body ~self_id (module Msg) ps e

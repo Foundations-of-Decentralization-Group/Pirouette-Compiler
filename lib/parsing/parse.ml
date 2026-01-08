@@ -8,11 +8,11 @@ let string_of_pos pos =
   spf "[Ln %s, Col %s]" l c
 ;;
 
-let parse_with_error lexbuf =
+let parse_with_error (input_filename : string) (lexbuf : Lexing.lexbuf) =
   try Parser.prog Lexer.read lexbuf with
   | Lexer.SyntaxError msg ->
-    failwith (spf "Syntax error at %s: %s" (string_of_pos lexbuf.lex_start_p) msg)
-  | Parser.Error -> failwith (spf "Parse error at %s" (string_of_pos lexbuf.lex_start_p))
+    failwith (spf "Syntax error at [%s]: %s: %s" (input_filename) (string_of_pos lexbuf.lex_start_p) msg)
+  | Parser.Error -> failwith (spf "Parse error at [%s]:  %s" (input_filename) (string_of_pos lexbuf.lex_start_p))
 ;;
 
 let parse_net_with_error lexbuf =
