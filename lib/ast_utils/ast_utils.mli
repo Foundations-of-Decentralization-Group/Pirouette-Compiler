@@ -296,5 +296,4 @@ val parse_external_name : string -> (string option * string * string option)
       into [(module_name, function_name, alias)]. See section example for usage. *)
 
 val collect_ffi_info : 'a Ast_core.Choreo.M.stmt list -> (string option * string * string option) list
-(** [collect_ffi_info] extracts all foreign function declarations from 
-      statement list [stmts]. See section example for usage. *)
+val ast_list_info_map : ('a -> 'b) -> 'a Ast_core.Choreo.M.stmt_block -> 'b Ast_core.Choreo.M.stmt_block

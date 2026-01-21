@@ -39,6 +39,7 @@ end
 let emit_toplevel_init _loc_ids config_file_path =
   [ [%stri
     let () =
+      (* print_endline "In here for testing"; *)
       let config_file_path : string = [%e Ast_builder.Default.estring ~loc config_file_path] in
       match Lwt_main.run (Config_parser.load_config config_file_path) with
       | Some cfg ->
@@ -69,7 +70,7 @@ let emit_toplevel_http
          | binding ->
            Ast_builder.Default.pexp_let
              ~loc
-             Nonrecursive
+             Recursive
              [ binding ]
              (emit_net_toplevel stmts))
     in
