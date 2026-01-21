@@ -1,13 +1,17 @@
 open Cohttp_eio
 
-(* Global config reference *)
+(** Global config reference, initialized by the compiler generated code. *)
 let config = ref None
 
 (* Message queues for each location *)
 let loc_to_address = Hashtbl.create 10
 let message_queues : (string, string Eio.Stream.t) Hashtbl.t = Hashtbl.create 10
 
-(* Helper to get location config *)
+(** Helper to get location config; [get_location_config location] is [Ok config] containing the HTTP address
+    configuration for the [location] if [location] exists in the configuration,
+    and [Error msg] if the configuration is not initialized or [location] is unknown.
+    
+    Requires: Configuration must be initialized before calling this function.  *)
 let get_location_config location =
   match !config with
   | None -> Error "Config not initialized. Call init() first"
@@ -63,7 +67,11 @@ let marshal_data data =
   | e -> raise e
 ;;
 
-(* Function to unmarshal data *)
+(** [unmarshal_data data_str] is [Ok value] containing the unmarshaled OCaml value
+    if [data_str] is a valid marshaled string, and [Error msg] if [data_str] is
+    empty or unmarshaling fails.
+    
+    Requires: [data_str] must be a marshaled OCaml value. *)
 let unmarshal_data data_str =
   try
     if String.length data_str = 0
