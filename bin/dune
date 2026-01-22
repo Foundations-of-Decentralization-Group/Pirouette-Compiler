@@ -7,8 +7,3 @@
 (documentation
  (package pirc)
  (mld_files index))
-
- (install
- (section doc)
- (package pirc)
- (files ../odoc-config.sexp))
