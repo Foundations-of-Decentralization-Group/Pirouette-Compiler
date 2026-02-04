@@ -20,4 +20,4 @@ broadcast_unopt freq :=
 	let A.result_C := [C] C.x ~> A; in
         A.print_endline A."Terminate - Unoptimized";
 
-main := broadcast_unopt A.1050;
+main := broadcast_unopt A.1000;

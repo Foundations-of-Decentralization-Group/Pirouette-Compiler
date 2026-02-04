@@ -1,0 +1,1831 @@
+8276  futex(0x7fa7e3e4e848, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 132, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8241  futex(0x7fa7e000c420, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 130, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8060  futex(0x7fa7e2fe7bb8, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 10, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8059  futex(0x7fa7e2fe7b5c, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 21, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8058  futex(0x7fa7e2fe743c, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 43, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8057  futex(0x7fa7e2fe713c, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 263, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8056  futex(0x7fa7e2fe761c, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 647, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8054  futex(0x7fa7e2fd225c, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 1445, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8053  futex(0x7fa7e2fd2a38, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 2480, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8040  futex(0x7fa7e79a8d14, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 0, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8039  futex(0x7fa7e79a8e70, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 26, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8038  futex(0x7fa7e79a8580, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 0, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8033  restart_syscall(<... resuming interrupted futex ...> <unfinished ...>
+8032  futex(0x7fa7e79a8c60, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 0, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8031  futex(0x7fa7e79a84d0, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 30, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8030  futex(0x7fa7e79a8844, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 0, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8028  futex(0x7fa7e3e25a2c, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 1073, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8027  futex(0x7fa7e79f0188, FUTEX_WAIT_BITSET_PRIVATE, 1, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8026  futex(0x7fa7e79f0108, FUTEX_WAIT_BITSET_PRIVATE, 2, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8025  futex(0x7fa7e79f0088, FUTEX_WAIT_BITSET_PRIVATE, 11, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8024  futex(0x7fa7e79f0008, FUTEX_WAIT_BITSET_PRIVATE, 11, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8023  futex(0x7fa7e79eff88, FUTEX_WAIT_BITSET_PRIVATE, 10, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8022  futex(0x7fa7e79a88f0, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 54, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8021  futex(0x7fa7e79a8a54, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 245, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8011  epoll_wait(11 <unfinished ...>
+8007  read(3 <unfinished ...>
+8002  restart_syscall(<... resuming interrupted poll ...> <unfinished ...>
+8055  futex(0x7fa7e2fe755c, FUTEX_WAIT_BITSET_PRIVATE|FUTEX_CLOCK_REALTIME, 871, NULL, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8033  <... restart_syscall resumed>)    = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101497, {tv_sec=27516, tv_nsec=595633573}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... restart_syscall resumed>)    = 1
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8002  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8002  write(34, "\372", 1 <unfinished ...>
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101499, {tv_sec=27500, tv_nsec=884139665}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101499, {tv_sec=27516, tv_nsec=595633443}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101500, {tv_sec=27505, tv_nsec=884815548}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8011  recvmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8011  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... read resumed>, "\372", 1)    = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101502, {tv_sec=27501, tv_nsec=885637538}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101502, {tv_sec=27516, tv_nsec=595633375}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8002  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8002  write(34, "\372", 1 <unfinished ...>
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101504, {tv_sec=27501, tv_nsec=902188051}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101504, {tv_sec=27516, tv_nsec=595633366}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8002  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101505, {tv_sec=27506, tv_nsec=902668632}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  <... read resumed>, "\372", 1)    = 1
+8011  recvmsg(16, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  write(34, "\372", 1 <unfinished ...>
+8011  epoll_wait(11 <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101507, {tv_sec=27502, tv_nsec=903307733}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101507, {tv_sec=27516, tv_nsec=595633213}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8002  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101509, {tv_sec=27502, tv_nsec=920064852}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101509, {tv_sec=27516, tv_nsec=595633428}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101510, {tv_sec=27507, tv_nsec=920508931}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8011  recvmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8011  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... read resumed>, "\372", 1)    = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101512, {tv_sec=27503, tv_nsec=921339844}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101512, {tv_sec=27516, tv_nsec=595633264}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8002  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101514, {tv_sec=27503, tv_nsec=937974970}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101514, {tv_sec=27516, tv_nsec=595633436}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8002  write(34, "\372", 1 <unfinished ...>
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  <... write resumed>)              = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101515, {tv_sec=27508, tv_nsec=938593430}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  recvmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8011  write(34, "\372", 1)              = 1
+8011  recvmsg(16, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8011  epoll_wait(11 <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  write(34, "\372", 1)              = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101517, {tv_sec=27504, tv_nsec=939560167}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101517, {tv_sec=27516, tv_nsec=595633375}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101519, {tv_sec=27504, tv_nsec=956020357}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101519, {tv_sec=27516, tv_nsec=595633357}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8002  write(34, "\372", 1 <unfinished ...>
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  <... write resumed>)              = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101520, {tv_sec=27509, tv_nsec=956409730}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0 <unfinished ...>
+8011  recvmsg(16 <unfinished ...>
+8002  <... poll resumed>)               = 0 (Timeout)
+8011  <... recvmsg resumed>, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... read resumed>, "\372", 1)    = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101522, {tv_sec=27505, tv_nsec=957086318}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101522, {tv_sec=27516, tv_nsec=595633557}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8002  write(34, "\372", 1 <unfinished ...>
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101524, {tv_sec=27505, tv_nsec=974548734}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101524, {tv_sec=27516, tv_nsec=595633310}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8002  write(34, "\372", 1 <unfinished ...>
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  <... write resumed>)              = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101525, {tv_sec=27510, tv_nsec=975328486}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8011  recvmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8011  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... read resumed>, "\372", 1)    = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8002  <... sendmsg resumed>)            = 120
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101527, {tv_sec=27506, tv_nsec=976084942}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101527, {tv_sec=27516, tv_nsec=595633427}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101529, {tv_sec=27506, tv_nsec=992985676}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101529, {tv_sec=27516, tv_nsec=595633401}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8002  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101530, {tv_sec=27511, tv_nsec=993419445}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8011  recvmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8011  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... read resumed>, "\372", 1)    = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101532, {tv_sec=27507, tv_nsec=994204293}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101532, {tv_sec=27516, tv_nsec=595633937}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8002  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101534, {tv_sec=27508, tv_nsec=11119194}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101534, {tv_sec=27516, tv_nsec=595633426}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101535, {tv_sec=27513, tv_nsec=11654608}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8011  recvmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8011  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... read resumed>, "\372", 1)    = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101537, {tv_sec=27509, tv_nsec=12383272}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101537, {tv_sec=27516, tv_nsec=595633190}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101539, {tv_sec=27509, tv_nsec=28932022}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101539, {tv_sec=27516, tv_nsec=595633343}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101540, {tv_sec=27514, tv_nsec=29356156}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  <... read resumed>, "\372", 1)    = 1
+8011  recvmsg(16 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... write resumed>)              = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... sendmsg resumed>)            = 120
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101542, {tv_sec=27510, tv_nsec=29984648}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101542, {tv_sec=27516, tv_nsec=595633458}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101544, {tv_sec=27510, tv_nsec=46636748}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101544, {tv_sec=27516, tv_nsec=595633268}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101545, {tv_sec=27515, tv_nsec=47001298}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0 <unfinished ...>
+8011  recvmsg(16 <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  <... recvmsg resumed>, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  read(33 <unfinished ...>
+8011  recvmsg(16 <unfinished ...>
+8002  <... read resumed>, "\372", 1)    = 1
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  write(34, "\372", 1 <unfinished ...>
+8011  epoll_wait(11 <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101547, {tv_sec=27511, tv_nsec=47697291}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101547, {tv_sec=27516, tv_nsec=595633489}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101549, {tv_sec=27511, tv_nsec=68553250}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101549, {tv_sec=27516, tv_nsec=595633424}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  write(34, "\372", 1)              = 1
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  recvmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8011  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... read resumed>, "\372", 1)    = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8002  <... sendmsg resumed>)            = 120
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101550, {tv_sec=27512, tv_nsec=70257654}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101550, {tv_sec=27516, tv_nsec=595633994}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101552, {tv_sec=27512, tv_nsec=87115214}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101552, {tv_sec=27516, tv_nsec=595633550}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  write(34, "\372", 1)              = 1
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  <... read resumed>, "\372", 1)    = 1
+8011  recvmsg(16 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... write resumed>)              = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... sendmsg resumed>)            = 120
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101554, {tv_sec=27513, tv_nsec=88063464}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101554, {tv_sec=27516, tv_nsec=595633402}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101556, {tv_sec=27513, tv_nsec=104581646}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101556, {tv_sec=27516, tv_nsec=595633245}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  write(34, "\372", 1)              = 1
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  recvmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8011  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... read resumed>, "\372", 1)    = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101558, {tv_sec=27514, tv_nsec=106178051}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101558, {tv_sec=27516, tv_nsec=595633404}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8002  write(34, "\372", 1 <unfinished ...>
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  <... write resumed>)              = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101560, {tv_sec=27514, tv_nsec=123002589}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101560, {tv_sec=27516, tv_nsec=595633533}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  write(34, "\372", 1)              = 1
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  <... read resumed>, "\372", 1)    = 1
+8011  recvmsg(16, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  write(34, "\372", 1 <unfinished ...>
+8011  epoll_wait(11 <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101562, {tv_sec=27515, tv_nsec=124093320}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101562, {tv_sec=27516, tv_nsec=595633459}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101564, {tv_sec=27515, tv_nsec=141043924}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101564, {tv_sec=27516, tv_nsec=595633412}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  write(34, "\372", 1)              = 1
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  <... read resumed>, "\372", 1)    = 1
+8011  recvmsg(16, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  write(34, "\372", 1 <unfinished ...>
+8011  epoll_wait(11 <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101566, {tv_sec=27516, tv_nsec=142129328}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101566, {tv_sec=27516, tv_nsec=595633320}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101568, {tv_sec=27516, tv_nsec=214469108}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101568, {tv_sec=27516, tv_nsec=595633445}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  write(34, "\372", 1)              = 1
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  <... read resumed>, "\372", 1)    = 1
+8011  recvmsg(16, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8011  epoll_wait(11 <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101568, {tv_sec=27517, tv_nsec=215878705}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  getrusage(RUSAGE_SELF, {ru_utime={tv_sec=24, tv_usec=70655}, ru_stime={tv_sec=9, tv_usec=104448}, ...}) = 0
+8002  rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+8002  clone(child_stack=0x7fa7e2339ef0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID <unfinished ...>
+38564 rseq(0x7fa7e233a5a0, 0x20, 0, 0x53053053 <unfinished ...>
+8002  <... clone resumed>, parent_tid=[38564], tls=0x7fa7e233a6c0, child_tidptr=0x7fa7e233a990) = 38564
+38564 <... rseq resumed>)               = 0
+8002  rt_sigprocmask(SIG_SETMASK, [] <unfinished ...>
+38564 set_robust_list(0x7fa7e233a9a0, 24 <unfinished ...>
+8002  <... rt_sigprocmask resumed>, NULL, 8) = 0
+38564 <... set_robust_list resumed>)    = 0
+38564 rt_sigprocmask(SIG_SETMASK, [] <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+38564 <... rt_sigprocmask resumed>, NULL, 8) = 0
+8002  <... write resumed>)              = 1
+38564 mmap(NULL, 16384, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0 <unfinished ...>
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+38564 <... mmap resumed>)               = 0x7fa7f6087000
+38564 sigaltstack({ss_sp=0x7fa7f6087000, ss_flags=0, ss_size=16384} <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+38564 <... sigaltstack resumed>, NULL)  = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0 <unfinished ...>
+38564 gettid( <unfinished ...>
+8033  <... futex resumed>)              = 0
+38564 <... gettid resumed>)             = 38564
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+38564 getpriority(PRIO_PROCESS, 0 <unfinished ...>
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101570, {tv_sec=27516, tv_nsec=613786467}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+38564 <... getpriority resumed>)        = 20
+8002  read(33 <unfinished ...>
+38564 setpriority(PRIO_PROCESS, 38564, 0 <unfinished ...>
+8002  <... read resumed>, "\372", 1)    = 1
+38564 <... setpriority resumed>)        = 0
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0 <unfinished ...>
+38564 prctl(PR_SET_NAME, "StreamT~ns #500"... <unfinished ...>
+8002  <... poll resumed>)               = 0 (Timeout)
+38564 <... prctl resumed>)              = 0
+38564 gettid( <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+38564 <... gettid resumed>)             = 38564
+38564 sched_getaffinity(38564, 32 <unfinished ...>
+8002  <... sendmsg resumed>)            = 128
+38564 <... sched_getaffinity resumed>, [0 1 2 3 4 5 6 7]) = 8
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+38564 madvise(0x7fa7e22fb000, 262144, MADV_NOHUGEPAGE) = 0
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+38564 gettid()                          = 38564
+8011  recvmsg(16 <unfinished ...>
+38564 gettid()                          = 38564
+8011  <... recvmsg resumed>, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+38564 prctl(PR_SET_NAME, "StreamT~ns #500"...) = 0
+8011  write(34, "\372", 1 <unfinished ...>
+38564 openat(AT_FDCWD, "/proc/self/statm", O_RDONLY <unfinished ...>
+8011  <... write resumed>)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+38564 <... openat resumed>)             = 257
+8011  recvmsg(16 <unfinished ...>
+38564 --- SIGSYS {si_signo=SIGSYS, si_code=SYS_SECCOMP, si_errno=EMFILE, si_call_addr=0x7fa7f929f042, si_syscall=__NR_openat, si_arch=AUDIT_ARCH_X86_64} ---
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... read resumed>, "\372", 1)    = 1
+38564 getpid( <unfinished ...>
+8011  epoll_wait(11 <unfinished ...>
+38564 <... getpid resumed>)             = 8002
+8002  write(34, "\372", 1 <unfinished ...>
+38564 getpid( <unfinished ...>
+8002  <... write resumed>)              = 1
+38564 <... getpid resumed>)             = 8002
+38564 socketpair(AF_UNIX, SOCK_SEQPACKET, 0 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+38564 <... socketpair resumed>, [48, 50]) = 0
+8002  <... sendmsg resumed>)            = 120
+38564 sendmsg(29, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\0\0\0\0\0\0\0\0.\3\0\0\0\0\0\0\0\0\0\0\0\0\0\0", iov_len=24}, {iov_base="/proc/8002/statm\0", iov_len=17}, {iov_base=NULL, iov_len=0}], msg_iovlen=3, msg_control=[{cmsg_len=20, cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, cmsg_data=[50]}], msg_controllen=24, msg_flags=0}, MSG_NOSIGNAL <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0 <unfinished ...>
+38564 <... sendmsg resumed>)            = 41
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+38564 close(50 <unfinished ...>
+8002  read(33 <unfinished ...>
+38564 <... close resumed>)              = 0
+8002  <... read resumed>, "\372", 1)    = 1
+38564 recvmsg(48 <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+38564 <... recvmsg resumed>, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\0\0\0\0", iov_len=4}], msg_iovlen=1, msg_control=[{cmsg_len=20, cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, cmsg_data=[50]}], msg_controllen=24, msg_flags=MSG_CMSG_CLOEXEC}, MSG_CMSG_CLOEXEC) = 4
+38564 close(48)                         = 0
+38564 fcntl(50, F_SETFD, 0)             = 0
+38564 rt_sigreturn({mask=[]})           = 50
+38564 fstat(50, {st_mode=S_IFREG|0444, st_size=0, ...}) = 0
+38564 read(50, "655578 47459 25521 153 0 40557 0"..., 1024) = 33
+38564 lseek(50, 0, SEEK_CUR)            = 33
+38564 lseek(50, 12, SEEK_SET)           = 12
+38564 close(50)                         = 0
+38564 getrusage(RUSAGE_SELF, {ru_utime={tv_sec=24, tv_usec=71737}, ru_stime={tv_sec=9, tv_usec=104857}, ...}) = 0
+38564 openat(AT_FDCWD, "/proc/self/smaps", O_RDONLY) = 257
+38564 --- SIGSYS {si_signo=SIGSYS, si_code=SYS_SECCOMP, si_errno=EMFILE, si_call_addr=0x7fa7f929f042, si_syscall=__NR_openat, si_arch=AUDIT_ARCH_X86_64} ---
+38564 getpid()                          = 8002
+38564 getpid()                          = 8002
+38564 socketpair(AF_UNIX, SOCK_SEQPACKET, 0, [48, 50]) = 0
+38564 sendmsg(29, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\0\0\0\0\0\0\0\0/\3\0\0\0\0\0\0\0\0\0\0\0\0\0\0", iov_len=24}, {iov_base="/proc/8002/smaps\0", iov_len=17}, {iov_base=NULL, iov_len=0}], msg_iovlen=3, msg_control=[{cmsg_len=20, cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, cmsg_data=[50]}], msg_controllen=24, msg_flags=0}, MSG_NOSIGNAL) = 41
+38564 close(50)                         = 0
+38564 recvmsg(48, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\0\0\0\0", iov_len=4}], msg_iovlen=1, msg_control=[{cmsg_len=20, cmsg_level=SOL_SOCKET, cmsg_type=SCM_RIGHTS, cmsg_data=[50]}], msg_controllen=24, msg_flags=MSG_CMSG_CLOEXEC}, MSG_CMSG_CLOEXEC) = 4
+38564 close(48)                         = 0
+38564 fcntl(50, F_SETFD, 0)             = 0
+38564 rt_sigreturn({mask=[]})           = 50
+38564 read(50, "29380400000-29380500000 rw-p 000"..., 8191) = 3940
+38564 read(50, "1a5420900000-1a5420a00000 rw-p 0"..., 8191) = 3971
+38564 read(50, "1ae01e9b4000-1ae01ea54000 ---p 0"..., 8191) = 3969
+38564 read(50, "1ae01eaa4000-1ae01eac4000 rwxp 0"..., 8191) = 3981
+38564 read(50, "1ae01eb74000-1ae01ec84000 ---p 0"..., 8191) = 3945
+38564 read(50, "1dd916600000-1dd916700000 rw-p 0"..., 8191) = 3940
+38564 read(50, "35dc36900000-35dc36a00000 rw-p 0"..., 8191) = 3940
+38564 read(50, "559a4c5ec000-559a4c60f000 r--p 0"..., 8191) = 3914
+38564 read(50, "7f02d4e00000-7f02d4e71000 r--s 0"..., 8191) = 3943
+38564 read(50, "7fa7daaff000-7fa7dab00000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7dac00000-7fa7dac02000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7dad02000-7fa7dad03000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7daf03000-7fa7dafff000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7db0ff000-7fa7db100000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7db200000-7fa7db202000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7db302000-7fa7db303000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7db403000-7fa7db4ff000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7db7ff000-7fa7db800000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7db900000-7fa7db902000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7dba02000-7fa7dba03000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7dbb03000-7fa7dbbff000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7dbcff000-7fa7dbd00000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7dbe00000-7fa7dbe02000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7dbf02000-7fa7dbf03000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7dc003000-7fa7dc0ff000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7dc1ff000-7fa7dc200000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7dc300000-7fa7dc302000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7dc402000-7fa7dc403000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7dc503000-7fa7dc5ff000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7dc6ff000-7fa7dc700000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7dc800000-7fa7dcc0e000 r--p 0"..., 8191) = 4007
+38564 read(50, "7fa7dce00000-7fa7dce02000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7dcf02000-7fa7dcf03000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7dd003000-7fa7dd0ff000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7dd1ff000-7fa7dd200000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7dd300000-7fa7dd302000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7dd402000-7fa7dd403000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7dd503000-7fa7dd5ff000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7dd6ff000-7fa7dd700000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7dd900000-7fa7dd902000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7dda02000-7fa7dda03000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7ddb03000-7fa7ddbff000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7ddcff000-7fa7ddd00000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7dde00000-7fa7dde02000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7ddf02000-7fa7ddf03000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7de003000-7fa7de0ff000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7de1ff000-7fa7de200000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7de300000-7fa7de302000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7de402000-7fa7de403000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7de503000-7fa7de5ff000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7de6ff000-7fa7de700000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7de800000-7fa7de802000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7de902000-7fa7de903000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7dea03000-7fa7deaff000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7debff000-7fa7dec00000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7ded00000-7fa7ded02000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7dee02000-7fa7dee03000 ---p 0"..., 8191) = 3850
+38564 read(50, "7fa7df100000-7fa7df102000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7df202000-7fa7df203000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7df303000-7fa7df3ff000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7df4ff000-7fa7df500000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7df600000-7fa7df602000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7df702000-7fa7df703000 ---p 0"..., 8191) = 3970
+38564 read(50, "7fa7dfa29000-7fa7dfb00000 r--p 0"..., 8191) = 3963
+38564 read(50, "7fa7dfc00000-7fa7dfc02000 rw-p 0"..., 8191) = 3936
+38564 read(50 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+38564 <... read resumed>, "7fa7dfd02000-7fa7dfd03000 ---p 0"..., 8191) = 3939
+8033  <... futex resumed>)              = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101570, {tv_sec=27517, tv_nsec=599138594}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33 <unfinished ...>
+38564 read(50 <unfinished ...>
+8002  <... read resumed>, "\372", 1)    = 1
+38564 <... read resumed>, "7fa7dfe03000-7fa7dfeff000 rw-p 0"..., 8191) = 3936
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101572, {tv_sec=27516, tv_nsec=864193930}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... write resumed>)              = 1
+38564 read(50 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+38564 <... read resumed>, "7fa7dffff000-7fa7e0000000 ---p 0"..., 8191) = 3939
+8002  <... sendmsg resumed>)            = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+38564 read(50 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  read(33 <unfinished ...>
+8011  recvmsg(16 <unfinished ...>
+8002  <... read resumed>, "\372", 1)    = 1
+8011  <... recvmsg resumed>, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0 <unfinished ...>
+38564 <... read resumed>, "7fa7e0100000-7fa7e0102000 rw-p 0"..., 8191) = 3954
+8011  write(34, "\372", 1 <unfinished ...>
+8002  <... poll resumed>)               = 0 (Timeout)
+38564 read(50 <unfinished ...>
+8011  <... write resumed>)              = 1
+8002  futex(0x7fa7f8d95180, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8011  futex(0x7fa7f8d95180, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  <... futex resumed>)              = -1 EAGAIN (Resource temporarily unavailable)
+8011  <... futex resumed>)              = 0
+8002  futex(0x7fa7f8d95180, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+38564 <... read resumed>, "7fa7e02d1000-7fa7e0369000 r--p 0"..., 8191) = 3991
+8011  recvmsg(16 <unfinished ...>
+8002  <... futex resumed>)              = 0
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8011  epoll_wait(11 <unfinished ...>
+38564 read(50, "7fa7e04f9000-7fa7e04fb000 r--p 0"..., 8191) = 3912
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 120
+38564 read(50 <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+38564 <... read resumed>, "7fa7e0503000-7fa7e05ff000 rw-p 0"..., 8191) = 3936
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+38564 read(50, "7fa7e06ff000-7fa7e0700000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7e0800000-7fa7e0802000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7e0902000-7fa7e0903000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7e0a03000-7fa7e0aff000 rw-p 0"..., 8191) = 3943
+38564 read(50, "7fa7e0d03000-7fa7e0dff000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7e0eff000-7fa7e0f00000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7e107e000-7fa7e107f000 ---p 0"..., 8191) = 3758
+38564 read(50, "7fa7e1102000-7fa7e1103000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7e1203000-7fa7e12ff000 rw-p 0"..., 8191) = 3962
+38564 read(50, "7fa7e13b2000-7fa7e13c2000 r--p 0"..., 8191) = 3856
+38564 read(50, "7fa7e13c7000-7fa7e1407000 rw-p 0"..., 8191) = 3721
+38564 read(50, "7fa7e1805000-7fa7e1806000 ---p 0"..., 8191) = 3709
+38564 read(50, "7fa7e1c04000-7fa7e1e02000 rw-p 0"..., 8191) = 3721
+38564 read(50, "7fa7e2278000-7fa7e2279000 ---p 0"..., 8191) = 3709
+38564 read(50, "7fa7e22fb000-7fa7e233b000 rw-p 0"..., 8191) = 3721
+38564 read(50, "7fa7e23bd000-7fa7e23be000 ---p 0"..., 8191) = 3844
+38564 read(50, "7fa7e2470000-7fa7e2471000 ---p 0"..., 8191) = 3821
+38564 read(50, "7fa7e263e000-7fa7e267e000 rw-p 0"..., 8191) = 3721
+38564 read(50, "7fa7e2700000-7fa7e2702000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7e2802000-7fa7e2803000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7e2903000-7fa7e29ff000 rw-p 0"..., 8191) = 3981
+38564 read(50, "7fa7e2a2c000-7fa7e2a30000 rw-s 0"..., 8191) = 3892
+38564 read(50, "7fa7e2aa4000-7fa7e2aa5000 ---p 0"..., 8191) = 3709
+38564 read(50, "7fa7e2b27000-7fa7e2b67000 rw-p 0"..., 8191) = 3774
+38564 mprotect(0x7fa7f8f8f000, 4096, PROT_READ|PROT_WRITE) = 0
+38564 read(50, "7fa7e2bc0000-7fa7e2c00000 rw-p 0"..., 8191) = 3899
+38564 read(50, "7fa7e2d0a000-7fa7e2f00000 r--p 0"..., 8191) = 4017
+38564 read(50, "7fa7e3000000-7fa7e3100000 r--s 0"..., 8191) = 3947
+38564 read(50, "7fa7e32ff000-7fa7e3300000 ---p 0"..., 8191) = 3997
+38564 read(50, "7fa7e3310000-7fa7e3330000 rw-p 0"..., 8191) = 3718
+38564 read(50, "7fa7e33b2000-7fa7e33b3000 ---p 0"..., 8191) = 3893
+38564 read(50, "7fa7e3503000-7fa7e35ff000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7e36ff000-7fa7e3700000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7e3800000-7fa7e3802000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7e3902000-7fa7e3903000 ---p 0"..., 8191) = 3968
+38564 read(50, "7fa7e3a0b000-7fa7e3a13000 rw-p 0"..., 8191) = 3928
+38564 read(50, "7fa7e3a41000-7fa7e3a5a000 r--s 0"..., 8191) = 3328
+38564 read(50, "7fa7e3a7a000-7fa7e3a89000 r--s 0"..., 8191) = 4082
+38564 read(50, "7fa7e3b3d000-7fa7e3b3e000 ---p 0"..., 8191) = 3709
+38564 read(50, "7fa7e3bc0000-7fa7e3c00000 rw-p 0"..., 8191) = 3899
+38564 read(50, "7fa7e3d00000-7fa7e3d02000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7e3e02000-7fa7e3e03000 ---p 0"..., 8191) = 3939
+38564 read(50, "7fa7e3f03000-7fa7e3fff000 rw-p 0"..., 8191) = 3939
+38564 read(50, "7fa7e42fb000-7fa7e433b000 rw-p 0"..., 8191) = 3721
+38564 read(50, "7fa7e43bd000-7fa7e43be000 ---p 0"..., 8191) = 3712
+38564 read(50, "7fa7e4600000-7fa7e4e00000 rw-p 0"..., 8191) = 3922
+38564 read(50, "7fa7e78c0000-7fa7e7900000 rw-p 0"..., 8191) = 3899
+38564 read(50, "7fa7e7a00000-7fa7e9e6c000 r--p 0"..., 8191) = 3861
+38564 read(50, "7fa7e9ec2000-7fa7e9ed9000 r--p 0"..., 8191) = 3932
+38564 read(50, "7fa7e9ffe000-7fa7ea000000 rw-p 0"..., 8191) = 3922
+38564 read(50, "7fa7f4130000-7fa7f41dd000 rw-p 0"..., 8191) = 3948
+38564 read(50, "7fa7f6062000-7fa7f6063000 r--p 0"..., 8191) = 3985
+38564 read(50, "7fa7f6076000-7fa7f607c000 r--s 0"..., 8191) = 3896
+38564 read(50, "7fa7f6098000-7fa7f609c000 rw-p 0"..., 8191) = 3919
+38564 read(50, "7fa7f61ce000-7fa7f61f7000 r--p 0"..., 8191) = 3968
+38564 read(50, "7fa7f635f000-7fa7f63ec000 r--p 0"..., 8191) = 3927
+38564 read(50, "7fa7f6403000-7fa7f6413000 rw-p 0"..., 8191) = 3904
+38564 read(50, "7fa7f643f000-7fa7f6440000 rw-p 0"..., 8191) = 3936
+38564 read(50, "7fa7f64a6000-7fa7f64a7000 rw-p 0"..., 8191) = 3807
+38564 read(50, "7fa7f64f4000-7fa7f64f9000 r-xp 0"..., 8191) = 3958
+38564 read(50, "7fa7f64fe000-7fa7f6502000 r-xp 0"..., 8191) = 3934
+38564 read(50, "7fa7f6506000-7fa7f6507000 r--p 0"..., 8191) = 4002
+38564 read(50, "7fa7f6529000-7fa7f653d000 r--p 0"..., 8191) = 3982
+38564 read(50, "7fa7f6648000-7fa7f6649000 rw-p 0"..., 8191) = 3912
+38564 read(50, "7fa7f66ce000-7fa7f66cf000 rw-p 0"..., 8191) = 3915
+38564 read(50, "7fa7f67b3000-7fa7f67b4000 r--p 0"..., 8191) = 3962
+38564 read(50, "7fa7f67e7000-7fa7f67e8000 r--p 0"..., 8191) = 3956
+38564 read(50, "7fa7f67f3000-7fa7f67f4000 r--p 0"..., 8191) = 3955
+38564 read(50, "7fa7f680d000-7fa7f680e000 r--p 0"..., 8191) = 3963
+38564 read(50, "7fa7f6815000-7fa7f6816000 r--p 0"..., 8191) = 3961
+38564 read(50, "7fa7f681a000-7fa7f681b000 r--p 0"..., 8191) = 3975
+38564 read(50, "7fa7f6829000-7fa7f682a000 r--p 0"..., 8191) = 3969
+38564 read(50, "7fa7f683c000-7fa7f683d000 r--p 0"..., 8191) = 3966
+38564 read(50, "7fa7f6845000-7fa7f6846000 r--p 0"..., 8191) = 3969
+38564 read(50, "7fa7f687a000-7fa7f6880000 r--p 0"..., 8191) = 3976
+38564 read(50, "7fa7f69ea000-7fa7f69ee000 r--p 0"..., 8191) = 3928
+38564 read(50, "7fa7f6aea000-7fa7f6b27000 r--p 0"..., 8191) = 3930
+38564 read(50, "7fa7f6b3a000-7fa7f6b50000 r-xp 0"..., 8191) = 4013
+38564 read(50, "7fa7f6b69000-7fa7f6b9a000 r-xp 0"..., 8191) = 3975
+38564 read(50, "7fa7f6bbc000-7fa7f6bd5000 r-xp 0"..., 8191) = 3966
+38564 read(50, "7fa7f6bed000-7fa7f6c43000 r-xp 0"..., 8191) = 3962
+38564 read(50, "7fa7f6c7f000-7fa7f6cf5000 r-xp 0"..., 8191) = 3964
+38564 read(50, "7fa7f6d1e000-7fa7f6d3c000 r-xp 0"..., 8191) = 3975
+38564 read(50, "7fa7f6d49000-7fa7f6d62000 r-xp 0"..., 8191) = 3987
+38564 read(50, "7fa7f6d6f000-7fa7f6e00000 r-xp 0"..., 8191) = 3985
+38564 read(50, "7fa7f6e1a000-7fa7f6e1b000 r-xp 0"..., 8191) = 3980
+38564 read(50, "7fa7f6e24000-7fa7f6e29000 r-xp 0"..., 8191) = 3985
+38564 read(50, "7fa7f6e39000-7fa7f6e4d000 r-xp 0"..., 8191) = 3961
+38564 read(50, "7fa7f6e5a000-7fa7f6e61000 r-xp 0"..., 8191) = 3979
+38564 read(50, "7fa7f6e6a000-7fa7f6f02000 r-xp 0"..., 8191) = 3985
+38564 read(50, "7fa7f6f3a000-7fa7f6f63000 r-xp 0"..., 8191) = 3974
+38564 read(50, "7fa7f6f70000-7fa7f6f74000 r-xp 0"..., 8191) = 3963
+38564 read(50, "7fa7f6f83000-7fa7f6fbd000 r-xp 0"..., 8191) = 3963
+38564 read(50, "7fa7f6fd2000-7fa7f6fe0000 r-xp 0"..., 8191) = 3949
+38564 read(50, "7fa7f6fea000-7fa7f6ff1000 r-xp 0"..., 8191) = 3962
+38564 read(50, "7fa7f6ff6000-7fa7f7072000 r-xp 0"..., 8191) = 3982
+38564 read(50, "7fa7f70a0000-7fa7f70a1000 r-xp 0"..., 8191) = 3980
+38564 read(50, "7fa7f70a6000-7fa7f70ad000 r-xp 0"..., 8191) = 3976
+38564 read(50, "7fa7f70b2000-7fa7f70b3000 r-xp 0"..., 8191) = 3989
+38564 read(50, "7fa7f70b9000-7fa7f70bf000 r-xp 0"..., 8191) = 3974
+38564 read(50, "7fa7f70c7000-7fa7f70d2000 r-xp 0"..., 8191) = 3973
+38564 read(50, "7fa7f70da000-7fa7f70dc000 r-xp 0"..., 8191) = 4012
+38564 read(50, "7fa7f70e6000-7fa7f7112000 r-xp 0"..., 8191) = 3998
+38564 read(50, "7fa7f7154000-7fa7f71d1000 r-xp 0"..., 8191) = 4020
+38564 read(50, "7fa7f7214000-7fa7f721e000 r-xp 0"..., 8191) = 4012
+38564 read(50, "7fa7f7230000-7fa7f7248000 r-xp 0"..., 8191) = 4001
+38564 read(50, "7fa7f7276000-7fa7f730a000 r-xp 0"..., 8191) = 3959
+38564 read(50, "7fa7f73ea000-7fa7f7450000 r-xp 0"..., 8191) = 3973
+38564 read(50, "7fa7f74b5000-7fa7f74c4000 r-xp 0"..., 8191) = 4004
+38564 read(50, "7fa7f74db000-7fa7f7506000 r-xp 0"..., 8191) = 4026
+38564 read(50, "7fa7f7524000-7fa7f760e000 r-xp 0"..., 8191) = 3999
+38564 read(50, "7fa7f7657000-7fa7f774a000 r-xp 0"..., 8191) = 3938
+38564 read(50, "7fa7f7786000-7fa7f7794000 r--p 0"..., 8191) = 4002
+38564 read(50, "7fa7f77f0000-7fa7f7822000 r--p 0"..., 8191) = 3992
+38564 read(50, "7fa7f79bc000-7fa7f79be000 rw-p 0"..., 8191) = 3940
+38564 read(50, "7fa7f7b12000-7fa7f7b13000 rw-p 0"..., 8191) = 3937
+38564 read(50, "7fa7f7bf4000-7fa7f7bfe000 r--p 0"..., 8191) = 3987
+38564 read(50, "7fa7f82e5000-7fa7f82f7000 r--p 0"..., 8191) = 3949
+38564 read(50, "7fa7f8301000-7fa7f8302000 r--p 0"..., 8191) = 3977
+38564 read(50, "7fa7f8306000-7fa7f830c000 r--p 0"..., 8191) = 3997
+38564 read(50, "7fa7f8357000-7fa7f8363000 r--p 0"..., 8191) = 4012
+38564 read(50, "7fa7f83b6000-7fa7f83b7000 r--s 0"..., 8191) = 3944
+38564 read(50, "7fa7f83bf000-7fa7f83c0000 r--p 0"..., 8191) = 3953
+38564 read(50, "7fa7f83c4000-7fa7f83c5000 r--p 0"..., 8191) = 3963
+38564 read(50, "7fa7f83ea000-7fa7f83ef000 r--p 0"..., 8191) = 3938
+38564 read(50, "7fa7f83f7000-7fa7f83f8000 r--p 0"..., 8191) = 3960
+38564 read(50, "7fa7f83fe000-7fa7f83ff000 r--p 0"..., 8191) = 3999
+38564 read(50, "7fa7f8ca6000-7fa7f8ca7000 rw-p 0"..., 8191) = 3945
+38564 read(50, "7fa7f8cfe000-7fa7f8cff000 r--p 0"..., 8191) = 3966
+38564 read(50, "7fa7f8dff000-7fa7f8e00000 ---p 0"..., 8191) = 3755
+38564 read(50, "7fa7f8e0c000-7fa7f8e0d000 ---p 0"..., 8191) = 3703
+38564 read(50, "7fa7f8e21000-7fa7f8e22000 rw-p 0"..., 8191) = 3712
+38564 read(50, "7fa7f8e26000-7fa7f8e2d000 ---p 0"..., 8191) = 3703
+38564 read(50, "7fa7f8e57000-7fa7f8e58000 rw-p 0"..., 8191) = 3712
+38564 read(50, "7fa7f8e62000-7fa7f8e6f000 ---p 0"..., 8191) = 3703
+38564 read(50, "7fa7f8e91000-7fa7f8e92000 rw-p 0"..., 8191) = 3712
+38564 read(50, "7fa7f8f40000-7fa7f8f4f000 ---p 0"..., 8191) = 3703
+38564 read(50, "7fa7f8f77000-7fa7f8f78000 rw-p 0"..., 8191) = 3712
+38564 read(50, "7fa7f8f90000-7fa7f9000000 ---p 0"..., 8191) = 3887
+38564 read(50, "7fa7f9200000-7fa7f9224000 r--p 0"..., 8191) = 3927
+38564 read(50, "7fa7f940b000-7fa7f9413000 rw-p 0"..., 8191) = 3956
+38564 read(50, "7fa7f9422000-7fa7f9423000 rw-p 0"..., 8191) = 3965
+38564 read(50, "7fa7f9435000-7fa7f9436000 rw-p 0"..., 8191) = 3972
+38564 read(50, "7fa7f9455000-7fa7f9456000 rw-p 0"..., 8191) = 4003
+38564 read(50, "7fa7f95c0000-7fa7f95ca000 r--p 0"..., 8191) = 3937
+38564 read(50, "7fa7f95fd000-7fa7f9600000 rw-p 0"..., 8191) = 3924
+38564 read(50, "7fa7f988f000-7fa7f9890000 rw-p 0"..., 8191) = 3986
+38564 read(50, "7fa7f989b000-7fa7f989d000 r--p 0"..., 8191) = 4023
+38564 read(50, "7fa7f98b7000-7fa7f98bc000 r--p 0"..., 8191) = 3945
+38564 read(50, "7fa7f98c7000-7fa7f98ea000 r-xp 0"..., 8191) = 3943
+38564 read(50, "7fa7f98ff000-7fa7f998a000 r-xp 0"..., 8191) = 3936
+38564 read(50, "7fa7f9a00000-7fa7f9a03000 r-xp 0"..., 8191) = 3983
+38564 read(50, "7fa7f9a0b000-7fa7f9a12000 r-xp 0"..., 8191) = 4024
+38564 read(50, "7fa7f9a18000-7fa7f9a1a000 r-xp 0"..., 8191) = 4006
+38564 read(50, "7fa7f9a1e000-7fa7f9a1f000 r-xp 0"..., 8191) = 3989
+38564 read(50, "7fa7f9a44000-7fa7f9a47000 r--p 0"..., 8191) = 4001
+38564 read(50, "7fa7f9a74000-7fa7f9a75000 rw-p 0"..., 8191) = 3935
+38564 read(50, "7fa7f9ab0000-7fa7f9ab2000 r--p 0"..., 8191) = 3870
+38564 read(50, "7fff403c1000-7fff403c5000 r--p 0"..., 8191) = 2317
+38564 read(50, "", 8191)                = 0
+38564 close(50)                         = 0
+38564 mmap(0x7fa7f8f8f000, 4096, PROT_NONE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7fa7f8f8f000
+38564 futex(0x7fa7e23397a0, FUTEX_WAIT_BITSET_PRIVATE, 0, {tv_sec=27546, tv_nsec=653080487}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101572, {tv_sec=27517, tv_nsec=615569135}, FUTEX_BITSET_MATCH_ANY) = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101572, {tv_sec=27518, tv_nsec=596102248}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101575, {tv_sec=27517, tv_nsec=632459060}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101575, {tv_sec=27518, tv_nsec=596102259}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  write(34, "\372", 1)              = 1
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  read(33 <unfinished ...>
+8011  recvmsg(16 <unfinished ...>
+8002  <... read resumed>, "\372", 1)    = 1
+8011  <... recvmsg resumed>, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0 <unfinished ...>
+8011  write(34, "\372", 1 <unfinished ...>
+8002  <... poll resumed>)               = 0 (Timeout)
+8011  <... write resumed>)              = 1
+8011  futex(0x7fa7f8d95180, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  futex(0x7fa7f8d95180, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8011  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = -1 EAGAIN (Resource temporarily unavailable)
+8011  recvmsg(16 <unfinished ...>
+8002  futex(0x7fa7f8d95180, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... futex resumed>)              = 0
+8011  epoll_wait(11 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101575, {tv_sec=27518, tv_nsec=634369202}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\334\0\0\0\372\09\0\1\0\0\0@\0\0\0\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377\377"..., iov_len=268}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 268
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="T\0\0\0\377\09\0\1\0\0\0@\0\0\0\377\377\377\377\377\377\377\177\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\0\0\0\0\332\320q\247tzA\260\17_\27t\217\271\206\4<\343\2300"..., iov_len=68}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 132
+8002  write(34, "\372", 1)              = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101575, {tv_sec=27519, tv_nsec=597398775}, FUTEX_BITSET_MATCH_ANY) = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101575, {tv_sec=28805, tv_nsec=736545944}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101577, {tv_sec=27519, tv_nsec=614261680}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101577, {tv_sec=28805, tv_nsec=736545749}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101580, {tv_sec=27524, tv_nsec=614592806}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  recvmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8011  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... read resumed>, "\372", 1)    = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8002  <... sendmsg resumed>)            = 120
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101585, {tv_sec=27520, tv_nsec=615350932}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101585, {tv_sec=28805, tv_nsec=736546051}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101587, {tv_sec=27520, tv_nsec=632545954}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101587, {tv_sec=28805, tv_nsec=736545807}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101588, {tv_sec=27525, tv_nsec=633564338}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0 <unfinished ...>
+8011  recvmsg(16 <unfinished ...>
+8002  <... poll resumed>)               = 0 (Timeout)
+8011  <... recvmsg resumed>, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  write(34, "\372", 1)              = 1
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8011  epoll_wait(11 <unfinished ...>
+8002  <... futex resumed>)              = 1
+8033  <... futex resumed>)              = 0
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8002  <... sendmsg resumed>)            = 120
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101590, {tv_sec=27521, tv_nsec=634367116}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101590, {tv_sec=28805, tv_nsec=736545961}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101592, {tv_sec=27521, tv_nsec=650948140}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101592, {tv_sec=28805, tv_nsec=736545787}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101593, {tv_sec=27526, tv_nsec=651311659}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8011  recvmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8011  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... read resumed>, "\372", 1)    = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101595, {tv_sec=27522, tv_nsec=652489539}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101595, {tv_sec=28805, tv_nsec=736545801}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101597, {tv_sec=27522, tv_nsec=669477885}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101597, {tv_sec=28805, tv_nsec=736545844}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101598, {tv_sec=27527, tv_nsec=670244070}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8002  read(33 <unfinished ...>
+8011  recvmsg(16 <unfinished ...>
+8002  <... read resumed>, "\372", 1)    = 1
+8011  <... recvmsg resumed>, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0 <unfinished ...>
+8011  write(34, "\372", 1 <unfinished ...>
+8002  <... poll resumed>)               = 0 (Timeout)
+8011  <... write resumed>)              = 1
+8011  futex(0x7fa7f8d95180, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  futex(0x7fa7f8d95180, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8011  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = -1 EAGAIN (Resource temporarily unavailable)
+8011  recvmsg(16 <unfinished ...>
+8002  futex(0x7fa7f8d95180, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... futex resumed>)              = 0
+8011  epoll_wait(11 <unfinished ...>
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8002  <... sendmsg resumed>)            = 120
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101600, {tv_sec=27523, tv_nsec=670921037}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101600, {tv_sec=28805, tv_nsec=736545819}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8002  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101602, {tv_sec=27523, tv_nsec=687658738}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101602, {tv_sec=28805, tv_nsec=736545839}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101603, {tv_sec=27528, tv_nsec=688276428}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8011  recvmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8011  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... read resumed>, "\372", 1)    = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101605, {tv_sec=27524, tv_nsec=689016016}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101605, {tv_sec=28805, tv_nsec=736545890}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8002  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101607, {tv_sec=27524, tv_nsec=705860233}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101607, {tv_sec=28805, tv_nsec=736545693}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8002  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101608, {tv_sec=27529, tv_nsec=706345247}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8011  recvmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8011  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... read resumed>, "\372", 1)    = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101610, {tv_sec=27525, tv_nsec=707188721}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101610, {tv_sec=28805, tv_nsec=736545910}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8002  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8002  write(34, "\372", 1 <unfinished ...>
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101612, {tv_sec=27525, tv_nsec=724110732}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101612, {tv_sec=28805, tv_nsec=736545647}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8002  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101613, {tv_sec=27530, tv_nsec=724557236}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8011  recvmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8011  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... read resumed>, "\372", 1)    = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101615, {tv_sec=27526, tv_nsec=725439854}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101615, {tv_sec=28805, tv_nsec=736545875}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAIT_PRIVATE, 2, NULL <unfinished ...>
+8002  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... futex resumed>)              = 1
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8002  write(34, "\372", 1 <unfinished ...>
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101617, {tv_sec=27526, tv_nsec=742289043}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... write resumed>)              = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8033  <... futex resumed>)              = -1 ETIMEDOUT (Connection timed out)
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1) = 0
+8033  write(34, "\372", 1)              = 1
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101617, {tv_sec=28805, tv_nsec=736545721}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  futex(0x7fa7f8dc04c8, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  write(34, "\372", 1 <unfinished ...>
+8033  <... futex resumed>)              = 0
+8002  <... write resumed>)              = 1
+8033  futex(0x7fa7f8dc04cc, FUTEX_WAIT_BITSET_PRIVATE, 101618, {tv_sec=27531, tv_nsec=742692592}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\4\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\0\0\0\0\0\0\0\0\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341"..., iov_len=64}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 0 (Timeout)
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <unfinished ...>
+8011  <... epoll_wait resumed>, [{events=EPOLLIN, data=0x10}], 32, -1) = 1
+8011  recvmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="P\0\0\0\1\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=4096}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT) = 128
+8011  write(34, "\372", 1)              = 1
+8002  <... poll resumed>)               = 1 ([{fd=33, revents=POLLIN}])
+8011  recvmsg(16 <unfinished ...>
+8002  read(33 <unfinished ...>
+8011  <... recvmsg resumed>, {msg_namelen=0}, MSG_DONTWAIT) = -1 EAGAIN (Resource temporarily unavailable)
+8002  <... read resumed>, "\372", 1)    = 1
+8011  epoll_wait(11 <unfinished ...>
+8002  write(34, "\372", 1)              = 1
+8002  futex(0x7fa7f8dc04cc, FUTEX_WAKE_PRIVATE, 1) = 1
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc0478, FUTEX_WAKE_PRIVATE, 1 <unfinished ...>
+8002  sendmsg(16, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="H\0\0\0\5\0c\0\1\0\0\0@\0\0\0\373\377\377\377\377\377\377\377\377\377\377\377\377\377\377\377"..., iov_len=64}, {iov_base="\232+\236z|\217?=\37\340\302\341\353\310Y:i\"\355\236$\212\337\341E~S\245\376H\307f"..., iov_len=56}], msg_iovlen=2, msg_controllen=0, msg_flags=0}, MSG_DONTWAIT <unfinished ...>
+8033  <... futex resumed>)              = 0
+8033  futex(0x7fa7f8dc04c8, FUTEX_WAIT_BITSET_PRIVATE, 101620, {tv_sec=27527, tv_nsec=743442803}, FUTEX_BITSET_MATCH_ANY <unfinished ...>
+8002  <... sendmsg resumed>)            = 120
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, 0) = 1 ([{fd=33, revents=POLLIN}])
+8002  read(33, "\372", 1)               = 1
+8002  poll([{fd=13, events=POLLIN}, {fd=33, events=POLLIN}], 2, -1 <detached ...>

@@ -1,0 +1,440 @@
+let loc_to_rank = function
+  | "P1" -> 0
+  | "P10" -> 1
+  | "P11" -> 2
+  | "P12" -> 3
+  | "P13" -> 4
+  | "P14" -> 5
+  | "P15" -> 6
+  | "P2" -> 7
+  | "P3" -> 8
+  | "P4" -> 9
+  | "P5" -> 10
+  | "P6" -> 11
+  | "P7" -> 12
+  | "P8" -> 13
+  | "P9" -> 14
+  | _ -> failwith "Runtime Error: Unknown location"
+;;
+
+let _ = Mpi.barrier Mpi.comm_world
+
+let _ =
+  match Mpi.comm_rank Mpi.comm_world with
+  | 0 ->
+    let rec gettimeofday arg = Unix.gettimeofday arg in
+    let rec print_float arg = Stdlib.print_float arg in
+    let rec print_int arg = Stdlib.print_int arg in
+    let rec print_endline arg = Stdlib.print_endline arg in
+    let rec sub_float arg = Stdlib.( -. ) arg in
+    let rec loop iter =
+      if iter > 0
+      then (
+        Mpi.send "L" (loc_to_rank "P2") 0 Mpi.comm_world;
+        Mpi.send "L" (loc_to_rank "P3") 0 Mpi.comm_world;
+        Mpi.send "L" (loc_to_rank "P4") 0 Mpi.comm_world;
+        Mpi.send "L" (loc_to_rank "P5") 0 Mpi.comm_world;
+        Mpi.send "L" (loc_to_rank "P6") 0 Mpi.comm_world;
+        Mpi.send "L" (loc_to_rank "P7") 0 Mpi.comm_world;
+        Mpi.send "L" (loc_to_rank "P8") 0 Mpi.comm_world;
+        Mpi.send "L" (loc_to_rank "P9") 0 Mpi.comm_world;
+        Mpi.send "L" (loc_to_rank "P10") 0 Mpi.comm_world;
+        Mpi.send "L" (loc_to_rank "P11") 0 Mpi.comm_world;
+        Mpi.send "L" (loc_to_rank "P12") 0 Mpi.comm_world;
+        Mpi.send "L" (loc_to_rank "P13") 0 Mpi.comm_world;
+        Mpi.send "L" (loc_to_rank "P14") 0 Mpi.comm_world;
+        Mpi.send "L" (loc_to_rank "P15") 0 Mpi.comm_world;
+        let rec reply_P2 =
+          Marshal.from_string
+            (Mpi.receive (loc_to_rank "P2") Mpi.any_tag Mpi.comm_world)
+            0
+        in
+        let rec reply_P3 =
+          Marshal.from_string
+            (Mpi.receive (loc_to_rank "P3") Mpi.any_tag Mpi.comm_world)
+            0
+        in
+        let rec full_result = reply_P3 + reply_P2 in
+        let rec _unit_3 = print_int full_result in
+        let rec _unit_2 = print_endline "This is for space" in
+        loop (iter - 1))
+      else (
+        Mpi.send "R" (loc_to_rank "P2") 0 Mpi.comm_world;
+        Mpi.send "R" (loc_to_rank "P3") 0 Mpi.comm_world;
+        Mpi.send "R" (loc_to_rank "P4") 0 Mpi.comm_world;
+        Mpi.send "R" (loc_to_rank "P5") 0 Mpi.comm_world;
+        Mpi.send "R" (loc_to_rank "P6") 0 Mpi.comm_world;
+        Mpi.send "R" (loc_to_rank "P7") 0 Mpi.comm_world;
+        Mpi.send "R" (loc_to_rank "P8") 0 Mpi.comm_world;
+        Mpi.send "R" (loc_to_rank "P9") 0 Mpi.comm_world;
+        Mpi.send "R" (loc_to_rank "P10") 0 Mpi.comm_world;
+        Mpi.send "R" (loc_to_rank "P11") 0 Mpi.comm_world;
+        Mpi.send "R" (loc_to_rank "P12") 0 Mpi.comm_world;
+        Mpi.send "R" (loc_to_rank "P13") 0 Mpi.comm_world;
+        Mpi.send "R" (loc_to_rank "P14") 0 Mpi.comm_world;
+        Mpi.send "R" (loc_to_rank "P15") 0 Mpi.comm_world;
+        let rec _unit_1 = () in
+        print_endline "Terminate Unoptimized")
+    in
+    let rec start_time = gettimeofday () in
+    let rec _unit_4 = loop 1000 in
+    let rec end_time = gettimeofday () in
+    let rec time_diff = (sub_float end_time) start_time in
+    print_float time_diff
+  | 1 ->
+    let rec gettimeofday arg = Unix.gettimeofday arg in
+    let rec print_float arg = Stdlib.print_float arg in
+    let rec print_int arg = Stdlib.print_int arg in
+    let rec print_endline arg = Stdlib.print_endline arg in
+    let rec sub_float arg = Stdlib.( -. ) arg in
+    let rec loop iter =
+      match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
+      | "L" ->
+        let rec result = 10 in
+        let rec _unit_6 =
+          let val_5 = result in
+          Mpi.send (Marshal.to_string val_5 []) (loc_to_rank "P5") 0 Mpi.comm_world
+        in
+        loop ()
+      | "R" -> ()
+      | _ -> failwith "Runtime Error: Unmatched label"
+    in
+    let rec _unit_7 = loop () in
+    ()
+  | 2 ->
+    let rec gettimeofday arg = Unix.gettimeofday arg in
+    let rec print_float arg = Stdlib.print_float arg in
+    let rec print_int arg = Stdlib.print_int arg in
+    let rec print_endline arg = Stdlib.print_endline arg in
+    let rec sub_float arg = Stdlib.( -. ) arg in
+    let rec loop iter =
+      match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
+      | "R" -> ()
+      | "L" ->
+        let rec result = 11 in
+        let rec _unit_9 =
+          let val_8 = result in
+          Mpi.send (Marshal.to_string val_8 []) (loc_to_rank "P5") 0 Mpi.comm_world
+        in
+        loop ()
+      | _ -> failwith "Runtime Error: Unmatched label"
+    in
+    let rec _unit_10 = loop () in
+    ()
+  | 3 ->
+    let rec gettimeofday arg = Unix.gettimeofday arg in
+    let rec print_float arg = Stdlib.print_float arg in
+    let rec print_int arg = Stdlib.print_int arg in
+    let rec print_endline arg = Stdlib.print_endline arg in
+    let rec sub_float arg = Stdlib.( -. ) arg in
+    let rec loop iter =
+      match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
+      | "R" -> ()
+      | "L" ->
+        let rec result = 12 in
+        let rec _unit_12 =
+          let val_11 = result in
+          Mpi.send (Marshal.to_string val_11 []) (loc_to_rank "P6") 0 Mpi.comm_world
+        in
+        loop ()
+      | _ -> failwith "Runtime Error: Unmatched label"
+    in
+    let rec _unit_13 = loop () in
+    ()
+  | 4 ->
+    let rec gettimeofday arg = Unix.gettimeofday arg in
+    let rec print_float arg = Stdlib.print_float arg in
+    let rec print_int arg = Stdlib.print_int arg in
+    let rec print_endline arg = Stdlib.print_endline arg in
+    let rec sub_float arg = Stdlib.( -. ) arg in
+    let rec loop iter =
+      match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
+      | "R" -> ()
+      | "L" ->
+        let rec result = 13 in
+        let rec _unit_15 =
+          let val_14 = result in
+          Mpi.send (Marshal.to_string val_14 []) (loc_to_rank "P6") 0 Mpi.comm_world
+        in
+        loop ()
+      | _ -> failwith "Runtime Error: Unmatched label"
+    in
+    let rec _unit_16 = loop () in
+    ()
+  | 5 ->
+    let rec gettimeofday arg = Unix.gettimeofday arg in
+    let rec print_float arg = Stdlib.print_float arg in
+    let rec print_int arg = Stdlib.print_int arg in
+    let rec print_endline arg = Stdlib.print_endline arg in
+    let rec sub_float arg = Stdlib.( -. ) arg in
+    let rec loop iter =
+      match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
+      | "L" ->
+        let rec result = 14 in
+        let rec _unit_18 =
+          let val_17 = result in
+          Mpi.send (Marshal.to_string val_17 []) (loc_to_rank "P7") 0 Mpi.comm_world
+        in
+        loop ()
+      | "R" -> ()
+      | _ -> failwith "Runtime Error: Unmatched label"
+    in
+    let rec _unit_19 = loop () in
+    ()
+  | 6 ->
+    let rec gettimeofday arg = Unix.gettimeofday arg in
+    let rec print_float arg = Stdlib.print_float arg in
+    let rec print_int arg = Stdlib.print_int arg in
+    let rec print_endline arg = Stdlib.print_endline arg in
+    let rec sub_float arg = Stdlib.( -. ) arg in
+    let rec loop iter =
+      match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
+      | "R" -> ()
+      | "L" ->
+        let rec result = 15 in
+        let rec _unit_21 =
+          let val_20 = result in
+          Mpi.send (Marshal.to_string val_20 []) (loc_to_rank "P7") 0 Mpi.comm_world
+        in
+        loop ()
+      | _ -> failwith "Runtime Error: Unmatched label"
+    in
+    let rec _unit_22 = loop () in
+    ()
+  | 7 ->
+    let rec gettimeofday arg = Unix.gettimeofday arg in
+    let rec print_float arg = Stdlib.print_float arg in
+    let rec print_int arg = Stdlib.print_int arg in
+    let rec print_endline arg = Stdlib.print_endline arg in
+    let rec sub_float arg = Stdlib.( -. ) arg in
+    let rec loop iter =
+      match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
+      | "R" -> ()
+      | "L" ->
+        let rec result = 2 in
+        let rec reply_P4 =
+          Marshal.from_string
+            (Mpi.receive (loc_to_rank "P4") Mpi.any_tag Mpi.comm_world)
+            0
+        in
+        let rec reply_P11 =
+          Marshal.from_string
+            (Mpi.receive (loc_to_rank "P5") Mpi.any_tag Mpi.comm_world)
+            0
+        in
+        let rec reply_P5 =
+          Marshal.from_string
+            (Mpi.receive (loc_to_rank "P5") Mpi.any_tag Mpi.comm_world)
+            0
+        in
+        let rec final_result = reply_P4 + reply_P5 + result in
+        let rec _unit_24 =
+          let val_23 = final_result in
+          Mpi.send (Marshal.to_string val_23 []) (loc_to_rank "P1") 0 Mpi.comm_world
+        in
+        loop ()
+      | _ -> failwith "Runtime Error: Unmatched label"
+    in
+    let rec _unit_25 = loop () in
+    ()
+  | 8 ->
+    let rec gettimeofday arg = Unix.gettimeofday arg in
+    let rec print_float arg = Stdlib.print_float arg in
+    let rec print_int arg = Stdlib.print_int arg in
+    let rec print_endline arg = Stdlib.print_endline arg in
+    let rec sub_float arg = Stdlib.( -. ) arg in
+    let rec loop iter =
+      match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
+      | "R" -> ()
+      | "L" ->
+        let rec result = 3 in
+        let rec reply_P6 =
+          Marshal.from_string
+            (Mpi.receive (loc_to_rank "P6") Mpi.any_tag Mpi.comm_world)
+            0
+        in
+        let rec reply_P7 =
+          Marshal.from_string
+            (Mpi.receive (loc_to_rank "P7") Mpi.any_tag Mpi.comm_world)
+            0
+        in
+        let rec final_result = result + reply_P6 + reply_P7 in
+        let rec _unit_27 =
+          let val_26 = final_result in
+          Mpi.send (Marshal.to_string val_26 []) (loc_to_rank "P1") 0 Mpi.comm_world
+        in
+        loop ()
+      | _ -> failwith "Runtime Error: Unmatched label"
+    in
+    let rec _unit_28 = loop () in
+    ()
+  | 9 ->
+    let rec gettimeofday arg = Unix.gettimeofday arg in
+    let rec print_float arg = Stdlib.print_float arg in
+    let rec print_int arg = Stdlib.print_int arg in
+    let rec print_endline arg = Stdlib.print_endline arg in
+    let rec sub_float arg = Stdlib.( -. ) arg in
+    let rec loop iter =
+      match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
+      | "L" ->
+        let rec result = 4 in
+        let rec reply_P8 =
+          Marshal.from_string
+            (Mpi.receive (loc_to_rank "P8") Mpi.any_tag Mpi.comm_world)
+            0
+        in
+        let rec reply_P9 =
+          Marshal.from_string
+            (Mpi.receive (loc_to_rank "P9") Mpi.any_tag Mpi.comm_world)
+            0
+        in
+        let rec final_result = reply_P8 + reply_P9 + result in
+        let rec _unit_30 =
+          let val_29 = final_result in
+          Mpi.send (Marshal.to_string val_29 []) (loc_to_rank "P2") 0 Mpi.comm_world
+        in
+        loop ()
+      | "R" -> ()
+      | _ -> failwith "Runtime Error: Unmatched label"
+    in
+    let rec _unit_31 = loop () in
+    ()
+  | 10 ->
+    let rec gettimeofday arg = Unix.gettimeofday arg in
+    let rec print_float arg = Stdlib.print_float arg in
+    let rec print_int arg = Stdlib.print_int arg in
+    let rec print_endline arg = Stdlib.print_endline arg in
+    let rec sub_float arg = Stdlib.( -. ) arg in
+    let rec loop iter =
+      match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
+      | "R" -> ()
+      | "L" ->
+        let rec result = 5 in
+        let rec reply_P10 =
+          Marshal.from_string
+            (Mpi.receive (loc_to_rank "P10") Mpi.any_tag Mpi.comm_world)
+            0
+        in
+        let rec reply_P11 =
+          Marshal.from_string
+            (Mpi.receive (loc_to_rank "P11") Mpi.any_tag Mpi.comm_world)
+            0
+        in
+        let rec _unit_35 =
+          let val_34 = reply_P11 in
+          Mpi.send (Marshal.to_string val_34 []) (loc_to_rank "P2") 0 Mpi.comm_world
+        in
+        let rec final_result = reply_P11 + reply_P10 + result in
+        let rec _unit_33 =
+          let val_32 = final_result in
+          Mpi.send (Marshal.to_string val_32 []) (loc_to_rank "P2") 0 Mpi.comm_world
+        in
+        loop ()
+      | _ -> failwith "Runtime Error: Unmatched label"
+    in
+    let rec _unit_36 = loop () in
+    ()
+  | 11 ->
+    let rec gettimeofday arg = Unix.gettimeofday arg in
+    let rec print_float arg = Stdlib.print_float arg in
+    let rec print_int arg = Stdlib.print_int arg in
+    let rec print_endline arg = Stdlib.print_endline arg in
+    let rec sub_float arg = Stdlib.( -. ) arg in
+    let rec loop iter =
+      match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
+      | "R" -> ()
+      | "L" ->
+        let rec result = 6 in
+        let rec reply_P12 =
+          Marshal.from_string
+            (Mpi.receive (loc_to_rank "P12") Mpi.any_tag Mpi.comm_world)
+            0
+        in
+        let rec reply_P13 =
+          Marshal.from_string
+            (Mpi.receive (loc_to_rank "P13") Mpi.any_tag Mpi.comm_world)
+            0
+        in
+        let rec final_result = reply_P12 + reply_P13 + result in
+        let rec _unit_38 =
+          let val_37 = final_result in
+          Mpi.send (Marshal.to_string val_37 []) (loc_to_rank "P3") 0 Mpi.comm_world
+        in
+        loop ()
+      | _ -> failwith "Runtime Error: Unmatched label"
+    in
+    let rec _unit_39 = loop () in
+    ()
+  | 12 ->
+    let rec gettimeofday arg = Unix.gettimeofday arg in
+    let rec print_float arg = Stdlib.print_float arg in
+    let rec print_int arg = Stdlib.print_int arg in
+    let rec print_endline arg = Stdlib.print_endline arg in
+    let rec sub_float arg = Stdlib.( -. ) arg in
+    let rec loop iter =
+      match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
+      | "R" -> ()
+      | "L" ->
+        let rec result = 7 in
+        let rec reply_P14 =
+          Marshal.from_string
+            (Mpi.receive (loc_to_rank "P14") Mpi.any_tag Mpi.comm_world)
+            0
+        in
+        let rec reply_P15 =
+          Marshal.from_string
+            (Mpi.receive (loc_to_rank "P15") Mpi.any_tag Mpi.comm_world)
+            0
+        in
+        let rec final_result = reply_P15 + reply_P14 + result in
+        let rec _unit_41 =
+          let val_40 = final_result in
+          Mpi.send (Marshal.to_string val_40 []) (loc_to_rank "P3") 0 Mpi.comm_world
+        in
+        loop ()
+      | _ -> failwith "Runtime Error: Unmatched label"
+    in
+    let rec _unit_42 = loop () in
+    ()
+  | 13 ->
+    let rec gettimeofday arg = Unix.gettimeofday arg in
+    let rec print_float arg = Stdlib.print_float arg in
+    let rec print_int arg = Stdlib.print_int arg in
+    let rec print_endline arg = Stdlib.print_endline arg in
+    let rec sub_float arg = Stdlib.( -. ) arg in
+    let rec loop iter =
+      match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
+      | "R" -> ()
+      | "L" ->
+        let rec result = 8 in
+        let rec _unit_44 =
+          let val_43 = result in
+          Mpi.send (Marshal.to_string val_43 []) (loc_to_rank "P4") 0 Mpi.comm_world
+        in
+        loop ()
+      | _ -> failwith "Runtime Error: Unmatched label"
+    in
+    let rec _unit_45 = loop () in
+    ()
+  | 14 ->
+    let rec gettimeofday arg = Unix.gettimeofday arg in
+    let rec print_float arg = Stdlib.print_float arg in
+    let rec print_int arg = Stdlib.print_int arg in
+    let rec print_endline arg = Stdlib.print_endline arg in
+    let rec sub_float arg = Stdlib.( -. ) arg in
+    let rec loop iter =
+      match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
+      | "R" -> ()
+      | "L" ->
+        let rec result = 9 in
+        let rec _unit_47 =
+          let val_46 = result in
+          Mpi.send (Marshal.to_string val_46 []) (loc_to_rank "P4") 0 Mpi.comm_world
+        in
+        loop ()
+      | _ -> failwith "Runtime Error: Unmatched label"
+    in
+    let rec _unit_48 = loop () in
+    ()
+  | _ -> failwith "Runtime Error: Unknown rank"
+;;

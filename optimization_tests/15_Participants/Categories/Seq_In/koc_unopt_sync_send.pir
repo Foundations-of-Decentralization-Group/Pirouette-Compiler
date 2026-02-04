@@ -1,6 +1,6 @@
-foreign gettimeofday : unit -> unit := "@Unix:gettimeofday";
-foreign print_float : unit -> unit := "@Stdlib:print_float";
-foreign sub_float : unit -> unit -> unit := "@Stdlib:(-.)";
+foreign gettimeofday : unit -> unit := "Unix:gettimeofday";
+foreign print_float : unit -> unit := "Stdlib:print_float";
+foreign sub_float : unit -> unit -> unit := "Stdlib:(-.)";
 
 broadcast_unopt freq :=
 
@@ -98,7 +98,7 @@ broadcast_unopt freq :=
 main :=
 
     let A.start_time := A.gettimeofday A.(); in
-    let A._ := loop A.1000; in
+    let A._ := broadcast_unopt A.1000; in
     let A.end_time := A.gettimeofday A.(); in
     let A.time_diff := A.sub_float A.end_time A.start_time; in
     A.print_float A.time_diff;

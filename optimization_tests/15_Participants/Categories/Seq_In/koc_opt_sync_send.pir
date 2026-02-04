@@ -1,8 +1,8 @@
-foreign gettimeofday : unit -> unit := "@Unix:gettimeofday";
-foreign print_float : unit -> unit := "@Stdlib:print_float";
-foreign sub_float : unit -> unit -> unit := "@Stdlib:(-.)";
+foreign gettimeofday : unit -> unit := "Unix:gettimeofday";
+foreign print_float : unit -> unit := "Stdlib:print_float";
+foreign sub_float : unit -> unit -> unit := "Stdlib:(-.)";
 
-broadcast_opt freq :=
+loop freq :=
 
     if A.(freq > 0) then
     A[L] ~> B;
@@ -48,7 +48,7 @@ broadcast_opt freq :=
 	let A.result_N := [N] N.x ~> A; in 	
         let O.x := O.10; in
 	let A.result_O := [O] O.x ~> A; in 		
-	broadcast_opt A.(freq - 1)
+	loop A.(freq - 1)
 
     else
     
