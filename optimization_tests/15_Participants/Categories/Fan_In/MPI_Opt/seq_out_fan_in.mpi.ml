@@ -63,7 +63,7 @@ let _ =
         print_endline "Terminate Unoptimized")
     in
     let rec start_time = gettimeofday () in
-    let rec _unit_2 = loop 2 in
+    let rec _unit_2 = loop 1000 in
     let rec end_time = gettimeofday () in
     let rec time_diff = (sub_float end_time) start_time in
     print_float time_diff
@@ -116,8 +116,7 @@ let _ =
         let rec result = 12 in
         let rec _unit_10 =
           let val_9 = result in
-          Mpi.gather (Marshal.to_string result []) (loc_to_rank "P6") Mpi.comm_world;
-          print_endline "This send is done ; this is for processor P12"
+          Mpi.gather (Marshal.to_string result []) (loc_to_rank "P6") Mpi.comm_world
           (* Mpi.send (Marshal.to_string val_9 []) (loc_to_rank "P6") 0 Mpi.comm_world *)
         in
         loop ()
@@ -135,8 +134,7 @@ let _ =
         let rec result = 13 in
         let rec _unit_13 =
           let val_12 = result in
-          Mpi.gather (Marshal.to_string result []) (loc_to_rank "P6") Mpi.comm_world;
-          print_endline "This send is done ; this is for P13"
+          Mpi.gather (Marshal.to_string result []) (loc_to_rank "P6") Mpi.comm_world
           (* Mpi.send (Marshal.to_string val_12 []) (loc_to_rank "P6") 0 Mpi.comm_world *)
         in
         loop ()
@@ -153,13 +151,10 @@ let _ =
       match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
       | "R" -> ()
       | "L" ->
-        print_endline "Got the L from P1 ; this is P14";
         let rec result = 14 in
         let rec _unit_16 =
           let val_15 = result in
-          print_endline "Before the gather send to P7";
-          Mpi.gather (Marshal.to_string result []) (loc_to_rank "P7") Mpi.comm_world;
-          print_endline "This send is done ; this is for P14"
+          Mpi.gather (Marshal.to_string result []) (loc_to_rank "P7") Mpi.comm_world
           (* Mpi.send (Marshal.to_string val_15 []) (loc_to_rank "P7") 0 Mpi.comm_world *)
         in
         loop ()
@@ -177,8 +172,7 @@ let _ =
         let rec result = 15 in
         let rec _unit_19 =
           let val_18 = result in
-          Mpi.gather (Marshal.to_string result []) (loc_to_rank "P7") Mpi.comm_world;
-          (* print_endline "This send is done ; this is for P15" *)
+          Mpi.gather (Marshal.to_string result []) (loc_to_rank "P7") Mpi.comm_world
           (* Mpi.send (Marshal.to_string val_18 []) (loc_to_rank "P7") 0 Mpi.comm_world *)
         in
         loop ()
@@ -196,11 +190,9 @@ let _ =
       | "L" ->
         let rec initial_result = 2 in
         let result_array = Mpi.gather "result" (loc_to_rank "P2") Mpi.comm_world in
-        let result_arr_one = Marshal.from_string (Array.get result_array 0) 0 in
-        let result_arr_two = Marshal.from_string (Array.get result_array 1) 0 in
-        let result =
-          int_of_string result_arr_one + int_of_string result_arr_two + initial_result
-        in
+        let result_arr_one = Array.get result_array 0 in
+        let result_arr_two = Array.get result_array 1 in
+        let result = result_arr_one + result_arr_two + initial_result in
         Mpi.gather (Marshal.to_string result []) (loc_to_rank "P1") Mpi.comm_world;
         loop ()
       | "R" -> ()
@@ -217,9 +209,9 @@ let _ =
       | "R" -> ()
       | "L" ->
         let rec initial_result = 3 in
-        let result_arr = Mpi.gather "result" (loc_to_rank "P3") Mpi.comm_world in
-        let result_arr_one = Marshal.from_string (Array.get result_arr 0) 0 in
-        let result_arr_two = Marshal.from_string (Array.get result_arr 1) 0 in
+        Mpi.gather "result" (loc_to_rank "P3") Mpi.comm_world;
+        let result_arr_one = Array.get result_arr 0 in
+        let result_arr_two = Array.get result_arr 1 in
         let result = result_arr_one + result_arr_two + initial_result in
         Mpi.gather (Marshal.to_string result []) (loc_to_rank "P1") Mpi.comm_world;
         loop ()
@@ -236,8 +228,8 @@ let _ =
       | "L" ->
         let rec initial_result = 4 in
         let result_arr = Mpi.gather "result" (loc_to_rank "P4") Mpi.comm_world in
-        let result_arr_one = Marshal.from_string (Array.get result_arr 0) 0 in
-        let result_arr_two = Marshal.from_string (Array.get result_arr 1) 0 in
+        let result_arr_one = Array.get result_arr 0 in
+        let result_arr_two = Array.get result_arr 1 in
         let result = result_arr_one + result_arr_two + initial_result in
         Mpi.gather (Marshal.to_string result []) (loc_to_rank "P2") Mpi.comm_world;
         loop ()
@@ -255,11 +247,10 @@ let _ =
       | "L" ->
         let rec initial_result = 5 in
         let result_arr = Mpi.gather "result" (loc_to_rank "P5") Mpi.comm_world in
-        let result_arr_one = Marshal.from_string (Array.get result_arr 0) 0 in
-        let result_arr_two = Marshal.from_string (Array.get result_arr 1) 0 in
+        let result_arr_one = Array.get result_arr 0 in
+        let result_arr_two = Array.get result_arr 1 in
         let result = result_arr_one + result_arr_two + initial_result in
-        Mpi.gather (Marshal.to_string result []) (loc_to_rank "P2") Mpi.comm_world;
-        loop ()
+        Mpi.gather (Marshal.to_string result []) (loc_to_rank "P2") Mpi.comm_world loop ()
       | "R" -> ()
       | _ -> failwith "Runtime Error: Unmatched label"
     in
@@ -274,11 +265,10 @@ let _ =
       | "L" ->
         let rec initial_result = 6 in
         let result_arr = Mpi.gather "result" (loc_to_rank "P6") Mpi.comm_world in
-        let result_arr_one = Marshal.from_string (Array.get result_arr 0) 0 in
-        let result_arr_two = Marshal.from_string (Array.get result_arr 1) 0 in
+        let result_arr_one = Array.get result_arr 0 in
+        let result_arr_two = Array.get result_arr 1 in
         let result = result_arr_one + result_arr_two + initial_result in
-        Mpi.gather (Marshal.to_string resu
-                      lt) (loc_to_rank "P3") Mpi.comm_world;
+        Mpi.gather (Marshal.to_string result []) (loc_to_rank "P3") Mpi.comm_world;
         loop ()
       | "R" -> ()
       | _ -> failwith "Runtime Error: Unmatched label"
@@ -292,14 +282,12 @@ let _ =
     let rec loop iter =
       match Mpi.receive (loc_to_rank "P1") Mpi.any_tag Mpi.comm_world with
       | "L" ->
-        print_endline "Got the L from P1 ; this is P7";
         let rec initial_result = 7 in
         let result_arr = Mpi.gather "result" (loc_to_rank "P7") Mpi.comm_world in
-        print_endline "Got past the recv";
-        let result_arr_one = Marshal.from_string (Array.get result_arr 0) 0 in
-        let result_arr_two = Marshal.from_string (Array.get result_arr 1) 0 in
+        let result_arr_one = Array.get result_arr 0 in
+        let result_arr_two = Array.get result_arr 1 in
         let result = result_arr_one + result_arr_two + initial_result in
-        Mpi.gather (Marshal.to_string result) (loc_to_rank "P3") Mpi.comm_world;
+        Mpi.gather (Marshal.to_string result []) (loc_to_rank "P3") Mpi.comm_world;
         loop ()
       | "R" -> ()
       | _ -> failwith "Runtime Error: Unmatched label"
@@ -317,7 +305,7 @@ let _ =
         let rec result = 8 in
         let rec _unit_80 =
           let val_79 = result in
-          Mpi.gather (Marshal.to_string result) (loc_to_rank "P4") Mpi.comm_world
+          Mpi.gather "result" (loc_to_rank "P4") Mpi.comm_world
           (* Mpi.send (Marshal.to_string val_79 []) (loc_to_rank "P4") 0 Mpi.comm_world *)
         in
         loop ()
@@ -336,7 +324,7 @@ let _ =
         let rec result = 9 in
         let rec _unit_83 =
           let val_82 = result in
-          Mpi.gather (Marshal.to_string result) (loc_to_rank "P4") Mpi.comm_world
+          Mpi.gather "result" (loc_to_rank "P4") Mpi.comm_world
           (* Mpi.send (Marshal.to_string val_82 []) (loc_to_rank "P4") 0 Mpi.comm_world *)
         in
         loop ()

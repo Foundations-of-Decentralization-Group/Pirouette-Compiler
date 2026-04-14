@@ -177,7 +177,7 @@ let _ =
         let rec result = 15 in
         let rec _unit_19 =
           let val_18 = result in
-          Mpi.gather (Marshal.to_string result []) (loc_to_rank "P7") Mpi.comm_world;
+          Mpi.gather (Marshal.to_string result []) (loc_to_rank "P7") Mpi.comm_world
           (* print_endline "This send is done ; this is for P15" *)
           (* Mpi.send (Marshal.to_string val_18 []) (loc_to_rank "P7") 0 Mpi.comm_world *)
         in
@@ -277,8 +277,7 @@ let _ =
         let result_arr_one = Marshal.from_string (Array.get result_arr 0) 0 in
         let result_arr_two = Marshal.from_string (Array.get result_arr 1) 0 in
         let result = result_arr_one + result_arr_two + initial_result in
-        Mpi.gather (Marshal.to_string resu
-                      lt) (loc_to_rank "P3") Mpi.comm_world;
+        Mpi.gather (Marshal.to_string result) (loc_to_rank "P3") Mpi.comm_world;
         loop ()
       | "R" -> ()
       | _ -> failwith "Runtime Error: Unmatched label"
