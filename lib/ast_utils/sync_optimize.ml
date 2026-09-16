@@ -42,7 +42,48 @@ and visit_choreo_expr
   | Unit _ -> holder1
   | Var (_, _) -> holder1
   | LocExpr (_, _, _) -> holder1
-  | Send (_, e, _, _) -> visit_choreo_expr e holder1 _holder2
+  | Send (LocId (id1, _), e, LocId (id2, _), _) ->
+    (* print_endline "Hit the Send AST node"; *)
+    Printf.printf "%s\n" id1;
+    Printf.printf "%s\n" id2;
+    let holder1 = List.cons id1 holder1 in
+    let holder1 = List.cons id2 holder1 in
+    (* let rec check_consecutive_sends (e : 'a Choreo.expr) holder1 = *)
+    (*   match e with *)
+    (*   | Send (LocId (id1, _), e, LocId (id2, _), _) -> *)
+    (*     let () = print_endline "In here precisely once" in *)
+    (*     let holder1 = List.cons id1 holder1 in *)
+    (*     let holder1 = List.cons id2 holder1 in *)
+    (*     check_consecutive_sends e holder1 *)
+    (*   | _ -> *)
+    (*     print_endline "This branch was executed"; *)
+    (*     holder1 *)
+    (* in *)
+    (* let () = Printf.printf "Size of holder %d\n" (List.length holder1) in *)
+    (* let list_to_be_split = check_consecutive_sends e holder1 in *)
+    (* let () = Printf.printf "Size of list %d\n" (List.length list_to_be_split) in *)
+    (* let rec split input_list list_one list_two = *)
+    (*   match input_list with *)
+    (*   | head_one :: head_two :: tail -> *)
+    (*     split tail (head_one :: list_one) (head_two :: list_two) *)
+    (*   | head_one :: [] -> head_one :: list_one, list_two *)
+    (*   | [] -> list_one, list_two *)
+    (* in *)
+    (* let result_list_one, result_list_two = split list_to_be_split [] [] in *)
+    (* let check_equality input_list = *)
+    (*   match input_list with *)
+    (*   | [] -> true *)
+    (*   | head :: tail -> List.for_all (fun y -> y = head) tail *)
+    (* in *)
+    (* let check_one = check_equality result_list_one in *)
+    (* let check_two = check_equality result_list_two in *)
+    (* let check_opt inp_one inp_two = *)
+    (*   if inp_one && inp_two *)
+    (*   then Printf.printf "Optimization possible" *)
+    (*   else Printf.printf "Optimization not possible" *)
+    (* in *)
+    (* check_opt check_one check_two; *)
+    visit_choreo_expr e holder1 _holder2
   | If (e1, e2, _, _) ->
     (* let list_three = *)
     (*   let list_two = *)
@@ -365,7 +406,11 @@ and copy_choreo_expr (x : 'a Choreo.expr) (holder : string list) : 'a Choreo.exp
 (*     print_endline "This is being used"; *)
 (*     Unit a *)
 
-and copy_choreo_expr_right_sync (x : 'a Choreo.expr) (holder : string list) (index : int) a
+and copy_choreo_expr_right_sync
+      (x : 'a Choreo.expr)
+      (holder : string list)
+      (index : int)
+      a
   : 'a Choreo.expr
   =
   print_endline "Inside here ie the right sync expr";

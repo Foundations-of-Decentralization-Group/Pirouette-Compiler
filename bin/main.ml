@@ -33,95 +33,118 @@ let () =
     exit 1);
   let lexbuf = Lexing.from_channel (Option.get !file_ic) in
   let program = Parsing.Parse.parse_with_error lexbuf in
-  (* (match !ast_dump_format with *)
-  (*  | "json" -> Ast_utils.jsonify_choreo_ast (open_out (spf "%s.json" !basename)) program *)
-  (*  | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (spf "%s.ast" !basename)) program *)
-  (*  | _ -> invalid_arg "Invalid ast-dump format"); *)
+  (match !ast_dump_format with
+   | "json" -> Ast_utils.jsonify_choreo_ast (open_out (spf "%s.json" !basename)) program
+   | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (spf "%s.ast" !basename)) program
+   | _ -> invalid_arg "Invalid ast-dump format");
   let holder1 = [] in
   let holder2 = [] in
   let holder_3 = Ast_utils.optimize_sync_expr program holder1 holder2 in
+  let holder_3_size = List.length holder_3 in
+  Printf.printf "Size of holder_3 is %d\n" holder_3_size;
+  let list_to_be_split = holder_3 in
+  let () = Printf.printf "Size of list %d\n" (List.length list_to_be_split) in
+  let rec split input_list list_one list_two =
+    match input_list with
+    | head_one :: head_two :: tail ->
+      split tail (head_one :: list_one) (head_two :: list_two)
+    | head_one :: [] -> head_one :: list_one, list_two
+    | [] -> list_one, list_two
+  in
+  let result_list_one, result_list_two = split list_to_be_split [] [] in
+  let check_equality input_list =
+    match input_list with
+    | [] -> true
+    | head :: tail -> List.for_all (fun y -> y = head) tail
+  in
+  let check_one = check_equality result_list_one in
+  let check_two = check_equality result_list_two in
+  let check_opt inp_one inp_two =
+    if inp_one && inp_two
+    then Printf.printf "Optimization possible"
+    else Printf.printf "Optimization not possible"
+  in
+  check_opt check_one check_two;
   (* let size = List.length holder_3 in Printf.printf "This is the size of the list %d" size; *)
   (* List.iter (fun x -> Printf.printf "String to be used here : %s\n" x) holder_3; *)
-  let optimization_flag =
-    let optimization_flag_to_convert = List.hd holder_3 in
-    Stdlib.bool_of_string optimization_flag_to_convert
-  in
-  let feed_list =
-    if optimization_flag
-    then (
-      (* This is where we would do the optimization to reorder the control messages ; ie the call to appropriate function *)
-      (* Have to do some list processing here to generate the right sends and receives for Sync messages *)
-      print_endline "Optimization is possible";
-      let rec remove_duplicates_of_head input_list value_of_head =
-        match input_list with
-        | [] -> []
-        | head :: tail ->
-          if String.equal head value_of_head
-          then remove_duplicates_of_head tail value_of_head
-          else head :: remove_duplicates_of_head tail value_of_head
-      in
-      let holder_3 = List.tl holder_3 in
-      let head_val = List.hd holder_3 in
-      let final_list =
-        let result_list = remove_duplicates_of_head (List.tl holder_3) head_val in
-        List.cons head_val result_list
-      in
-      let check_valid_index index length_of_list =
-        if (index * 2) + 2 <= length_of_list - 1
-        then "First and Second"
-        else if (index * 2) + 1 = length_of_list - 1
-        then "First"
-        else "Nothing"
-      in
-      let rec print_order input_list index1 return_list =
-        let match_value = check_valid_index index1 (List.length input_list) in
-        match match_value with
-        | "First and Second" ->
-          let sender = List.nth input_list index1 in
-          let recv_one = List.nth input_list ((index1 * 2) + 1) in
-          let recv_two = List.nth input_list ((index1 * 2) + 2) in
-          let result_list = List.cons sender return_list in
-          let result_list = List.cons recv_one result_list in
-          let result_list = List.cons sender result_list in
-          let result_list = List.cons recv_two result_list in
-          Printf.printf "%s -> %s \n %s -> %s \n" sender recv_one sender recv_two;
-          print_order input_list (index1 + 1) result_list
-        | "First" ->
-          let sender = List.nth input_list index1 in
-          let recv_one = List.nth input_list ((index1 * 2) + 1) in
-          let result_list = List.cons sender return_list in
-          let result_list = List.cons recv_one result_list in
-          Printf.printf "%s -> %s \n" sender recv_one;
-          print_endline "Done generating";
-          result_list
-        | _ ->
-          print_endline "Done generating";
-          return_list
-      in
-      print_order final_list 0 [])
-    else (
-      print_endline "Cannot do optimization";
-      [])
-  in
-  let feed_list = List.rev feed_list in
-  List.iter (fun x -> Printf.printf "Order of messages : %s\n" x) feed_list;
-  let program_one = Ast_utils.add_sync_opt program feed_list in
+  (* let optimization_flag = *)
+  (*   let optimization_flag_to_convert = List.hd holder_3 in *)
+  (*   Stdlib.bool_of_string optimization_flag_to_convert *)
+  (* in *)
+  (* let _feed_list = *)
+  (*   if optimization_flag *)
+  (*   then ( *)
+  (* This is where we would do the optimization to reorder the control messages ; ie the call to appropriate function *)
+  (* Have to do some list processing here to generate the right sends and receives for Sync messages *)
+  (*   print_endline "Optimization is possible"; *)
+  (*   let rec remove_duplicates_of_head input_list value_of_head = *)
+  (*     match input_list with *)
+  (*     | [] -> [] *)
+  (*     | head :: tail -> *)
+  (*       if String.equal head value_of_head *)
+  (*       then remove_duplicates_of_head tail value_of_head *)
+  (*       else head :: remove_duplicates_of_head tail value_of_head *)
+  (*   in *)
+  (*   let holder_3 = List.tl holder_3 in *)
+  (*   let head_val = List.hd holder_3 in *)
+  (*   let final_list = *)
+  (*     let result_list = remove_duplicates_of_head (List.tl holder_3) head_val in *)
+  (*     List.cons head_val result_list *)
+  (*   in *)
+  (*   let check_valid_index index length_of_list = *)
+  (*     if (index * 2) + 2 <= length_of_list - 1 *)
+  (*     then "First and Second" *)
+  (*     else if (index * 2) + 1 = length_of_list - 1 *)
+  (*     then "First" *)
+  (*     else "Nothing" *)
+  (*   in *)
+  (*   let rec print_order input_list index1 return_list = *)
+  (*     let match_value = check_valid_index index1 (List.length input_list) in *)
+  (*     match match_value with *)
+  (*     | "First and Second" -> *)
+  (*       let sender = List.nth input_list index1 in *)
+  (*       let recv_one = List.nth input_list ((index1 * 2) + 1) in *)
+  (*       let recv_two = List.nth input_list ((index1 * 2) + 2) in *)
+  (*       let result_list = List.cons sender return_list in *)
+  (*       let result_list = List.cons recv_one result_list in *)
+  (*       let result_list = List.cons sender result_list in *)
+  (*       let result_list = List.cons recv_two result_list in *)
+  (*       Printf.printf "%s -> %s \n %s -> %s \n" sender recv_one sender recv_two; *)
+  (*       print_order input_list (index1 + 1) result_list *)
+  (*     | "First" -> *)
+  (*       let sender = List.nth input_list index1 in *)
+  (*       let recv_one = List.nth input_list ((index1 * 2) + 1) in *)
+  (*       let result_list = List.cons sender return_list in *)
+  (*       let result_list = List.cons recv_one result_list in *)
+  (*       Printf.printf "%s -> %s \n" sender recv_one; *)
+  (*       print_endline "Done generating"; *)
+  (*       result_list *)
+  (*     | _ -> *)
+  (*       print_endline "Done generating"; *)
+  (*       return_list *)
+  (*   in *)
+  (*   print_order final_list 0 []) *)
+  (* else ( *)
+  (*   print_endline "Cannot do optimization"; *)
+  (*   []) *)
+  (* in *)
+  (* let feed_list = List.rev feed_list in *)
+  (* List.iter (fun x -> Printf.printf "Order of messages : %s\n" x) feed_list; *)
+  (* let program_one = Ast_utils.add_sync_opt program feed_list in *)
   (match !ast_dump_format with
-   | "json" -> Ast_utils.jsonify_choreo_ast (open_out (spf "%s.json" !basename)) program_one
-   | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (spf "%s.ast" !basename)) program_one
+   | "json" -> Ast_utils.jsonify_choreo_ast (open_out (spf "%s.json" !basename)) program
+   | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (spf "%s.ast" !basename)) program
    | _ -> invalid_arg "Invalid ast-dump format");
-  let locs = Ast_utils.extract_locs program_one in
-  List.iter (fun x -> Printf.printf "These are the locations : %s\n" x) locs;
-  let net_stmtblocks =
-    List.map (fun loc -> Netgen.epp_choreo_to_net program_one loc) locs
-  in
+  let locs = Ast_utils.extract_locs program in
+  (* List.iter (fun x -> Printf.printf "These are the locations : %s\n" x) locs; *)
+  let net_stmtblocks = List.map (fun loc -> Netgen.epp_choreo_to_net program loc) locs in
   List.iter2
     (fun loc stmtblock ->
        match !ast_dump_format with
        | "json" ->
          Ast_utils.jsonify_net_ast (open_out (spf "%s.%s.json" !basename loc)) stmtblock
        | "pprint" ->
-         print_endline "Count";
+         (* print_endline "Count"; *)
          Ast_utils.pprint_net_ast (open_out (spf "%s.%s.ast" !basename loc)) stmtblock
        | _ -> invalid_arg "Invalid ast-dump format")
     locs
