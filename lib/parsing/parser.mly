@@ -2,7 +2,7 @@
 %token <int> INT
 %token <string> STRING
 %token TRUE FALSE
-%token UNIT_T INT_T STRING_T BOOL_T
+%token UNIT_T INT_T STRING_T BOOL_T LIST_T
 %token FUN TYPE
 %token UNDERSCORE
 %token COLONEQ
@@ -33,6 +33,7 @@
 %left EQ NEQ LT LEQ GT GEQ
 %left PLUS MINUS
 %left TIMES DIV
+%nonassoc LIST_T
 %nonassoc UNARY
 %left DOT
 
@@ -98,7 +99,7 @@ choreo_expr:
   | SND e=choreo_expr { Snd (e, gen_pos $startpos $endpos) }
   | LEFT e=choreo_expr { Left (e, gen_pos $startpos $endpos) }
   | RIGHT e=choreo_expr { Right (e, gen_pos $startpos $endpos) }
-  | MATCH e=choreo_expr WITH cases=nonempty_list(choreo_case) { Match (e, cases, gen_pos $startpos $endpos) }
+  | MATCH e=choreo_expr WITH cases=nonempty_list(choreo_case) {print_endline "Inside the match inside the parser";  Match (e, cases, gen_pos $startpos $endpos) }
   | id1=loc_id LBRACKET l=sync_label RBRACKET TILDE_ARROW id2=loc_id SEMICOLON e=choreo_expr { Sync (id1, l, id2, e, gen_pos $startpos $endpos) }
   | LBRACKET id1=loc_id RBRACKET e=choreo_expr TILDE_ARROW id2=loc_id { Send (id1, e, id2, gen_pos $startpos $endpos) }
   | LBRACKET id1=loc_id RBRACKET e1=choreo_expr TILDE_ARROW id2=loc_id DOT p=local_pattern SEMICOLON e2=choreo_expr
@@ -131,8 +132,13 @@ local_expr:
   | SND e=local_expr { Snd (e, gen_pos $startpos $endpos) }
   | LEFT e=local_expr { Left (e, gen_pos $startpos $endpos) }
   | RIGHT e=local_expr { Right (e, gen_pos $startpos $endpos) }
-  | MATCH e=local_expr WITH cases=nonempty_list(local_case) { Match (e, cases, gen_pos $startpos $endpos) }
+  | MATCH e=local_expr WITH cases=nonempty_list(local_case) {Match (e, cases, gen_pos $startpos $endpos) }
   | LPAREN e=local_expr RPAREN { Local.set_info_expr (gen_pos $startpos $endpos) e }
+  | LBRACKET elems=list_elements RBRACKET { Val (ListIn(elems, gen_pos $startpos $endpos), gen_pos $startpos $endpos) }
+
+list_elements:
+  | v=value { Cons (v, Nil (gen_pos $startpos $endpos), gen_pos $startpos $endpos) }
+  | v=value COMMA rest=list_elements { Cons (v, rest, gen_pos $startpos $endpos) }
 
 (** [choreo_pattern] parses patterns used in choreography expressions and constructs corresponding AST nodes.*)
 choreo_pattern:
@@ -153,6 +159,11 @@ local_pattern:
   | LEFT p=local_pattern { Left (p, gen_pos $startpos $endpos) }
   | RIGHT p=local_pattern { Right (p, gen_pos $startpos $endpos) }
   | LPAREN p=local_pattern RPAREN { Local.set_info_pattern (gen_pos $startpos $endpos) p }
+  | LBRACKET elems=list_pat_elements RBRACKET { ListPat (elems, gen_pos $startpos $endpos) }
+
+list_pat_elements:
+  | p=local_pattern { PCons (p, PNil (gen_pos $startpos $endpos), gen_pos $startpos $endpos) }
+  | p=local_pattern COMMA rest=list_pat_elements { PCons (p, rest, gen_pos $startpos $endpos) }
 
 (** [choreo_type] parses choreography types and constructs corresponding AST nodes.
 
@@ -175,6 +186,7 @@ local_type:
   | INT_T { TInt (gen_pos $startpos $endpos) }
   | STRING_T { TString (gen_pos $startpos $endpos) }
   | BOOL_T { TBool (gen_pos $startpos $endpos) }
+  | LIST_T t=local_type { TListIn (t, gen_pos $startpos $endpos) }
   | t1=local_type TIMES t2=local_type { TProd (t1, t2, gen_pos $startpos $endpos) }
   | t1=local_type PLUS t2=local_type { TSum (t1, t2, gen_pos $startpos $endpos) }
   | LPAREN t=local_type RPAREN { Local.set_info_typ (gen_pos $startpos $endpos) t }
@@ -201,6 +213,7 @@ value:
   | s=STRING { String (s, gen_pos $startpos $endpos) }
   | TRUE { Bool (true, gen_pos $startpos $endpos) }
   | FALSE { Bool (false, gen_pos $startpos $endpos) }
+  | LBRACKET RBRACKET { ListIn (Nil(gen_pos $startpos $endpos), gen_pos $startpos $endpos)}
 
 (** [choreo_case] parses case expressions for choreography expressions and constructs corresponding AST nodes.
 

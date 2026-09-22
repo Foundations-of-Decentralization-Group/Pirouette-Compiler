@@ -26,12 +26,13 @@ let rec jsonify_local_type = function
   | Local.TUnit _ -> `String "TUnit"
   | Local.TInt _ -> `String "TInt"
   | Local.TString _ -> `String "TString"
-  | Local.TBool _ -> `String "TBool"
+  | Local.TBool _ -> `String "TBool"                       
   | Local.TVar (TypId (id, _), _) -> `String id
   | Local.TProd (t1, t2, _) ->
     `Assoc [ "TProd", `List [ jsonify_local_type t1; jsonify_local_type t2 ] ]
   | Local.TSum (t1, t2, _) ->
     `Assoc [ "TSum", `List [ jsonify_local_type t1; jsonify_local_type t2 ] ]
+  | Local.TListIn _ -> `String "TListIn"      
 ;;
 
 let rec jsonify_local_pattern = function
@@ -42,13 +43,20 @@ let rec jsonify_local_pattern = function
         , match v with
           | Int (i, _) -> `Int i
           | String (s, _) -> `String s
-          | Bool (b, _) -> `Bool b )
+          | Bool (b, _) -> `Bool b
+          | ListIn (_,_) -> `String "List"
+        )
       ]
   | Local.Var (VarId (id, _), _) -> `Assoc [ "Var", `String id ]
   | Local.Left (p, _) -> `Assoc [ "Left", jsonify_local_pattern p ]
   | Local.Right (p, _) -> `Assoc [ "Right", jsonify_local_pattern p ]
   | Local.Pair (p1, p2, _) ->
     `Assoc [ "Pair", `List [ jsonify_local_pattern p1; jsonify_local_pattern p2 ] ]
+  | Local.ListPat (p,_) -> let rec matcher_func input_pattern =
+    match input_pattern with 
+    | Local.PNil _ -> `String "End of list"
+    | Local.PCons(a,b,_) -> `List [jsonify_local_pattern a; matcher_func b]
+  in matcher_func p
 ;;
 
 let rec jsonify_local_expr = function
@@ -59,7 +67,9 @@ let rec jsonify_local_expr = function
         , match v with
           | Int (i, _) -> `Int i
           | String (s, _) -> `String s
-          | Bool (b, _) -> `Bool b )
+          | Bool (b, _) -> `Bool b
+          | ListIn (_,_) -> `String "List"
+        )
       ]
   | Local.Var (VarId (id, _), _) -> `Assoc [ "Var", `String id ]
   | Local.Fst (e, _) -> `Assoc [ "Fst", jsonify_local_expr e ]

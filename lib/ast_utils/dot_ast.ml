@@ -81,6 +81,8 @@ let rec dot_local_type (string_of_info : 'a -> string) (typ : 'a Local.typ)
     let edge1 = spf "%s -> %s;\n" node_name n1 in
     let edge2 = spf "%s -> %s;\n" node_name n2 in
     sum_node ^ edge1 ^ edge2 ^ c1 ^ c2, node_name
+  | TListIn (_, info) ->
+    spf "%s [label=\"List %s\"];\n" node_name (string_of_info info), node_name
 ;;
 
 (* node name format: n + node_counter *)
@@ -109,7 +111,9 @@ let rec dot_local_pattern (string_of_info : 'a -> string) (pat : 'a Local.patter
        spf "%s [label=\"%s %s\"];\n" node_name s (string_of_info info), node_name
      | Bool (b, info) ->
        ( spf "%s [label=\"%s %s\"];\n" node_name (string_of_bool b) (string_of_info info)
-       , node_name ))
+       , node_name )
+     | ListIn (_, info) ->
+       spf "%s [label=\"%s %s\"];\n" node_name "List" (string_of_info info), node_name)
   | Var (VarId (id, _), info) ->
     spf "%s [label=\"%s %s\"];\n" node_name id (string_of_info info), node_name
   | Pair (pat1, pat2, info) ->
@@ -129,6 +133,8 @@ let rec dot_local_pattern (string_of_info : 'a -> string) (pat : 'a Local.patter
     let right_node = spf "%s [label=\"Right %s\"];\n" node_name (string_of_info info) in
     let edge = spf "%s -> %s;\n" node_name n in
     right_node ^ edge ^ c, node_name
+  | ListPat (_, info) ->
+    spf "%s [label=\"List %s\"];\n" node_name (string_of_info info), node_name
 ;;
 
 (** [dot_local_expr loc_expr] creates the dot code for local expressions [loc_expr]
@@ -155,7 +161,9 @@ let rec dot_local_expr (string_of_info : 'a -> string) (loc_expr : 'a Local.expr
        spf "%s [label=\"%s %s\"];\n" node_name s (string_of_info info), node_name
      | Bool (b, info) ->
        ( spf "%s [label=\"%s %s\"];\n" node_name (string_of_bool b) (string_of_info info)
-       , node_name ))
+       , node_name )
+     | ListIn (_, info) ->
+       spf "%s [label=\"%s %s\"];\n" node_name "String" (string_of_info info), node_name)
   | Var (VarId (id, _), info) ->
     spf "%s [label=\"%s %s\"];\n" node_name id (string_of_info info), node_name
   | UnOp (op, e, info) ->

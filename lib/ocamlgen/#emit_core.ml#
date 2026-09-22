@@ -80,23 +80,8 @@ let rec emit_local_pexp (expr : 'a Local.expr) =
     in
     Builder.pexp_match (emit_local_pexp e) cases
 
-and emit_local_ppat (pat : 'a Local.pattern) =
-  match pat with
-  | Default _ -> Builder.ppat_any
-  | Val (Int (i, _), _) -> Builder.pint i
-  | Val (String (s, _), _) -> Builder.pstring s
-  | Val (Bool (b, _), _) -> Builder.pbool b
-  | Val (ListIn (l, _), _) ->
-    let rec return_list input_list =
-      match input_list with
-      | Local.Nil _ -> [%pat? []]
-      | Local.Cons (head, rest_of_list, _) ->
-        let val_to_pat conv_one =
-          match conv_one with
-          | Local.Int (i, _) -> Builder.pint i
-          | Local.String (s, _) -> Builder.pstring s
-          | Local.Bool (b, _) -> Builder.pbool b
-          | Local.ListIn (_, _) -> Builder.ppat_any
+ | Local.Bool (b, _) -> Builder.pbool b
+          | _ -> Builder.ppat_any
         in
         [%pat? [%p val_to_pat head] :: [%p return_list rest_of_list]]
     in
@@ -105,14 +90,6 @@ and emit_local_ppat (pat : 'a Local.pattern) =
   | Pair (p1, p2, _) -> [%pat? [%p emit_local_ppat p1], [%p emit_local_ppat p2]]
   | Left (p, _) -> [%pat? Either.Left [%p emit_local_ppat p]]
   | Right (p, _) -> [%pat? Either.Right [%p emit_local_ppat p]]
-  | ListPat(p,_) ->   let rec return_pat_list input_list =
-    print_endline "In here";
-    match input_list with
-    | Local.PNil _ -> [%pat? []]
-    | Local.PCons (head, rest, _) ->
-      [%pat? [%p emit_local_ppat head] :: [%p return_pat_list rest]]
-  in
-  return_pat_list p
 ;;
 
 let rec emit_net_fun_body

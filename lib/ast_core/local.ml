@@ -3,6 +3,11 @@ module M = struct
     | Int of int * 'a
     | String of string * 'a
     | Bool of bool * 'a
+    | ListIn of 'a plist * 'a
+
+  and 'a plist =
+    | Nil of 'a
+    | Cons of 'a value * 'a plist * 'a
 
   type 'a loc_id = LocId of string * 'a
   type 'a var_id = VarId of string * 'a
@@ -35,6 +40,7 @@ module M = struct
     | TVar of 'a typ_id * 'a
     | TProd of 'a typ * 'a typ * 'a
     | TSum of 'a typ * 'a typ * 'a
+    | TListIn of 'a typ * 'a
 
   type 'a pattern =
     | Default of 'a
@@ -43,6 +49,11 @@ module M = struct
     | Pair of 'a pattern * 'a pattern * 'a
     | Left of 'a pattern * 'a
     | Right of 'a pattern * 'a
+    | ListPat of 'a pat_list * 'a
+
+  and 'a pat_list = 
+    | PNil of 'a
+    | PCons of 'a pattern * 'a pat_list * 'a
 
   type 'a expr =
     | Unit of 'a
@@ -73,11 +84,14 @@ struct
   type nonrec typ = Info.t M.typ
   type nonrec pattern = Info.t M.pattern
   type nonrec expr = Info.t M.expr
+  type nonrec plist = Info.t M.plist [@@warning "-34"]
+  type nonrec pat_list = Info.t M.pat_list [@@warning "-34"]
 
   let get_info_value : value -> Info.t = function
     | Int (_, i) -> i
     | String (_, i) -> i
     | Bool (_, i) -> i
+    | ListIn (_, i) -> i
   ;;
 
   let get_info_locid : loc_id -> Info.t = function
@@ -120,6 +134,7 @@ struct
     | TVar (_, i) -> i
     | TProd (_, _, i) -> i
     | TSum (_, _, i) -> i
+    | TListIn (_, i) -> i
   ;;
 
   let get_info_pattern : pattern -> Info.t = function
@@ -129,6 +144,7 @@ struct
     | Pair (_, _, i) -> i
     | Left (_, i) -> i
     | Right (_, i) -> i
+    | ListPat (_,i) -> i
   ;;
 
   let get_info_expr : expr -> Info.t = function
@@ -151,6 +167,7 @@ struct
     | Int (n, _) -> Int (n, i)
     | String (s, _) -> String (s, i)
     | Bool (b, _) -> Bool (b, i)
+    | ListIn (l, _) -> ListIn (l, i)
   ;;
 
   let set_info_locid : Info.t -> loc_id -> loc_id =
@@ -199,6 +216,7 @@ struct
     | TVar (t, _) -> TVar (t, i)
     | TProd (t1, t2, _) -> TProd (t1, t2, i)
     | TSum (t1, t2, _) -> TSum (t1, t2, i)
+    | TListIn (l, _) -> TListIn (l, i)
   ;;
 
   let set_info_pattern : Info.t -> pattern -> pattern =
@@ -209,6 +227,7 @@ struct
     | Pair (p1, p2, _) -> Pair (p1, p2, i)
     | Left (p, _) -> Left (p, i)
     | Right (p, _) -> Right (p, i)
+    | ListPat (p, _) -> ListPat (p, i)                        
   ;;
 
   let set_info_expr : Info.t -> expr -> expr =
@@ -225,5 +244,15 @@ struct
     | Left (e, _) -> Left (e, i)
     | Right (e, _) -> Right (e, i)
     | Match (e, cases, _) -> Match (e, cases, i)
+
+  let get_info_plist : plist -> Info.t = function
+    | Nil i -> i
+    | Cons (_, _, i) -> i
+    [@@warning "-32"]
+
+  let get_info_pat_list : pat_list -> Info.t = function
+    | PNil i -> i
+    | PCons (_, _, i) -> i
+    [@@warning "-32"]
   ;;
 end

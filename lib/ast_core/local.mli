@@ -3,6 +3,11 @@ module M : sig
     | Int of int * 'a
     | String of string * 'a
     | Bool of bool * 'a
+    | ListIn of 'a plist * 'a
+
+  and 'a plist =
+    | Nil of 'a
+    | Cons of 'a value * 'a plist * 'a
 
   type 'a loc_id = LocId of string * 'a
   type 'a var_id = VarId of string * 'a
@@ -35,6 +40,8 @@ module M : sig
     | TVar of 'a typ_id * 'a
     | TProd of 'a typ * 'a typ * 'a
     | TSum of 'a typ * 'a typ * 'a
+    | TListIn of 'a typ * 'a
+
 
   type 'a pattern =
     | Default of 'a
@@ -43,6 +50,11 @@ module M : sig
     | Pair of 'a pattern * 'a pattern * 'a
     | Left of 'a pattern * 'a
     | Right of 'a pattern * 'a
+    | ListPat of 'a pat_list * 'a     
+    
+  and 'a pat_list = 
+    | PNil of 'a
+    | PCons of 'a pattern * 'a pat_list * 'a
 
   type 'a expr =
     | Unit of 'a
@@ -74,6 +86,8 @@ module With : functor
   type nonrec typ = Info.t M.typ
   type nonrec pattern = Info.t M.pattern
   type nonrec expr = Info.t M.expr
+  type nonrec plist = Info.t M.plist [@@warning "-34"]
+  type nonrec pat_list = Info.t M.pat_list [@@warning "-34"]
 
   val get_info_value : value -> Info.t
   val get_info_locid : loc_id -> Info.t

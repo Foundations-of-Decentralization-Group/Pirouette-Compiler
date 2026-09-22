@@ -45,6 +45,7 @@ rule read = parse
   | ','                { COMMA }
   | '.'                { DOT }
   | ':'                { COLON }
+  | '::'               { CONS }
   | ';'                { SEMICOLON }
   | '+'                { PLUS }
   | '-'                { MINUS }
@@ -67,6 +68,7 @@ rule read = parse
   | "int"              { INT_T }
   | "string"           { STRING_T }
   | "bool"             { BOOL_T }
+  | "list"             { LIST_T}
   | "not"              { NOT }
   | "fun"              { FUN }
   | "type"             { TYPE }

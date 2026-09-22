@@ -37,6 +37,7 @@ let rec pprint_local_type ppf (typ : 'a Local.typ) =
     fprintf ppf "@[<h>%a * %a@]" pprint_local_type t1 pprint_local_type t2
   | TSum (t1, t2, _) ->
     fprintf ppf "@[<h>%a + %a@]" pprint_local_type t1 pprint_local_type t2
+  | TListIn _ -> fprintf ppf "@[<h>list@]"      
 ;;
 
 (** [pprint_local_pattern] takes a formatter [ppf] and a local pattern,
@@ -56,13 +57,16 @@ let rec pprint_local_pattern ppf (pat : 'a Local.pattern) =
          match v with
          | Int (i, _) -> fprintf ppf "%d" i
          | String (s, _) -> fprintf ppf "\"%s\"" s
-         | Bool (b, _) -> fprintf ppf "%b" b)
+         | Bool (b, _) -> fprintf ppf "%b" b
+         | ListIn (_, _) -> fprintf ppf "List"
+      )
       v
   | Var (VarId (id, _), _) -> fprintf ppf "@[<h>%s@]" id
   | Pair (p1, p2, _) ->
     fprintf ppf "@[<hv>(%a, %a)@]" pprint_local_pattern p1 pprint_local_pattern p2
   | Left (p, _) -> fprintf ppf "@[<hv2>left@ %a@]" pprint_local_pattern p
   | Right (p, _) -> fprintf ppf "@[<hv2>right@ %a@]" pprint_local_pattern p
+  | ListPat (_, _) -> fprintf ppf "List"
 ;;
 
 (** [pprint_local_expr] takes a formatter [ppf] and a local expression, and prints the formatted code of the local expression
@@ -82,7 +86,9 @@ let rec pprint_local_expr ppf (expr : 'a Local.expr) =
          match v with
          | Int (i, _) -> fprintf ppf "%d" i
          | String (s, _) -> fprintf ppf "\"%s\"" s
-         | Bool (b, _) -> fprintf ppf "%b" b)
+         | Bool (b, _) -> fprintf ppf "%b" b
+         | ListIn (_, _) -> fprintf ppf "List"
+      )
       v
   | Var (VarId (id, _), _) -> fprintf ppf "@[<h>%s@]" id
   | UnOp (op, e, _) ->
