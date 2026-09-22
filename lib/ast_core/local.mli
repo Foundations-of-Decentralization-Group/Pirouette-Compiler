@@ -55,6 +55,7 @@ module M : sig
   and 'a pat_list = 
     | PNil of 'a
     | PCons of 'a pattern * 'a pat_list * 'a
+    | PTail of 'a pattern * 'a
 
   type 'a expr =
     | Unit of 'a

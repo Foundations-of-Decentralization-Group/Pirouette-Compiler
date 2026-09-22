@@ -20,6 +20,7 @@
 %token MATCH WITH
 %token EOF
 %token FOREIGN
+%token CONS
 
 (** Operator Precedence and Associativity:
     - Defines the precedence and associativity rules for operators to resolve ambiguities in expressions.
@@ -28,6 +29,7 @@
 %right ARROW
 %nonassoc BAR
 %nonassoc FST SND LEFT RIGHT
+%right CONS
 %right OR
 %right AND
 %left EQ NEQ LT LEQ GT GEQ
@@ -160,6 +162,7 @@ local_pattern:
   | RIGHT p=local_pattern { Right (p, gen_pos $startpos $endpos) }
   | LPAREN p=local_pattern RPAREN { Local.set_info_pattern (gen_pos $startpos $endpos) p }
   | LBRACKET elems=list_pat_elements RBRACKET { ListPat (elems, gen_pos $startpos $endpos) }
+  | p1=local_pattern CONS p2=local_pattern { ListPat (PCons (p1, PTail (p2, gen_pos $startpos $endpos), gen_pos $startpos $endpos), gen_pos $startpos $endpos) }
 
 list_pat_elements:
   | p=local_pattern { PCons (p, PNil (gen_pos $startpos $endpos), gen_pos $startpos $endpos) }

@@ -111,6 +111,7 @@ and emit_local_ppat (pat : 'a Local.pattern) =
     | Local.PNil _ -> [%pat? []]
     | Local.PCons (head, rest, _) ->
       [%pat? [%p emit_local_ppat head] :: [%p return_pat_list rest]]
+    | Local.PTail (p,_) -> emit_local_ppat p
   in
   return_pat_list p
 ;;

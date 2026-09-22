@@ -54,6 +54,7 @@ module M = struct
   and 'a pat_list = 
     | PNil of 'a
     | PCons of 'a pattern * 'a pat_list * 'a
+    | PTail of 'a pattern * 'a
 
   type 'a expr =
     | Unit of 'a
@@ -253,6 +254,7 @@ struct
   let get_info_pat_list : pat_list -> Info.t = function
     | PNil i -> i
     | PCons (_, _, i) -> i
+    | PTail (_,i) -> i  
     [@@warning "-32"]
   ;;
 end

@@ -56,6 +56,7 @@ let rec jsonify_local_pattern = function
     match input_pattern with 
     | Local.PNil _ -> `String "End of list"
     | Local.PCons(a,b,_) -> `List [jsonify_local_pattern a; matcher_func b]
+    | Local.PTail(_,_) -> `String "Tail of list"
   in matcher_func p
 ;;
 
