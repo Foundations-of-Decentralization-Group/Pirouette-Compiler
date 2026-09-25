@@ -66,8 +66,8 @@ let rec emit_local_pexp (expr : 'a Local.expr) =
         cases
     in
     Builder.pexp_match (emit_local_pexp e) cases
-  | Cons(e1,e2,_) ->
-  | Nil _ ->
+  | Cons (e1, e2, _) -> [%expr [%e emit_local_pexp e1] :: [%e emit_local_pexp e2]]
+  | Nil _ -> [%expr []]
 
 and emit_local_ppat (pat : 'a Local.pattern) =
   match pat with
@@ -79,6 +79,8 @@ and emit_local_ppat (pat : 'a Local.pattern) =
   | Pair (p1, p2, _) -> [%pat? [%p emit_local_ppat p1], [%p emit_local_ppat p2]]
   | Left (p, _) -> [%pat? Either.Left [%p emit_local_ppat p]]
   | Right (p, _) -> [%pat? Either.Right [%p emit_local_ppat p]]
+  | PCons (p1, p2, _) -> [%pat? [%p emit_local_ppat p1] :: [%p emit_local_ppat p2]]
+  | PNil _ -> [%pat? []]
 ;;
 
 let rec emit_net_fun_body
@@ -121,9 +123,7 @@ and emit_net_binding ~(self_id : string) (module Msg : Msg_intf) (stmt : 'a Net.
 
 and emit_foreign_decl id _typ external_name =
   let open Ast_builder.Default in
-  let package_name, function_name, _ =
-    Ast_utils.parse_external_name external_name
-  in
+  let package_name, function_name, _ = Ast_utils.parse_external_name external_name in
   let package_string =
     match package_name with
     | Some pack -> pack ^ "."
@@ -135,9 +135,7 @@ and emit_foreign_decl id _typ external_name =
       Nolabel
       None
       (pvar ~loc "arg")
-      [%expr
-        [%e evar ~loc (package_string ^ function_name)]
-        [%e evar ~loc "arg"]]
+      [%expr [%e evar ~loc (package_string ^ function_name)] [%e evar ~loc "arg"]]
   in
   value_binding ~loc ~pat:(pvar ~loc id) ~expr:fun_expr
 

@@ -43,6 +43,8 @@ module M = struct
     | Pair of 'a pattern * 'a pattern * 'a
     | Left of 'a pattern * 'a
     | Right of 'a pattern * 'a
+    | PCons of 'a pattern * 'a pattern * 'a
+    | PNil of 'a
 
   type 'a expr =
     | Unit of 'a
@@ -131,6 +133,8 @@ struct
     | Pair (_, _, i) -> i
     | Left (_, i) -> i
     | Right (_, i) -> i
+    | PCons (_, _, i) -> i
+    | PNil i -> i
   ;;
 
   let get_info_expr : expr -> Info.t = function
@@ -213,6 +217,8 @@ struct
     | Pair (p1, p2, _) -> Pair (p1, p2, i)
     | Left (p, _) -> Left (p, i)
     | Right (p, _) -> Right (p, i)
+    | PCons (p1, p2, _) -> PCons (p1, p2, i)
+    | PNil _ -> PNil i
   ;;
 
   let set_info_expr : Info.t -> expr -> expr =

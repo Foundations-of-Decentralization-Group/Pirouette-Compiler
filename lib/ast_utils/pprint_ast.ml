@@ -63,6 +63,9 @@ let rec pprint_local_pattern ppf (pat : 'a Local.pattern) =
     fprintf ppf "@[<hv>(%a, %a)@]" pprint_local_pattern p1 pprint_local_pattern p2
   | Left (p, _) -> fprintf ppf "@[<hv2>left@ %a@]" pprint_local_pattern p
   | Right (p, _) -> fprintf ppf "@[<hv2>right@ %a@]" pprint_local_pattern p
+  | PCons (p1, p2, _) ->
+    fprintf ppf "@[%a :: %a@]" pprint_local_pattern p1 pprint_local_pattern p2
+  | PNil _ -> fprintf ppf "[]"
 ;;
 
 (** [pprint_local_expr] takes a formatter [ppf] and a local expression, and prints the formatted code of the local expression
@@ -143,6 +146,9 @@ let rec pprint_local_expr ppf (expr : 'a Local.expr) =
       e
       (pp_print_list ~pp_sep:(fun ppf () -> fprintf ppf "@ | ") pprint_local_case)
       cases
+  | Cons (e1, e2, _) ->
+    fprintf ppf "@[%a :: %a@]" pprint_local_expr e1 pprint_local_expr e2
+  | Nil _ -> fprintf ppf "[]"
 ;;
 
 (* ============================== Choreo ============================== *)

@@ -129,6 +129,14 @@ let rec dot_local_pattern (string_of_info : 'a -> string) (pat : 'a Local.patter
     let right_node = spf "%s [label=\"Right %s\"];\n" node_name (string_of_info info) in
     let edge = spf "%s -> %s;\n" node_name n in
     right_node ^ edge ^ c, node_name
+  | PCons (e1, e2, info) ->
+    let c1, n1 = dot_local_pattern string_of_info e1 in
+    let c2, n2 = dot_local_pattern string_of_info e2 in
+    let cons_node = spf "%s [label=\"PCons %s\"];\n" node_name (string_of_info info) in
+    let edge1 = spf "%s -> %s;\n" node_name n1 in
+    let edge2 = spf "%s -> %s;\n" node_name n2 in
+    cons_node ^ edge1 ^ edge2 ^ c1 ^ c2, node_name
+  | PNil info -> spf "%s [label=\"[] %s\"];\n" node_name (string_of_info info), node_name
 ;;
 
 (** [dot_local_expr loc_expr] creates the dot code for local expressions [loc_expr]
@@ -247,6 +255,14 @@ let rec dot_local_expr (string_of_info : 'a -> string) (loc_expr : 'a Local.expr
     let edge1 = spf "%s -> %s;\n" node_name n1 in
     let edge2 = spf "%s -> %s;\n" node_name n2 in
     match_node ^ edge1 ^ edge2 ^ c1 ^ c2, node_name
+  | Cons (e1, e2, info) ->
+    let c1, n1 = dot_local_expr string_of_info e1 in
+    let c2, n2 = dot_local_expr string_of_info e2 in
+    let cons_node = spf "%s [label=\"Cons %s\"];\n" node_name (string_of_info info) in
+    let edge1 = spf "%s -> %s;\n" node_name n1 in
+    let edge2 = spf "%s -> %s;\n" node_name n2 in
+    cons_node ^ edge1 ^ edge2 ^ c1 ^ c2, node_name
+  | Nil info -> spf "%s [label=\"[] %s\"];\n" node_name (string_of_info info), node_name
 ;;
 
 (*=========================== Choreo ===========================*)

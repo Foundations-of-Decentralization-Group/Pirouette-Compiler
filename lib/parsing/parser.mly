@@ -139,7 +139,7 @@ local_expr:
   | e=local_expr CONS rest=local_expr { Cons (e, rest, gen_pos $startpos $endpos) }
 
 list_elements:
-  | _e=local_expr { Nil (gen_pos $startpos $endpos) }
+  | e=local_expr  { Cons (e, Nil (gen_pos $startpos $endpos), gen_pos $startpos $endpos) }
   | e=local_expr SEMICOLON rest=list_elements { Cons (e, rest, gen_pos $startpos $endpos) }
 
 (** [choreo_pattern] parses patterns used in choreography expressions and constructs corresponding AST nodes.*)
@@ -161,6 +161,13 @@ local_pattern:
   | LEFT p=local_pattern { Left (p, gen_pos $startpos $endpos) }
   | RIGHT p=local_pattern { Right (p, gen_pos $startpos $endpos) }
   | LPAREN p=local_pattern RPAREN { Local.set_info_pattern (gen_pos $startpos $endpos) p }
+  | LBRACKET RBRACKET { PNil (gen_pos $startpos $endpos) }
+  | LBRACKET elems=list_patterns RBRACKET { elems }
+  | e=local_pattern CONS rest=local_pattern { PCons (e, rest, gen_pos $startpos $endpos) }
+
+list_patterns:
+  | e=local_pattern { PCons (e, PNil (gen_pos $startpos $endpos), gen_pos $startpos $endpos) }
+  | e=local_pattern SEMICOLON rest=list_patterns { PCons (e, rest, gen_pos $startpos $endpos) }
 
 (** [choreo_type] parses choreography types and constructs corresponding AST nodes.
 

@@ -43,6 +43,8 @@ module M : sig
     | Pair of 'a pattern * 'a pattern * 'a
     | Left of 'a pattern * 'a
     | Right of 'a pattern * 'a
+    | PCons of 'a pattern * 'a pattern * 'a
+    | PNil of 'a
 
   type 'a expr =
     | Unit of 'a
@@ -58,7 +60,7 @@ module M : sig
     | Right of 'a expr * 'a
     | Match of 'a expr * ('a pattern * 'a expr) list * 'a
     | Cons of 'a expr * 'a expr * 'a
-    | Nil of 'a               
+    | Nil of 'a
 end
 
 module With : functor
