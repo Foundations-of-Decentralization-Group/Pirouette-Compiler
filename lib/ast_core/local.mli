@@ -57,6 +57,8 @@ module M : sig
     | Left of 'a expr * 'a
     | Right of 'a expr * 'a
     | Match of 'a expr * ('a pattern * 'a expr) list * 'a
+    | Cons of 'a expr * 'a expr * 'a
+    | Nil of 'a               
 end
 
 module With : functor

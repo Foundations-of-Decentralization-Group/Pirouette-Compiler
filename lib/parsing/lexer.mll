@@ -44,6 +44,7 @@ rule read = parse
   | ']'                { RBRACKET }
   | ','                { COMMA }
   | '.'                { DOT }
+  | "::"               { CONS }
   | ':'                { COLON }
   | ';'                { SEMICOLON }
   | '+'                { PLUS }

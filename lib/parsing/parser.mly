@@ -20,6 +20,7 @@
 %token MATCH WITH
 %token EOF
 %token FOREIGN
+%token CONS
 
 (** Operator Precedence and Associativity:
     - Defines the precedence and associativity rules for operators to resolve ambiguities in expressions.
@@ -28,6 +29,7 @@
 %right ARROW
 %nonassoc BAR
 %nonassoc FST SND LEFT RIGHT
+%nonassoc CONS
 %right OR
 %right AND
 %left EQ NEQ LT LEQ GT GEQ
@@ -133,6 +135,12 @@ local_expr:
   | RIGHT e=local_expr { Right (e, gen_pos $startpos $endpos) }
   | MATCH e=local_expr WITH cases=nonempty_list(local_case) { Match (e, cases, gen_pos $startpos $endpos) }
   | LPAREN e=local_expr RPAREN { Local.set_info_expr (gen_pos $startpos $endpos) e }
+  | LBRACKET elems=list_elements RBRACKET { elems }
+  | e=local_expr CONS rest=local_expr { Cons (e, rest, gen_pos $startpos $endpos) }
+
+list_elements:
+  | _e=local_expr { Nil (gen_pos $startpos $endpos) }
+  | e=local_expr SEMICOLON rest=list_elements { Cons (e, rest, gen_pos $startpos $endpos) }
 
 (** [choreo_pattern] parses patterns used in choreography expressions and constructs corresponding AST nodes.*)
 choreo_pattern:

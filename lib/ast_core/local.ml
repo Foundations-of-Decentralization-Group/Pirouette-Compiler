@@ -57,6 +57,8 @@ module M = struct
     | Left of 'a expr * 'a
     | Right of 'a expr * 'a
     | Match of 'a expr * ('a pattern * 'a expr) list * 'a
+    | Cons of 'a expr * 'a expr * 'a
+    | Nil of 'a
 end
 
 module With (Info : sig
@@ -144,6 +146,8 @@ struct
     | Left (_, i) -> i
     | Right (_, i) -> i
     | Match (_, _, i) -> i
+    | Cons (_, _, i) -> i
+    | Nil i -> i
   ;;
 
   let set_info_value : Info.t -> value -> value =
@@ -225,5 +229,7 @@ struct
     | Left (e, _) -> Left (e, i)
     | Right (e, _) -> Right (e, i)
     | Match (e, cases, _) -> Match (e, cases, i)
+    | Cons (e1, e2, _) -> Cons (e1, e2, i)
+    | Nil _ -> Nil i
   ;;
 end

@@ -66,6 +66,8 @@ let rec emit_local_pexp (expr : 'a Local.expr) =
         cases
     in
     Builder.pexp_match (emit_local_pexp e) cases
+  | Cons(e1,e2,_) ->
+  | Nil _ ->
 
 and emit_local_ppat (pat : 'a Local.pattern) =
   match pat with
