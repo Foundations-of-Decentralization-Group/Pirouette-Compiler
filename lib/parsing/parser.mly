@@ -29,7 +29,7 @@
 %right ARROW
 %nonassoc BAR
 %nonassoc FST SND LEFT RIGHT
-%nonassoc CONS
+%right CONS
 %right OR
 %right AND
 %left EQ NEQ LT LEQ GT GEQ
@@ -163,7 +163,9 @@ local_pattern:
   | LPAREN p=local_pattern RPAREN { Local.set_info_pattern (gen_pos $startpos $endpos) p }
   | LBRACKET RBRACKET { PNil (gen_pos $startpos $endpos) }
   | LBRACKET elems=list_patterns RBRACKET { elems }
-  | e=local_pattern CONS rest=local_pattern { PCons (e, rest, gen_pos $startpos $endpos) }
+  | e=local_pattern CONS rest=local_pattern 
+    
+  {   print_endline "hit CONS pattern"; PCons (e, rest, gen_pos $startpos $endpos) }
 
 list_patterns:
   | e=local_pattern { PCons (e, PNil (gen_pos $startpos $endpos), gen_pos $startpos $endpos) }
