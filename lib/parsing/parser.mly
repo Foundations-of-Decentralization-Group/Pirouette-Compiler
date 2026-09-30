@@ -137,6 +137,14 @@ local_expr:
   | LPAREN e=local_expr RPAREN { Local.set_info_expr (gen_pos $startpos $endpos) e }
   | LBRACKET elems=list_elements RBRACKET { elems }
   | e=local_expr CONS rest=local_expr { Cons (e, rest, gen_pos $startpos $endpos) }
+  | ps=nonempty_list(local_pattern) COLONEQ e1=local_expr IN e2=local_expr { LocalFunDef (ps, e1, e2, gen_pos $startpos $endpos) }
+  | local_expr1 { $1 }
+
+local_expr1:
+  | e1=local_expr1 e2=local_expr2 { LocalFunApp (e1, e2, gen_pos $startpos $endpos) }
+  | local_expr2 { $1 }
+
+local_expr2:
 
 list_elements:
   | e=local_expr  { Cons (e, Nil (gen_pos $startpos $endpos), gen_pos $startpos $endpos) }

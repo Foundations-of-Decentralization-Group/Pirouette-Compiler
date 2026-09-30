@@ -61,6 +61,8 @@ module M = struct
     | Match of 'a expr * ('a pattern * 'a expr) list * 'a
     | Cons of 'a expr * 'a expr * 'a
     | Nil of 'a
+    | LocalFunDef of 'a pattern list * 'a expr * 'a expr * 'a
+    | LocalFunApp of 'a expr * 'a expr * 'a
 end
 
 module With (Info : sig
@@ -152,6 +154,8 @@ struct
     | Match (_, _, i) -> i
     | Cons (_, _, i) -> i
     | Nil i -> i
+    | LocalFunDef (_, _, _, i) -> i
+    | LocalFunApp (_, _, i) -> i
   ;;
 
   let set_info_value : Info.t -> value -> value =
@@ -237,5 +241,7 @@ struct
     | Match (e, cases, _) -> Match (e, cases, i)
     | Cons (e1, e2, _) -> Cons (e1, e2, i)
     | Nil _ -> Nil i
+    | LocalFunDef (cases, e1, e2, i) -> LocalFunDef (cases, e1, e2, i)
+    | LocalFunApp (e1, e2, i) -> LocalFunApp (e1, e2, i)
   ;;
 end

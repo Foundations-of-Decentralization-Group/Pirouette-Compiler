@@ -61,6 +61,8 @@ module M : sig
     | Match of 'a expr * ('a pattern * 'a expr) list * 'a
     | Cons of 'a expr * 'a expr * 'a
     | Nil of 'a
+    | LocalFunDef of 'a pattern list * 'a expr * 'a expr * 'a
+    | LocalFunApp of 'a expr * 'a expr * 'a      
 end
 
 module With : functor
