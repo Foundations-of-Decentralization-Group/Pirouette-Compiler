@@ -21,6 +21,7 @@
 %token EOF
 %token FOREIGN
 %token CONS
+%token LFUN
 
 (** Operator Precedence and Associativity:
     - Defines the precedence and associativity rules for operators to resolve ambiguities in expressions.
@@ -115,16 +116,13 @@ choreo_expr1:
 choreo_expr2:
   | LPAREN RPAREN { Unit (gen_pos $startpos $endpos) }
   | id=var_id { Var (id, gen_pos $startpos $endpos) }
-  | id=loc_id DOT e=local_expr { LocExpr (id, e, gen_pos $startpos $endpos) }
+  | id=loc_id DOT e=local_expr2 { LocExpr (id, e, gen_pos $startpos $endpos) }
   | LPAREN e=choreo_expr RPAREN { Choreo.set_info_expr (gen_pos $startpos $endpos) e }
 
 (** [local_expr] parses local expressions and constructs corresponding AST nodes.
 
     - Returns: An AST node representing the local expression.*)
 local_expr:
-  | LPAREN RPAREN { Unit (gen_pos $startpos $endpos) }
-  | v=value { Val (v, gen_pos $startpos $endpos) }
-  | id=var_id { Var (id, gen_pos $startpos $endpos) }
   | op=un_op e=local_expr %prec UNARY { UnOp (op, e, gen_pos $startpos $endpos) }
   | e1=local_expr op=bin_op e2=local_expr { BinOp (e1, op, e2, gen_pos $startpos $endpos) }
   | LET id=var_id COLON t=local_type COLONEQ e1=local_expr IN e2=local_expr { Let (id, t, e1, e2, gen_pos $startpos $endpos) }
@@ -135,9 +133,8 @@ local_expr:
   | RIGHT e=local_expr { Right (e, gen_pos $startpos $endpos) }
   | MATCH e=local_expr WITH cases=nonempty_list(local_case) { Match (e, cases, gen_pos $startpos $endpos) }
   | LPAREN e=local_expr RPAREN { Local.set_info_expr (gen_pos $startpos $endpos) e }
-  | LBRACKET elems=list_elements RBRACKET { elems }
   | e=local_expr CONS rest=local_expr { Cons (e, rest, gen_pos $startpos $endpos) }
-  | ps=nonempty_list(local_pattern) COLONEQ e1=local_expr IN e2=local_expr { LocalFunDef (ps, e1, e2, gen_pos $startpos $endpos) }
+  | LFUN ps=nonempty_list(local_pattern) COLONEQ e1=local_expr IN e2=local_expr { LocalFunDef (ps, e1, e2, gen_pos $startpos $endpos) }
   | local_expr1 { $1 }
 
 local_expr1:
@@ -145,6 +142,11 @@ local_expr1:
   | local_expr2 { $1 }
 
 local_expr2:
+  | LPAREN RPAREN { Unit (gen_pos $startpos $endpos) }
+  | id=var_id { Var (id, gen_pos $startpos $endpos) }
+  | v=value { Val (v, gen_pos $startpos $endpos) }
+  | LBRACKET RBRACKET { Nil (gen_pos $startpos $endpos) }
+  | LBRACKET elems=list_elements RBRACKET { elems }
 
 list_elements:
   | e=local_expr  { Cons (e, Nil (gen_pos $startpos $endpos), gen_pos $startpos $endpos) }
@@ -171,10 +173,8 @@ local_pattern:
   | LPAREN p=local_pattern RPAREN { Local.set_info_pattern (gen_pos $startpos $endpos) p }
   | LBRACKET RBRACKET { PNil (gen_pos $startpos $endpos) }
   | LBRACKET elems=list_patterns RBRACKET { elems }
-  | e=local_pattern CONS rest=local_pattern 
+  | e=local_pattern CONS rest=local_pattern { PCons (e, rest, gen_pos $startpos $endpos) }
     
-  {   print_endline "hit CONS pattern"; PCons (e, rest, gen_pos $startpos $endpos) }
-
 list_patterns:
   | e=local_pattern { PCons (e, PNil (gen_pos $startpos $endpos), gen_pos $startpos $endpos) }
   | e=local_pattern SEMICOLON rest=list_patterns { PCons (e, rest, gen_pos $startpos $endpos) }

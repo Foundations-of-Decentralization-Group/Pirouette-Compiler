@@ -64,6 +64,7 @@ rule read = parse
   | ":="               { COLONEQ }
   | "->"               { ARROW }
   | "~>"               { TILDE_ARROW }
+  | "local_function"   { LFUN }
   | "unit"             { UNIT_T }
   | "int"              { INT_T }
   | "string"           { STRING_T }
