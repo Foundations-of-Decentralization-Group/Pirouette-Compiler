@@ -68,6 +68,20 @@ let rec emit_local_pexp (expr : 'a Local.expr) =
     Builder.pexp_match (emit_local_pexp e) cases
   | Cons (e1, e2, _) -> [%expr [%e emit_local_pexp e1] :: [%e emit_local_pexp e2]]
   | Nil _ -> [%expr []]
+  | LocalFunDef (ps, e1, e2, _) ->
+    let fn_name, arguments = List.hd ps, List.tl ps in
+    Builder.pexp_let
+      Recursive
+      [ Builder.value_binding
+          ~pat:(emit_local_ppat fn_name)
+          ~expr:
+            (List.fold_right
+               (fun arg acc -> Builder.pexp_fun Nolabel None (emit_local_ppat arg) acc)
+               arguments
+               (emit_local_pexp e1))
+      ]
+      (emit_local_pexp e2)
+  | LocalFunApp (e1, e2, _) -> [%expr [%e emit_local_pexp e1] [%e emit_local_pexp e2]]
 
 and emit_local_ppat (pat : 'a Local.pattern) =
   match pat with
