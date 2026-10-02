@@ -49,10 +49,9 @@ let rec jsonify_local_pattern = function
   | Local.Right (p, _) -> `Assoc [ "Right", jsonify_local_pattern p ]
   | Local.Pair (p1, p2, _) ->
     `Assoc [ "Pair", `List [ jsonify_local_pattern p1; jsonify_local_pattern p2 ] ]
- | Local.PCons (p1, p2, _) ->
+  | Local.PCons (p1, p2, _) ->
     `Assoc [ "List", `List [ jsonify_local_pattern p1; jsonify_local_pattern p2 ] ]
   | Local.PNil _ -> `String "[]"
-
 ;;
 
 let rec jsonify_local_expr = function
@@ -112,6 +111,16 @@ let rec jsonify_local_expr = function
   | Local.Cons (e1, e2, _) ->
     `Assoc [ "List", `List [ jsonify_local_expr e1; jsonify_local_expr e2 ] ]
   | Local.Nil _ -> `String "[]"
+  | Local.LocalFunDef (ps, e1, e2, _) ->
+    `Assoc
+      [ ( "LocalFunDef"
+        , `Assoc
+            [ "Arguments", `List (List.map (fun arg -> jsonify_local_pattern arg) ps) ] )
+      ; "Body", jsonify_local_expr e1
+      ; "Rest", jsonify_local_expr e2
+      ]
+  | Local.LocalFunApp (e1, e2, _) ->
+    `Assoc [ "LocalFunApp", `List [ jsonify_local_expr e1; jsonify_local_expr e2 ] ]
 ;;
 
 (* ============================== Choreo ============================== *)
@@ -138,7 +147,6 @@ let rec jsonify_choreo_pattern = function
   | Choreo.LocPat (LocId (loc, _), p, _) ->
     `Assoc
       [ "LocPat", `Assoc [ "loc", `String loc; "local_patt", jsonify_local_pattern p ] ]
-  
 ;;
 
 let rec jsonify_choreo_stmt = function

@@ -263,6 +263,30 @@ let rec dot_local_expr (string_of_info : 'a -> string) (loc_expr : 'a Local.expr
     let edge2 = spf "%s -> %s;\n" node_name n2 in
     cons_node ^ edge1 ^ edge2 ^ c1 ^ c2, node_name
   | Nil info -> spf "%s [label=\"[] %s\"];\n" node_name (string_of_info info), node_name
+  | LocalFunDef (ps,e1,e2,info) -> 
+      let rec pattern_loop patterns =
+      match patterns with
+      | [] -> "", ""
+      | pat :: rest ->
+        let pat_c, pat_n = dot_local_pattern string_of_info pat in
+        let edge = spf "%s -> %s;\n" node_name pat_n in
+        let rest_c, rest_e = pattern_loop rest in
+        pat_c ^ rest_c, edge ^ rest_e
+    in
+    let pattern_code, pattern_edge = pattern_loop ps in
+    let c1, n1 = dot_local_expr string_of_info e1 in
+    let c2, n2 = dot_local_expr string_of_info e2 in 
+    let fundef_node = spf "%s [label=\"FunDef %s\"];\n" node_name (string_of_info info) in
+    let edge1 = spf "%s -> %s;\n" node_name n1 in
+    let edge2 = spf "%s -> %s;\n" node_name n2 in
+    fundef_node ^ pattern_edge ^ edge1 ^ edge2 ^ pattern_code ^ c1 ^ c2, node_name  
+  | LocalFunApp (e1, e2, info) ->
+    let c1, n1 = dot_local_expr string_of_info e1 in
+    let c2, n2 = dot_local_expr string_of_info e2 in
+    let localfunapp_node = spf "%s [label=\"LocalFunApp %s\"];\n" node_name (string_of_info info) in
+    let edge1 = spf "%s -> %s;\n" node_name n1 in
+    let edge2 = spf "%s -> %s;\n" node_name n2 in
+    localfunapp_node ^ edge1 ^ edge2 ^ c1 ^ c2, node_name
 ;;
 
 (*=========================== Choreo ===========================*)

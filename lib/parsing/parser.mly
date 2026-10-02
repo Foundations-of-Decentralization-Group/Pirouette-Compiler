@@ -126,13 +126,11 @@ local_expr:
   | op=un_op e=local_expr %prec UNARY { UnOp (op, e, gen_pos $startpos $endpos) }
   | e1=local_expr op=bin_op e2=local_expr { BinOp (e1, op, e2, gen_pos $startpos $endpos) }
   | LET id=var_id COLON t=local_type COLONEQ e1=local_expr IN e2=local_expr { Let (id, t, e1, e2, gen_pos $startpos $endpos) }
-  | LPAREN e1=local_expr COMMA e2=local_expr RPAREN { Pair (e1, e2, gen_pos $startpos $endpos) }
   | FST e=local_expr { Fst (e, gen_pos $startpos $endpos) }
   | SND e=local_expr { Snd (e, gen_pos $startpos $endpos) }
   | LEFT e=local_expr { Left (e, gen_pos $startpos $endpos) }
   | RIGHT e=local_expr { Right (e, gen_pos $startpos $endpos) }
   | MATCH e=local_expr WITH cases=nonempty_list(local_case) { Match (e, cases, gen_pos $startpos $endpos) }
-  | LPAREN e=local_expr RPAREN { Local.set_info_expr (gen_pos $startpos $endpos) e }
   | e=local_expr CONS rest=local_expr { Cons (e, rest, gen_pos $startpos $endpos) }
   | LFUN ps=nonempty_list(local_pattern) COLONEQ e1=local_expr IN e2=local_expr { LocalFunDef (ps, e1, e2, gen_pos $startpos $endpos) }
   | local_expr1 { $1 }
@@ -147,6 +145,8 @@ local_expr2:
   | v=value { Val (v, gen_pos $startpos $endpos) }
   | LBRACKET RBRACKET { Nil (gen_pos $startpos $endpos) }
   | LBRACKET elems=list_elements RBRACKET { elems }
+  | LPAREN e1=local_expr COMMA e2=local_expr RPAREN { Pair (e1,e2 , gen_pos $startpos $endpos) }
+  | LPAREN e=local_expr RPAREN { Local.set_info_expr (gen_pos $startpos $endpos) e }
 
 list_elements:
   | e=local_expr  { Cons (e, Nil (gen_pos $startpos $endpos), gen_pos $startpos $endpos) }

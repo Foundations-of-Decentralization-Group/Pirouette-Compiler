@@ -149,6 +149,18 @@ let rec pprint_local_expr ppf (expr : 'a Local.expr) =
   | Cons (e1, e2, _) ->
     fprintf ppf "@[%a :: %a@]" pprint_local_expr e1 pprint_local_expr e2
   | Nil _ -> fprintf ppf "[]"
+  | LocalFunDef (ps, e1, e2, _) ->
+    fprintf
+      ppf
+      "@[<hv2>fun@ %a ->@ %a%a@]"
+      (pp_print_list ~pp_sep:pp_print_space pprint_local_pattern)
+      ps
+      pprint_local_expr
+      e1
+      pprint_local_expr
+      e2
+  | LocalFunApp (e1, e2, _) ->
+    fprintf ppf "@[<hv>(%a, %a)@]" pprint_local_expr e1 pprint_local_expr e2
 ;;
 
 (* ============================== Choreo ============================== *)
