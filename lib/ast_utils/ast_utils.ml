@@ -1,5 +1,6 @@
 module Choreo = Ast_core.Choreo.M
 module Net = Ast_core.Net.M
+module Local = Ast_core.Local.M
 
 let tree_walk (stmt_block : 'a Choreo.stmt list) (holder : string list) : string list =
   Tree_walk.get_stmt_block stmt_block holder
@@ -11,16 +12,19 @@ let infer_sync_expr (stmt_block : 'a Choreo.stmt list) (holder : string list)
   Tree_walk.copy_get_stmt_block stmt_block holder
 ;;
 
-let optimize_sync_expr (stmt : 'a Choreo.stmt list) (holder1 : string list) (holder2 : string list)
-  : string list
+let optimize_sync_expr
+      (stmt : 'a Choreo.stmt list)
+      ((holder1, holder2) : string list * 'a Local.value list)
+  : string list * 'a Local.value list
   =
-  Sync_optimize.collect_data stmt holder1 holder2
+  Sync_optimize.collect_data stmt (holder1, holder2)
 ;;
 
 let add_sync_opt (stmt_block : 'a Choreo.stmt list) (holder : string list)
   : 'a Choreo.stmt list
   =
   Sync_optimize.add_sync_opt stmt_block holder
+;;
 
 let extract_locs (stmt_block : 'a Choreo.stmt_block) =
   Ast_locs.extract_stmt_block stmt_block |> Ast_locs.LocSet.elements

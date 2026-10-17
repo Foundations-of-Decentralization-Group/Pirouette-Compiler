@@ -39,7 +39,21 @@ let () =
    | _ -> invalid_arg "Invalid ast-dump format");
   let holder1 = [] in
   let holder2 = [] in
-  let holder_3 = Ast_utils.optimize_sync_expr program holder1 holder2 in
+  let holder_3, holder4 = Ast_utils.optimize_sync_expr program (holder1, holder2) in
+  let rec print_holder4 inp_list =
+    match inp_list with
+    | [] -> Printf.printf "Done with the list\n"
+    | Ast_core.Local.M.Int (i, _) :: rest ->
+      Printf.printf "This is an int in main.ml %d" i;
+      print_holder4 rest
+    | Ast_core.Local.M.String (s, _) :: rest ->
+      Printf.printf "This is an string in main.ml %s" s;
+      print_holder4 rest
+    | Ast_core.Local.M.Bool (b, _) :: rest ->
+      Printf.printf "This is an bool in main.ml %b" b;
+      print_holder4 rest
+  in
+  print_holder4 holder4;
   let holder_3_size = List.length holder_3 in
   Printf.printf "Size of holder_3 is %d\n" holder_3_size;
   let list_to_be_split = holder_3 in

@@ -4,114 +4,118 @@ module Net = Ast_core.Net.M
 
 let rec collect_data
           (p : 'a Choreo.stmt list)
-          (holder1 : string list)
-          (_holder2 : string list)
-  : string list
+          ((holder1, holder2) : string list * 'a Local.value list)
+  : string list * 'a Local.value list
   =
   match p with
-  | [] -> holder1
+  | [] -> holder1, holder2
   | head :: tail ->
     let list_two =
-      let list_one = copy_matcher_stmt head holder1 _holder2 in
-      collect_data tail list_one _holder2
+      let holder1, holder2 = copy_matcher_stmt head (holder1, holder2) in
+      collect_data tail (holder1, holder2)
     in
     list_two
 
 and copy_matcher_stmt
       (x : 'a Choreo.stmt)
-      (holder1 : string list)
-      (_holder2 : string list)
-  : string list
+      ((holder1, holder2) : string list * 'a Local.value list)
+  : string list * 'a Local.value list
   =
   match x with
   | Assign (_, e, _) ->
     (* this is where we go to the choreo expr variant*)
-    let rs_list = visit_choreo_expr e holder1 _holder2 in
+    let rs_list = visit_choreo_expr e (holder1, holder2) in
     rs_list
   | _ ->
     print_endline "Hit this";
-    []
+    [], []
+
+and visit_value (x : 'a Local.expr) (holder1, holder2) : string list * 'a Local.value list
+  =
+  match x with
+  | Val (Local.Int (i, a), _) ->
+    (* let () = Printf.printf "This is the value that is being sent %d" i in *)
+    let holder2 = List.cons (Local.Int (i, a)) holder2 in
+    holder1, holder2
+  | Val (Local.String (s, a), _) ->
+    (* let () = Printf.printf "This is the value that is being sent %s" s in     *)
+    let holder2 = List.cons (Local.String (s, a)) holder2 in
+    holder1, holder2
+  | Val (Local.Bool (b, a), _) ->
+    (* let () = Printf.printf "This is the value that is being sent %b" b in     *)
+    let holder2 = List.cons (Local.Bool (b, a)) holder2 in
+    holder1, holder2
+  | _ -> holder1, holder2
 
 and visit_choreo_expr
       (x : 'a Choreo.expr)
-      (holder1 : string list)
-      (_holder2 : string list)
-  : string list
+      ((holder1, holder2) : string list * 'a Local.value list)
+  : string list * 'a Local.value list
   =
   match x with
-  | Unit _ -> holder1
-  | Var (_, _) -> holder1
-  | LocExpr (_, _, _) -> holder1
-  | Send (LocId (id1, _), e, LocId (id2, _), _) ->
-    (* print_endline "Hit the Send AST node"; *)
-    Printf.printf "%s\n" id1;
-    Printf.printf "%s\n" id2;
-    let holder1 = List.cons id1 holder1 in
-    let holder1 = List.cons id2 holder1 in
-    (* let rec check_consecutive_sends (e : 'a Choreo.expr) holder1 = *)
-    (*   match e with *)
-    (*   | Send (LocId (id1, _), e, LocId (id2, _), _) -> *)
-    (*     let () = print_endline "In here precisely once" in *)
-    (*     let holder1 = List.cons id1 holder1 in *)
-    (*     let holder1 = List.cons id2 holder1 in *)
-    (*     check_consecutive_sends e holder1 *)
-    (*   | _ -> *)
-    (*     print_endline "This branch was executed"; *)
-    (*     holder1 *)
-    (* in *)
-    (* let () = Printf.printf "Size of holder %d\n" (List.length holder1) in *)
-    (* let list_to_be_split = check_consecutive_sends e holder1 in *)
-    (* let () = Printf.printf "Size of list %d\n" (List.length list_to_be_split) in *)
-    (* let rec split input_list list_one list_two = *)
-    (*   match input_list with *)
-    (*   | head_one :: head_two :: tail -> *)
-    (*     split tail (head_one :: list_one) (head_two :: list_two) *)
-    (*   | head_one :: [] -> head_one :: list_one, list_two *)
-    (*   | [] -> list_one, list_two *)
-    (* in *)
-    (* let result_list_one, result_list_two = split list_to_be_split [] [] in *)
-    (* let check_equality input_list = *)
-    (*   match input_list with *)
-    (*   | [] -> true *)
-    (*   | head :: tail -> List.for_all (fun y -> y = head) tail *)
-    (* in *)
-    (* let check_one = check_equality result_list_one in *)
-    (* let check_two = check_equality result_list_two in *)
-    (* let check_opt inp_one inp_two = *)
-    (*   if inp_one && inp_two *)
-    (*   then Printf.printf "Optimization possible" *)
-    (*   else Printf.printf "Optimization not possible" *)
-    (* in *)
-    (* check_opt check_one check_two; *)
-    visit_choreo_expr e holder1 _holder2
+  | Unit _ -> holder1, holder2
+  | Var (_, _) -> holder1, holder2
+  | LocExpr (_, v1, _) -> visit_value v1 (holder1, holder2)
+  | Send (_, _, _, _) -> (holder1,holder2)
   | If (e1, e2, _, _) ->
-    (* let list_three = *)
-    (*   let list_two = *)
-    (*     let list_one = visit_choreo_expr e1 holder1 _holder2 in *)
-    (*     visit_choreo_expr e2 list_one _holder2 *)
-    (*   in *)
-    (*   visit_choreo_expr e3 list_two _holder2 *)
-    (* in *)
-    (* (\* let size = List.length list_three in *\) *)
-    (* Printf.printf "This is the size of the internal list %d \n" size; *)
-    (* list_three *)
-    let list_one = visit_choreo_expr e1 holder1 _holder2 in
-    visit_choreo_expr e2 list_one _holder2
-  | Let (stmts, e, _) ->
-    let list_one = collect_data stmts holder1 _holder2 in
-    visit_choreo_expr e list_one _holder2
-  | FunDef (_, e, _) -> visit_choreo_expr e holder1 _holder2
+    let holder1, holder2 = visit_choreo_expr e1 (holder1, holder2) in
+    visit_choreo_expr e2 (holder1, holder2)
+  | Let (stmt_block, e, a) ->
+    let input_node = Choreo.Let (stmt_block, e, a) in
+    let rec check_consecutive_sends input_node_arg count node_tuple =
+      let () = print_endline "Inside the check consecutive sends function" in
+      match input_node_arg with
+      | Choreo.Let (stmt_block, e1, _) ->
+        (match stmt_block with
+         | [] ->
+           print_endline "This is empty";
+           count, node_tuple, input_node_arg
+         | head :: _ ->
+           (match head with
+            | Choreo.Assign (_, Send (LocId (id1, _), _, LocId (id2, _), _), _) ->
+              print_endline "This is a send inside a let statement";
+              let tuple_nodes_list_one = List.cons id1 (fst node_tuple) in
+              let tuple_nodes_list_two = List.cons id2 (snd node_tuple) in
+              let node_tuple = tuple_nodes_list_one, tuple_nodes_list_two in
+              check_consecutive_sends e1 (count + 1) node_tuple
+            | _ -> count, node_tuple, input_node_arg))
+      | other_node ->
+        print_endline "Not a let statement";
+        count, node_tuple, other_node
+    in
+    let consec_sends_number, node_list, node_to_visit =
+      check_consecutive_sends input_node 0 ([], [])
+    in
+    let check_equality input_list =
+      match input_list with
+      | [] -> true
+      | head :: tail -> List.for_all (fun per_elem_tail -> head = per_elem_tail) tail
+    in
+    if consec_sends_number >= 2
+    then (
+      let sender_check = check_equality (fst node_list) in
+      let recv_check = check_equality (snd node_list) in
+      Printf.printf "Bool values %b %b" sender_check recv_check;
+      let () = print_endline "Hit the let for collecting the values" in
+      let holder1, holder2 = collect_data stmt_block (holder1, holder2) in
+      visit_choreo_expr node_to_visit (holder1, holder2))
+    else (
+      Printf.printf "The sends and the recvs have different nodes";
+      let () = print_endline "Hit the let for collecting the values" in
+      let holder1, holder2 = collect_data stmt_block (holder1, holder2) in
+      visit_choreo_expr node_to_visit (holder1, holder2))
+  | FunDef (_, e, _) -> visit_choreo_expr e (holder1, holder2)
   | FunApp (e1, e2, _) ->
-    let list_one = visit_choreo_expr e1 holder1 _holder2 in
-    visit_choreo_expr e2 list_one _holder2
+    let holder1, holder2 = visit_choreo_expr e1 (holder1, holder2) in
+    visit_choreo_expr e2 (holder1, holder2)
   | Pair (e1, e2, _) ->
-    let list_one = visit_choreo_expr e1 holder1 _holder2 in
-    visit_choreo_expr e2 list_one _holder2
-  | Fst (e, _) -> visit_choreo_expr e holder1 _holder2
-  | Snd (e, _) -> visit_choreo_expr e holder1 _holder2
-  | Left (e, _) -> visit_choreo_expr e holder1 _holder2
-  | Right (e, _) -> visit_choreo_expr e holder1 _holder2
-  | Match (e, _, _) -> visit_choreo_expr e holder1 _holder2
+    let holder1, holder2 = visit_choreo_expr e1 (holder1, holder2) in
+    visit_choreo_expr e2 (holder1, holder2)
+  | Fst (e, _) -> visit_choreo_expr e (holder1, holder2)
+  | Snd (e, _) -> visit_choreo_expr e (holder1, holder2)
+  | Left (e, _) -> visit_choreo_expr e (holder1, holder2)
+  | Right (e, _) -> visit_choreo_expr e (holder1, holder2)
+  | Match (e, _, _) -> visit_choreo_expr e (holder1, holder2)
   | Sync (LocId (id1, _), _, LocId (id3, _), e, _) ->
     print_endline "Hit the Sync Ast node";
     let holder1 = List.cons id1 holder1 in
@@ -138,7 +142,7 @@ and visit_choreo_expr
     then (
       print_endline
         "Cannot be optimized because there are no sync statements/control messages";
-      [])
+      [], holder2)
     else (
       let result_list = check_optimization_possible final_list [] 0 in
       let rec check_equality input_list acc =
@@ -154,7 +158,7 @@ and visit_choreo_expr
         print_endline
           "Optimization not possible because the sender for each of the control messages \
            is different";
-      final_list)
+      final_list, holder2)
 ;;
 
 (* This is a marker that denotes the part of the file used to check if optimization is a good idea - the said portion is above*)
