@@ -404,7 +404,7 @@ and copy_choreo_expr
          , a ))
   | Let (stmts, e, info_block) ->
     (* print_endline "Hit the Let AST node"; *)
-    let input_node = Choreo.Let (stmts, e, a) in
+    let input_node = Choreo.Let (stmts, e, info_block) in
     let grab_values input_expression output_list =
       match input_expression with
       | Choreo.LocExpr (l1, le, a) ->
@@ -480,9 +480,10 @@ and copy_choreo_expr
     let rec synthesize_pattern_pairs local_list info_block : 'a Local.pattern =
       match local_list with
       | [ last_element ] -> last_element
-      | head :: tail -> Local.Pair (head, synthesize_pattern_pairs tail info_block, info_block)
+      | head :: tail ->
+        Local.Pair (head, synthesize_pattern_pairs tail info_block, info_block)
       | [] -> failwith "Empty list"
-    in    
+    in
     let rec flatten_list local_list =
       match local_list with
       | [] -> []
@@ -509,10 +510,6 @@ and copy_choreo_expr
       let new_choreo_exp_payload =
         Choreo.LocExpr (LocId (sender_val, info_block), local_pair_exp, info_block)
       in
-      let loc_pattern_flat_list = flatten_list pattern_list in
-      let loc_pattern_list = extract_patterns loc_pattern_flat_list in
-      let pattern_pairs = synthesize_pattern_pairs loc_pattern_list in 
-      
       let choreo_send_expression =
         Choreo.Send
           ( LocId (sender_val, info_block)
@@ -520,16 +517,25 @@ and copy_choreo_expr
           , LocId (recv_val, info_block)
           , info_block )
       in
-
-
-      Printf.printf "Bool values %b %b" sender_check recv_check;
-      let () = print_endline "Hit the let for collecting the values" in
+      let loc_pattern_flat_list = flatten_list pattern_list in
+      let loc_pattern_list = extract_patterns loc_pattern_flat_list in
+      let pattern_pairs : 'a Local.pattern =
+        synthesize_pattern_pairs loc_pattern_list info_block
+      in
       Choreo.Let
-        (add_sync_opt stmts expr_list holder, copy_choreo_expr e expr_list holder, a))
+        ( [ Choreo.Assign
+              ( [ Choreo.LocPat (LocId (recv_val, info_block), pattern_pairs, info_block) ]
+              , choreo_send_expression
+              , info_block )
+          ]
+        , node_to_visit
+        , info_block ))
     else (
       Printf.printf "Batching is not possible";
       Choreo.Let
-        (add_sync_opt stmts expr_list holder, copy_choreo_expr e expr_list holder, a))
+        ( add_sync_opt stmts expr_list holder
+        , copy_choreo_expr e expr_list holder
+        , info_block ))
   | FunDef (ps, e, a) ->
     (* print_endline "Hit the FunDef AST node"; *)
     FunDef (copy_get_pattern_list ps holder, copy_choreo_expr e expr_list holder, a)

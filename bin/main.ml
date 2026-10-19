@@ -146,14 +146,14 @@ let () =
   (* in *)
   (* let feed_list = List.rev feed_list in *)
   (* List.iter (fun x -> Printf.printf "Order of messages : %s\n" x) feed_list; *)
-  let _program_one = Ast_utils.add_sync_opt program holder_3 holder_4 in
+  let program_one = Ast_utils.add_sync_opt program holder_3 holder_4 in
   (match !ast_dump_format with
-   | "json" -> Ast_utils.jsonify_choreo_ast (open_out (spf "%s.json" !basename)) program
-   | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (spf "%s.ast" !basename)) program
+   | "json" -> Ast_utils.jsonify_choreo_ast (open_out (spf "%s.json" !basename)) program_one
+   | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (spf "%s.ast" !basename)) program_one
    | _ -> invalid_arg "Invalid ast-dump format");
-  let locs = Ast_utils.extract_locs program in
+  let locs = Ast_utils.extract_locs program_one in
   (* List.iter (fun x -> Printf.printf "These are the locations : %s\n" x) locs; *)
-  let net_stmtblocks = List.map (fun loc -> Netgen.epp_choreo_to_net program loc) locs in
+  let net_stmtblocks = List.map (fun loc -> Netgen.epp_choreo_to_net program_one loc) locs in
   List.iter2
     (fun loc stmtblock ->
        match !ast_dump_format with
