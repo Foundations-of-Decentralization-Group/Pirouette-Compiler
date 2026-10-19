@@ -8,12 +8,13 @@ val infer_sync_expr
 
 val optimize_sync_expr
   :  'a Ast_core.Choreo.M.stmt list
-  -> string list * 'a Ast_core.Local.M.value list
-  -> string list * 'a Ast_core.Local.M.value list
+  -> string list * 'a Ast_core.Choreo.M.expr list
+  -> string list * 'a Ast_core.Choreo.M.expr list
 
 val add_sync_opt
   :  'a Ast_core.Choreo.M.stmt list
-  -> string list
+  -> string list    
+  -> 'a Ast_core.Choreo.M.expr list 
   -> 'a Ast_core.Choreo.M.stmt list
 
 val jsonify_choreo_ast : out_channel -> 'a Ast_core.Choreo.M.stmt_block -> unit

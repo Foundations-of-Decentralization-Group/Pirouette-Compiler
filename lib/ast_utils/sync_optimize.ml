@@ -4,8 +4,8 @@ module Net = Ast_core.Net.M
 
 let rec collect_data
           (p : 'a Choreo.stmt list)
-          ((holder1, holder2) : string list * 'a Local.value list)
-  : string list * 'a Local.value list
+          ((holder1, holder2) : string list * 'a Choreo.expr list)
+  : string list * 'a Choreo.expr list
   =
   match p with
   | [] -> holder1, holder2
@@ -18,8 +18,8 @@ let rec collect_data
 
 and copy_matcher_stmt
       (x : 'a Choreo.stmt)
-      ((holder1, holder2) : string list * 'a Local.value list)
-  : string list * 'a Local.value list
+      ((holder1, holder2) : string list * 'a Choreo.expr list)
+  : string list * 'a Choreo.expr list
   =
   match x with
   | Assign (_, e, _) ->
@@ -30,61 +30,60 @@ and copy_matcher_stmt
     print_endline "Hit this";
     [], []
 
-and visit_value (x : 'a Local.expr) (holder1, holder2) : string list * 'a Local.value list
+and visit_value (x : 'a Local.expr) (holder1, holder2) : string list * 'a Choreo.expr list
   =
   match x with
-  | Val (Local.Int (i, a), _) ->
-    (* let () = Printf.printf "This is the value that is being sent %d" i in *)
-    let holder2 = List.cons (Local.Int (i, a)) holder2 in
-    holder1, holder2
-  | Val (Local.String (s, a), _) ->
-    (* let () = Printf.printf "This is the value that is being sent %s" s in     *)
-    let holder2 = List.cons (Local.String (s, a)) holder2 in
-    holder1, holder2
-  | Val (Local.Bool (b, a), _) ->
-    (* let () = Printf.printf "This is the value that is being sent %b" b in     *)
-    let holder2 = List.cons (Local.Bool (b, a)) holder2 in
-    holder1, holder2
+  | Val (Local.Int (_, _), _) -> holder1, holder2
+  | Val (Local.String (_, _), _) -> holder1, holder2
+  | Val (Local.Bool (_, _), _) -> holder1, holder2
   | _ -> holder1, holder2
 
 and visit_choreo_expr
       (x : 'a Choreo.expr)
-      ((holder1, holder2) : string list * 'a Local.value list)
-  : string list * 'a Local.value list
+      ((holder1, holder2) : string list * 'a Choreo.expr list)
+  : string list * 'a Choreo.expr list
   =
   match x with
   | Unit _ -> holder1, holder2
   | Var (_, _) -> holder1, holder2
   | LocExpr (_, v1, _) -> visit_value v1 (holder1, holder2)
-  | Send (_, _, _, _) -> (holder1,holder2)
+  | Send (_, _, _, _) -> holder1, holder2
   | If (e1, e2, _, _) ->
     let holder1, holder2 = visit_choreo_expr e1 (holder1, holder2) in
     visit_choreo_expr e2 (holder1, holder2)
   | Let (stmt_block, e, a) ->
     let input_node = Choreo.Let (stmt_block, e, a) in
-    let rec check_consecutive_sends input_node_arg count node_tuple =
+    let grab_values input_expression output_list =
+      match input_expression with
+      | Choreo.LocExpr (l1, le, a) ->
+        let insert_val = Choreo.LocExpr (l1, le, a) in
+        List.cons insert_val output_list
+      | _ -> output_list
+    in
+    let rec check_consecutive_sends input_node_arg count node_tuple value_list =
       let () = print_endline "Inside the check consecutive sends function" in
       match input_node_arg with
       | Choreo.Let (stmt_block, e1, _) ->
         (match stmt_block with
          | [] ->
            print_endline "This is empty";
-           count, node_tuple, input_node_arg
+           count, node_tuple, input_node_arg, value_list
          | head :: _ ->
            (match head with
-            | Choreo.Assign (_, Send (LocId (id1, _), _, LocId (id2, _), _), _) ->
+            | Choreo.Assign (_, Send (LocId (id1, _), value_exp, LocId (id2, _), _), _) ->
               print_endline "This is a send inside a let statement";
               let tuple_nodes_list_one = List.cons id1 (fst node_tuple) in
               let tuple_nodes_list_two = List.cons id2 (snd node_tuple) in
               let node_tuple = tuple_nodes_list_one, tuple_nodes_list_two in
-              check_consecutive_sends e1 (count + 1) node_tuple
-            | _ -> count, node_tuple, input_node_arg))
+              let value_list = grab_values value_exp [] in
+              check_consecutive_sends e1 (count + 1) node_tuple value_list
+            | _ -> count, node_tuple, input_node_arg, value_list))
       | other_node ->
         print_endline "Not a let statement";
-        count, node_tuple, other_node
+        count, node_tuple, other_node, value_list
     in
-    let consec_sends_number, node_list, node_to_visit =
-      check_consecutive_sends input_node 0 ([], [])
+    let consec_sends_number, node_list, node_to_visit, value_list =
+      check_consecutive_sends input_node 0 ([], []) []
     in
     let check_equality input_list =
       match input_list with
@@ -97,7 +96,7 @@ and visit_choreo_expr
       let recv_check = check_equality (snd node_list) in
       Printf.printf "Bool values %b %b" sender_check recv_check;
       let () = print_endline "Hit the let for collecting the values" in
-      let holder1, holder2 = collect_data stmt_block (holder1, holder2) in
+      let holder1, holder2 = collect_data stmt_block (holder1, value_list) in
       visit_choreo_expr node_to_visit (holder1, holder2))
     else (
       Printf.printf "The sends and the recvs have different nodes";
@@ -163,7 +162,12 @@ and visit_choreo_expr
 
 (* This is a marker that denotes the part of the file used to check if optimization is a good idea - the said portion is above*)
 
-let rec copy_local_expr (x : 'a Local.expr) (holder : string list) : 'a Local.expr =
+let rec copy_local_expr
+          (x : 'a Local.expr)
+          (expr_list : 'a Choreo.expr list)
+          (holder : string list)
+  : 'a Local.expr
+  =
   match x with
   | Unit a ->
     (* print_endline "Hit a Local Unit AST Node"; *)
@@ -176,31 +180,39 @@ let rec copy_local_expr (x : 'a Local.expr) (holder : string list) : 'a Local.ex
     Var (copy_loc_var_id v, a)
   | UnOp (u, e, a) ->
     (* print_endline "Hit a Local Unop Ast Node"; *)
-    UnOp (copy_local_unop u, copy_local_expr e holder, a)
+    UnOp (copy_local_unop u, copy_local_expr e expr_list holder, a)
   | BinOp (e1, bop, e2, a) ->
     (* print_endline "Hit a Local Binop Node"; *)
-    BinOp (copy_local_expr e1 holder, copy_local_binop bop, copy_local_expr e2 holder, a)
+    BinOp
+      ( copy_local_expr e1 expr_list holder
+      , copy_local_binop bop
+      , copy_local_expr e2 expr_list holder
+      , a )
   | Let (v, e1, e2, a) ->
     (* print_endline "Hit a Local Let AST node"; *)
-    Let (copy_loc_var_id v, copy_local_expr e1 holder, copy_local_expr e2 holder, a)
+    Let
+      ( copy_loc_var_id v
+      , copy_local_expr e1 expr_list holder
+      , copy_local_expr e2 expr_list holder
+      , a )
   | Pair (e1, e2, a) ->
     (* print_endline "Hit a Local Pair AST node"; *)
-    Pair (copy_local_expr e1 holder, copy_local_expr e2 holder, a)
+    Pair (copy_local_expr e1 expr_list holder, copy_local_expr e2 expr_list holder, a)
   | Fst (e, a) ->
     (* print_endline "Hit a Local Fst AST node"; *)
-    Fst (copy_local_expr e holder, a)
+    Fst (copy_local_expr e expr_list holder, a)
   | Snd (e, a) ->
     (* print_endline "Hit a Local Snd AST node"; *)
-    Snd (copy_local_expr e holder, a)
+    Snd (copy_local_expr e expr_list holder, a)
   | Left (e, a) ->
     (* print_endline "Hit a Local Left AST node"; *)
-    Left (copy_local_expr e holder, a)
+    Left (copy_local_expr e expr_list holder, a)
   | Right (e, a) ->
     (* print_endline "Hit a Local Right AST node"; *)
-    Right (copy_local_expr e holder, a)
+    Right (copy_local_expr e expr_list holder, a)
   | Match (e, l, a) ->
     (* print_endline "Hit a Local Match AST node"; *)
-    Match (copy_local_expr e holder, copy_local_case l holder, a)
+    Match (copy_local_expr e expr_list holder, copy_local_case l expr_list holder, a)
 
 and copy_local_val (x : 'a Local.value) : 'a Local.value =
   match x with
@@ -268,22 +280,28 @@ and copy_local_binop (x : 'a Local.bin_op) : 'a Local.bin_op =
     (* print_endline "Hit a Local Binop Node of type Geq"; *)
     Geq a
 
-and copy_local_case (x : ('a Local.pattern * 'a Local.expr) list) (holder : string list)
+and copy_local_case
+      (x : ('a Local.pattern * 'a Local.expr) list)
+      (expr_list : 'a Choreo.expr list)
+      (holder : string list)
   : ('a Local.pattern * 'a Local.expr) list
   =
   match x with
   | [] ->
     (* print_endline "Done with the list of cases"; *)
     []
-  | head :: tail -> copy_split_local_pat_expr head holder :: copy_local_case tail holder
+  | head :: tail ->
+    copy_split_local_pat_expr head expr_list holder
+    :: copy_local_case tail expr_list holder
 
 and copy_split_local_pat_expr
       (x : 'a Local.pattern * 'a Local.expr)
+      (expr_list : 'a Choreo.expr list)
       (holder : string list)
   : 'a Local.pattern * 'a Local.expr
   =
   match x with
-  | p, e -> copy_loc_pattern p holder, copy_local_expr e holder
+  | p, e -> copy_loc_pattern p holder, copy_local_expr e expr_list holder
 
 and copy_loc_pattern (x : 'a Local.pattern) (holder : string list) : 'a Local.pattern =
   match x with
@@ -307,28 +325,42 @@ and copy_loc_pattern (x : 'a Local.pattern) (holder : string list) : 'a Local.pa
     Right (copy_loc_pattern p holder, a)
 ;;
 
-let rec add_sync_opt (p : 'a Choreo.stmt list) (holder : string list)
+let rec add_sync_opt
+          (p : 'a Choreo.stmt list)
+          (expr_list : 'a Choreo.expr list)
+          (holder : string list)
   : 'a Choreo.stmt list
   =
   match p with
   | [] ->
     (* print_endline "Done with the statement list"; *)
     []
-  | head :: tail -> copy_matcher_stmt head holder :: add_sync_opt tail holder
+  | head :: tail ->
+    copy_matcher_stmt head expr_list holder :: add_sync_opt tail expr_list holder
 
-and copy_matcher_stmt (x : 'a Choreo.stmt) (holder : string list) : 'a Choreo.stmt =
+and copy_matcher_stmt
+      (x : 'a Choreo.stmt)
+      (expr_list : 'a Choreo.expr list)
+      (holder : string list)
+  : 'a Choreo.stmt
+  =
   match x with
   | Decl (p, t, a) ->
     (* print_endline "Hit the Decl AST node"; *)
     Decl (copy_choreo_pattern p holder, copy_choreo_typ t holder, a)
   | Assign (ps, e, a) ->
     (* print_endline "Hit the Assign AST node"; *)
-    Assign (copy_get_pattern_list ps holder, copy_choreo_expr e holder, a)
+    Assign (copy_get_pattern_list ps holder, copy_choreo_expr e expr_list holder, a)
   | TypeDecl (t1, t2, a) ->
     (* print_endline "Hit the TypeDecl AST node"; *)
     TypeDecl (copy_loc_typ_id t1 holder, copy_choreo_typ t2 holder, a)
 
-and copy_choreo_expr (x : 'a Choreo.expr) (holder : string list) : 'a Choreo.expr =
+and copy_choreo_expr
+      (x : 'a Choreo.expr)
+      (expr_list : 'a Choreo.expr list)
+      (holder : string list)
+  : 'a Choreo.expr
+  =
   match x with
   | Unit a ->
     (* print_endline "Hit the Unit AST node in Choreo"; *)
@@ -338,10 +370,14 @@ and copy_choreo_expr (x : 'a Choreo.expr) (holder : string list) : 'a Choreo.exp
     Var (copy_loc_var_id v, a)
   | LocExpr (l, e, a) ->
     (* print_endline "Hit the LocExpr AST node\n"; *)
-    LocExpr (copy_loc_id l holder, copy_local_expr e holder, a)
+    LocExpr (copy_loc_id l holder, copy_local_expr e expr_list holder, a)
   | Send (l1, e, l2, a) ->
     (* print_endline "Hit the Send Ast node\n"; *)
-    Send (copy_loc_id l1 holder, copy_choreo_expr e holder, copy_loc_id l2 holder, a)
+    Send
+      ( copy_loc_id l1 holder
+      , copy_choreo_expr e expr_list holder
+      , copy_loc_id l2 holder
+      , a )
   | Sync (l1, l2, l3, e, a) ->
     print_endline "In the default";
     (* print_endline "Hit the Sync Ast node"; *)
@@ -349,50 +385,175 @@ and copy_choreo_expr (x : 'a Choreo.expr) (holder : string list) : 'a Choreo.exp
       ( copy_loc_id l1 holder
       , copy_sync_label_id l2
       , copy_loc_id l3 holder
-      , copy_choreo_expr e holder
+      , copy_choreo_expr e expr_list holder
       , a )
   | If (e1, e2, e3, a) ->
     (match e2 with
      | Sync (_, _, _, _, _) ->
        print_endline "In here";
        If
-         ( copy_choreo_expr e1 holder
-         , copy_choreo_expr_left_sync e2 holder 0 a
-         , copy_choreo_expr_right_sync e3 holder 0 a
+         ( copy_choreo_expr e1 expr_list holder
+         , copy_choreo_expr_left_sync e2 expr_list holder 0 a
+         , copy_choreo_expr_right_sync e3 expr_list holder 0 a
          , a )
      | _ ->
        If
-         ( copy_choreo_expr e1 holder
-         , copy_choreo_expr e2 holder
-         , copy_choreo_expr e3 holder
+         ( copy_choreo_expr e1 expr_list holder
+         , copy_choreo_expr e2 expr_list holder
+         , copy_choreo_expr e3 expr_list holder
          , a ))
-  | Let (stmts, e, a) ->
+  | Let (stmts, e, info_block) ->
     (* print_endline "Hit the Let AST node"; *)
-    Let (add_sync_opt stmts holder, copy_choreo_expr e holder, a)
+    let input_node = Choreo.Let (stmts, e, a) in
+    let grab_values input_expression output_list =
+      match input_expression with
+      | Choreo.LocExpr (l1, le, a) ->
+        let insert_val = Choreo.LocExpr (l1, le, a) in
+        List.cons insert_val output_list
+      | _ -> output_list
+    in
+    let rec check_consecutive_sends
+              input_node_arg
+              count
+              node_tuple
+              value_list
+              pattern_list
+      =
+      let () = print_endline "Inside the check consecutive sends function" in
+      match input_node_arg with
+      | Choreo.Let (stmt_block, e1, _) ->
+        (match stmt_block with
+         | [] ->
+           print_endline "This is empty";
+           count, node_tuple, input_node_arg, value_list, pattern_list
+         | head :: _ ->
+           (match head with
+            | Choreo.Assign
+                (ps_list, Send (LocId (id1, _), value_exp, LocId (id2, _), _), _) ->
+              print_endline "This is a send inside a let statement";
+              let tuple_nodes_list_one = List.cons id1 (fst node_tuple) in
+              let tuple_nodes_list_two = List.cons id2 (snd node_tuple) in
+              let node_tuple = tuple_nodes_list_one, tuple_nodes_list_two in
+              let value_list = grab_values value_exp value_list in
+              let pattern_list = List.cons ps_list pattern_list in
+              check_consecutive_sends e1 (count + 1) node_tuple value_list pattern_list
+            | _ -> count, node_tuple, input_node_arg, value_list, pattern_list))
+      | other_node ->
+        print_endline "Not a let statement";
+        count, node_tuple, other_node, value_list, pattern_list
+    in
+    let consec_sends_number, node_list, node_to_visit, value_list, pattern_list =
+      check_consecutive_sends input_node 0 ([], []) [] []
+    in
+    let check_equality input_list =
+      match input_list with
+      | [] -> true
+      | head :: tail -> List.for_all (fun per_elem_tail -> head = per_elem_tail) tail
+    in
+    let sender_check = check_equality (fst node_list) in
+    let recv_check = check_equality (snd node_list) in
+    let rec grab_values_from_choreo_exp input_expression_list output_list =
+      match input_expression_list with
+      | [] -> output_list
+      | head :: tail ->
+        (match head with
+         | Choreo.LocExpr (_, le, _) ->
+           (match le with
+            | Val (Int (i, a2), a1) ->
+              let output_list = List.cons (Local.Val (Int (i, a2), a1)) output_list in
+              grab_values_from_choreo_exp tail output_list
+            | Val (String (s, a2), a1) ->
+              let output_list = List.cons (Local.Val (String (s, a2), a1)) output_list in
+              grab_values_from_choreo_exp tail output_list
+            | Val (Bool (b, a2), a1) ->
+              let output_list = List.cons (Local.Val (Bool (b, a2), a1)) output_list in
+              grab_values_from_choreo_exp tail output_list
+            | _ -> output_list)
+         | _ -> output_list)
+    in
+    let rec synthesize_pairs local_list info_block =
+      match local_list with
+      | [ last_element ] -> last_element
+      | head :: tail -> Local.Pair (head, synthesize_pairs tail info_block, info_block)
+      | [] -> failwith "Empty list"
+    in
+    let rec synthesize_pattern_pairs local_list info_block : 'a Local.pattern =
+      match local_list with
+      | [ last_element ] -> last_element
+      | head :: tail -> Local.Pair (head, synthesize_pattern_pairs tail info_block, info_block)
+      | [] -> failwith "Empty list"
+    in    
+    let rec flatten_list local_list =
+      match local_list with
+      | [] -> []
+      | head1 :: tail1 ->
+        (match head1 with
+         | head2 :: _ -> head2 :: flatten_list tail1
+         | [] -> failwith "Empty list")
+    in
+    let rec extract_patterns input_list =
+      match input_list with
+      | [] -> []
+      | head :: tail ->
+        (match head with
+         | Choreo.LocPat (_, p, _) -> p :: extract_patterns tail
+         | _ -> extract_patterns tail)
+    in
+    if consec_sends_number >= 2 && sender_check && recv_check
+    then (
+      let sender_val = List.hd (fst node_list) in
+      let recv_val = List.hd (snd node_list) in
+      let local_value_list = grab_values_from_choreo_exp value_list [] in
+      let local_value_list = List.rev local_value_list in
+      let local_pair_exp = synthesize_pairs local_value_list info_block in
+      let new_choreo_exp_payload =
+        Choreo.LocExpr (LocId (sender_val, info_block), local_pair_exp, info_block)
+      in
+      let loc_pattern_flat_list = flatten_list pattern_list in
+      let loc_pattern_list = extract_patterns loc_pattern_flat_list in
+      let pattern_pairs = synthesize_pattern_pairs loc_pattern_list in 
+      
+      let choreo_send_expression =
+        Choreo.Send
+          ( LocId (sender_val, info_block)
+          , new_choreo_exp_payload
+          , LocId (recv_val, info_block)
+          , info_block )
+      in
+
+
+      Printf.printf "Bool values %b %b" sender_check recv_check;
+      let () = print_endline "Hit the let for collecting the values" in
+      Choreo.Let
+        (add_sync_opt stmts expr_list holder, copy_choreo_expr e expr_list holder, a))
+    else (
+      Printf.printf "Batching is not possible";
+      Choreo.Let
+        (add_sync_opt stmts expr_list holder, copy_choreo_expr e expr_list holder, a))
   | FunDef (ps, e, a) ->
     (* print_endline "Hit the FunDef AST node"; *)
-    FunDef (copy_get_pattern_list ps holder, copy_choreo_expr e holder, a)
+    FunDef (copy_get_pattern_list ps holder, copy_choreo_expr e expr_list holder, a)
   | FunApp (e1, e2, a) ->
     (* print_endline "Hit the FunApp AST node"; *)
-    FunApp (copy_choreo_expr e1 holder, copy_choreo_expr e2 holder, a)
+    FunApp (copy_choreo_expr e1 expr_list holder, copy_choreo_expr e2 expr_list holder, a)
   | Pair (e1, e2, a) ->
     (* print_endline "Hit the Pair AST node"; *)
-    Pair (copy_choreo_expr e1 holder, copy_choreo_expr e2 holder, a)
+    Pair (copy_choreo_expr e1 expr_list holder, copy_choreo_expr e2 expr_list holder, a)
   | Fst (e, a) ->
     (* print_endline "Hit the FST AST node"; *)
-    Fst (copy_choreo_expr e holder, a)
+    Fst (copy_choreo_expr e expr_list holder, a)
   | Snd (e, a) ->
     (* print_endline "Hit the Snd AST node"; *)
-    Snd (copy_choreo_expr e holder, a)
+    Snd (copy_choreo_expr e expr_list holder, a)
   | Left (e, a) ->
     (* print_endline "Hit the Left AST node"; *)
-    Left (copy_choreo_expr e holder, a)
+    Left (copy_choreo_expr e expr_list holder, a)
   | Right (e, a) ->
     (* print_endline "Hit the Right AST node"; *)
-    Right (copy_choreo_expr e holder, a)
+    Right (copy_choreo_expr e expr_list holder, a)
   | Match (e, cases, a) ->
     (* print_endline "Hit the Match AST node"; *)
-    Match (copy_choreo_expr e holder, copy_choreo_case cases holder, a)
+    Match (copy_choreo_expr e expr_list holder, copy_choreo_case cases expr_list holder, a)
 
 (* and copy_choreo_expr_right_sync (x : 'a Choreo.expr) (holder : string list) a *)
 (*   : 'a Choreo.expr *)
@@ -412,6 +573,7 @@ and copy_choreo_expr (x : 'a Choreo.expr) (holder : string list) : 'a Choreo.exp
 
 and copy_choreo_expr_right_sync
       (x : 'a Choreo.expr)
+      (expr_list : 'a Choreo.expr list)
       (holder : string list)
       (index : int)
       a
@@ -433,7 +595,7 @@ and copy_choreo_expr_right_sync
          ( LocId (l1, a)
          , LabelId ("R57", a)
          , LocId (l2, a)
-         , copy_choreo_expr_right_sync e holder (index + 2) a
+         , copy_choreo_expr_right_sync e expr_list holder (index + 2) a
          , a )
      | _ ->
        print_endline "Goes in here";
@@ -442,12 +604,21 @@ and copy_choreo_expr_right_sync
        Printf.printf "Value of l1 %s\n" l1;
        Printf.printf "Value of l2 %s\n" l2;
        Sync
-         (LocId (l1, a), LabelId ("R67", a), LocId (l2, a), copy_choreo_expr e holder, a))
+         ( LocId (l1, a)
+         , LabelId ("R67", a)
+         , LocId (l2, a)
+         , copy_choreo_expr e expr_list holder
+         , a ))
   | _ ->
     print_endline "This is being used";
     Unit a
 
-and copy_choreo_expr_left_sync (x : 'a Choreo.expr) (holder : string list) (index : int) a
+and copy_choreo_expr_left_sync
+      (x : 'a Choreo.expr)
+      (expr_list : 'a Choreo.expr list)
+      (holder : string list)
+      (index : int)
+      a
   : 'a Choreo.expr
   =
   print_endline "Inside here ie the left sync expr";
@@ -466,7 +637,7 @@ and copy_choreo_expr_left_sync (x : 'a Choreo.expr) (holder : string list) (inde
          ( LocId (l1, a)
          , LabelId ("L57", a)
          , LocId (l2, a)
-         , copy_choreo_expr_left_sync e holder (index + 2) a
+         , copy_choreo_expr_left_sync e expr_list holder (index + 2) a
          , a )
      | _ ->
        print_endline "Goes in here";
@@ -475,7 +646,11 @@ and copy_choreo_expr_left_sync (x : 'a Choreo.expr) (holder : string list) (inde
        Printf.printf "Value of l1 %s\n" l1;
        Printf.printf "Value of l2 %s\n" l2;
        Sync
-         (LocId (l1, a), LabelId ("L67", a), LocId (l2, a), copy_choreo_expr e holder, a))
+         ( LocId (l1, a)
+         , LabelId ("L67", a)
+         , LocId (l2, a)
+         , copy_choreo_expr e expr_list holder
+         , a ))
   | _ ->
     print_endline "This is being used";
     Unit a
@@ -545,6 +720,7 @@ and copy_sync_label_id (x : 'a Local.sync_label) : 'a Local.sync_label =
 
 and copy_choreo_case
       (x : ('a Choreo.pattern * 'a Choreo.expr) list)
+      (expr_list : 'a Choreo.expr list)
       (holder : string list)
   : ('a Choreo.pattern * 'a Choreo.expr) list
   =
@@ -552,14 +728,17 @@ and copy_choreo_case
   | [] ->
     (* print_endline "Done with the list of cases"; *)
     []
-  | head :: tail -> copy_split_choreo_pat_expr head holder :: copy_choreo_case tail holder
+  | head :: tail ->
+    copy_split_choreo_pat_expr head expr_list holder
+    :: copy_choreo_case tail expr_list holder
 
 and copy_split_choreo_pat_expr
       (x : 'a Choreo.pattern * 'a Choreo.expr)
+      (expr_list : 'a Choreo.expr list)
       (holder : string list)
   =
   match x with
-  | p, e -> copy_choreo_pattern p holder, copy_choreo_expr e holder
+  | p, e -> copy_choreo_pattern p holder, copy_choreo_expr e expr_list holder
 
 (* Need a good return from this guy ; matcher_pattern is copy_choreo_pattern *)
 and copy_choreo_pattern (x : 'a Choreo.pattern) (holder : string list) : 'a Choreo.pattern
