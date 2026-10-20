@@ -126,10 +126,24 @@ and emit_net_pexp ~(self_id : string) (module Msg : Msg_intf) (exp : 'a Net.expr
       (emit_net_pexp ~self_id (module Msg) e2)
       (Some (emit_net_pexp ~self_id (module Msg) e3))
   | Let (stmts, e, _) ->
-    Builder.pexp_let
-      Recursive (*FIXME: how to handle tuples?*)
-      (List.map (emit_net_binding ~self_id (module Msg)) stmts)
-      (emit_net_pexp ~self_id (module Msg) e)
+    (match stmts with
+     | Assign (ps_list, _, _) :: _ ->
+       (match ps_list with
+        | Pair (_, _, _) :: _ ->
+          Builder.pexp_let
+            Nonrecursive (*FIXME: how to handle tuples?*)
+            (List.map (emit_net_binding ~self_id (module Msg)) stmts)
+            (emit_net_pexp ~self_id (module Msg) e)
+        | _ ->
+          Builder.pexp_let
+            Recursive (*FIXME: how to handle tuples?*)
+            (List.map (emit_net_binding ~self_id (module Msg)) stmts)
+            (emit_net_pexp ~self_id (module Msg) e))
+     | _ ->
+       Builder.pexp_let
+         Recursive (*FIXME: how to handle tuples?*)
+         (List.map (emit_net_binding ~self_id (module Msg)) stmts)
+         (emit_net_pexp ~self_id (module Msg) e))
   | FunDef (ps, e, _) -> emit_net_fun_body ~self_id (module Msg) ps e
   | FunApp (e1, e2, _) ->
     [%expr
