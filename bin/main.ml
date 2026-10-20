@@ -146,7 +146,7 @@ let () =
   (* in *)
   (* let feed_list = List.rev feed_list in *)
   (* List.iter (fun x -> Printf.printf "Order of messages : %s\n" x) feed_list; *)
-  let program_one = Ast_utils.add_sync_opt program holder_3 holder_4 in
+  let program_one = Ast_utils.batch_reorder program holder_3 holder_4 in
   (match !ast_dump_format with
    | "json" -> Ast_utils.jsonify_choreo_ast (open_out (spf "%s.json" !basename)) program_one
    | "pprint" -> Ast_utils.pprint_choreo_ast (open_out (spf "%s.ast" !basename)) program_one

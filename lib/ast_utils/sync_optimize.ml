@@ -325,7 +325,7 @@ and copy_loc_pattern (x : 'a Local.pattern) (holder : string list) : 'a Local.pa
     Right (copy_loc_pattern p holder, a)
 ;;
 
-let rec add_sync_opt
+let rec batch_reorder
           (p : 'a Choreo.stmt list)
           (expr_list : 'a Choreo.expr list)
           (holder : string list)
@@ -336,7 +336,7 @@ let rec add_sync_opt
     (* print_endline "Done with the statement list"; *)
     []
   | head :: tail ->
-    copy_matcher_stmt head expr_list holder :: add_sync_opt tail expr_list holder
+    copy_matcher_stmt head expr_list holder :: batch_reorder tail expr_list holder
 
 and copy_matcher_stmt
       (x : 'a Choreo.stmt)
@@ -533,7 +533,7 @@ and copy_choreo_expr
     else (
       Printf.printf "Batching is not possible";
       Choreo.Let
-        ( add_sync_opt stmts expr_list holder
+        ( batch_reorder stmts expr_list holder
         , copy_choreo_expr e expr_list holder
         , info_block ))
   | FunDef (ps, e, a) ->

@@ -11,7 +11,7 @@ val optimize_sync_expr
   -> string list * 'a Ast_core.Choreo.M.expr list
   -> string list * 'a Ast_core.Choreo.M.expr list
 
-val add_sync_opt
+val batch_reorder
   :  'a Ast_core.Choreo.M.stmt list
   -> string list    
   -> 'a Ast_core.Choreo.M.expr list 

@@ -20,13 +20,13 @@ let optimize_sync_expr
   Sync_optimize.collect_data stmt (holder1, holder2)
 ;;
 
-let add_sync_opt
+let batch_reorder
       (stmt_block : 'a Choreo.stmt list)
       (holder : string list)
       (expr_list : 'a Choreo.expr list)
   : 'a Choreo.stmt list
   =
-  Sync_optimize.add_sync_opt stmt_block expr_list holder
+  Sync_optimize.batch_reorder stmt_block expr_list holder
 ;;
 
 let extract_locs (stmt_block : 'a Choreo.stmt_block) =
